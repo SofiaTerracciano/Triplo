@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:triplo/pages/home-page.dart';
-import 'package:triplo/pages/setting-page.dart';
-import 'package:triplo/pages/search-page.dart';
+import 'package:flutter/services.dart'; // per Clipboard
+import 'home-page.dart';
+import 'setting-page.dart';
+import 'search-page.dart';
 
 //DA CAPIRE LA COSA DEL POP
 
@@ -30,8 +31,55 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
-      body: Container(
+      appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex])),
+
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          //colonna avatar + username
+          Container(
+            width: 200,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // margine su tutti i lati
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(radius: 40, backgroundColor: Colors.grey),
+                SizedBox(height: 8),
+                Text(
+                  'Username',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text('Livello: Esperto'),
+              ],
+            ),
+          ),
+
+          // colonna statistiche
+          Container(
+            width: 200,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Percorsi fatti',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _StatItem(label: 'Totali', value: '40'),
+                    _StatItem(label: 'Pubblicati', value: '20'),
+                    _StatItem(label: 'Privati', value: '20'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+      /*body: Container(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -105,8 +153,8 @@ class _UserPageState extends State<UserPage> {
             ),
           ],
         ),
-      ),
-      
+      ),*/
+
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -123,8 +171,9 @@ class _UserPageState extends State<UserPage> {
               title: const Text('Home'),
               selected: _selectedIndex == 0,
               onTap: () {
-                Navigator.pushReplacement(context, 
-                  MaterialPageRoute(builder: (context) => const MyHomePage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage()),
                 );
               },
             ),
@@ -133,8 +182,9 @@ class _UserPageState extends State<UserPage> {
               title: const Text('Profile'),
               selected: _selectedIndex == 1,
               onTap: () {
-                Navigator.pushReplacement(context, 
-                  MaterialPageRoute(builder: (context) => const UserPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserPage()),
                 );
               },
             ),
@@ -143,8 +193,9 @@ class _UserPageState extends State<UserPage> {
               title: const Text('Search'),
               selected: _selectedIndex == 2,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SearchPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
                 );
               },
             ),
@@ -153,14 +204,35 @@ class _UserPageState extends State<UserPage> {
               title: const Text('Settings'),
               selected: _selectedIndex == 3,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SettingPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingPage()),
                 );
               },
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _StatItem({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        Text(label),
+      ],
     );
   }
 }
