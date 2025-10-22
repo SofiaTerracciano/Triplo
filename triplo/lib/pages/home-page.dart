@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/pages/search-page.dart';
 import 'package:triplo/pages/setting-page.dart';
 import 'user-page.dart';
 
@@ -12,11 +13,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
   );
 
+  //Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -29,12 +33,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
       //body: 
+
+      //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
@@ -42,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home'),
+              title: const Text('Home', style: optionStyle,),
               selected: _selectedIndex == 0,
               onTap: () {
                 Navigator.pushReplacement(context,
@@ -52,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile'),
+              title: const Text('Profile', style: optionStyle,),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pushReplacement(context, 
@@ -62,17 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search'),
+              title: const Text('Search', style: optionStyle,),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage())
+                  MaterialPageRoute(builder: (context) => const SearchPage())
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              title: const Text('Settings', style: optionStyle,),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pushReplacement(context,

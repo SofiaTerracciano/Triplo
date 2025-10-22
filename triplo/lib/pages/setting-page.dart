@@ -13,11 +13,14 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   int _selectedIndex = 3;
 
+  //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
   );
 
+  //Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -30,12 +33,13 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
       //body:
+      //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
@@ -43,7 +47,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home'),
+              title: const Text('Home', style: optionStyle,),
               selected: _selectedIndex == 0,
               onTap: () {
                 Navigator.pushReplacement(context, 
@@ -53,7 +57,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile'),
+              title: const Text('Profile', style: optionStyle,),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pushReplacement(context, 
@@ -63,7 +67,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search'),
+              title: const Text('Search', style: optionStyle,),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pushReplacement(context,
@@ -73,7 +77,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              title: const Text('Settings',style: optionStyle,),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pushReplacement(context,

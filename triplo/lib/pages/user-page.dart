@@ -16,11 +16,14 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   int _selectedIndex = 1;
 
+  //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
   );
 
+  //Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -36,10 +39,11 @@ class _UserPageState extends State<UserPage> {
       body: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          //colonna avatar + username
+          //avatar + username column
           Container(
             width: 200,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), // margine su tutti i lati
+            // padding on all sides
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10), 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -54,7 +58,7 @@ class _UserPageState extends State<UserPage> {
             ),
           ),
 
-          // colonna statistiche
+          // statistics column
           Container(
             width: 200,
             child: Column(
@@ -154,13 +158,13 @@ class _UserPageState extends State<UserPage> {
           ],
         ),
       ),*/
-
+    //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
                 'Menu',
                 style: TextStyle(color: Colors.white, fontSize: 24),
@@ -168,7 +172,7 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home'),
+              title: const Text('Home', style: optionStyle,),
               selected: _selectedIndex == 0,
               onTap: () {
                 Navigator.pushReplacement(
@@ -179,7 +183,7 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile'),
+              title: const Text('Profile', style: optionStyle,),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pushReplacement(
@@ -190,7 +194,7 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search'),
+              title: const Text('Search', style: optionStyle,),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pushReplacement(
@@ -201,7 +205,7 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              title: const Text('Settings', style: optionStyle,),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pushReplacement(
