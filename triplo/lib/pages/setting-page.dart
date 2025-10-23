@@ -150,15 +150,23 @@ class _SettingPageState extends State<SettingPage> {
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
+              const Spacer(),
+              Text(
+                'name_placeholder',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                )
+              ),
             ],
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.only(left: 0, bottom: 8.0),
             child: Text(
               'name_placeholder', // da prendere dal database
               style: TextStyle(fontSize: 14),
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -172,15 +180,23 @@ class _SettingPageState extends State<SettingPage> {
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
+              const Spacer(),
+              Text(
+                'surname_placeholder',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                )
+              ),
             ],
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.only(left: 0, bottom: 8.0),
             child: Text(
               'surname_placeholder', // da prendere dal database
               style: TextStyle(fontSize: 14),
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -194,15 +210,23 @@ class _SettingPageState extends State<SettingPage> {
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
+              const Spacer(),
+              Text(
+                'birthdate_placeholder',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                )
+              ),
             ],
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.only(left: 0, bottom: 8.0),
             child: Text(
               '16/04/2002', // da prendere dal database
               style: TextStyle(fontSize: 14),
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -216,15 +240,23 @@ class _SettingPageState extends State<SettingPage> {
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
+              const Spacer(),
+              Text(
+                'email_palceholder',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                )
+              ),
             ],
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.only(left: 0, bottom: 8.0),
             child: Text(
               'email_placeholder', // da prendere dal database
               style: TextStyle(fontSize: 14),
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -244,21 +276,30 @@ class _SettingPageState extends State<SettingPage> {
                   AlertDialog(
                     content: Text('Language changed to: ${selected.languageCode}'),
                   ); 
-            }*/
+                }*/
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
+              const Spacer(),
+              Text( //però dovrebbe essere dinamico in base alla lingua selezionata
+                'language_placeholder',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                )
+              ),
             ],
           ),
-          const Padding(
+          /*const Padding(
             padding: EdgeInsets.only(left: 0, bottom: 8.0),
             child: Text(
               'language_placeholder', // da prendere dal database
               style: TextStyle(fontSize: 14),
             ),
-),
+          ),*/
         ],
       ),
+      
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
