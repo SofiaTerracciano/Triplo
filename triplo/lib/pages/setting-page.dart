@@ -138,20 +138,125 @@ class _SettingPageState extends State<SettingPage> {
 
           // Altri campi come nome, cognome, email, nascita, lingua .
           Row(
-            
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                'Name: ',
+                style: TextStyle(fontSize: 14),
+              ),
+              IconButton(
+                onPressed: () {
+                  // to do modifica name
+                },
+                icon: const Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 0, bottom: 8.0),
+            child: Text(
+              'name_placeholder', // da prendere dal database
+              style: TextStyle(fontSize: 14),
+            ),
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                'Surname: ',
+                style: TextStyle(fontSize: 14),
+              ),
+              IconButton(
+                onPressed: () {
+                  // to do modifica surname
+                },
+                icon: const Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 0, bottom: 8.0),
+            child: Text(
+              'surname_placeholder', // da prendere dal database
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                'Birthdate: ',
+                style: TextStyle(fontSize: 14),
+              ),
+              IconButton(
+                onPressed: () {
+                  // to do modifica bithdate
+                },
+                icon: const Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 0, bottom: 8.0),
+            child: Text(
+              '16/04/2002', // da prendere dal database
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                'Email: ',
+                style: TextStyle(fontSize: 14),
+              ),
+              IconButton(
+                onPressed: () {
+                  // to do modifica email
+                },
+                icon: const Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 0, bottom: 8.0),
+            child: Text(
+              'email_placeholder', // da prendere dal database
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                'Language: ',
+                style: TextStyle(fontSize: 14),
+              ),
+              IconButton(
+                onPressed: () async {
+                  final selected = await showDialog<Locale>(
+                  context: context,
+                  builder: (context) => LanguageDialog(),
+                );
 
+               /*  if (selected != null) {
+                  //onLanguageChanged(selected);
+                  AlertDialog(
+                    content: Text('Language changed to: ${selected.languageCode}'),
+                  ); 
+            }*/
+                },
+                icon: const Icon(Icons.edit, size: 16),
+              ),
+            ],
           ),
-          Row(
-
-          ),
-          Row(
-            
-          ),
-          Row(
-            
-          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 0, bottom: 8.0),
+            child: Text(
+              'language_placeholder', // da prendere dal database
+              style: TextStyle(fontSize: 14),
+            ),
+),
         ],
       ),
       //Drawer to control the navigation among pages
@@ -213,3 +318,49 @@ class _SettingPageState extends State<SettingPage> {
   }
 }
 
+//popup dialog to select the language
+class LanguageDialog extends StatelessWidget {
+
+  LanguageDialog({super.key});
+
+  final Map<String, Locale> languages = {
+    'English': const Locale('en'),
+    'Italian': const Locale('it'),
+  };
+
+//TODO: implementare il cambio lingua effettivo nell'app
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Select Language'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            TextButton(
+              child: const Text('English'),
+              onPressed: () {
+                AlertDialog(
+                    content: Text('Language changed to: english'),
+                  );
+                //locale -> to change the language of the app
+                //Navigator.of(context).pop(const Locale('en'));
+                
+              },
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              child: const Text('Italian'),
+              onPressed: () {
+                AlertDialog(
+                    content: Text('Language changed to: italian'),
+                  );
+                //Navigator.of(context).pop(const Locale('it'));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
