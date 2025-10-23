@@ -16,7 +16,7 @@ class _SearchPageState extends State<SearchPage> {
 
   //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
@@ -40,7 +40,9 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
+      appBar: AppBar(title: _widgetOptions[_selectedIndex],
+          centerTitle: true, //Forced center the title
+      ),
       body: Container(
         alignment: Alignment.center,
         //TextField to insert search text

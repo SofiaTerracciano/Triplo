@@ -15,7 +15,7 @@ class _SettingPageState extends State<SettingPage> {
 
   //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
@@ -31,8 +31,129 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
-      //body:
+      appBar: AppBar(
+        title: _widgetOptions[_selectedIndex],
+        centerTitle: true, //Forced center the title
+      ),
+
+      body: ListView(
+        padding: const EdgeInsets.all(25.0),
+        children: [
+          // profile info + avatar
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // left column: username + password
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Username + edit
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Username: ',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // to do modifica username
+                          },
+                          icon: const Icon(Icons.edit, size: 16),
+                        ),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 0, bottom: 8.0),
+                      child: Text(
+                        'username_placeholder', // da prendere dal database
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+
+                    // Password + edit
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Password: ',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            // to do modifica password
+                          },
+                          icon: const Icon(Icons.edit, size: 16),
+                        ),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 0, bottom: 8.0),
+                      child: Text(
+                        '***********', // numero di * uguale alla lunghezza della password
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              //const SizedBox(width: 2), // spazio tra le colonne
+
+              // right column: avatar + edit photo
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            // to do modifica foto profilo
+                          },
+                          child: const Text(
+                            'Edit Profile Photo',
+                            style: TextStyle(
+                              fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Altri campi come nome, cognome, email, nascita, lingua .
+          Row(
+            
+          ),
+          Row(
+
+          ),
+          Row(
+
+          ),
+          Row(
+            
+          ),
+          Row(
+            
+          ),
+        ],
+      ),
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(

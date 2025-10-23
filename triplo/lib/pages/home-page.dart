@@ -31,7 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Center(child: _widgetOptions[_selectedIndex]),),
+      appBar: AppBar(
+        title: _widgetOptions[_selectedIndex],
+        centerTitle: true, //Forced center the title
+      ),
       //body: 
 
       //Drawer to control the navigation among pages
