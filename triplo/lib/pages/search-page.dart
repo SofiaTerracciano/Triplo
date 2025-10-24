@@ -13,6 +13,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   int _selectedIndex = 2;
   late final TextEditingController _searchController;
+  late final FocusNode _focusNode;
 
   //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
@@ -21,7 +22,6 @@ class _SearchPageState extends State<SearchPage> {
     fontStyle: FontStyle.italic,
   );
 
-  //Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -29,70 +29,91 @@ class _SearchPageState extends State<SearchPage> {
     Text('Settings', style: optionStyle),
   ];
 
-  //initState to initialize the controller
+  // Initialize the controller and focus node
   @override
   void initState() {
     super.initState();
-    //setting controller for TextField -> to acquire input
     _searchController = TextEditingController();
+    _focusNode = FocusNode();
+
+    // Every time the focus changes, update the state
+    _focusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  // Clean up the controller and focus node when the widget is disposed
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isFocused = _focusNode.hasFocus;
+    final bool hasText = _searchController.text.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: _widgetOptions[_selectedIndex],
-        centerTitle: true, //Forced center the title
+        centerTitle: true,
       ),
-      body: Container(
-        alignment: Alignment.center,
-        //TextField to insert search text
-        child: Column(
+
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            // search box
+            Expanded(
               child: TextField(
                 controller: _searchController,
+                focusNode: _focusNode, // To manage focus state
                 decoration: InputDecoration(
-                  hintText: 'Search', // text inside the box
+                  hintText: isFocused ? '' : 'Search', // It disappears when focused
                   prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                  suffixIcon: hasText // Show X only if there's text
+                      ? IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchController.clear(); // Clear text
+                            setState(() {});
+                          },
+                        )
+                      : null,
+                  border: const OutlineInputBorder(),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
-                onTap: () {
-                  setState(() {});
+                onChanged: (_) {
+                  setState(() {}); // Update state to show/hide the X
                 },
               ),
             ),
-            /*Button to trigger search action
-                ElevatedButton(
-                  onPressed: () {
-                    String insertedText = _searchController.text;
-                    //pop up to be sure that TextField acquires the input string
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Search Text'),
-                          content: Text('You searched for: $insertedText'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: const Icon(Icons.search)
-                )*/
+
+            // Cancel button
+            if (isFocused) ...[
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () {
+                  _searchController.clear(); // Clear text
+                  _focusNode.unfocus(); // Dismiss keyboard
+                  setState(() {}); // Reset state
+                },
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontSize: 17
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
 
-      //Drawer to control the navigation among pages
+      // Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,

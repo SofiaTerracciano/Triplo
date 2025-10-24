@@ -20,7 +20,7 @@ class _SettingPageState extends State<SettingPage> {
     fontStyle: FontStyle.italic,
   );
 
-  //Page titles for AppBar
+  // Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -33,17 +33,17 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
         title: _widgetOptions[_selectedIndex],
-        centerTitle: true, //Forced center the title
+        centerTitle: true, // Forced center the title
       ),
 
       body: ListView(
         padding: const EdgeInsets.all(25.0),
         children: [
-          // profile info + avatar
+          // Profile info + avatar
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // left column: username + password
+              // Left column: username + password
               Expanded(
                 flex: 1,
                 child: Column(
@@ -100,9 +100,7 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
 
-              //const SizedBox(width: 2), // spazio tra le colonne
-
-              // right column: avatar + edit photo
+              // Right column: avatar + edit photo
               Expanded(
                 flex: 1,
                 child: Column(
@@ -110,7 +108,9 @@ class _SettingPageState extends State<SettingPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                      backgroundImage: AssetImage(
+                        'assets/profile_placeholder.png',
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -122,8 +122,7 @@ class _SettingPageState extends State<SettingPage> {
                           },
                           child: const Text(
                             'Edit Profile Photo',
-                            style: TextStyle(
-                              fontSize: 12),
+                            style: TextStyle(fontSize: 12),
                           ),
                         ),
                       ],
@@ -140,10 +139,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Name: ',
-                style: TextStyle(fontSize: 14),
-              ),
+              const Text('Name: ', style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica name
@@ -153,10 +149,7 @@ class _SettingPageState extends State<SettingPage> {
               const Spacer(),
               Text(
                 'name_placeholder',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                )
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -170,10 +163,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Surname: ',
-                style: TextStyle(fontSize: 14),
-              ),
+              const Text('Surname: ', style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica surname
@@ -183,10 +173,7 @@ class _SettingPageState extends State<SettingPage> {
               const Spacer(),
               Text(
                 'surname_placeholder',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                )
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -200,10 +187,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Birthdate: ',
-                style: TextStyle(fontSize: 14),
-              ),
+              const Text('Birthdate: ', style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica bithdate
@@ -213,10 +197,7 @@ class _SettingPageState extends State<SettingPage> {
               const Spacer(),
               Text(
                 'birthdate_placeholder',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                )
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -230,10 +211,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Email: ',
-                style: TextStyle(fontSize: 14),
-              ),
+              const Text('Email: ', style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica email
@@ -243,10 +221,7 @@ class _SettingPageState extends State<SettingPage> {
               const Spacer(),
               Text(
                 'email_palceholder',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                )
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -260,18 +235,15 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Language: ',
-                style: TextStyle(fontSize: 14),
-              ),
+              const Text('Language: ', style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () async {
                   final selected = await showDialog<Locale>(
-                  context: context,
-                  builder: (context) => LanguageDialog(),
-                );
+                    context: context,
+                    builder: (context) => LanguageDialog(),
+                  );
 
-               /*  if (selected != null) {
+                  /*  if (selected != null) {
                   //onLanguageChanged(selected);
                   AlertDialog(
                     content: Text('Language changed to: ${selected.languageCode}'),
@@ -281,12 +253,10 @@ class _SettingPageState extends State<SettingPage> {
                 icon: const Icon(Icons.edit, size: 16),
               ),
               const Spacer(),
-              Text( //però dovrebbe essere dinamico in base alla lingua selezionata
+              Text(
+                //però dovrebbe essere dinamico in base alla lingua selezionata
                 'language_placeholder',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                )
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -299,7 +269,7 @@ class _SettingPageState extends State<SettingPage> {
           ),*/
         ],
       ),
-      
+
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
@@ -314,41 +284,45 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home', style: optionStyle,),
+              title: const Text('Home', style: optionStyle),
               selected: _selectedIndex == 0,
               onTap: () {
-                Navigator.pushReplacement(context, 
-                  MaterialPageRoute(builder: (context) => const MyHomePage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile', style: optionStyle,),
+              title: const Text('Profile', style: optionStyle),
               selected: _selectedIndex == 1,
               onTap: () {
-                Navigator.pushReplacement(context, 
-                  MaterialPageRoute(builder: (context) => const UserPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserPage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search', style: optionStyle,),
+              title: const Text('Search', style: optionStyle),
               selected: _selectedIndex == 2,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SearchPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings',style: optionStyle,),
+              title: const Text('Settings', style: optionStyle),
               selected: _selectedIndex == 3,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SettingPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingPage()),
                 );
               },
             ),
@@ -359,9 +333,8 @@ class _SettingPageState extends State<SettingPage> {
   }
 }
 
-//popup dialog to select the language
+// Popup dialog to select the language
 class LanguageDialog extends StatelessWidget {
-
   LanguageDialog({super.key});
 
   final Map<String, Locale> languages = {
@@ -369,7 +342,7 @@ class LanguageDialog extends StatelessWidget {
     'Italian': const Locale('it'),
   };
 
-//TODO: implementare il cambio lingua effettivo nell'app
+  //TODO: implementare il cambio lingua effettivo nell'app
 
   @override
   Widget build(BuildContext context) {
@@ -381,21 +354,16 @@ class LanguageDialog extends StatelessWidget {
             TextButton(
               child: const Text('English'),
               onPressed: () {
-                AlertDialog(
-                    content: Text('Language changed to: english'),
-                  );
+                AlertDialog(content: Text('Language changed to: english'));
                 //locale -> to change the language of the app
                 //Navigator.of(context).pop(const Locale('en'));
-                
               },
             ),
             const SizedBox(height: 10),
             TextButton(
               child: const Text('Italian'),
               onPressed: () {
-                AlertDialog(
-                    content: Text('Language changed to: italian'),
-                  );
+                AlertDialog(content: Text('Language changed to: italian'));
                 //Navigator.of(context).pop(const Locale('it'));
               },
             ),

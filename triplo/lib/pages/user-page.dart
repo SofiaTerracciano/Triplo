@@ -1,7 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // per Clipboard
+import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
@@ -19,14 +18,14 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   int _selectedIndex = 1;
 
-  //TextStyle for texts
+  // TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
 
-  //Page titles for AppBar
+  // Page titles for AppBar
   static const List<Widget> _widgetOptions = <Widget>[
     Text('Home', style: optionStyle),
     Text('Profile', style: optionStyle),
@@ -42,7 +41,7 @@ class _UserPageState extends State<UserPage> {
       child: Scaffold(
         appBar: AppBar(
           title: _widgetOptions[_selectedIndex],
-          centerTitle: true, //Forced center the title
+          centerTitle: true, // Forced center the title
         ),
 
         body: Column(
@@ -50,10 +49,10 @@ class _UserPageState extends State<UserPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // avatar + username column
+                // Avatar + username column
                 Container(
                   width: 200,
-                  // padding on all sides
+                  // Padding on all sides
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 10,
@@ -105,11 +104,11 @@ class _UserPageState extends State<UserPage> {
 
             SizedBox(height: 12),
 
-            //setting and share buttons
+            // Setting and share buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // setting button
+                // Setting button
                 Column(
                   children: [
                     ElevatedButton(
@@ -126,12 +125,12 @@ class _UserPageState extends State<UserPage> {
                   ],
                 ),
                 SizedBox(width: 7),
-                // copy URL button
+                // Copy URL button
                 Column(
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // funzione che fa copiare URL
+                        // Funzione che fa copiare URL
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -292,6 +291,7 @@ class _UserPageState extends State<UserPage> {
   }
 }
 
+// Widget for individual statistic item
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;
