@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final mapController = MapController(); // Controller for FlutterMap
+    final mapController = MapController();
 
     return Scaffold(
       appBar: AppBar(
@@ -81,13 +81,16 @@ class _MyHomePageState extends State<MyHomePage> {
         mapController: mapController, 
         options: MapOptions( 
           initialCenter: LatLng(46.230, 10.831), // Center in Madonna di Campiglio
-          initialZoom: 13.0,
+          initialZoom: 15.0,
         ),
         children: [
-          TileLayer( // TileLayer to load map tiles
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
-            subdomains: const ['a', 'b', 'c'], 
+          TileLayer( // TileLayer to load map tiles 
+            urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            subdomains: const ['a', 'b', 'c'],
+            userAgentPackageName: 'com.tua.app',
           ),
+
+
           
           PolylineLayer( // PolylineLayer to show routes on the map
             polylines: _routes.map(
