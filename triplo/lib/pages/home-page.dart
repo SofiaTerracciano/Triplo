@@ -24,6 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Predefined routes with their details (da mettere quelli veri)
   final List<Map<String, dynamic>> _routes = [
+    // Dividere i percorsi a seconda delle difficoltà, quindi blu/azzurroi facile, rosso media, nero difficile
     {
       'name': 'Sentiero del Grostè',
       'color': Colors.blueAccent,
@@ -77,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       
       body: FlutterMap( // FlutterMap widget to show a map 
-        mapController: mapController, // collega il controller
+        mapController: mapController, 
         options: MapOptions( 
           initialCenter: LatLng(46.230, 10.831), // Center in Madonna di Campiglio
           initialZoom: 13.0,

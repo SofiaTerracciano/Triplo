@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/home-page.dart';
+import 'pages/splash-screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,10 +14,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Triplo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      //home: const MyHomePage(),
+      home: const SplashScreen(),
     );
   }
 }
-
