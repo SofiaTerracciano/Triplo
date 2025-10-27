@@ -4,6 +4,8 @@ import 'setting-page.dart';
 import 'user-page.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
+import 'trekking-page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -37,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
     },
     {
       'name': 'Giro del Lago Nambino',
-      'color': Colors.green,
+      'color': Colors.red,
       'points': [
         LatLng(46.2240, 10.8195), // Starting point Lago Nambino
         LatLng(46.2215, 10.8260),
@@ -47,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     },
     {
       'name': 'Rifugio Vallesinella',
-      'color': Colors.orange,
+      'color': Colors.black,
       'points': [
         LatLng(46.2290, 10.8300), // Starting point Rifugio Vallesinella
         LatLng(46.2270, 10.8350),
@@ -76,98 +78,127 @@ class _MyHomePageState extends State<MyHomePage> {
         title: _widgetOptions[_selectedIndex],
         centerTitle: true, // Forced center the title
       ),
-      
-      body: FlutterMap( // FlutterMap widget to show a map 
-        mapController: mapController, 
-        options: MapOptions( 
-          initialCenter: LatLng(46.230, 10.831), // Center in Madonna di Campiglio
+
+      body: FlutterMap(
+        // FlutterMap widget to show a map
+        mapController: mapController,
+        options: MapOptions(
+          initialCenter: LatLng(
+            46.230,
+            10.831,
+          ), // Center in Madonna di Campiglio
           initialZoom: 15.0,
         ),
         children: [
-          TileLayer( // TileLayer to load map tiles 
+          TileLayer(
+            // TileLayer to load map tiles
             urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
             subdomains: const ['a', 'b', 'c'],
             userAgentPackageName: 'com.tua.app',
           ),
 
-
-          
-          PolylineLayer( // PolylineLayer to show routes on the map
-            polylines: _routes.map(
-                (r) => Polyline(
-                  points: List<LatLng>.from(r['points']),
-                  strokeWidth: 5.0,
-                  color: r['color'],
+          // Functionality to tap on polylines
+          TappablePolylineLayer(
+            polylineCulling: false,
+            polylines: _routes
+                .map(
+                  (r) => TaggedPolyline( // TaggedPolyline to identify each route
+                    tag: r['name'], 
+                    points: List<LatLng>.from(r['points']),
+                    strokeWidth: 5.0,
+                    color: r['color'],
+                  ),
+                )
+                .toList(),
+            onTap: (tappedPolylines, tapPosition) { 
+              final tapped = tappedPolylines.first;
+              
+              Navigator.push(context,
+                MaterialPageRoute(
+                  builder: (context) => TrekkingPage(routeName: tapped.tag!), // Navigate to TrekkingPage with route name
                 ),
-              )
-              .toList(),
+              );
+            },
           ),
 
-          MarkerLayer( // MarkerLayer to show markers on the map
+          MarkerLayer(
+            // MarkerLayer to show markers on the map
             markers: [
               Marker(
                 point: LatLng(46.2300, 10.8310), // Centro Madonna di Campiglio
                 width: 40,
                 height: 40,
-                child: const Icon(Icons.location_pin, color: Colors.redAccent, size: 36),
+                child: const Icon(
+                  Icons.location_pin,
+                  color: Colors.redAccent,
+                  size: 36,
+                ),
               ),
               Marker(
                 point: LatLng(46.2285, 10.8225), // Grostè
                 width: 40,
                 height: 40,
-                child: const Icon(Icons.outlined_flag, color: Colors.green, size: 36),
+                child: const Icon(
+                  Icons.outlined_flag,
+                  color: Colors.green,
+                  size: 36,
+                ),
               ),
               Marker(
                 point: LatLng(46.2240, 10.8195), // Lago Nambino
                 width: 40,
                 height: 40,
-                child: const Icon(Icons.outlined_flag, color: Colors.green, size: 36),
+                child: const Icon(
+                  Icons.outlined_flag,
+                  color: Colors.green,
+                  size: 36,
+                ),
               ),
               Marker(
                 point: LatLng(46.2290, 10.8300), // Rifugio Vallesinella
                 width: 40,
                 height: 40,
-                child: const Icon(Icons.outlined_flag, color: Colors.green, size: 36),
+                child: const Icon(
+                  Icons.outlined_flag,
+                  color: Colors.green,
+                  size: 36,
+                ),
               ),
             ],
           ),
+        ],
+      ),
 
-           // Zoom buttons
-          Positioned(
-            bottom: 30,
-            right: 10,
-            child: Column(
-              children: [
-                FloatingActionButton( // Zoom in button
-                  heroTag: "zoomIn",
-                  mini: true,
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.add, color: Colors.black),
-                  onPressed: () {
-                    mapController.move( // Zoom in action
-                      mapController.camera.center,
-                      mapController.camera.zoom +1
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton( // Zoom out button
-                  heroTag: "zoomOut",
-                  mini: true,
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.remove, color: Colors.black),
-                  onPressed: () {
-                    mapController.move( // Zoom out action
-                      mapController.camera.center,
-                      mapController.camera.zoom - 1
-                    );
-                  },
-                ),
-              ],
-            ),
+      // Zoom buttons
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "zoomIn",
+            mini: true,
+            backgroundColor: Colors.white,
+            child: const Icon(Icons.add, color: Colors.black),
+            onPressed: () {
+              mapController.move(
+                mapController.center, 
+                mapController.zoom + 1);
+            },
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            heroTag: "zoomOut",
+            mini: true,
+            backgroundColor: Colors.white,
+            child: const Icon(Icons.remove, color: Colors.black),
+            onPressed: () {
+              mapController.move(
+                mapController.center, 
+                mapController.zoom - 1);
+            },
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positioning the button to the bottom right
 
       //Drawer to control the navigation among pages
       drawer: Drawer(
@@ -183,41 +214,45 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home', style: optionStyle,),
+              title: const Text('Home', style: optionStyle),
               selected: _selectedIndex == 0,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile', style: optionStyle,),
+              title: const Text('Profile', style: optionStyle),
               selected: _selectedIndex == 1,
               onTap: () {
-                Navigator.pushReplacement(context, 
-                  MaterialPageRoute(builder: (context) => const UserPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserPage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search', style: optionStyle,),
+              title: const Text('Search', style: optionStyle),
               selected: _selectedIndex == 2,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SearchPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings', style: optionStyle,),
+              title: const Text('Settings', style: optionStyle),
               selected: _selectedIndex == 3,
               onTap: () {
-                Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const SettingPage())
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingPage()),
                 );
               },
             ),
