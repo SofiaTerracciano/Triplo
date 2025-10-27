@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/pages/login_page/LoginPage.dart';
 import 'pages/home-page.dart';
 import 'pages/splash-screen.dart';
 
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: const MyHomePage(),
-      home: const SplashScreen(),
+      //home: const SplashScreen(),
+      home: LoginPage(),
     );
   }
 }
