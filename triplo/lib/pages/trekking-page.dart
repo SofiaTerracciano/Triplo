@@ -15,10 +15,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
   bool isFamFriendly = true;
   bool isPicnicable = true;
 
-  final List<Icon> icons = [
-    Icon(Icons.bookmark_border),
-    Icon(Icons.bookmark)
-  ];
+  final List<Icon> icons = [Icon(Icons.bookmark_border), 
+                            Icon(Icons.bookmark)];
+
+  static const TextStyle optionStyle = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
           IconButton(
             icon: Icon(Icons.start),
             onPressed: () {
-                // Implement start trekking functionality hereR
+              // Implement start trekking functionality hereR
             },
           ),
           IconButton(
@@ -59,23 +63,23 @@ class _TrekkingPageState extends State<TrekkingPage> {
               Row(),
               Row(
                 children: [
-                  Text("Starting Point: XYZ")
-                ],
+                  Text("Starting Point: XYZ",),
+                ]
               ),
               Row(
                 children: [
-                  Text("Level: Medium"),
-                ],
+                  Text("Level: Medium")
+                ]
               ),
               Row(
                 children: [
-                  Text("Distance: 10 km"),
-                ],
+                  Text("Distance: 10 km")
+                ]
               ),
               Row(
-              children: [
-                Text("Estimated Time: 3 hours"),
-                ],
+                children: [
+                  Text("Estimated Time: 3 hours")
+                ]
               ),
               Row(
                 children: [
@@ -86,29 +90,33 @@ class _TrekkingPageState extends State<TrekkingPage> {
                           text: 'Elevation Gain: 500 m  ',
                           style: TextStyle(color: Colors.black),
                         ),
-                        //da capire dai dati 
-                        WidgetSpan(
-                          child: Icon(Icons.arrow_upward, size: 16),
-                        ),
-                        WidgetSpan(
-                          child: Icon(Icons.arrow_downward, size: 16),
-                        ),
+                        //da capire dai dati
+                        WidgetSpan(child: Icon(Icons.arrow_upward, size: 16)),
+                        WidgetSpan(child: Icon(Icons.arrow_downward, size: 16)),
                       ],
                     ),
-                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
-                  Text("Ending Point: ABC"),
-                ],
+                  Text("Ending Point: ABC")
+                ]
               ),
               //immagine ending point
               Row(),
               Row(
                 children: [
-                  Text("Info: Beautiful trek with scenic views."),
+                  Text("Info: Beautiful trek with scenic views.")
                 ]
+              ),
+              Row(
+                children: [
+                  //mettere una legenda da qualche parte?
+                  Icon(Icons.family_restroom, size: 16), // da prendere da db --> family friendly
+                  Icon(Icons.table_restaurant, size: 16), // da prendere da db --> picknick area
+                  Icon(Icons.local_parking, size: 16), // da prendere da db --> parking 
+                ],
               ),
               Row(
                 children: [
@@ -117,7 +125,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
               ),
               Row(
                 children: [
-                  Text("Ristors Points"), // non sarà un text, ma sarà interattivo
+                  Text(
+                    "Ristors Points",
+                  ), // non sarà un text, ma sarà interattivo
                 ],
               ),
               Row(
