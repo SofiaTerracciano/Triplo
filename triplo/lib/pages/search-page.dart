@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'setting-page.dart';
+import 'diary-page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -63,53 +64,148 @@ class _SearchPageState extends State<SearchPage> {
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            // search box
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                focusNode: _focusNode, // To manage focus state
-                decoration: InputDecoration(
-                  hintText: isFocused ? '' : 'Search', // It disappears when focused
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: hasText // Show X only if there's text
-                      ? IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            _searchController.clear(); // Clear text
-                            setState(() {});
-                          },
-                        )
-                      : null,
-                  border: const OutlineInputBorder(),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                ),
-                onChanged: (_) {
-                  setState(() {}); // Update state to show/hide the X
-                },
-              ),
-            ),
-
-            // Cancel button
-            if (isFocused) ...[
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () {
-                  _searchController.clear(); // Clear text
-                  _focusNode.unfocus(); // Dismiss keyboard
-                  setState(() {}); // Reset state
-                },
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(
-                    fontSize: 17
+        child: Column (
+          children:[
+            Row(
+              children: [
+                // Search box
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    focusNode: _focusNode, // To manage focus state
+                    decoration: InputDecoration(
+                      hintText: isFocused ? '' : 'Search', // It disappears when focused
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: hasText // Show X only if there's text
+                          ? IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () {
+                                _searchController.clear(); // Clear text
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      border: const OutlineInputBorder(),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    onChanged: (_) {
+                      setState(() {}); // Update state to show/hide the X
+                    },
                   ),
                 ),
+
+                // Cancel button
+                if (isFocused) ...[
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      _searchController.clear(); // Clear text
+                      _focusNode.unfocus(); // Dismiss keyboard
+                      setState(() {}); // Reset state
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 17
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.only(top: 16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2 elementi per riga
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1.2, // Modifica proporzioni (opzionale)
+                ),
+                itemCount: 10,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DiaryPage(routeName: "Percorso $index"),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          // IMMAGINE
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                              child: Image.asset(
+                                'images/prova.jpeg', // IMG placeholder
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          // TESTI
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // NOME UTENTE SX
+                                Flexible(
+                                  child: Text(
+                                    "Utente $index", //prendere dal db
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+
+                                const SizedBox(width: 6),
+
+                                // NOME PERCORSO DX
+                                Flexible(
+                                  child: Text(
+                                    "Percorso $index", //prendere dal db
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
               ),
-            ],
-          ],
+            ),
+          ]
         ),
       ),
 

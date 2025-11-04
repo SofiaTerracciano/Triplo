@@ -113,7 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
             onTap: (tappedPolylines, tapPosition) { 
               final tapped = tappedPolylines.first;
               
-              Navigator.push(context,
+              Navigator.push(
+                context,
                 MaterialPageRoute(
                   builder: (context) => TrekkingPage(routeName: tapped.tag!), // Navigate to TrekkingPage with route name
                 ),

@@ -27,18 +27,18 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
         useMaterial3: true,
       ),
-      //home: const MyHomePage(),
+      home: const MyHomePage(),
       //home: const SplashScreen(),
       //home: RegistrationPage(),
 
 
-      initialRoute: '/login',
+      /*initialRoute: '/login',
 
       routes: {
         '/login' : (context) => LoginPage(),
         '/registration' : (context) => RegistrationPage(),
 
-      },
+      },*/
 
     );
   }

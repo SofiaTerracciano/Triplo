@@ -153,13 +153,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ],
           ),
-          /*const Padding(
-            padding: EdgeInsets.only(left: 0, bottom: 8.0),
-            child: Text(
-              'name_placeholder', // da prendere dal database
-              style: TextStyle(fontSize: 14),
-            ),
-          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -177,13 +170,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ],
           ),
-          /*const Padding(
-            padding: EdgeInsets.only(left: 0, bottom: 8.0),
-            child: Text(
-              'surname_placeholder', // da prendere dal database
-              style: TextStyle(fontSize: 14),
-            ),
-          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -201,13 +187,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ],
           ),
-          /*const Padding(
-            padding: EdgeInsets.only(left: 0, bottom: 8.0),
-            child: Text(
-              '16/04/2002', // da prendere dal database
-              style: TextStyle(fontSize: 14),
-            ),
-          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -225,13 +204,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ],
           ),
-          /*const Padding(
-            padding: EdgeInsets.only(left: 0, bottom: 8.0),
-            child: Text(
-              'email_placeholder', // da prendere dal database
-              style: TextStyle(fontSize: 14),
-            ),
-          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -260,13 +232,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ],
           ),
-          /*const Padding(
-            padding: EdgeInsets.only(left: 0, bottom: 8.0),
-            child: Text(
-              'language_placeholder', // da prendere dal database
-              style: TextStyle(fontSize: 14),
-            ),
-          ),*/
         ],
       ),
 
