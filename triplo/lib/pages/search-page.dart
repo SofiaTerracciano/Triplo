@@ -115,18 +115,19 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
 
+            // Suggestion section (trekking path of your friends)
             Expanded(
               child: GridView.builder(
                 padding: const EdgeInsets.only(top: 16),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2 elementi per riga
+                  crossAxisCount: 2, // 2 element for each row
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
-                  childAspectRatio: 1.2, // Modifica proporzioni (opzionale)
+                  childAspectRatio: 1.2, // To modify the ratio
                 ),
                 itemCount: 10,
                 itemBuilder: (context, index) {
-                  return InkWell(
+                  return InkWell( // Animation on tap
                     onTap: () {
                       Navigator.push(
                         context,
@@ -151,25 +152,25 @@ class _SearchPageState extends State<SearchPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
 
-                          // IMMAGINE
+                          // Image of the trekking trip (presa dal db in base a quelle caricate nella diary page)
                           Expanded(
-                            child: ClipRRect(
+                            child: ClipRRect( 
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                               child: Image.asset(
-                                'images/prova.jpeg', // IMG placeholder
+                                'images/prova.jpeg', 
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
 
-                          // TESTI
+                          // Text 
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // NOME UTENTE SX
+                                // Username
                                 Flexible(
                                   child: Text(
                                     "Utente $index", //prendere dal db
@@ -183,7 +184,7 @@ class _SearchPageState extends State<SearchPage> {
 
                                 const SizedBox(width: 6),
 
-                                // NOME PERCORSO DX
+                                // Trekking name
                                 Flexible(
                                   child: Text(
                                     "Percorso $index", //prendere dal db

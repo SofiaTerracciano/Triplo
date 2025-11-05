@@ -29,7 +29,7 @@ class _DiaryPageState extends State<DiaryPage> {
       body: ListView(
         padding: const EdgeInsets.all(25.0),
         children: [
-          // Profile info + avatar
+          // Profile info + profile pictures
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -44,20 +44,25 @@ class _DiaryPageState extends State<DiaryPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const Text(
-                          'Username: ',
+                          'arco33Mega',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
 
+                    const SizedBox(height: 5),
                     // Date
-                    const Padding(
-                      padding: EdgeInsets.only(left: 0, bottom: 8.0),
-                      child: Text(
-                        'Date: ', // da prendere dal database
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Date: ', // da prendere dal db
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
                     ),
 
+                    const SizedBox(height: 5),
                     // How much time
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -69,6 +74,7 @@ class _DiaryPageState extends State<DiaryPage> {
                       ],
                     ),
                     
+                    const SizedBox(height: 5),
                     // Friends
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -101,8 +107,7 @@ class _DiaryPageState extends State<DiaryPage> {
             ],
           ),
 
-          const SizedBox(height: 20),
-
+          const SizedBox(height: 30),
           // Other information about the trekking
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -113,6 +118,7 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ],
           ),
+          const SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal, // orizontal scroll
             child: Row(
@@ -122,48 +128,48 @@ class _DiaryPageState extends State<DiaryPage> {
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg',
                   width: 150, 
                   height: 100),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
                   height: 100
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 3),
                 Image.asset(
                   'images/prova.jpeg', 
                   width: 150, 
@@ -173,6 +179,7 @@ class _DiaryPageState extends State<DiaryPage> {
             ),
           ),
           
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -183,6 +190,8 @@ class _DiaryPageState extends State<DiaryPage> {
               // fai json in cui metti path dell'immagine della sfida e descrzione della sfida
             ],
           ),
+
+          const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -193,6 +202,7 @@ class _DiaryPageState extends State<DiaryPage> {
              //modo dinamico per mettere le stelline al rifugio
             ],
           ),
+          const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -203,6 +213,7 @@ class _DiaryPageState extends State<DiaryPage> {
               // fai come le challenges
             ],
           ),
+          const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
