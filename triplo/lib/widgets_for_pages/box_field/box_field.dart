@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A reusable text input field used for login and forms (optional password hiding)
+// A reusable text input field used for login and forms (optional password hiding)
 class BoxField extends StatefulWidget {
   final String label;
   final bool isPassword;
