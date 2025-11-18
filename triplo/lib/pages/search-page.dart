@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'setting-page.dart';
@@ -57,15 +64,12 @@ class _SearchPageState extends State<SearchPage> {
     final bool hasText = _searchController.text.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: _widgetOptions[_selectedIndex],
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: _widgetOptions[_selectedIndex], centerTitle: true),
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column (
-          children:[
+        child: Column(
+          children: [
             Row(
               children: [
                 // Search box
@@ -74,9 +78,12 @@ class _SearchPageState extends State<SearchPage> {
                     controller: _searchController,
                     focusNode: _focusNode, // To manage focus state
                     decoration: InputDecoration(
-                      hintText: isFocused ? '' : 'Search', // It disappears when focused
+                      hintText: isFocused
+                          ? ''
+                          : 'Search', // It disappears when focused
                       prefixIcon: const Icon(Icons.search),
-                      suffixIcon: hasText // Show X only if there's text
+                      suffixIcon:
+                          hasText // Show X only if there's text
                           ? IconButton(
                               icon: const Icon(Icons.close),
                               onPressed: () {
@@ -86,8 +93,10 @@ class _SearchPageState extends State<SearchPage> {
                             )
                           : null,
                       border: const OutlineInputBorder(),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                     ),
                     onChanged: (_) {
                       setState(() {}); // Update state to show/hide the X
@@ -104,12 +113,7 @@ class _SearchPageState extends State<SearchPage> {
                       _focusNode.unfocus(); // Dismiss keyboard
                       setState(() {}); // Reset state
                     },
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 17
-                      ),
-                    ),
+                    child: const Text('Cancel', style: TextStyle(fontSize: 17)),
                   ),
                 ],
               ],
@@ -127,12 +131,14 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 itemCount: 10,
                 itemBuilder: (context, index) {
-                  return InkWell( // Animation on tap
+                  return InkWell(
+                    // Animation on tap
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DiaryPage(routeName: "Percorso $index"),
+                          builder: (context) =>
+                              DiaryPage(routeName: "Percorso $index"),
                         ),
                       );
                     },
@@ -145,28 +151,32 @@ class _SearchPageState extends State<SearchPage> {
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 5,
                             spreadRadius: 1,
-                          )
+                          ),
                         ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           // Image of the trekking trip (presa dal db in base a quelle caricate nella diary page)
                           Expanded(
-                            child: ClipRRect( 
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
                               child: Image.asset(
-                                'images/prova.jpeg', 
+                                'images/prova.jpeg',
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
 
-                          // Text 
+                          // Text
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -203,10 +213,10 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                     ),
                   );
-                }
+                },
               ),
             ),
-          ]
+          ],
         ),
       ),
 

@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:flutter/src/material/icons.dart';
 
 class TrekkingPage extends StatefulWidget {
@@ -15,8 +22,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
   bool isFamFriendly = true;
   bool isPicnicable = true;
 
-  final List<Icon> icons = [Icon(Icons.bookmark_border), 
-                            Icon(Icons.bookmark)];
+  final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
@@ -61,26 +67,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
             children: [
               //placeholder dell'immagine del percorso (facciamo lo screen)
               Row(),
-              Row(
-                children: [
-                  Text("Starting Point: XYZ",),
-                ]
-              ),
-              Row(
-                children: [
-                  Text("Level: Medium")
-                ]
-              ),
-              Row(
-                children: [
-                  Text("Distance: 10 km")
-                ]
-              ),
-              Row(
-                children: [
-                  Text("Estimated Time: 3 hours")
-                ]
-              ),
+              Row(children: [Text("Starting Point: XYZ")]),
+              Row(children: [Text("Level: Medium")]),
+              Row(children: [Text("Distance: 10 km")]),
+              Row(children: [Text("Estimated Time: 3 hours")]),
               Row(
                 children: [
                   RichText(
@@ -98,24 +88,25 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  Text("Ending Point: ABC")
-                ]
-              ),
+              Row(children: [Text("Ending Point: ABC")]),
               //immagine ending point
               Row(),
-              Row(
-                children: [
-                  Text("Info: Beautiful trek with scenic views.")
-                ]
-              ),
+              Row(children: [Text("Info: Beautiful trek with scenic views.")]),
               Row(
                 children: [
                   //mettere una legenda da qualche parte?
-                  Icon(Icons.family_restroom, size: 16), // da prendere da db --> family friendly
-                  Icon(Icons.table_restaurant, size: 16), // da prendere da db --> picknick area
-                  Icon(Icons.local_parking, size: 16), // da prendere da db --> parking 
+                  Icon(
+                    Icons.family_restroom,
+                    size: 16,
+                  ), // da prendere da db --> family friendly
+                  Icon(
+                    Icons.table_restaurant,
+                    size: 16,
+                  ), // da prendere da db --> picknick area
+                  Icon(
+                    Icons.local_parking,
+                    size: 16,
+                  ), // da prendere da db --> parking
                 ],
               ),
               Row(

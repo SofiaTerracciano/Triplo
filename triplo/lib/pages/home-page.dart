@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'search-page.dart';
 import 'setting-page.dart';
 import 'user-page.dart';
@@ -18,7 +25,11 @@ class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
   final List<Map<String, dynamic>> routes;
 
-  const ZoomAwareMap({required this.mapController, required this.routes, super.key});
+  const ZoomAwareMap({
+    required this.mapController,
+    required this.routes,
+    super.key,
+  });
 
   @override
   _ZoomAwareMapState createState() => _ZoomAwareMapState();
@@ -39,7 +50,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   @override
   void initState() {
     super.initState();
-    mapController = MapController(); 
+    mapController = MapController();
 
     // Ascolta tutti gli eventi della mappa
     widget.mapController.mapEventStream.listen((event) {
@@ -70,7 +81,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
             ),
 
             // Polylines solo zoom >= 20
-            if (currentZoom >= 20)
+            if (currentZoom >= 12)
               TappablePolylineLayer(
                 polylineCulling: false,
                 polylines: widget.routes
@@ -96,7 +107,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               ),
 
             // Marker unico quando zoom < 20
-            if (currentZoom < 20)
+            if (currentZoom < 12)
               MarkerLayer(
                 markers: [
                   Marker(
@@ -123,9 +134,9 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               heroTag: "recenter",
               backgroundColor: Colors.white,
               icon: const Icon(Icons.my_location, color: Colors.black),
-              label: const Text("Riposizionami"),
+              label: const Text("Move me"),
               onPressed: () {
-                widget.mapController.move(LatLng(46.230, 10.831), 20);
+                widget.mapController.move(LatLng(46.230, 10.831), 12);
                 setState(() => showRecenter = false);
               },
             ),
@@ -145,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
     fontStyle: FontStyle.italic,
   );
 
-  late final MapController mapController; 
+  late final MapController mapController;
 
   // Center initiale della mappa
   final LatLng mapInitialCenter = const LatLng(46.230, 10.831);
@@ -160,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    mapController = MapController();   
+    mapController = MapController();
 
     // Listener per verificare zoom e posizione
     mapController.mapEventStream.listen((event) {
@@ -218,6 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final mapController = MapController();
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -225,191 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true, // Forced center the title
       ),
 
-      /*body: FlutterMap(
-        // FlutterMap widget to show a map
-        mapController: mapController,
-        options: MapOptions(
-          initialCenter: LatLng(
-            46.230,
-            10.831,
-          ), // Center in Madonna di Campiglio
-          initialZoom: 12.0,
-        ),
-        children: [
-          TileLayer(
-            // TileLayer to load map tiles
-            urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-            subdomains: const ['a', 'b', 'c'],
-            userAgentPackageName: 'com.tua.app',
-          ),
-
-          // Functionality to tap on polylines
-          TappablePolylineLayer(
-            polylineCulling: false,
-            polylines: _routes
-                .map(
-                  (r) => TaggedPolyline( // TaggedPolyline to identify each route
-                    tag: r['name'], 
-                    points: List<LatLng>.from(r['points']),
-                    strokeWidth: 5.0,
-                    color: r['color'],
-                  ),
-                )
-                .toList(),
-            onTap: (tappedPolylines, tapPosition) { 
-              final tapped = tappedPolylines.first;
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TrekkingPage(routeName: tapped.tag!), // Navigate to TrekkingPage with route name
-                ),
-              );
-            },
-          ),
-
-          MarkerLayer(
-            // MarkerLayer to show markers on the map
-            markers: [
-              Marker(
-                point: LatLng(46.2300, 10.8310), // Centro Madonna di Campiglio
-                width: 40,
-                height: 40,
-                child: const Icon(
-                  Icons.location_pin,
-                  color: Colors.redAccent,
-                  size: 36,
-                ),
-              ),
-              Marker(
-                point: LatLng(46.2285, 10.8225), // Grostè
-                width: 40,
-                height: 40,
-                child: const Icon(
-                  Icons.outlined_flag,
-                  color: Colors.green,
-                  size: 36,
-                ),
-              ),
-              Marker(
-                point: LatLng(46.2240, 10.8195), // Lago Nambino
-                width: 40,
-                height: 40,
-                child: const Icon(
-                  Icons.outlined_flag,
-                  color: Colors.green,
-                  size: 36,
-                ),
-              ),
-              Marker(
-                point: LatLng(46.2290, 10.8300), // Rifugio Vallesinella
-                width: 40,
-                height: 40,
-                child: const Icon(
-                  Icons.outlined_flag,
-                  color: Colors.green,
-                  size: 36,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),*/
-
-      /*body: Stack(
-        children: [
-          FlutterMap(
-            mapController: mapController,
-            options: MapOptions(
-              initialCenter: currentCenter,
-              initialZoom: currentZoom,
-              onPositionChanged: (pos, hasGesture) {
-                setState(() {
-                  currentZoom = pos.zoom ?? currentZoom;
-                  currentCenter = pos.center ?? currentCenter;
-
-                  // mostra pulsante se esci dai bounds
-                  showRecenter = !bounds.contains(currentCenter);
-                });
-              },
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c'],
-              ),
-
-              // POLYLINES — SOLO SE ZOOM >= 20
-              if (currentZoom <= 20)
-                TappablePolylineLayer(
-                  polylineCulling: false,
-                  polylines: _routes
-                      .map(
-                        (r) => TaggedPolyline(
-                              tag: r['name'],
-                              points: List<LatLng>.from(r['points']),
-                              strokeWidth: 5.0,
-                              color: r['color'],
-                            ),
-                      )
-                      .toList(),
-                  onTap: (tappedPolylines, tapPosition) {
-                    final tapped = tappedPolylines.first;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            TrekkingPage(routeName: tapped.tag!),
-                      ),
-                    );
-                  },
-                ),
-
-              // MARKER — SOLO SE ZOOM < 20
-              if (currentZoom > 20)
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: LatLng(46.2300, 10.8310),
-                      width: 40,
-                      height: 40,
-                      child: const Icon(
-                        Icons.location_pin,
-                        color: Colors.red,
-                        size: 40,
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-          ),
-
-          /// PULSANTE RIPOSIZIONAMI
-          if (showRecenter)
-            Positioned(
-              top: 20,
-              right: 20,
-              child: FloatingActionButton.extended(
-                heroTag: "recenter",
-                backgroundColor: Colors.white,
-                icon: const Icon(Icons.my_location, color: Colors.black),
-                label: const Text("Riposizionami"),
-                onPressed: () {
-                  mapController.move(
-                    LatLng(46.230, 10.831),
-                    12,
-                  );
-                  setState(() => showRecenter = false);
-                },
-              ),
-            ),
-        ],
-      ),*/
-
-      body: ZoomAwareMap(
-        mapController: mapController,
-        routes: _routes,
-      ),
+      body: ZoomAwareMap(mapController: mapController, routes: _routes),
 
       // Zoom buttons
       floatingActionButton: Column(
@@ -421,9 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.white,
             child: const Icon(Icons.add, color: Colors.black),
             onPressed: () {
-              mapController.move(
-                mapController.center, 
-                mapController.zoom + 1);
+              mapController.move(mapController.center, mapController.zoom + 1);
             },
           ),
           const SizedBox(height: 10),
@@ -433,15 +259,13 @@ class _MyHomePageState extends State<MyHomePage> {
             backgroundColor: Colors.white,
             child: const Icon(Icons.remove, color: Colors.black),
             onPressed: () {
-              mapController.move(
-                mapController.center, 
-                mapController.zoom - 1);
+              mapController.move(mapController.center, mapController.zoom - 1);
             },
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positioning the button to the bottom right
-
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .endFloat, // Positioning the button to the bottom right
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
@@ -456,7 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home', style: optionStyle),
+              title: Text(AppLocalizations.of(context)!.home_page_title, style: optionStyle),
               selected: _selectedIndex == 0,
               onTap: () {
                 Navigator.pushReplacement(
@@ -467,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile', style: optionStyle),
+              title: Text(AppLocalizations.of(context)!.profile_page_title, style: optionStyle),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pushReplacement(
@@ -478,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search', style: optionStyle),
+              title: Text(AppLocalizations.of(context)!.search_page_title, style: optionStyle),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pushReplacement(
@@ -489,7 +313,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings', style: optionStyle),
+              title: Text(AppLocalizations.of(context)!.settings_page_title, style: optionStyle),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pushReplacement(

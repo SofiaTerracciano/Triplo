@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'search-page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
+  /*final void Function(Locale)? onLocaleChanged;*/
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -318,11 +326,24 @@ class LanguageDialog extends StatelessWidget {
           children: <Widget>[
             TextButton(
               child: const Text('English'),
-              onPressed: () {
-                AlertDialog(content: Text('Language changed to: english'));
+              onPressed: () {},
+              /*onPressed: () async{
+                final selected = await showDialog<Locale>(
+                  context: context,
+                  builder: (context) => LanguageDialog(onLocaleChanged: widget.onLocaleChanged);
+                  },),
+                );
+                if(selected != null){
+                  onLocalChanged(selected);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Language changed to: ${selected.languageCode}'),
+                    duration: const Duration(seconds: 2),),
+                  );
+                }
                 //locale -> to change the language of the app
                 //Navigator.of(context).pop(const Locale('en'));
-              },
+              },*/
             ),
             const SizedBox(height: 10),
             TextButton(

@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:flutter/src/material/icons.dart';
 
 class DiaryPage extends StatefulWidget {
@@ -11,7 +18,6 @@ class DiaryPage extends StatefulWidget {
 }
 
 class _DiaryPageState extends State<DiaryPage> {
-
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -21,11 +27,8 @@ class _DiaryPageState extends State<DiaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.routeName),
-        centerTitle: true, 
-      ),
-      
+      appBar: AppBar(title: Text(widget.routeName), centerTitle: true),
+
       body: ListView(
         padding: const EdgeInsets.all(25.0),
         children: [
@@ -73,23 +76,20 @@ class _DiaryPageState extends State<DiaryPage> {
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 5),
                     // Friends
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Friends: ',
-                          style: TextStyle(fontSize: 14),
-                        ),
+                        const Text('Friends: ', style: TextStyle(fontSize: 14)),
                       ],
                     ),
                   ],
                 ),
               ),
 
-              // Right column: avatar 
+              // Right column: avatar
               Expanded(
                 flex: 1,
                 child: Column(
@@ -111,82 +111,40 @@ class _DiaryPageState extends State<DiaryPage> {
           // Other information about the trekking
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Text(
-                'Images: ', 
-                style: TextStyle(fontSize: 14)
-              ),
-            ],
+            children: [const Text('Images: ', style: TextStyle(fontSize: 14))],
           ),
           const SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal, // orizontal scroll
             child: Row(
-              children: [ // sarà da prendere in modo dinamico
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+              children: [
+                // sarà da prendere in modo dinamico
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg',
-                  width: 150, 
-                  height: 100),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
                 SizedBox(width: 3),
-                Image.asset(
-                  'images/prova.jpeg', 
-                  width: 150, 
-                  height: 100
-                ),
+                Image.asset('images/prova.jpeg', width: 150, height: 100),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Challenges: ', 
-                style: TextStyle(fontSize: 14)
-                ),
+              const Text('Challenges: ', style: TextStyle(fontSize: 14)),
               // fai json in cui metti path dell'immagine della sfida e descrzione della sfida
             ],
           ),
@@ -195,21 +153,15 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Refuge: ', 
-                style: TextStyle(fontSize: 14)
-              ),
-             //modo dinamico per mettere le stelline al rifugio
+              const Text('Refuge: ', style: TextStyle(fontSize: 14)),
+              //modo dinamico per mettere le stelline al rifugio
             ],
           ),
           const SizedBox(height: 15),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Mood: ', 
-                style: TextStyle(fontSize: 14)
-              ),
+              const Text('Mood: ', style: TextStyle(fontSize: 14)),
               // fai come le challenges
             ],
           ),
@@ -217,10 +169,7 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text(
-                'Notes: ', 
-                style: TextStyle(fontSize: 14)
-              ),
+              const Text('Notes: ', style: TextStyle(fontSize: 14)),
               // prendi da database
             ],
           ),

@@ -1,0 +1,51 @@
+{
+     "@@locale": "it",
+
+    "home_page_title": "Home",
+    "repositioning_button_label": "Riposizionami",
+    
+    "profile_page_title": "Profilo",
+    "username_label": "Username",
+    "password_label": "Password",
+    "email_label": "Email",
+    "done_trekking_label": "Percorsi completati",
+    "totals_trekking_label": "Totali",
+    "published_trekking_label": "Pubblicati",
+    "private_trekking_label": "Privati",
+    "share_profile_button_label": "Condividi Profilo",
+    "level_label": "Livello",
+    "begginer_level": "Principiante",
+    "intermediate_level": "Intermedio",
+    "advanced_level": "Esperto",
+
+    "search_page_title": "Cerca",
+    "cancel_button_label": "Cancella",
+
+    "settings_page_title": "Impostazioni",
+    "edit_profile_photo_button_label": "Modifica Foto Profilo",
+    "name_field_label": "Nome",
+    "surname_field_label": "Coognome",
+    "birthdate_field_label": "Data di Nascita",
+    "language_field_label": "Lingua",
+
+    "starting_point_trekking_label": "Punto d'inizio",
+    "distance_trekking_label": "Distanza",
+    "estimated_time_trekking_label": "Tempo previsto",
+    "elevaition_gain_trekking_label": "Dislivello",
+    "ending_point_trekking_label": "Punto di fine",
+    "description_trekking_label": "Descrizione",
+    "refreshment_point_trekking_label": "Punti ristorop",
+    "pic_nic_area_trekking_label": "Area Picnic",
+    "family_friendly_trekking_label": "Adatto alle famiglie",
+    "start_trekking_button_label": "Inizia",
+    "save_trekking_button_label": "Salva",
+
+    "date_trecking_label": "Data",
+    "duration_trekking_label": "Durata",
+    "friends_trekking_label": "Amici",
+    "photos_trekking_label": "Foto",
+    "challenges_trekking_label": "Sfide",
+    "refuge_trekking_label": "Rifugio",
+    "mood_trekking_label": "Mood",
+    "notes_trekking_label": "Note"
+}
