@@ -21,6 +21,7 @@ class BoxField extends StatefulWidget {
     this.isPassword = false,
     this.isEmail = false,
     this.controller,
+
   }) : super(key: key);
 
   @override
