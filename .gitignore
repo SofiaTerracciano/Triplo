@@ -235,3 +235,8 @@ pubspec.lock
 # === Flutter & Dart ===
 .dart_tool/
 **/build/
+
+
+/.env
+/.env.*
+*.env

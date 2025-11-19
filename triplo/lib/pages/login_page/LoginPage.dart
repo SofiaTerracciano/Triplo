@@ -63,7 +63,9 @@ class LoginPage extends StatelessWidget {
                     controller: passwordcontroller,
 
                   ),
-                  const SizedBox(height: 30),
+
+                  const SizedBox(height: 16),
+
                   Center(
                     child: SizedBox(
                       width: 250,
@@ -114,6 +116,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         child: const Text('Login', style: TextStyle(fontSize: 18, color: Colors.white)),
                       )
+
                     ),
                   )
 ,
@@ -126,7 +129,7 @@ class LoginPage extends StatelessWidget {
                           onPressed: () async{
                             await signInWithGoogle(b);
                             ScaffoldMessenger.of(b).showSnackBar(
-                              const SnackBar(content: Text('Google sign-in')),
+                              const SnackBar(content: Text('Authenticated with Google sign-in')),
                             );
                           },
                           icon : Image. asset(
@@ -147,15 +150,30 @@ class LoginPage extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pushNamed(b, '/registration');
-                    ScaffoldMessenger.of(b).showSnackBar(
-                      const SnackBar(content: Text('Sign-up'))
-                    );
+                    //ScaffoldMessenger.of(b).showSnackBar(
+                    //  const SnackBar(content: Text('Sign-up'))
+                    //);
                   },
                    child : const Text(
                        "Don't have an account? Sign up",
                      style: TextStyle(fontSize: 16, color: Colors.blueAccent),
                    ) ,
-                )
+                ),
+                  const SizedBox(height: 30),
+
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(b, '/forgotten_password');
+                      },
+                      child: const Text(
+                          'Forgot password?',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.blueAccent,
+                            decoration: TextDecoration.underline,
+                          )
+                      )
+                  ),
 
               ],
               )
@@ -178,46 +196,97 @@ class LoginPage extends StatelessWidget {
     }
   }
 
+  ///Firebase Google sign-in
+  Future<void> signInWithGoogle(BuildContext b) async{
+    final GoogleSignIn googleSignIn = GoogleSignIn();
 
-
-
-  Future<void> signInWithGoogle(BuildContext BB) async{
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
+      await googleSignIn.signOut();
+      final GoogleSignInAccount ? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
-        ScaffoldMessenger.of(BB).showSnackBar(
+        ScaffoldMessenger.of(b).showSnackBar(
           const SnackBar(content: Text('Google sign-in cancelled')),
         );
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser
-          .authentication;
-
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
+
+
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+          credential);
+      final user = userCredential.user;
 
-      ScaffoldMessenger.of(BB).showSnackBar(
-        SnackBar(
-            content: Text('Welcome, ${googleUser.displayName ?? 'User'}!')),
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        ScaffoldMessenger.of(b).showSnackBar(
+          SnackBar(
+            content: Text('Welcome, ${user?.displayName ??
+                'you are now registered on the application'}!'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(b).showSnackBar(
+          SnackBar(
+            content: Text('Welcome back, ${user?.displayName}!'),
+          ),
+        );
+      }
+
+
+
+
+
+
+
+
+
+
+    } on FirebaseAuthException catch (e) {
+      String message = 'Google sign-in failed: ${e.message}';
+
+      if (e.code == 'account-exists-with-different-credential') {
+        message = 'Account exists wth different credential';
+      } else if (e.code == 'invalid-credential') {
+        message = 'Invalid Google credential';
+      }
+
+      ScaffoldMessenger.of(b).showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(b).showSnackBar(
+        const SnackBar(content: Text('Error')),
       );
     }
 
-    on FirebaseAuthException catch(e){
-      ScaffoldMessenger.of(BB).showSnackBar(
-        SnackBar(content: Text('Google sign-in failed: ${e.message}'))
 
-
-
-      );} catch(e) {
-        ScaffoldMessenger.of(BB).showSnackBar(
-          const SnackBar(content: Text('An unexpected error occurred')),
-        );
-      }
   }
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
