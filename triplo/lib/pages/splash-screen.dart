@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -8,7 +15,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _sloganController;
 
@@ -35,31 +43,37 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     );
 
     // "T" animation
-    _tScale = Tween<double>(begin: 0.8, end: 1.0).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
-    ));
+    _tScale = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
+      ),
+    );
 
     // "T" opacity animation
-    _tOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-    ));
+    _tOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
+      ),
+    );
 
     // "riplo" animation
-    _riploSlide = Tween<Offset>(
-      begin: const Offset(0.4, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-    ));
+    _riploSlide = Tween<Offset>(begin: const Offset(0.4, 0.0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _logoController,
+            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
 
     // "riplo" opacity animation
-    _riploOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
-    ));
+    _riploOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
 
     // Slogan animation
     _sloganOpacity = CurvedAnimation(
@@ -75,9 +89,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     // Navigate to home page after 4 seconds
     Future.delayed(const Duration(milliseconds: 4000), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MyHomePage()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const MyHomePage()));
     });
   }
 
@@ -96,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           // Patterned background
           Positioned.fill(
             child: Container(
-              color: const Color.fromARGB(255, 218, 249, 215), 
+              color: const Color.fromARGB(255, 218, 249, 215),
               child: Opacity(
                 opacity: 0.25, // slight transparency
                 child: LayoutBuilder(
@@ -116,7 +130,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           children: List.generate(cols, (x) {
                             final emojis = ['🏔️', '🌲', '🗻', '⛺', '🔥', '🥾'];
                             final e = emojis[(x + y) % emojis.length];
-                            return Text(e, style: const TextStyle(fontSize: 20));
+                            return Text(
+                              e,
+                              style: const TextStyle(fontSize: 20),
+                            );
                           }),
                         );
                       }),

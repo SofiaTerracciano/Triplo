@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/l10n/app_localizations_de.dart';
+import 'package:triplo/l10n/app_localizations_it.dart';
+import 'package:triplo/l10n/app_localizations_en.dart';
+import 'package:triplo/l10n/app_localizations_fr.dart';
+import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 ///Login Page for the Triplo App, allowing sign in with email and password and Google sign-in
 class LoginPage extends StatelessWidget {
-
   final TextEditingController emailcontroller = TextEditingController();
   final TextEditingController passwordcontroller = TextEditingController();
   LoginPage({super.key});
 
   @override
   Widget build(BuildContext b) {
-
     return Scaffold(
       //appBar: AppBar(title: const Text('Login'),),
 
@@ -73,25 +78,27 @@ class LoginPage extends StatelessWidget {
                         final email = emailcontroller.text.trim();
                         final password = passwordcontroller.text.trim();
 
-                        if(email.isEmpty || password.isEmpty) {
+                        if (email.isEmpty || password.isEmpty) {
                           ScaffoldMessenger.of(b).showSnackBar(
-                            const SnackBar(content: Text('Please fill in both fields')),
+                            const SnackBar(
+                              content: Text('Please fill in both fields'),
+                            ),
                           );
                           return;
                         }
 
                         //Firebase
                         //ScaffoldMessenger.of(b).showSnackBar(
-                          //SnackBar(content: Text('Logging in')),
+                        //SnackBar(content: Text('Logging in')),
                         //);
-                        try{
+                        try {
                           await login(email, password);
                           ScaffoldMessenger.of(b).showSnackBar(
-                          const SnackBar(content: Text('Logged in'))
+                            const SnackBar(content: Text('Logged in')),
                           );
 
                           //Navigator.pushReplacementNamed(b, '/home);
-                        } on FirebaseAuthException catch(e) {
+                        } on FirebaseAuthException catch (e) {
                           String message;
                           switch (e.code) {
                             case 'user-not-found':
@@ -103,16 +110,16 @@ class LoginPage extends StatelessWidget {
                             default:
                               message = 'Login failed : ${e.message}';
                           }
-                          ScaffoldMessenger.of(b).showSnackBar(
-                            SnackBar(content: Text(message)),
-                          );
+                          ScaffoldMessenger.of(
+                            b,
+                          ).showSnackBar(SnackBar(content: Text(message)));
                         }
-
                       },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text('Login', style: TextStyle(fontSize: 18, color: Colors.white)),
                       )
@@ -144,8 +151,9 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                    )
-                  ,
+                    ),
+                  ),
+                ),
 
                 TextButton(
                   onPressed: () {
@@ -176,23 +184,24 @@ class LoginPage extends StatelessWidget {
                   ),
 
               ],
-              )
-
-            )
-          )
-      )
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   ///Firebase email and password login
   Future<void> login(String email, String password) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       print('Logged in');
-    } on FirebaseAuthException catch(e) {
+    } on FirebaseAuthException catch (e) {
       print('Error: ${e.message}');
       rethrow;
-
     }
   }
 
