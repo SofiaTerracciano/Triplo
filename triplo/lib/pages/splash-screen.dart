@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/l10n/app_localizations_de.dart';
@@ -9,7 +9,9 @@ import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, required this.onLocaleChanged});
+   final void Function(Locale) onLocaleChanged;
+
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -211,4 +213,4 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
+}*/

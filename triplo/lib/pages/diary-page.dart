@@ -10,8 +10,9 @@ import 'package:flutter/src/material/icons.dart';
 
 class DiaryPage extends StatefulWidget {
   final String routeName;
+  final void Function(Locale) onLocaleChanged;
 
-  DiaryPage({super.key, required this.routeName});
+  DiaryPage({super.key, required this.routeName, required this.onLocaleChanged});
 
   @override
   _DiaryPageState createState() => _DiaryPageState();
@@ -26,6 +27,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(widget.routeName), centerTitle: true),
 
@@ -58,8 +60,8 @@ class _DiaryPageState extends State<DiaryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Date: ', // da prendere dal db
+                        Text(
+                          '${local.date_trecking_label}', // da prendere dal db
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
@@ -70,8 +72,8 @@ class _DiaryPageState extends State<DiaryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Duration: ',
+                        Text(
+                          '${local.duration_trekking_label}: ',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],
@@ -82,7 +84,10 @@ class _DiaryPageState extends State<DiaryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text('Friends: ', style: TextStyle(fontSize: 14)),
+                        Text(
+                          '${local.friends_trekking_label}: ', 
+                          style: TextStyle(fontSize: 14)
+                        ),
                       ],
                     ),
                   ],
@@ -111,7 +116,12 @@ class _DiaryPageState extends State<DiaryPage> {
           // Other information about the trekking
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [const Text('Images: ', style: TextStyle(fontSize: 14))],
+            children: [ 
+              Text(
+                '${local.photos_trekking_label}: ', 
+                style: TextStyle(fontSize: 14)
+              )
+            ],
           ),
           const SizedBox(height: 10),
           SingleChildScrollView(
@@ -144,7 +154,10 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Challenges: ', style: TextStyle(fontSize: 14)),
+              Text(
+                '${local.challenges_trekking_label}: ', 
+                style: TextStyle(fontSize: 14)
+              ),
               // fai json in cui metti path dell'immagine della sfida e descrzione della sfida
             ],
           ),
@@ -153,7 +166,10 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Refuge: ', style: TextStyle(fontSize: 14)),
+              Text(
+                '${local.refuge_trekking_label}: ', 
+                style: TextStyle(fontSize: 14)
+              ),
               //modo dinamico per mettere le stelline al rifugio
             ],
           ),
@@ -161,7 +177,10 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Mood: ', style: TextStyle(fontSize: 14)),
+              Text(
+                '${local.mood_trekking_label}: ', 
+                style: TextStyle(fontSize: 14)
+              ),
               // fai come le challenges
             ],
           ),
@@ -169,7 +188,10 @@ class _DiaryPageState extends State<DiaryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Notes: ', style: TextStyle(fontSize: 14)),
+              Text(
+                '${local.notes_trekking_label}: ', 
+                style: TextStyle(fontSize: 14)
+              ),
               // prendi da database
             ],
           ),

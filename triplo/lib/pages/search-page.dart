@@ -12,8 +12,12 @@ import 'setting-page.dart';
 import 'diary-page.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
-
+  final void Function(Locale) onLocaleChanged;
+  const SearchPage({
+    super.key, 
+    required this.onLocaleChanged
+  });
+  
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
@@ -29,13 +33,6 @@ class _SearchPageState extends State<SearchPage> {
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home', style: optionStyle),
-    Text('Profile', style: optionStyle),
-    Text('Search', style: optionStyle),
-    Text('Settings', style: optionStyle),
-  ];
 
   // Initialize the controller and focus node
   @override
@@ -62,9 +59,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final bool isFocused = _focusNode.hasFocus;
     final bool hasText = _searchController.text.isNotEmpty;
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: _widgetOptions[_selectedIndex], centerTitle: true),
+      appBar: AppBar(title: Text(local.search_page_title), centerTitle: true),
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -80,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
                     decoration: InputDecoration(
                       hintText: isFocused
                           ? ''
-                          : 'Search', // It disappears when focused
+                          : local.search_page_title, // It disappears when focused
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon:
                           hasText // Show X only if there's text
@@ -113,7 +111,10 @@ class _SearchPageState extends State<SearchPage> {
                       _focusNode.unfocus(); // Dismiss keyboard
                       setState(() {}); // Reset state
                     },
-                    child: const Text('Cancel', style: TextStyle(fontSize: 17)),
+                    child: Text(
+                      local.cancel_button_label, 
+                      style: TextStyle(fontSize: 17)
+                    ),
                   ),
                 ],
               ],
@@ -138,7 +139,10 @@ class _SearchPageState extends State<SearchPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              DiaryPage(routeName: "Percorso $index"),
+                              DiaryPage(
+                                routeName: "Percorso $index",
+                                onLocaleChanged: widget.onLocaleChanged
+                              ),
                         ),
                       );
                     },
@@ -225,54 +229,62 @@ class _SearchPageState extends State<SearchPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
-                'Menu',
+                local.menu_title,
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home', style: optionStyle),
-              selected: _selectedIndex == 0,
+              title: Text(
+                local.home_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile', style: optionStyle),
-              selected: _selectedIndex == 1,
+              title: Text(
+                local.profile_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const UserPage()),
+                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search', style: optionStyle),
-              selected: _selectedIndex == 2,
+              title: Text(
+                local.search_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings', style: optionStyle),
-              selected: _selectedIndex == 3,
+              title: Text(
+                local.settings_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingPage()),
+                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),

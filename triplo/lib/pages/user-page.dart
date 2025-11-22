@@ -15,7 +15,8 @@ import 'search-page.dart';
 //DA CAPIRE LA COSA DEL POP
 
 class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+  const UserPage({super.key, required this.onLocaleChanged});
+  final void Function(Locale) onLocaleChanged;
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -31,22 +32,16 @@ class _UserPageState extends State<UserPage> {
     fontStyle: FontStyle.italic,
   );
 
-  // Page titles for AppBar
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home', style: optionStyle),
-    Text('Profile', style: optionStyle),
-    Text('Search', style: optionStyle),
-    Text('Settings', style: optionStyle),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     // TabController for tabs in the body (public, private, saved)
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: _widgetOptions[_selectedIndex],
+          title: Text(local.profile_page_title),
           centerTitle: true, // Forced center the title
         ),
 
@@ -69,13 +64,13 @@ class _UserPageState extends State<UserPage> {
                       CircleAvatar(radius: 40, backgroundColor: Colors.grey),
                       SizedBox(height: 8),
                       Text(
-                        'Username',
+                        local.username_label,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text('Livello: Esperto'),
+                      Text('${local.level_label} : ${local.advanced_level}'),
                     ],
                   ),
                 ),
@@ -87,7 +82,7 @@ class _UserPageState extends State<UserPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Percorsi fatti',
+                        local.done_trekking_label,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -97,9 +92,9 @@ class _UserPageState extends State<UserPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(label: 'Totali', value: '40'),
-                          _StatItem(label: 'Pubblicati', value: '20'),
-                          _StatItem(label: 'Privati', value: '20'),
+                          _StatItem(label: local.totals_trekking_label, value: '40'),
+                          _StatItem(label: local.published_trekking_label, value: '20'),
+                          _StatItem(label: local.private_trekking_label, value: '20'),
                         ],
                       ),
                     ],
@@ -122,11 +117,13 @@ class _UserPageState extends State<UserPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SettingPage(),
+                            builder: (context) => SettingPage(
+                              onLocaleChanged: widget.onLocaleChanged,
+                            ),
                           ),
                         );
                       },
-                      child: const Text('Settings'),
+                      child: Text(local.settings_page_title),
                     ),
                   ],
                 ),
@@ -155,7 +152,7 @@ class _UserPageState extends State<UserPage> {
                           },
                         );
                       },
-                      child: const Text('Share Profile'),
+                      child: Text(local.share_profile_button_label),
                     ),
                   ],
                 ),
@@ -178,7 +175,7 @@ class _UserPageState extends State<UserPage> {
                         10, //sarà dinamico -> numero di percorsi pubblici
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('Public Path ${index + 1}'),
+                        title: Text('${local.published_trekking_label}  ${index + 1}'),
                         onTap: () {
                           showDialog(
                             context: context,
@@ -207,7 +204,7 @@ class _UserPageState extends State<UserPage> {
                     itemCount: 10, //sarà dinamico -> numero di percorsi privati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('Private Path ${index + 1}'),
+                        title: Text('${local.private_trekking_label} ${index + 1}'),
                         onTap: () {
                           // Azione al tap sul percorso privato
                         },
@@ -218,7 +215,7 @@ class _UserPageState extends State<UserPage> {
                     itemCount: 10, //sarà dinamico -> numero di percorsi salvati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('Saved Path ${index + 1}'),
+                        title: Text('${local.save_trekking_button_label} ${index + 1}'),
                         onTap: () {
                           // Azione al tap sul percorso salvato
                         },
@@ -236,56 +233,62 @@ class _UserPageState extends State<UserPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
+              DrawerHeader(
                 decoration: BoxDecoration(color: Colors.greenAccent),
                 child: Text(
-                  'Menu',
+                  local.menu_title,
                   style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.home),
-                title: const Text('Home', style: optionStyle),
-                selected: _selectedIndex == 0,
+                title: Text(
+                  local.home_page_title, 
+                  style: optionStyle
+                ),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const MyHomePage()),
+                    MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('Profile', style: optionStyle),
-                selected: _selectedIndex == 1,
+                title: Text(
+                  local.profile_page_title, 
+                  style: optionStyle
+                ),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const UserPage()),
+                    MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.search),
-                title: const Text('Search', style: optionStyle),
-                selected: _selectedIndex == 2,
+                title: Text(
+                  local.search_page_title, 
+                  style: optionStyle
+                ),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const SearchPage()),
+                    MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings', style: optionStyle),
-                selected: _selectedIndex == 3,
+                title: Text(
+                  local.settings_page_title, 
+                  style: optionStyle
+                ),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingPage(),
-                    ),
+                    MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
                   );
                 },
               ),
@@ -302,7 +305,10 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({required this.label, required this.value});
+  const _StatItem({
+    required this.label, 
+    required this.value
+  });
 
   @override
   Widget build(BuildContext context) {

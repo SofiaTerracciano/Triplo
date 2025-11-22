@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 
-
 import 'package:triplo/pages/landing_page/landing_page.dart';
 
 import 'package:triplo/pages/login_page/LoginPage.dart';
@@ -69,7 +68,7 @@ class _MyAppState extends State<MyApp> {
       // Usa le routes (niente 'home:' in questo caso)
       initialRoute: '/landing_page',
       routes: {
-        '/landing_page': (context) => Landing_Page(), // o LandingPage() se la tua classe si chiama così
+        '/landing_page': (context) => Landing_Page(onLocaleChanged: setLocale), // o LandingPage() se la tua classe si chiama così
         '/login': (context) => const LoginPage(),
         '/registration': (context) => const RegistrationPage(),
         '/forgotten_password': (context) => ForgottenPasswordPage(),

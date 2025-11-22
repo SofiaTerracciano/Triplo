@@ -101,6 +101,12 @@ abstract class AppLocalizations {
     Locale('it')
   ];
 
+  /// No description provided for @menu_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu_title;
+
   /// No description provided for @home_page_title.
   ///
   /// In en, this message translates to:
@@ -239,6 +245,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language_field_label;
 
+  /// No description provided for @language_selection_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get language_selection_label;
+
   /// No description provided for @starting_point_trekking_label.
   ///
   /// In en, this message translates to:
@@ -268,6 +280,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ending Point'**
   String get ending_point_trekking_label;
+
+  /// No description provided for @info_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get info_trekking_label;
 
   /// No description provided for @description_trekking_label.
   ///

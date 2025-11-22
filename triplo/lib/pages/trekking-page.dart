@@ -10,8 +10,13 @@ import 'package:flutter/src/material/icons.dart';
 
 class TrekkingPage extends StatefulWidget {
   final String routeName;
+  final void Function(Locale) onLocaleChanged;
 
-  TrekkingPage({super.key, required this.routeName});
+  TrekkingPage({
+    super.key,
+    required this.routeName,
+    required this.onLocaleChanged,
+  });
 
   @override
   _TrekkingPageState createState() => _TrekkingPageState();
@@ -32,6 +37,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.routeName),
@@ -67,17 +74,24 @@ class _TrekkingPageState extends State<TrekkingPage> {
             children: [
               //placeholder dell'immagine del percorso (facciamo lo screen)
               Row(),
-              Row(children: [Text("Starting Point: XYZ")]),
-              Row(children: [Text("Level: Medium")]),
-              Row(children: [Text("Distance: 10 km")]),
-              Row(children: [Text("Estimated Time: 3 hours")]),
+              Row(
+                children: [Text("${local.starting_point_trekking_label}: XYZ")],
+              ),
+              Row(children: [Text("${local.level_label}: Medium")]),
+              Row(children: [Text("${local.distance_trekking_label}: 10 km")]),
+              Row(
+                children: [
+                  Text("${local.estimated_time_trekking_label}: 3 hours"),
+                ],
+              ),
               Row(
                 children: [
                   RichText(
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Elevation Gain: 500 m  ',
+                          text:
+                              '${local.elevaition_gain_trekking_label}: 500 m  ',
                           style: TextStyle(color: Colors.black),
                         ),
                         //da capire dai dati
@@ -88,10 +102,18 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ),
                 ],
               ),
-              Row(children: [Text("Ending Point: ABC")]),
+              Row(
+                children: [Text("${local.ending_point_trekking_label}: ABC")],
+              ),
               //immagine ending point
               Row(),
-              Row(children: [Text("Info: Beautiful trek with scenic views.")]),
+              Row(
+                children: [
+                  Text(
+                    "${local.info_trekking_label}: Beautiful trek with scenic views.",
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   //mettere una legenda da qualche parte?
@@ -111,24 +133,24 @@ class _TrekkingPageState extends State<TrekkingPage> {
               ),
               Row(
                 children: [
-                  Text("Description"), // da prendere da DB
+                  Text("${local.description_trekking_label}"), // da prendere da DB
                 ],
               ),
               Row(
                 children: [
                   Text(
-                    "Ristors Points",
+                    "${local.refreshment_point_trekking_label}",
                   ), // non sarà un text, ma sarà interattivo
                 ],
               ),
               Row(
                 children: [
-                  Text("Picnic"), // sarà un true o false
+                  Text("${local.pic_nic_area_trekking_label}"), // sarà un true o false
                 ],
               ),
               Row(
                 children: [
-                  Text("Adapt to famiglis"), // sarà un true o false
+                  Text("${local.family_friendly_trekking_label}"), // sarà un true o false
                 ],
               ),
               // Add more details and widgets as needed

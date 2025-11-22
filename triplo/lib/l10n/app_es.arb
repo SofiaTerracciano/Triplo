@@ -1,6 +1,8 @@
 {
   "@@locale": "es",
 
+  "menu_title": "Menu",
+  
   "home_page_title": "Home",
   "repositioning_button_label": "Recentrar",
 
@@ -27,12 +29,14 @@
   "surname_field_label": "Apellido",
   "birthdate_field_label": "Fecha de nacimiento",
   "language_field_label": "Idioma",
+  "language_selection_label": "Seleccionar idioma",
 
   "starting_point_trekking_label": "Punto de inicio",
   "distance_trekking_label": "Distancia",
   "estimated_time_trekking_label": "Tiempo estimado",
   "elevaition_gain_trekking_label": "Desnivel",
   "ending_point_trekking_label": "Punto final",
+  "info_trekking_label": "Info",
   "description_trekking_label": "Descripción",
   "refreshment_point_trekking_label": "Puntos de descanso",
   "pic_nic_area_trekking_label": "Área de picnic",

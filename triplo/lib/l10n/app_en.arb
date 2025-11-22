@@ -1,6 +1,8 @@
 {
     "@@locale": "en",
 
+    "menu_title": "Menu",
+    
     "home_page_title": "Home",
     "repositioning_button_label": "Move me",
     
@@ -27,12 +29,14 @@
     "surname_field_label": "Surname",
     "birthdate_field_label": "Birthdate",
     "language_field_label": "Language",
+    "language_selection_label": "Select Language",
 
     "starting_point_trekking_label": "Starting Point",
     "distance_trekking_label": "Distance",
     "estimated_time_trekking_label": "Estimated Time",
     "elevaition_gain_trekking_label": "Elevation Gain",
     "ending_point_trekking_label": "Ending Point",
+    "info_trekking_label": "Info",
     "description_trekking_label": "Description",
     "refreshment_point_trekking_label": "Refreshments",
     "pic_nic_area_trekking_label": "Picnic Areas",

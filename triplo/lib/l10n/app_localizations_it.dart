@@ -9,6 +9,9 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String get menu_title => 'Menu';
+
+  @override
   String get home_page_title => 'Home';
 
   @override
@@ -78,6 +81,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get language_field_label => 'Lingua';
 
   @override
+  String get language_selection_label => 'Seleziona Lingua';
+
+  @override
   String get starting_point_trekking_label => 'Punto d\'inizio';
 
   @override
@@ -93,10 +99,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get ending_point_trekking_label => 'Punto di fine';
 
   @override
+  String get info_trekking_label => 'Info';
+
+  @override
   String get description_trekking_label => 'Descrizione';
 
   @override
-  String get refreshment_point_trekking_label => 'Punti ristorop';
+  String get refreshment_point_trekking_label => 'Punti ristoro';
 
   @override
   String get pic_nic_area_trekking_label => 'Area Picnic';

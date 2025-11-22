@@ -15,7 +15,9 @@ import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart
 import 'trekking-page.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({super.key, required this.onLocaleChanged});
+   final void Function(Locale) onLocaleChanged;
+
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -24,11 +26,13 @@ class MyHomePage extends StatefulWidget {
 class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
   final List<Map<String, dynamic>> routes;
+  final void Function(Locale) onLocaleChanged;
 
   const ZoomAwareMap({
+    super.key,
     required this.mapController,
     required this.routes,
-    super.key,
+    required this.onLocaleChanged,
   });
 
   @override
@@ -66,6 +70,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    
     return Stack(
       children: [
         FlutterMap(
@@ -100,7 +106,10 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          TrekkingPage(routeName: tapped.tag!),
+                        TrekkingPage(
+                          routeName: tapped.tag!,
+                          onLocaleChanged: widget.onLocaleChanged
+                          ),
                     ),
                   );
                 },
@@ -134,7 +143,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               heroTag: "recenter",
               backgroundColor: Colors.white,
               icon: const Icon(Icons.my_location, color: Colors.black),
-              label: const Text("Move me"),
+              label: Text(local.repositioning_button_label),
               onPressed: () {
                 widget.mapController.move(LatLng(46.230, 10.831), 12);
                 setState(() => showRecenter = false);
@@ -218,14 +227,6 @@ class _MyHomePageState extends State<MyHomePage> {
     },
   ];
 
-  // Page titles for AppBar
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home', style: optionStyle),
-    Text('Profile', style: optionStyle),
-    Text('Search', style: optionStyle),
-    Text('Settings', style: optionStyle),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final mapController = MapController();
@@ -233,11 +234,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: _widgetOptions[_selectedIndex],
+        title: Text(
+          local.home_page_title, 
+          style: optionStyle
+        ),
         centerTitle: true, // Forced center the title
       ),
 
-      body: ZoomAwareMap(mapController: mapController, routes: _routes),
+      body: ZoomAwareMap(
+        mapController: mapController, 
+        routes: _routes,
+        onLocaleChanged: widget.onLocaleChanged,
+      ),
 
       // Zoom buttons
       floatingActionButton: Column(
@@ -264,61 +272,69 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .endFloat, // Positioning the button to the bottom right
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positioning the button to the bottom right
+
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
-                'Menu',
+                local.menu_title,
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: Text(AppLocalizations.of(context)!.home_page_title, style: optionStyle),
-              selected: _selectedIndex == 0,
+              title: Text(
+                local.home_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: Text(AppLocalizations.of(context)!.profile_page_title, style: optionStyle),
-              selected: _selectedIndex == 1,
+              title: Text(
+                local.profile_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const UserPage()),
+                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(AppLocalizations.of(context)!.search_page_title, style: optionStyle),
-              selected: _selectedIndex == 2,
+              title: Text(
+                local.search_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: Text(AppLocalizations.of(context)!.settings_page_title, style: optionStyle),
-              selected: _selectedIndex == 3,
+              title: Text(
+                local.settings_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingPage()),
+                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),

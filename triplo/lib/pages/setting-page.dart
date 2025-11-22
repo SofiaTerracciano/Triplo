@@ -11,8 +11,12 @@ import 'user-page.dart';
 import 'search-page.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({super.key});
-  /*final void Function(Locale)? onLocaleChanged;*/
+  final void Function(Locale) onLocaleChanged;
+
+  const SettingPage({
+    super.key, 
+    required this.onLocaleChanged
+  });
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -28,19 +32,13 @@ class _SettingPageState extends State<SettingPage> {
     fontStyle: FontStyle.italic,
   );
 
-  // Page titles for AppBar
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home', style: optionStyle),
-    Text('Profile', style: optionStyle),
-    Text('Search', style: optionStyle),
-    Text('Settings', style: optionStyle),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: _widgetOptions[_selectedIndex],
+        title: Text(local.settings_page_title),
         centerTitle: true, // Forced center the title
       ),
 
@@ -61,8 +59,8 @@ class _SettingPageState extends State<SettingPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Username: ',
+                        Text(
+                          local.username_label,
                           style: TextStyle(fontSize: 14),
                         ),
                         IconButton(
@@ -85,8 +83,8 @@ class _SettingPageState extends State<SettingPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Password: ',
+                        Text(
+                          local.password_label,
                           style: TextStyle(fontSize: 14),
                         ),
                         IconButton(
@@ -128,8 +126,8 @@ class _SettingPageState extends State<SettingPage> {
                           onPressed: () {
                             // to do modifica foto profilo
                           },
-                          child: const Text(
-                            'Edit Profile Photo',
+                          child: Text(
+                            local.edit_profile_photo_button_label,
                             style: TextStyle(fontSize: 12),
                           ),
                         ),
@@ -147,7 +145,10 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Name: ', style: TextStyle(fontSize: 14)),
+              Text(
+                local.name_field_label, 
+                style: TextStyle(fontSize: 14)
+              ),
               IconButton(
                 onPressed: () {
                   // to do modifica name
@@ -164,7 +165,10 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Surname: ', style: TextStyle(fontSize: 14)),
+              Text(
+                local.surname_field_label, 
+                style: TextStyle(fontSize: 14)
+              ),
               IconButton(
                 onPressed: () {
                   // to do modifica surname
@@ -181,7 +185,10 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Birthdate: ', style: TextStyle(fontSize: 14)),
+              Text(
+                local.birthdate_field_label, 
+                style: TextStyle(fontSize: 14)
+              ),
               IconButton(
                 onPressed: () {
                   // to do modifica bithdate
@@ -198,7 +205,10 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Email: ', style: TextStyle(fontSize: 14)),
+              Text(
+                local.email_label, 
+                style: TextStyle(fontSize: 14)
+              ),
               IconButton(
                 onPressed: () {
                   // to do modifica email
@@ -215,20 +225,20 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Text('Language: ', style: TextStyle(fontSize: 14)),
+              Text(
+                local.language_field_label, 
+                style: TextStyle(fontSize: 14)
+              ),
               IconButton(
-                onPressed: () async {
-                  final selected = await showDialog<Locale>(
+                onPressed: (){
+                  showDialog(
                     context: context,
-                    builder: (context) => LanguageDialog(),
+                    builder: (context) => LanguageDialog(
+                      onLocaleSelected: (locale) {
+                        widget.onLocaleChanged(locale);
+                      },
+                    ),
                   );
-
-                  /*  if (selected != null) {
-                  //onLanguageChanged(selected);
-                  AlertDialog(
-                    content: Text('Language changed to: ${selected.languageCode}'),
-                  ); 
-                }*/
                 },
                 icon: const Icon(Icons.edit, size: 16),
               ),
@@ -248,54 +258,62 @@ class _SettingPageState extends State<SettingPage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(color: Colors.greenAccent),
               child: Text(
-                'Menu',
+                local.menu_title,
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Home', style: optionStyle),
-              selected: _selectedIndex == 0,
+              title: Text(
+                local.home_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: const Text('Profile', style: optionStyle),
-              selected: _selectedIndex == 1,
+              title: Text(
+                local.profile_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const UserPage()),
+                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: const Text('Search', style: optionStyle),
-              selected: _selectedIndex == 2,
+              title: Text(
+                local.search_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings', style: optionStyle),
-              selected: _selectedIndex == 3,
+              title: Text(
+                local.settings_page_title, 
+                style: optionStyle
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingPage()),
+                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
                 );
               },
             ),
@@ -308,54 +326,45 @@ class _SettingPageState extends State<SettingPage> {
 
 // Popup dialog to select the language
 class LanguageDialog extends StatelessWidget {
-  LanguageDialog({super.key});
+  final void Function(Locale) onLocaleSelected;
 
-  final Map<String, Locale> languages = {
-    'English': const Locale('en'),
-    'Italian': const Locale('it'),
-  };
-
-  //TODO: implementare il cambio lingua effettivo nell'app
+  const LanguageDialog({
+    super.key, 
+    required this.onLocaleSelected
+  });
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    
     return AlertDialog(
-      title: const Text('Select Language'),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: <Widget>[
-            TextButton(
-              child: const Text('English'),
-              onPressed: () {},
-              /*onPressed: () async{
-                final selected = await showDialog<Locale>(
-                  context: context,
-                  builder: (context) => LanguageDialog(onLocaleChanged: widget.onLocaleChanged);
-                  },),
-                );
-                if(selected != null){
-                  onLocalChanged(selected);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Language changed to: ${selected.languageCode}'),
-                    duration: const Duration(seconds: 2),),
-                  );
-                }
-                //locale -> to change the language of the app
-                //Navigator.of(context).pop(const Locale('en'));
-              },*/
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              child: const Text('Italian'),
-              onPressed: () {
-                AlertDialog(content: Text('Language changed to: italian'));
-                //Navigator.of(context).pop(const Locale('it'));
-              },
-            ),
-          ],
-        ),
+      title: Text(local.language_selection_label),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _langTile(context, "🇬🇧", "English", const Locale('en')),
+          _langTile(context, "🇮🇹", "Italiano", const Locale('it')),
+          _langTile(context, "🇪🇸", "Español", const Locale('es')),
+          _langTile(context, "🇩🇪", "Deutsch", const Locale('de')),
+          _langTile(context, "🇫🇷", "Français", const Locale('fr')),
+        ],
       ),
+    );
+  }
+
+  Widget _langTile(
+    BuildContext context,
+    String flag,
+    String name,
+    Locale locale,
+  ) {
+    return ListTile(
+      leading: Text(flag, style: const TextStyle(fontSize: 22)),
+      title: Text(name),
+      onTap: () {
+        onLocaleSelected(locale);
+        Navigator.pop(context);
+      },
     );
   }
 }
