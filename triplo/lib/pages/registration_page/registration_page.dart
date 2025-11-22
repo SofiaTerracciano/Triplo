@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
@@ -9,9 +10,10 @@ import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 
+import '../user-page.dart';
+
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
-
   @override
   State<StatefulWidget> createState() => _RegistrationPageState();
 }
@@ -108,13 +110,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                       password: password,
                                     );
 
+                                // CREA IL DOCUMENTO IN FIRESTORE
+                                final user = FirebaseAuth.instance.currentUser;
+
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user!.uid)
+                                    .set({
+
+                                  'username': email.split('@')[0],
+                                  'level': 'principiante',
+                                  'photoURL': '',
+                                  'registerdate': FieldValue.serverTimestamp(),
+
+                                });
+
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Registration successful'),
                                   ),
                                 );
 
-                                //Navigator.pushReplacementNamed(context '/home');
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserPage(onLocaleChanged: (loc) {}),
+                                  ),
+                                ); //Navigator.pushReplacementNamed(context '/home');
                               } on FirebaseAuthException catch (e) {
                                 String message;
                                 switch (e.code) {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
@@ -11,6 +13,12 @@ import 'package:flutter/src/material/icons.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+import 'package:image_picker/image_picker.dart';
+
 
 //DA CAPIRE LA COSA DEL POP
 
@@ -23,6 +31,69 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+
+
+
+  Map<String, dynamic>? userData;
+
+  final ImagePicker _picker = ImagePicker();
+  //open image from phone
+  Future<XFile?> _pickImage() async {
+    return await _picker.pickImage(source: ImageSource.gallery);
+  }
+  //load firebase storage
+  Future<String?> uploadProfilePicture(File image) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('profile_photos')
+        .child(uid)
+        .child('$uid.jpg');
+
+    try {
+      await ref.putFile(image);
+      final url = await ref.getDownloadURL();
+      return url;
+    } catch (e) {
+      print('Errore upload: $e');
+      return null;
+    }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+
+    setState(() {
+      userData = doc.data();
+    });
+  }
+
+  Future<void> _saveProfileURL(String url) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .update({'photoURL': url});
+
+    // Aggiorno i dati mostrati nella UI
+    setState(() {
+      userData?['photoURL'] = url;
+    });
+  }
+
   int _selectedIndex = 1;
 
   // TextStyle for texts
@@ -43,6 +114,15 @@ class _UserPageState extends State<UserPage> {
         appBar: AppBar(
           title: Text(local.profile_page_title),
           centerTitle: true, // Forced center the title
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
+            ),
+          ],
         ),
 
         body: Column(
@@ -61,16 +141,38 @@ class _UserPageState extends State<UserPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      CircleAvatar(radius: 40, backgroundColor: Colors.grey),
+                      GestureDetector(
+                        onTap: () async {
+                          final picked = await _pickImage();
+                          if (picked == null) return;
+
+                          final file = File(picked.path);
+
+                          final url = await uploadProfilePicture(file);
+                          if (url != null) {
+                            await _saveProfileURL(url);
+                          }
+                        },
+
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: userData?['photoURL'] != null
+                              ? NetworkImage(userData!['photoURL'])
+                              : null,
+                          backgroundColor: Colors.grey,
+                        ),
+                      ),
                       SizedBox(height: 8),
                       Text(
-                        local.username_label,
+                        //local.username_label,
+                        userData?['username'] ?? 'Loading...',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text('${local.level_label} : ${local.advanced_level}'),
+                      //Text('${local.level_label} : ${local.advanced_level}'),
+                      Text('Livello: ${userData?['level'] ?? '...'}')
                     ],
                   ),
                 ),

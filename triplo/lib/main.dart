@@ -13,10 +13,21 @@ import 'package:triplo/pages/registration_page/registration_page.dart';
 import 'package:triplo/pages/forgotten_password_page/forgotten_password_page.dart';
 import 'package:triplo/pages/geowatch/geowatch.dart';
 
+
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint(".env file not found — continuing without it.");
+  }
 
-  await dotenv.load(fileName: ".env");
+
+
+
+
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -24,6 +35,7 @@ Future<void> main() async {
 
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
