@@ -46,6 +46,8 @@ dependencies:
   share_plus: ^10.0.2
   geocoding: ^3.0.0
   cloud_firestore: ^5.6.12
+  firebase_storage: ^12.1.1
+  image_picker: ^1.1.1
   #flutter_map_tile_caching: ^10.1.1
 
 
