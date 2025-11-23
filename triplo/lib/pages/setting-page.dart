@@ -23,8 +23,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  int _selectedIndex = 3;
-
   //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,

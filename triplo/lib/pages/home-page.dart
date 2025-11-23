@@ -156,8 +156,6 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
   // TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,

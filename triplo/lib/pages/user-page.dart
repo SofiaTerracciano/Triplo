@@ -94,8 +94,6 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-  int _selectedIndex = 1;
-
   // TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,

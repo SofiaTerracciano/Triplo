@@ -23,7 +23,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  int _selectedIndex = 2;
   late final TextEditingController _searchController;
   late final FocusNode _focusNode;
 
