@@ -57,6 +57,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get advanced_level => 'Esperto';
 
   @override
+  String get follow_label => 'Segui';
+
+  @override
+  String get followed_label => 'Seguito';
+
+  @override
   String get search_page_title => 'Cerca';
 
   @override

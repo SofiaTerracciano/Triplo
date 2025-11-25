@@ -1,53 +1,61 @@
+import 'user.dart';
+import 'trekking.dart';
+
 class Diary {
-  String _route; //title of the diary --> route done
-  DateTime _date;
-  double _estimated_time;
-  List _friends;
-  String? _photo;
-  String? _challengers;
-  String _refreshment_point;
-  String _mood; 
-  String _notes;
+  final String diaryId;
+
+  String routeId;               // <-- SOLO ID del trekking
+  DateTime date;
+  double duration;
+  List<Users> friends;
+  List<String> photos;
+  List<String> challenges;
+  String refreshmentPoint;
+  String mood;
+  String notes;
 
   Diary({
-    required String route,
-    required DateTime date,
-    required double estimated_time,
-    required List friends,
-    String? photo,
-    String? challengers,
-    required String refreshment_point,
-    required String mood,
-    required String notes,
-  })  : _route = route,
-        _date = date,
-        _estimated_time = estimated_time,
-        _friends = friends,
-        _photo = photo,
-        _challengers = challengers,
-        _refreshment_point = refreshment_point,
-        _mood = mood,
-        _notes = notes;
-  
-  // Getters
-  String get route => _route;
-  DateTime get date => _date;
-  double get estimatedTime => _estimated_time;
-  List get friends => _friends;
-  String? get photo => _photo;
-  String? get challengers => _challengers;
-  String get refreshmentPoint => _refreshment_point;
-  String get mood => _mood;
-  String get notes => _notes;
+    required this.diaryId,
+    required this.routeId,
+    required this.date,
+    required this.duration,
+    required this.friends,
+    required this.photos,
+    required this.challenges,
+    required this.refreshmentPoint,
+    required this.mood,
+    required this.notes,
+  });
 
-  // Setters
-  set route(String route) => _route = route;
-  set date(DateTime date) => _date = date;
-  set estimatedTime(double estimatedTime) => _estimated_time = estimatedTime;
-  set friends(List friends) => _friends = friends;
-  set photo(String? photo) => _photo = photo;
-  set challengers(String? challengers) => _challengers = challengers;
-  set refreshmentPoint(String refreshmentPoint) => _refreshment_point = refreshmentPoint;
-  set mood(String mood) => _mood = mood;
-  set notes(String notes) => _notes = notes;
+  // SERIALIZZAZIONE
+  Map<String, dynamic> toMap() {
+    return {
+      "RouteId": routeId,
+      "Date": date.toIso8601String(),
+      "Duration": duration,
+      "Friends": friends.map((f) => f.toMap()).toList(),
+      "Photos": photos,
+      "Challenges": challenges,
+      "Refreshment_point": refreshmentPoint,
+      "Mood": mood,
+      "Notes": notes,
+    };
+  }
+
+  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
+    return Diary(
+      diaryId: diaryId,
+      routeId: map["RouteId"],               // solo ID del trekking
+      date: DateTime.parse(map["Date"]),
+      duration: (map["Duration"] as num).toDouble(),
+      friends: (map["Friends"] as List)
+          .map((f) => Users.fromMap(f))
+          .toList(),
+      photos: List<String>.from(map["Photos"]),
+      challenges: List<String>.from(map["Challenges"]),
+      refreshmentPoint: map["Refreshment_point"],
+      mood: map["Mood"],
+      notes: map["Notes"],
+    );
+  }
 }

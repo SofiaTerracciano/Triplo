@@ -20,6 +20,9 @@
     "intermediate_level": "Intermedio",
     "advanced_level": "Esperto",
 
+    "follow_label": "Segui",
+    "followed_label": "Seguito",
+
     "search_page_title": "Cerca",
     "cancel_button_label": "Cancella",
 

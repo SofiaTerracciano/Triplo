@@ -20,6 +20,9 @@
     "intermediate_level": "Intermediate",
     "advanced_level": "Advanced",
 
+    "follow_label": "follow",
+    "followed_label": "followed",
+
     "search_page_title": "Search",
     "cancel_button_label": "Cancel",
 

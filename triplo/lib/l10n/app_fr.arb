@@ -20,6 +20,9 @@
   "intermediate_level": "Intermédiaire",
   "advanced_level": "Expert",
 
+  "follow_label": "Suivre",
+  "followed_label": "Suivi",
+
   "search_page_title": "Rechercher",
   "cancel_button_label": "Annuler",
 

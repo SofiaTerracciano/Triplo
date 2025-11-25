@@ -13,21 +13,28 @@ import 'package:flutter/src/material/icons.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
+import 'user-page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:image_picker/image_picker.dart';
 
-class UserPage extends StatefulWidget {
-  const UserPage({super.key, required this.onLocaleChanged});
+
+//DA CAPIRE LA COSA DEL POP
+
+class UserPagePublic extends StatefulWidget {
+  const UserPagePublic({super.key, required this.onLocaleChanged});
   final void Function(Locale) onLocaleChanged;
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State<UserPagePublic> createState() => _UserPageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _UserPageState extends State<UserPagePublic> {
+
+
+
   Map<String, dynamic>? userData;
 
   final ImagePicker _picker = ImagePicker();
@@ -54,6 +61,7 @@ class _UserPageState extends State<UserPage> {
       return null;
     }
   }
+
 
   @override
   void initState() {
@@ -155,8 +163,7 @@ class _UserPageState extends State<UserPage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        //local.username_label,
-                        userData?['username'] ?? 'Loading...',
+                        local.username_label,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -215,7 +222,7 @@ class _UserPageState extends State<UserPage> {
                           ),
                         );
                       },
-                      child: Text(local.settings_page_title),
+                      child: Text(local.follow_label),
                     ),
                   ],
                 ),

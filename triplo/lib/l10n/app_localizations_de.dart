@@ -57,6 +57,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get advanced_level => 'Experte';
 
   @override
+  String get follow_label => 'Folgen';
+
+  @override
+  String get followed_label => 'Gefolgt';
+
+  @override
   String get search_page_title => 'Suche';
 
   @override

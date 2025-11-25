@@ -57,6 +57,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get advanced_level => 'Advanced';
 
   @override
+  String get follow_label => 'follow';
+
+  @override
+  String get followed_label => 'followed';
+
+  @override
   String get search_page_title => 'Search';
 
   @override

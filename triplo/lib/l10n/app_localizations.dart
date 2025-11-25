@@ -197,6 +197,18 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get advanced_level;
 
+  /// No description provided for @follow_label.
+  ///
+  /// In en, this message translates to:
+  /// **'follow'**
+  String get follow_label;
+
+  /// No description provided for @followed_label.
+  ///
+  /// In en, this message translates to:
+  /// **'followed'**
+  String get followed_label;
+
   /// No description provided for @search_page_title.
   ///
   /// In en, this message translates to:

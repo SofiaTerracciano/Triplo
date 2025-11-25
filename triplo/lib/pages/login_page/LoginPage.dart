@@ -123,10 +123,6 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
 
-
-
-
-
       // Navigate to UserPage
       Navigator.pushReplacement(
         context,
