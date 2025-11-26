@@ -16,12 +16,13 @@ import 'trekking-page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.onLocaleChanged});
-   final void Function(Locale) onLocaleChanged;
+  final void Function(Locale) onLocaleChanged;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+// Widget that updates its content based on the zoom level
 class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
   final List<Map<String, dynamic>> routes;
@@ -55,7 +56,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
     super.initState();
     mapController = MapController();
 
-    // Ascolta tutti gli eventi della mappa
+    // Listener to verify zoom changes
     widget.mapController.mapEventStream.listen((event) {
       if (event is MapEventMove || event is MapEventMoveEnd) {
         setState(() {
@@ -70,7 +71,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    
+
     return Stack(
       children: [
         FlutterMap(
@@ -85,7 +86,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               subdomains: const ['a', 'b', 'c'],
             ),
 
-            // Polylines solo zoom >= 20
+            // Polylines only at high zoom of all trekkings available
             if (currentZoom >= 12)
               TappablePolylineLayer(
                 polylineCulling: false,
@@ -104,17 +105,16 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                        TrekkingPage(
-                          routeName: tapped.tag!,
-                          onLocaleChanged: widget.onLocaleChanged
-                          ),
+                      builder: (context) => TrekkingPage(
+                        routeName: tapped.tag!,
+                        onLocaleChanged: widget.onLocaleChanged,
+                      ),
                     ),
                   );
                 },
               ),
 
-            // Marker unico quando zoom < 20
+            // Unic marker at low zoom for each trekking start point
             if (currentZoom < 12)
               MarkerLayer(
                 markers: [
@@ -133,7 +133,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
           ],
         ),
 
-        // Pulsante Riposizionami
+        // Move to center button
         if (showRecenter)
           Positioned(
             top: 20,
@@ -164,10 +164,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   late final MapController mapController;
 
-  // Center initiale della mappa
+  // Initial center of the map
   final LatLng mapInitialCenter = const LatLng(46.230, 10.831);
 
-  // Limiti massimi della mappa
+  // Bounds of the map area
   final LatLngBounds bounds = LatLngBounds(
     LatLng(46.199, 10.753),
     LatLng(46.257, 10.887),
@@ -179,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     mapController = MapController();
 
-    // Listener per verificare zoom e posizione
+    // Listener to verify zoom changes
     mapController.mapEventStream.listen((event) {
       if (event is MapEventMove || event is MapEventMoveEnd) {
         setState(() {});
@@ -298,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
         LatLng(46.164182, 10.693414),
         LatLng(46.164081, 10.693303),
         LatLng(46.164037, 10.693453),
-        LatLng(46.163953, 10.693133)
+        LatLng(46.163953, 10.693133),
       ],
     },
     {
@@ -322,15 +322,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          local.home_page_title, 
-          style: optionStyle
-        ),
+        title: Text(local.home_page_title, style: optionStyle),
         centerTitle: true, // Forced center the title
       ),
 
       body: ZoomAwareMap(
-        mapController: mapController, 
+        mapController: mapController,
         routes: _routes,
         onLocaleChanged: widget.onLocaleChanged,
       ),
@@ -360,8 +357,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Positioning the button to the bottom right
-
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .endFloat, // Positioning the button to the bottom right
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
@@ -376,53 +373,53 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: Text(
-                local.home_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.home_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        MyHomePage(onLocaleChanged: widget.onLocaleChanged),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: Text(
-                local.profile_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.profile_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UserPage(onLocaleChanged: widget.onLocaleChanged),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(
-                local.search_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.search_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SearchPage(onLocaleChanged: widget.onLocaleChanged),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: Text(
-                local.settings_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.settings_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SettingPage(onLocaleChanged: widget.onLocaleChanged),
+                  ),
                 );
               },
             ),
@@ -433,14 +430,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// Function to convert difficulty level to color
 Color difficultyToColor(String difficulty) {
   switch (difficulty.toLowerCase()) {
     case "easy":
       return Colors.lightBlue;
     case "medium":
-      return Colors.orange;
-    case "hard":
       return Colors.red;
+    case "hard":
+      return Colors.black;
     default:
       return Colors.blueGrey; // fallback
   }

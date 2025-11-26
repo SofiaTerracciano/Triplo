@@ -161,3 +161,13 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 }
+
+/*// Function to get icon based on trekking attributes
+Icon trekkingIcon(Trekking t) {
+  if (t.pic_nic_area) {
+    return const Icon(Icons.park, color: Colors.green, size: 40);
+  }
+  if (t.family_firendly) {
+    return const Icon(Icons.family_restroom, size: 40);
+  }
+}*/

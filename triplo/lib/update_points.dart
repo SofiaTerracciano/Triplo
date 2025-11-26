@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latlong2/latlong.dart';
-import 'firebase_options.dart';
 
+// Sentiero delle cascate - Val Genova
 final List<LatLng> points = [
   LatLng(46.173287, 10.737364),
   LatLng(46.172935, 10.737014),
@@ -101,22 +100,49 @@ final List<LatLng> points = [
   LatLng(46.163953, 10.693133)
 ];
 
-Future<void> main() async {
-  // Inizializza Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+class AdminUploadPage extends StatelessWidget {
+  const AdminUploadPage({super.key});
 
-  final db = FirebaseFirestore.instance;
+  Future<void> uploadPoints() async {
+    final db = FirebaseFirestore.instance;
+    final docRef = db.collection('trekking').doc('0ozWP0pBQN8Gkk6FP5Lf');
 
-  final pointsGeo = points.map((p) => GeoPoint(p.latitude, p.longitude)).toList();
+    // Converti i LatLng in GeoPoint
+    final pointsGeo = points.map((p) => GeoPoint(p.latitude, p.longitude)).toList();
 
-  try {
-    await db.collection('trekking').doc('0ozWP0pBQN8Gkk6FP5Lf').set({
-      'Points': pointsGeo,
-    });
-    print('Punti caricati correttamente!');
-  } catch (e) {
-    print('Errore durante il caricamento: $e');
+    try {
+      final snapshot = await docRef.get();
+
+      if (!snapshot.exists || snapshot.data()?['Points'] == null) {
+        // Caso 1: il campo Points NON ESISTE --> lo creo da zero
+        await docRef.set({
+          'Points': pointsGeo,
+        }, SetOptions(merge: true));
+
+        print("Array 'Points' creato e popolato!");
+      } else {
+        // Caso 2: il campo Points esiste --> aggiungo i punti
+        await docRef.update({
+          'Points': FieldValue.arrayUnion(pointsGeo),
+        });
+
+        print("Punti aggiunti all’array esistente!");
+      }
+    } catch (e) {
+      print("Errore: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Admin: Upload Punti")),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: uploadPoints,
+          child: const Text("Carica punti nel Database"),
+        ),
+      ),
+    );
   }
 }

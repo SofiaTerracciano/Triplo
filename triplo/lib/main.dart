@@ -13,8 +13,8 @@ import 'package:triplo/pages/registration_page/registration_page.dart';
 import 'package:triplo/pages/forgotten_password_page/forgotten_password_page.dart';
 import 'package:triplo/pages/geowatch/geowatch.dart';
 
-
-
+// solo per caricare i punti di un trekking
+import 'package:triplo/update_points.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,11 +23,6 @@ Future<void> main() async {
   } catch (e) {
     debugPrint(".env file not found — continuing without it.");
   }
-
-
-
-
-
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -85,6 +80,9 @@ class _MyAppState extends State<MyApp> {
         '/registration': (context) => const RegistrationPage(),
         '/forgotten_password': (context) => ForgottenPasswordPage(),
         '/geowatch': (context) => const GeoWatchPage(),
+
+         // bottone per caricare i punti di un trekking
+        '/admin_upload': (context) => const AdminUploadPage(),
       },
     );
   }

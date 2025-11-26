@@ -15,6 +15,9 @@ import 'package:triplo/pages/Login_Page/LoginPage.dart';
 // Import da sottocartella geowatch
 import 'package:triplo/pages/geowatch/geowatch.dart';
 
+// Import della pagina admin che carica i punti
+import 'package:triplo/update_points.dart';
+
 class Landing_Page extends StatelessWidget {
   const Landing_Page({super.key, required this.onLocaleChanged});
   final void Function(Locale) onLocaleChanged;
@@ -33,6 +36,27 @@ class Landing_Page extends StatelessWidget {
           _buildNavButton(context, 'User Page',  UserPage(onLocaleChanged: onLocaleChanged)),
           _buildNavButton(context, 'Login Page', LoginPage()),
           _buildNavButton(context, 'GeoWatch', GeoWatchPage()),
+          
+           // Bottone per caricare i punti trekking
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+            ),
+            child: const Text(
+              "Carica punti trekking nel DB",
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminUploadPage(),
+                ),
+              );
+            },
+          ),
+          
         ],
       ),
     );
