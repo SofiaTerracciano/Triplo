@@ -1,4 +1,5 @@
 import 'package:latlong2/latlong.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Trekking {
   final String documentId;
@@ -13,11 +14,12 @@ class Trekking {
   bool _downGain;
   LatLng _starting_point;
   LatLng _ending_point;
+  List<LatLng> _points;
   String _starting_point_name;
   String _ending_point_name;
-  String _info;
+  List<String> _info;
   String _endingPointPhoto;
-  String _description;
+  List<String> _description;
   String _refreshment_point;
   bool _pic_nic_area;
   bool _family_firendly;
@@ -33,15 +35,16 @@ class Trekking {
     required bool upGain,
     required bool downGain,
     required LatLng startingPoint,
-    LatLng? endingPoint,
-    String? startingPointName,
-    String? endingPointName,
-    String? info,
-    String? endingPointPhoto,
-    String? description,
-    String? refreshmentPoint,
-    bool picNicArea = false,
-    bool familyFirendly = false,
+    required LatLng endingPoint,
+    required List<LatLng> points,
+    required String startingPointName,
+    required String endingPointName,
+    required List<String> info,
+    required String endingPointPhoto,
+    required List<String> description,
+    required String refreshmentPoint,
+    required bool picNicArea,
+    required bool familyFirendly,
   }) : _name = name,
        _mapPhoto = mapPhoto,
        _difficulty_level = difficultyLevel,
@@ -51,13 +54,14 @@ class Trekking {
        _upGain = upGain,
        _downGain = downGain,
        _starting_point = startingPoint,
-       _ending_point = endingPoint ?? startingPoint,
-       _starting_point_name = startingPointName ?? '',
-       _ending_point_name = endingPointName ?? '',
-       _info = info ?? '',
-       _endingPointPhoto = endingPointPhoto ?? '',
-       _description = description ?? '',
-       _refreshment_point = refreshmentPoint ?? '',
+       _ending_point = endingPoint,
+       _points = points,
+       _starting_point_name = startingPointName,
+       _ending_point_name = endingPointName,
+       _info = info,
+       _endingPointPhoto = endingPointPhoto,
+       _description = description,
+       _refreshment_point = refreshmentPoint,
        _pic_nic_area = picNicArea,
        _family_firendly = familyFirendly;
 
@@ -72,14 +76,37 @@ class Trekking {
   bool get downGain => _downGain;
   LatLng get starting_point => _starting_point;
   LatLng get ending_point => _ending_point;
+  List<LatLng> get points => _points;
   String get starting_point_name => _starting_point_name;
   String get ending_point_name => _ending_point_name;
-  String get info => _info;
+  List<String> get info => _info;
   String get endingPointPhoto => _endingPointPhoto;
-  String get description => _description;
+  List<String> get description => _description;
   String get refreshment_point => _refreshment_point;
   bool get pic_nic_area => _pic_nic_area;
   bool get family_firendly => _family_firendly;
+
+ // Setters
+  set name(String value) => _name = value;
+  set mapPhoto(String value) => _mapPhoto = value;
+  set difficulty_level(String value) => _difficulty_level = value;
+  set distance(double value) => _distance = value;
+  set estimated_time(double value) => _estimated_time = value;
+  set elevation_gain(double value) => _elevation_gain = value;
+  set upGain(bool value) => _upGain = value;
+  set downGain(bool value) => _downGain = value;
+  set starting_point(LatLng value) => _starting_point = value;
+  set ending_point(LatLng value) => _ending_point = value;
+  set points(List<LatLng> value) => _points = value;
+  set starting_point_name(String value) => _starting_point_name = value;
+  set ending_point_name(String value) => _ending_point_name = value;
+  set info(List<String> value) => _info = value;
+  set endingPointPhoto(String value) => _endingPointPhoto = value;
+  set description(List<String> value) => _description = value;
+  set refreshment_point(String value) => _refreshment_point = value;
+  set pic_nic_area(bool value) => _pic_nic_area = value;
+  set family_firendly(bool value) => _family_firendly = value;
+
 
   // Mappa → Firestore
   Map<String, dynamic> toMap() {
@@ -92,19 +119,12 @@ class Trekking {
       "Elevation_gain": _elevation_gain,
       "Up_gain": _upGain,
       "Down_gain": _downGain,
-      "Starting_point": {
-        "Latitudine": _starting_point.latitude,
-        "Longitudine": _starting_point.longitude,
-      },
-      "Ending_point": {
-        "Latitudine": _ending_point.latitude,
-        "Longitudine": _ending_point.longitude,
-      },
+      "Points": _points.map((p) => GeoPoint(p.latitude, p.longitude)).toList(),
       "Starting_point_name": _starting_point_name,
       "Ending_point_name": _ending_point_name,
-      "Info": _info,
+      "Info": _info.map((i) => i.toString()).toList(),
       "Ending_point_photo": _endingPointPhoto,
-      "Description": _description,
+      "Description": _description.map((i) => i.toString()).toList(),
       "Refreshment_point": _refreshment_point,
       "Picnic_area": _pic_nic_area,
       "Family_friendly": _family_firendly,
@@ -113,6 +133,20 @@ class Trekking {
 
   // Firestore → Model
   factory Trekking.fromMap(Map<String, dynamic> map, {required String docId}) {
+    List<LatLng> pts = (map["Points"] as List<dynamic>)
+      .map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
+      .toList();
+
+    final List<String>  info = (map["Info"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? [];
+
+    final List<String>  description = (map["Description"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? [];  
+
     return Trekking(
       documentId: docId,
       name: map["Name"],
@@ -123,19 +157,14 @@ class Trekking {
       elevationGain: (map["Elevation_gain"] as num).toDouble(),
       upGain: map["Up_gain"],
       downGain: map["Down_gain"],
-      startingPoint: LatLng(
-        map["Starting_point"]["Latitudine"],
-        map["Starting_point"]["Longitudine"],
-      ),
-      endingPoint: LatLng(
-        map["Ending_point"]["Latitudine"],
-        map["Ending_point"]["Longitudine"],
-      ),
+      startingPoint: pts.first,
+      endingPoint: pts.last,
+      points: pts,
       startingPointName: map["Starting_point_name"],
       endingPointName: map["Ending_point_name"],
-      info: map["Info"],
-      endingPointPhoto: map["Ending_point_photo"],
-      description: map["Description"],
+      info: info,
+      endingPointPhoto: map["Photo_ending_point"],
+      description: description,
       refreshmentPoint: map["Refreshment_point"],
       picNicArea: map["Picnic_area"],
       familyFirendly: map["Family_friendly"],

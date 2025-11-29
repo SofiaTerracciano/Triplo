@@ -325,7 +325,7 @@ class AdminUploadPage extends StatelessWidget {
 
   Future<void> uploadPoints() async {
     final db = FirebaseFirestore.instance;
-    final docRef = db.collection('trekking').doc('0ozWP0pBQN8Gkk6FP5Lf');
+    final docRef = db.collection('trekking').doc('PhdcnlgoNwFCREXbksn2');
 
     // Converti i LatLng in GeoPoint
     final pointsGeo = points.map((p) => GeoPoint(p.latitude, p.longitude)).toList();

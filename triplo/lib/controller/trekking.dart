@@ -1,31 +1,45 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter/material.dart';
 
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   List<Trekking> _trekkings;
+  bool _loaded = false;
 
-  TrekkingController({
-    required List<Trekking> trekkings,
-  }) : _trekkings = trekkings;
 
-  // Getter per tutta la collezione
+  TrekkingController({required List<Trekking> trekkings})
+    : _trekkings = trekkings;
+
+  // Getter for all trekkings
   List<Trekking> get allTrekkings => _trekkings;
 
-  // Carica tutti i trekking dalla collezione
-  Future<void> loadTrekkings() async {
-    final snapshot = await _db.collection("trekking").get();
+  // Load trekkings from Firestore
+  Future<void> loadTrekking() async {
+    if (_loaded) return; // To avoid reloading
+    _loaded = true;
 
-    _trekkings = snapshot.docs.map((doc) {
-      return Trekking.fromMap(doc.data(), docId: doc.id);
-    }).toList();
+    // Fetch trekking documents from Firestore
+    final snap = await _db
+        .collection('trekkings') // andrà messo trekking
+        .get();
+
+    // Map documents to Trekking objects
+    _trekkings = snap.docs
+        .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
+        .toList();
 
     notifyListeners();
   }
 
-  // Getter trekking per indice
+  // Callback when a trekking is selected
+  void Function(Trekking trekking)? onTrekkingSelected;
+
+  // Getter trekking per index
   Trekking getTrekkingByIndex(int index) => _trekkings[index];
 
   // Getter trekking per documentId
