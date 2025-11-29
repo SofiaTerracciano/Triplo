@@ -108,7 +108,7 @@ class Trekking {
   set family_firendly(bool value) => _family_firendly = value;
 
 
-  // Mappa → Firestore
+  // Model --> Firestore
   Map<String, dynamic> toMap() {
     return {
       "Name": _name,
@@ -131,22 +131,26 @@ class Trekking {
     };
   }
 
-  // Firestore → Model
+  // Firestore --> Model
   factory Trekking.fromMap(Map<String, dynamic> map, {required String docId}) {
+    // Convert Firestore GeoPoint to LatLng
     List<LatLng> pts = (map["Points"] as List<dynamic>)
       .map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
       .toList();
 
+    // Convert List<dynamic> to List<String> for info
     final List<String>  info = (map["Info"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];
 
+    // Convert List<dynamic> to List<String> for description
     final List<String>  description = (map["Description"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];  
 
+    // Create Trekking instance
     return Trekking(
       documentId: docId,
       name: map["Name"],
