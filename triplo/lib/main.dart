@@ -16,6 +16,9 @@ import 'package:triplo/pages/geowatch/geowatch.dart';
 // solo per caricare i punti di un trekking
 import 'package:triplo/update_points.dart';
 
+import 'package:provider/provider.dart';
+import 'package:triplo/controller/user.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -50,7 +53,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => UserController()),
+        ],
+    child: MaterialApp(
       title: 'Triplo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -84,6 +91,7 @@ class _MyAppState extends State<MyApp> {
          // bottone per caricare i punti di un trekking
         '/admin_upload': (context) => const AdminUploadPage(),
       },
+    )
     );
   }
 }

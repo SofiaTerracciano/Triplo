@@ -19,6 +19,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:image_picker/image_picker.dart';
 
+import 'package:provider/provider.dart';
+import 'package:triplo/controller/user.dart';
+
 class UserPage extends StatefulWidget {
   const UserPage({super.key, required this.onLocaleChanged});
   final void Function(Locale) onLocaleChanged;
@@ -28,14 +31,16 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  Map<String, dynamic>? userData;
+  //Map<String, dynamic>? userData;
+  //final user = Provider.of<UserController>(context).currentUser;
 
   final ImagePicker _picker = ImagePicker();
   //open image from phone
   Future<XFile?> _pickImage() async {
     return await _picker.pickImage(source: ImageSource.gallery);
   }
-  //load firebase storage
+
+  /*
   Future<String?> uploadProfilePicture(File image) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -54,13 +59,12 @@ class _UserPageState extends State<UserPage> {
       return null;
     }
   }
-
+ */
   @override
   void initState() {
     super.initState();
-    _loadUser();
   }
-
+/*
   Future<void> _loadUser() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -80,12 +84,15 @@ class _UserPageState extends State<UserPage> {
         .collection('users')
         .doc(uid)
         .update({'photoURL': url});
-
+*/
     // Aggiorno i dati mostrati nella UI
+  /*
     setState(() {
-      userData?['photoURL'] = url;
-    });
-  }
+      user.photoProfile != null
+          ? NetworkImage(user.photoProfile!)
+          : null    });
+   */
+
 
   // TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
@@ -96,6 +103,44 @@ class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<UserController>(context);
+    final user = controller.currentUser;
+/*
+    if (user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+ */
+
+    if (user == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.person_off, size: 70, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text(
+                "You are not logged in",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "Please login to access your profile",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: const Text("Go to Login"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final local = AppLocalizations.of(context)!;
 
     // TabController for tabs in the body (public, private, saved)
@@ -109,9 +154,13 @@ class _UserPageState extends State<UserPage> {
             IconButton(
               icon: Icon(Icons.logout),
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
+                final controller = Provider.of<UserController>(context, listen: false);
+
+                await controller.logout();
+
                 Navigator.pushReplacementNamed(context, '/login');
               },
+
             ),
           ],
         ),
@@ -139,24 +188,23 @@ class _UserPageState extends State<UserPage> {
 
                           final file = File(picked.path);
 
-                          final url = await uploadProfilePicture(file);
-                          if (url != null) {
-                            await _saveProfileURL(url);
-                          }
+                          await controller.updateProfilePhoto(file);
+
                         },
 
                         child: CircleAvatar(
                           radius: 40,
-                          backgroundImage: userData?['photoURL'] != null
-                              ? NetworkImage(userData!['photoURL'])
+                          backgroundImage: (user.photoProfile != null && user.photoProfile!.isNotEmpty)
+                              ? NetworkImage(user.photoProfile!)
                               : null,
+
                           backgroundColor: Colors.grey,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         //local.username_label,
-                        userData?['username'] ?? 'Loading...',
+                        user.username,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

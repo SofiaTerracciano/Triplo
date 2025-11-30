@@ -11,21 +11,85 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 
 import '../user-page.dart';
+import 'package:provider/provider.dart';
+import 'package:triplo/controller/user.dart';
 
+
+/**
+ * Registration page for creating a new Triplo profile, handles UI and validation.
+ */
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
   @override
   State<StatefulWidget> createState() => _RegistrationPageState();
 }
 
+
+
+
+
+
+/**
+ * Handles the registration by:
+ * 1. Validating the fields
+ * 2. Delegating the actual registration to UserController.register()
+ * 3. Navigating the user after successful registration
+ */
 class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
-      TextEditingController();
+ TextEditingController();
 
   bool _isLoading = false;
 
+
+
+  /** Validates the fields and delegates registration to the controller for the user.*/
+  Future<void> _register(BuildContext context) async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirm = confirmPasswordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in every field")),
+      );
+      return;
+    }
+
+    if (password != confirm) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final controller = Provider.of<UserController>(context, listen: false);
+
+    try {
+      await controller.register(email, password);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registration successful")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => UserPage(onLocaleChanged: (l) {})),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Registration failed: $e")),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  /** UI for the Registration Page */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,101 +134,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
                 const SizedBox(height: 30),
 
+
+
+
                 Center(
                   child: SizedBox(
                     width: 250,
                     child: ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () async {
-                              final email = emailController.text.trim();
-                              final password = passwordController.text.trim();
-                              final confirmPassword = confirmPasswordController
-                                  .text
-                                  .trim();
-                              if (email.isEmpty ||
-                                  password.isEmpty ||
-                                  confirmPassword.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please fill in every field'),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              if (password != confirmPassword) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Passwords do not match'),
-                                  ),
-                                );
-                                return;
-                              }
-                              setState(() => _isLoading = true);
-
-                              try {
-                                await FirebaseAuth.instance
-                                    .createUserWithEmailAndPassword(
-                                      email: email,
-                                      password: password,
-                                    );
-
-                                // CREA IL DOCUMENTO IN FIRESTORE
-                                final user = FirebaseAuth.instance.currentUser;
-
-                                await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(user!.uid)
-                                    .set({
-
-                                  'username': email.split('@')[0],
-                                  'level': 'principiante',
-                                  'photoURL': '',
-                                  'registerdate': FieldValue.serverTimestamp(),
-
-                                });
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Registration successful'),
-                                  ),
-                                );
-
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UserPage(onLocaleChanged: (loc) {}),
-                                  ),
-                                ); //Navigator.pushReplacementNamed(context '/home');
-                              } on FirebaseAuthException catch (e) {
-                                String message;
-                                switch (e.code) {
-                                  case 'weak-password':
-                                    message = 'Password is too weak';
-                                    break;
-
-                                  case 'email-already-in-use':
-                                    message =
-                                        'This email is already registered';
-                                    break;
-
-                                  case 'invalid email':
-                                    message = 'Invalid email';
-                                    break;
-
-                                  default:
-                                    message =
-                                        'Registration failed : ${e.message}';
-                                }
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(message)),
-                                );
-                              } finally {
-                                setState(() => _isLoading = false);
-                              }
-                            },
+                      onPressed: _isLoading ? null : () => _register(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -172,25 +149,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-
                       child: _isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Register',
-
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
+                          ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          : const Text("Register", style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
                 ),
