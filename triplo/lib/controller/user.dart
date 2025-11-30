@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,19 +6,37 @@ import 'package:flutter/foundation.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
 
+/**
+ * Controller responsible for:
+ * Authentication (email/password + Google)
+ * Creating user documents in Firestore
+ * Loading complete user profile
+ * Converting IDs into full objects (followers, diaries, etc.)
+ * Updating profile picture
+ */
+
+
+
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Users? _currentUser;
+  Users? _currentUser; // Local copy of logged user
   bool _loaded = false;
 
 
   Users? get currentUser => _currentUser;
 
-  // -----------------------------------------------------------
-  // REGISTER (EMAIL + PWD)
-  // -----------------------------------------------------------
+
+  /**
+   * Registers a new user using email and password.
+   * Steps:
+   * 1. Creates a FirebaseAuth account.
+   * 2. Creates a Firestore user document with model fields.
+   * 3. Loads the full user profile into the local model.
+   *
+   * This method is used exclusively for manual email/password sign-up
+   */
   Future<void> register(String email, String password) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -34,9 +51,13 @@ class UserController extends ChangeNotifier {
     await loadUser(uid);
   }
 
-  // -----------------------------------------------------------
-  // LOGIN EMAIL + PASSWORD
-  // -----------------------------------------------------------
+  /**
+   * Logs in a user using email and password.
+   * After authentication, this method:
+   * 1. Ensures the Firestore user document exists
+   * 2. Loads the complete user profile, including
+   *    followers, following, and diaries.
+   */
   Future<void> login(String email, String password) async {
     final credential = await _auth.signInWithEmailAndPassword(
       email: email,
@@ -61,14 +82,20 @@ class UserController extends ChangeNotifier {
 
   }
 
-  // -----------------------------------------------------------
-  // LOGIN GOOGLE
-  // -----------------------------------------------------------
+  /**
+   * Logs in a user using Google Sign-In.
+   * This method:
+   * Receives Google credentials from the LoginPage
+   * Uses them to authenticate with FirebaseAuth
+   * Ensures a Firestore document exists for the Google profile.
+   * Loads the user's full profile into memory.
+   * Supports creating a new Firestore user for the Google profile
+   * if the user has never logged in using Google
+   */
   Future<void> loginWithGoogle(AuthCredential credential) async {
     final userCredential = await _auth.signInWithCredential(credential);
     final user = userCredential.user!;
     final uid = user.uid;
-
     final email = user.email ?? "";
     final display = user.displayName ?? "";
 
@@ -85,16 +112,14 @@ class UserController extends ChangeNotifier {
       username: username,
       photoURL: photoURL,
     );
-
     await loadUser(uid);
   }
 
 
-  // -----------------------------------------------------------
-  // CREA DOCUMENTO FIRESTORE SE NON ESISTE
-  // -----------------------------------------------------------
+  /** Creates a new user document in Firestore matching the User model fields */
   Future<void> _createFirestoreUser(String uid, String email) async {
     await _db.collection("users").doc(uid).set({
+
       "Username": email.split('@')[0],
       "Photo_profile": "",
       "Name": "",
@@ -110,6 +135,11 @@ class UserController extends ChangeNotifier {
     });
   }
 
+  /**
+   * Ensures that a Firestore user document exists.
+   * Used mainly for Google login for new users.
+   * If the document does not exist, it is created with default fields.
+   */
   Future<void> _ensureFirestoreUserExists({
     required String uid,
     required String email,
@@ -136,9 +166,13 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // -----------------------------------------------------------
-  // LOAD USER
-  // -----------------------------------------------------------
+  /**
+   * Loads the user's complete profile from Firestore.
+   * This method:
+   * Reads basic user fields (email, username, photo, etc.)
+   * Reads lists of IDs (followers, following, diaries...)
+   * Builds from each ID a full Users/Diary object using helper methods
+   */
   Future<void> loadUser(String uid) async {
 
     //if (_loaded) return;
@@ -167,7 +201,7 @@ class UserController extends ChangeNotifier {
       birthdate = DateTime(2000, 1, 1);
     }
 
-    // Convertiamo le liste di stringhe --> Oggetti Users e Diary
+    // Conversione di liste di stringhe --> Oggetti Users e Diary
     List<String> followersIds = List<String>.from(data["Followers"] ?? []);
     List<String> followingIds = List<String>.from(data["Following"] ?? []);
     List<String> publicDiaryIds = List<String>.from(data["Public_diary"] ?? []);
@@ -240,11 +274,12 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // -----------------------------------------------------------
-  // HELPERS: FETCH USER + FETCH DIARY
-  // -----------------------------------------------------------
 
 
+  /**
+   * Fetches a user document by UID and converts it into a Users object.
+   * Used by loadUser() to reconstruct followers and following lists.
+   */
   Future<Users?> _fetchUserById(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     if (!snap.exists) return null;
@@ -254,7 +289,13 @@ class UserController extends ChangeNotifier {
   }
 
 
-
+  /**
+   * Fetches a diary entry by ID and returns a Diary.
+   * Used by loadUser() to build:
+   * - publicDiaryPages
+   * - privateDiaryPages
+   * - savedTrekkings
+   */
   Future<Diary?> _fetchDiary(String docId) async {
     final snap = await _db.collection("diary").doc(docId).get();
     if (!snap.exists) return null;
@@ -262,9 +303,7 @@ class UserController extends ChangeNotifier {
     return Diary.fromMap(snap.data()!, diaryId: docId);
   }
 
-  // -----------------------------------------------------------
-  // LOGOUT
-  // -----------------------------------------------------------
+  /** Handles logout of the user */
   Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
@@ -280,19 +319,17 @@ class UserController extends ChangeNotifier {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  /// Updates the profile picture of the current user.
+  /// This method uploads the selected image file to Firebase Storage
+  /// inside a folder named "profile_photos/<uid>/uid.jpg".
+  /// After the upload, it retrieves the public download URL and
+  /// updates the "Photo_profile" field in the user's Firestore record.
+  /// Updates the in-memory `_currentUser` model
+  /// and notifies listeners so that the UI refreshes.
+  /// Steps:
+  /// 1. Uploads the image file to Firebase Storage.
+  /// 2. Saves the URL of the image inside the "Photo_profile" field in Firestore.
+  /// 3. Updates the local user model and refresh UI.
   Future<void> updateProfilePhoto(File image) async {
     final uid = _auth.currentUser!.uid;
 
@@ -311,6 +348,19 @@ class UserController extends ChangeNotifier {
 
     _currentUser?.photoProfile = url;
     notifyListeners();
+  }
+
+
+
+
+
+
+
+
+  /// Sends a password reset link to the given email.
+  /// This method throws FirebaseAuthException if something goes wrong.
+  Future<void> sendPasswordReset(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
   }
 
 }

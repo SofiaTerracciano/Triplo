@@ -105,10 +105,42 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     final controller = Provider.of<UserController>(context);
     final user = controller.currentUser;
-
+/*
     if (user == null) {
       return const Center(child: CircularProgressIndicator());
     }
+ */
+
+    if (user == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.person_off, size: 70, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text(
+                "You are not logged in",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "Please login to access your profile",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: const Text("Go to Login"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final local = AppLocalizations.of(context)!;
 
     // TabController for tabs in the body (public, private, saved)
@@ -122,9 +154,13 @@ class _UserPageState extends State<UserPage> {
             IconButton(
               icon: Icon(Icons.logout),
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
+                final controller = Provider.of<UserController>(context, listen: false);
+
+                await controller.logout();
+
                 Navigator.pushReplacementNamed(context, '/login');
               },
+
             ),
           ],
         ),

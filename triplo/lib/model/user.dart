@@ -1,10 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'diary.dart';
+/**
+ * Model representing a user in the Triplo app.
+ * This class only stores basic information.
+ * Complex references (followers, diaries...) are loaded by the UserController
+ */
+
 class Users {
   String _uid; //user id on firebase
-  String _username;
-  String? _photoProfile;
+  String _username; // Public username chosen or derived from email
+  String? _photoProfile; // URL of profile picture stored in Firebase Storage
   String _name;
   String _surname;
   DateTime _birthdate;
@@ -15,6 +21,7 @@ class Users {
   List<Diary> _privateDiaryPages;
   List<Diary> _savedTrekkings;
 
+  /** Constructor for creating a full user object in memory */
   Users({
     required String uid,
     required String username,
@@ -87,11 +94,13 @@ class Users {
   }
    */
 
-  /// Converts this Users object into a Map<String, dynamic> that can be stored in Firestore.
-  /// IMPORTANT: fields  as followers, following, diary pages, saved trekkings cannot be saved as full Dart objects.
-  /// Firestore only stores primitive values and simple collections.
-  /// Only the IDs (e.g., user IDs or diary IDs) of related objects are saved on firestore.
-  /// The actual reconstruction of related Users and Diary objects happens inside the Controller where each ID is fetched and converted back into a full object.
+  /**
+   * Converts this Users object into a Map<String, dynamic> that can be stored in Firestore.
+   * IMPORTANT: fields  as followers, following, diary pages, saved trekkings cannot be saved as full Dart objects.
+   * Firestore only stores primitive values and simple collections.
+   * Only the IDs (e.g., user IDs or diary IDs) of related objects are saved on firestore.
+   * The actual reconstruction of related Users and Diary objects happens inside the Controller where each ID is fetched and converted back into a full object.
+   */
   Map<String, dynamic> toMap() {
     return {
       "Uid": _uid,
@@ -133,13 +142,20 @@ class Users {
 
 
 
-  /// Creates a Users object from Firestore data (a Map<String, dynamic>).
-  /// IMPORTANT: Firestore does not store full Users or Diary objects, only their IDs.
-  /// Therefore, fromMap() can only populate the "primitive" fields of the model
-  /// Lists such as followers, following, publicDiaryPages, privateDiaryPages,
-  /// and savedTrekkings cannot be reconstructed here because Firestore only stores IDs.
-  /// These lists are intentionally left empty here and are later populated in the UserController
-  ///  by converting the ID into a User or Diary object.
+
+
+
+
+
+  /**
+   * Creates a Users object from Firestore data (a Map<String, dynamic>).
+   * IMPORTANT: Firestore does not store full Users or Diary objects, only their IDs.
+   * Therefore, fromMap() can only populate the "primitive" fields of the model
+   * Lists such as followers, following, publicDiaryPages, privateDiaryPages,
+   * and savedTrekkings cannot be reconstructed here because Firestore only stores IDs.
+   * These lists are intentionally left empty here and are later populated in the UserController
+   *  by converting the ID into a User or Diary object.
+   */
   /*
   factory Users.fromMap(Map<String, dynamic> map, {required String uid}) {
     return Users(
@@ -181,7 +197,7 @@ class Users {
   }
 
   static DateTime _defaultBirthdate = DateTime(2000, 1, 1);
-
+  /** Helper for parsing the birthdate */
   static DateTime _parseBirthdate(Map<String, dynamic> map) {
     final raw = map["Birthdate"];
     if (raw is String && raw.isNotEmpty) {

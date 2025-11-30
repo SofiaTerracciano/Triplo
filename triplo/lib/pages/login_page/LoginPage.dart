@@ -7,10 +7,13 @@ import 'package:triplo/controller/user.dart';
 import '../user-page.dart';
 import 'package:provider/provider.dart';
 
-/// Login Page for the Triplo App.
-/// Email+password login + Google sign-in.
+/**
+ * Login Page for the Triplo App.
+ * Email+password login + Google sign-in.
+ */
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -20,6 +23,10 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+
+
+
+
   @override
   void dispose() {
     emailController.dispose();
@@ -27,10 +34,13 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-
-  // ---------------------------------------------------------
-  // EMAIL + PASSWORD LOGIN
-  // ---------------------------------------------------------
+  /**
+   * Attempts login using the provided email and password.
+   * 1. Validate fields.
+   * 2. Call UserController.login().
+   * 3. Navigate to the UserPage on success.
+   * 4. Show error messages using SnackBars.
+   */
   Future<void> _loginEmailPwd(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -62,9 +72,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // ---------------------------------------------------------
-  // GOOGLE LOGIN
-  // ---------------------------------------------------------
+  /**
+   * Handles Google Sign-In in the UI.
+   * Steps:
+   * 1. Ask the user to choose a Google profile.
+   * 2. Obtain GoogleAuth credentials.
+   * 3. Pass credentials to UserController.loginWithGoogle().
+   * 4. Navigate to the UserPage on success.
+   */
   Future<void> _loginGoogle(BuildContext context) async {
     final googleSignIn = GoogleSignIn();
 
@@ -94,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
+  /** UI of the Login Page */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
