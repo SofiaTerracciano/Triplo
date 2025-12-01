@@ -311,6 +311,12 @@ abstract class AppLocalizations {
   /// **'Refreshments'**
   String get refreshment_point_trekking_label;
 
+  /// No description provided for @refreshment_point_available_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no refreshment points for this trekking'**
+  String get refreshment_point_available_trekking_label;
+
   /// No description provided for @pic_nic_area_trekking_label.
   ///
   /// In en, this message translates to:
@@ -340,6 +346,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Challenges'**
   String get challenges_trekking_label;
+
+  /// No description provided for @challenges_available_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenges available for this trekking'**
+  String get challenges_available_trekking_label;
 
   /// No description provided for @date_trecking_label.
   ///

@@ -43,7 +43,7 @@ class Trekking {
     required List<String> info,
     required String endingPointPhoto,
     required List<String> description,
-    required String refreshmentPoint,
+    String? refreshmentPoint,
     required bool picNicArea,
     required bool familyFirendly,
     List<String>? challenges,
@@ -63,7 +63,7 @@ class Trekking {
        _info = info,
        _endingPointPhoto = endingPointPhoto,
        _description = description,
-       _refreshment_point = refreshmentPoint,
+       _refreshment_point = refreshmentPoint ?? '',
        _pic_nic_area = picNicArea,
        _family_firendly = familyFirendly,
        _challenges = challenges ?? [];

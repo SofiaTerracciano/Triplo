@@ -114,6 +114,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refreshment_point_trekking_label => 'Puntos de descanso';
 
   @override
+  String get refreshment_point_available_trekking_label => 'No hay puntos de descanso para esta ruta';
+
+  @override
   String get pic_nic_area_trekking_label => 'Área de picnic';
 
   @override
@@ -127,6 +130,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get challenges_trekking_label => 'Desafíos';
+
+  @override
+  String get challenges_available_trekking_label => 'No hay desafíos disponibles para esta ruta';
 
   @override
   String get date_trecking_label => 'Fecha';

@@ -24,10 +24,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
   int currentIconIndex = 0;
 
   // Icons for the bookmark button (unsaved and saved) --> 0:not saved, 1:saved
-  final List<Icon> icons = [
-    Icon(Icons.bookmark_border), 
-    Icon(Icons.bookmark)
-  ];
+  final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
@@ -37,7 +34,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!; 
+    final local = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
     final trekking = widget.trekking;
 
@@ -49,9 +46,15 @@ class _TrekkingPageState extends State<TrekkingPage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) => AddingDiaryPage(trekking: widget.trekking, onLocaleChanged: widget.onLocaleChanged,),
-              ));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddingDiaryPage(
+                    trekking: widget.trekking,
+                    onLocaleChanged: widget.onLocaleChanged,
+                  ),
+                ),
+              );
             },
           ),
           IconButton(
@@ -82,38 +85,38 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 children: [
                   Text(
                     "${trekking.name}",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Row(
                 children: [
                   Text(
-                    "${local.starting_point_trekking_label}: ${trekking.starting_point_name}"),
+                    "${local.starting_point_trekking_label}: ${trekking.starting_point_name}",
+                  ),
                 ],
               ),
               Row(
                 children: [
-                  Text("${local.level_label}: ${trekking.difficulty_level}")
-                ]
+                  Text("${local.level_label}: ${trekking.difficulty_level}"),
+                ],
               ),
               Row(
                 children: [
-                  Text("${local.distance_trekking_label}: ${trekking.distance} km")
-                ]
+                  Text(
+                    "${local.distance_trekking_label}: ${trekking.distance} km",
+                  ),
+                ],
               ),
               Row(
                 children: [
                   if (trekking.estimated_time < 60)
                     Text(
-                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} minutes"
+                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} minutes",
                     ),
                   if (trekking.estimated_time >= 60)
                     Text(
-                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time/60} hours ${trekking.estimated_time%60} minutes"
+                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} hours ${trekking.estimated_time % 60} minutes",
                     ),
                 ],
               ),
@@ -124,13 +127,15 @@ class _TrekkingPageState extends State<TrekkingPage> {
                       children: [
                         TextSpan(
                           text:
-                              '${local.elevaition_gain_trekking_label}: ${trekking.elevation_gain} m  ',
+                              '${local.elevaition_gain_trekking_label}: ${trekking.elevation_gain} m',
                           style: TextStyle(color: Colors.black),
                         ),
                         if (trekking.upGain)
                           WidgetSpan(child: Icon(Icons.arrow_upward, size: 16)),
                         if (trekking.downGain)
-                          WidgetSpan(child: Icon(Icons.arrow_downward, size: 16)),
+                          WidgetSpan(
+                            child: Icon(Icons.arrow_downward, size: 16),
+                          ),
                       ],
                     ),
                   ),
@@ -139,8 +144,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
               Row(
                 children: [
                   Text(
-                    "${local.ending_point_trekking_label}: ${trekking.ending_point_name}"
-                  )
+                    "${local.ending_point_trekking_label}: ${trekking.ending_point_name}",
+                  ),
                 ],
               ),
               //immagine ending point
@@ -173,7 +178,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                           ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
               Row(
@@ -181,83 +186,71 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children:[
+                      children: [
                         if (locale.languageCode == 'de')
                           Text(
                             "${local.description_trekking_label}: ${trekking.description[0]}",
                           ),
-                        if (locale.languageCode == 'en')  
+                        if (locale.languageCode == 'en')
                           Text(
                             "${local.description_trekking_label}: ${trekking.description[1]}",
                           ),
-                        if (locale.languageCode == 'es')  
+                        if (locale.languageCode == 'es')
                           Text(
                             "${local.description_trekking_label}: ${trekking.description[2]}",
                           ),
-                        if (locale.languageCode == 'fr')    
+                        if (locale.languageCode == 'fr')
                           Text(
                             "${local.description_trekking_label}: ${trekking.description[3]}",
                           ),
-                        if (locale.languageCode == 'it')      
+                        if (locale.languageCode == 'it')
                           Text(
                             "${local.description_trekking_label}: ${trekking.description[4]}",
                           ),
-                      ]
-                    )
-                  )
+                      ],
+                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
-                  if (trekking.refreshment_point != "null")
-                  Text(
-                    "${local.refreshment_point_trekking_label}: ${trekking.refreshment_point}",
-                  ), 
+                  if (trekking.refreshment_point != '') ...[
+                    Text(
+                      "${local.refreshment_point_trekking_label}: ${trekking.refreshment_point}",
+                    ),
+                  ] else ...[
+                    Text(
+                      "${local.refreshment_point_trekking_label}: ${local.refreshment_point_available_trekking_label}",
+                    ),
+                  ],
                 ],
               ),
               Row(
                 children: [
-                  Text(
-                    "${local.pic_nic_area_trekking_label}:",
-                  ), 
+                  Text("${local.pic_nic_area_trekking_label}:"),
                   if (trekking.pic_nic_area)
-                    Icon(
-                      Icons.table_restaurant,
-                      color: Colors.grey,
-                      size: 16,
-                    )
+                    Icon(Icons.table_restaurant, color: Colors.grey, size: 16)
                   else
-                    Icon(
-                      Icons.close,
-                      size: 16,
-                    ),
+                    Icon(Icons.close, size: 16),
                 ],
               ),
               Row(
                 children: [
-                  Text(
-                    "${local.family_friendly_trekking_label}:",
-                  ),
+                  Text("${local.family_friendly_trekking_label}:"),
                   if (trekking.family_firendly)
-                    Icon(
-                      Icons.family_restroom,
-                      color: Colors.grey,
-                      size: 16,
-                    )
+                    Icon(Icons.family_restroom, color: Colors.grey, size: 16)
                   else
-                    Icon(
-                      Icons.close,
-                      size: 16,
-                    ),
+                    Icon(Icons.close, size: 16),
                 ],
               ),
               Row(
                 children: [
-                  Text(
-                    "${local.challenges_trekking_label}: bho",
-                  ),
+                  if (trekking.challenges.isNotEmpty)
+                    Text("${local.challenges_trekking_label}: ") //mettere le icone delle sfide
+                  else
+                    Text("${local.challenges_trekking_label}: ${local.challenges_available_trekking_label}"),
                 ],
-              )
+              ),
             ],
           ),
         ),
