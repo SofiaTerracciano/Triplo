@@ -212,7 +212,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   List<TaggedPolyline> getPolylines() {
     return widget.trekkingController.allTrekkings.map((t) {
       return TaggedPolyline(
-        tag: t.name,
+        tag: t.documentId,
         points: t.points,
         strokeWidth: 5,
         color: difficultyToColor(t.difficulty_level),
@@ -233,7 +233,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               context,
               MaterialPageRoute(
                 builder: (context) => TrekkingPage(
-                  routeName: t.name,
+                  trekking: t,
                   onLocaleChanged: widget.onLocaleChanged,
                 ),
               ),
@@ -269,12 +269,14 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
                 polylineCulling: false,
                 polylines: getPolylines(),
                 onTap: (tapped, pos) {
-                  final t = tapped.first.tag!;
+                  final routeID = tapped.first.tag as String;
+                  //final t =  tapped.first.tag!;
+                  final trekking = widget.trekkingController.getTrekkingById(routeID)!;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => TrekkingPage(
-                        routeName: t,
+                        trekking: trekking,
                         onLocaleChanged: widget.onLocaleChanged,
                       ),
                     ),
