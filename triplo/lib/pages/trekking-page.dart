@@ -22,11 +22,12 @@ class TrekkingPage extends StatefulWidget {
 
 class _TrekkingPageState extends State<TrekkingPage> {
   int currentIconIndex = 0;
-  bool isFamFriendly = true;
-  bool isPicnicable = true;
-  
 
-  final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
+  // Icons for the bookmark button (unsaved and saved) --> 0:not saved, 1:saved
+  final List<Icon> icons = [
+    Icon(Icons.bookmark_border), 
+    Icon(Icons.bookmark)
+  ];
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
@@ -36,8 +37,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context); 
+    final local = AppLocalizations.of(context)!; 
+    final locale = Localizations.localeOf(context);
     final trekking = widget.trekking;
 
     return Scaffold(
@@ -80,14 +81,40 @@ class _TrekkingPageState extends State<TrekkingPage> {
               Row(
                 children: [
                   Text(
+                    "${trekking.name}",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
                     "${local.starting_point_trekking_label}: ${trekking.starting_point_name}"),
                 ],
               ),
-              Row(children: [Text("${local.level_label}: ${trekking.difficulty_level}")]),
-              Row(children: [Text("${local.distance_trekking_label}: ${trekking.distance} km")]),
               Row(
                 children: [
-                  Text("${local.estimated_time_trekking_label}: ${trekking.estimated_time/60} hours ${trekking.estimated_time%60} minutes"),
+                  Text("${local.level_label}: ${trekking.difficulty_level}")
+                ]
+              ),
+              Row(
+                children: [
+                  Text("${local.distance_trekking_label}: ${trekking.distance} km")
+                ]
+              ),
+              Row(
+                children: [
+                  if (trekking.estimated_time < 60)
+                    Text(
+                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} minutes"
+                    ),
+                  if (trekking.estimated_time >= 60)
+                    Text(
+                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time/60} hours ${trekking.estimated_time%60} minutes"
+                    ),
                 ],
               ),
               Row(
@@ -110,56 +137,74 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               Row(
-                children: [Text("${local.ending_point_trekking_label}: ${trekking.ending_point_name}")],
+                children: [
+                  Text(
+                    "${local.ending_point_trekking_label}: ${trekking.ending_point_name}"
+                  )
+                ],
               ),
               //immagine ending point
               Row(),
               Row(
                 children: [
-                  if (locale.languageCode == 'de')
-                    Text(
-                      "${local.info_trekking_label}: ${trekking.info[0]}",
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (locale.languageCode == 'de')
+                          Text(
+                            "${local.info_trekking_label}: ${trekking.info[0]}",
+                          ),
+                        if (locale.languageCode == 'en')
+                          Text(
+                            "${local.info_trekking_label}: ${trekking.info[1]}",
+                          ),
+                        if (locale.languageCode == 'es')
+                          Text(
+                            "${local.info_trekking_label}: ${trekking.info[2]}",
+                          ),
+                        if (locale.languageCode == 'fr')
+                          Text(
+                            "${local.info_trekking_label}: ${trekking.info[3]}",
+                          ),
+                        if (locale.languageCode == 'it')
+                          Text(
+                            "${local.info_trekking_label}: ${trekking.info[4]}",
+                          ),
+                      ],
                     ),
-                  if (locale.languageCode == 'en')
-                    Text(
-                      "${local.info_trekking_label}: ${trekking.info[1]}",
-                    ),
-                  if (locale.languageCode == 'es')
-                    Text(
-                      "${local.info_trekking_label}: ${trekking.info[2]}",
-                    ),
-                  if (locale.languageCode == 'fr')
-                    Text(
-                      "${local.info_trekking_label}: ${trekking.info[3]}",
-                    ),
-                  if (locale.languageCode == 'it')
-                    Text(
-                      "${local.info_trekking_label}: ${trekking.info[4]}",
-                    ),
+                  )
                 ],
               ),
               Row(
                 children: [
-                  if (locale.languageCode == 'de')
-                    Text(
-                      "${local.description_trekking_label}: ${trekking.description[0]}",
-                    ),
-                  if (locale.languageCode == 'en')  
-                    Text(
-                      "${local.description_trekking_label}: ${trekking.description[1]}",
-                    ),
-                  if (locale.languageCode == 'es')  
-                    Text(
-                      "${local.description_trekking_label}: ${trekking.description[2]}",
-                    ),
-                  if (locale.languageCode == 'fr')    
-                    Text(
-                      "${local.description_trekking_label}: ${trekking.description[3]}",
-                    ),
-                  if (locale.languageCode == 'it')      
-                    Text(
-                      "${local.description_trekking_label}: ${trekking.description[4]}",
-                    ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:[
+                        if (locale.languageCode == 'de')
+                          Text(
+                            "${local.description_trekking_label}: ${trekking.description[0]}",
+                          ),
+                        if (locale.languageCode == 'en')  
+                          Text(
+                            "${local.description_trekking_label}: ${trekking.description[1]}",
+                          ),
+                        if (locale.languageCode == 'es')  
+                          Text(
+                            "${local.description_trekking_label}: ${trekking.description[2]}",
+                          ),
+                        if (locale.languageCode == 'fr')    
+                          Text(
+                            "${local.description_trekking_label}: ${trekking.description[3]}",
+                          ),
+                        if (locale.languageCode == 'it')      
+                          Text(
+                            "${local.description_trekking_label}: ${trekking.description[4]}",
+                          ),
+                      ]
+                    )
+                  )
                 ],
               ),
               Row(
@@ -206,6 +251,13 @@ class _TrekkingPageState extends State<TrekkingPage> {
                     ),
                 ],
               ),
+              Row(
+                children: [
+                  Text(
+                    "${local.challenges_trekking_label}: bho",
+                  ),
+                ],
+              )
             ],
           ),
         ),

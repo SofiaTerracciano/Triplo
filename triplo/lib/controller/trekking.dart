@@ -28,7 +28,8 @@ class TrekkingController extends ChangeNotifier {
         .collection('trekkings') // andrà messo trekking
         .get();
 
-    // Map documents to Trekking objects
+    // Map documents to Trekking objects and store in the list --> this function create a 
+    //list of istance of trekkning (model)
     _trekkings = snap.docs
         .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
         .toList();
@@ -38,9 +39,6 @@ class TrekkingController extends ChangeNotifier {
 
   // Callback when a trekking is selected
   void Function(Trekking trekking)? onTrekkingSelected;
-
-  // Getter trekking per index
-  Trekking getTrekkingByIndex(int index) => _trekkings[index];
 
   // Getter trekking per documentId
   Trekking? getTrekkingById(String documentId) {

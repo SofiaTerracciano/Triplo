@@ -335,6 +335,12 @@ abstract class AppLocalizations {
   /// **'Save'**
   String get save_trekking_button_label;
 
+  /// No description provided for @challenges_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges'**
+  String get challenges_trekking_label;
+
   /// No description provided for @date_trecking_label.
   ///
   /// In en, this message translates to:
@@ -358,12 +364,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photos'**
   String get photos_trekking_label;
-
-  /// No description provided for @challenges_trekking_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Challenges'**
-  String get challenges_trekking_label;
 
   /// No description provided for @refuge_trekking_label.
   ///

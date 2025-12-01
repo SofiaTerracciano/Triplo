@@ -23,6 +23,7 @@ class Trekking {
   String _refreshment_point;
   bool _pic_nic_area;
   bool _family_firendly;
+  List<String> _challenges;
 
   Trekking({
     required this.documentId,
@@ -45,6 +46,7 @@ class Trekking {
     required String refreshmentPoint,
     required bool picNicArea,
     required bool familyFirendly,
+    List<String>? challenges,
   }) : _name = name,
        _mapPhoto = mapPhoto,
        _difficulty_level = difficultyLevel,
@@ -63,7 +65,9 @@ class Trekking {
        _description = description,
        _refreshment_point = refreshmentPoint,
        _pic_nic_area = picNicArea,
-       _family_firendly = familyFirendly;
+       _family_firendly = familyFirendly,
+       _challenges = challenges ?? [];
+      
 
   // Getters
   String get name => _name;
@@ -85,6 +89,7 @@ class Trekking {
   String get refreshment_point => _refreshment_point;
   bool get pic_nic_area => _pic_nic_area;
   bool get family_firendly => _family_firendly;
+  List<String> get challenges => _challenges;
 
  // Setters
   set name(String value) => _name = value;
@@ -106,7 +111,7 @@ class Trekking {
   set refreshment_point(String value) => _refreshment_point = value;
   set pic_nic_area(bool value) => _pic_nic_area = value;
   set family_firendly(bool value) => _family_firendly = value;
-
+  set challenges(List<String> value) => _challenges = value;
 
   // Model --> Firestore
   Map<String, dynamic> toMap() {
@@ -128,6 +133,7 @@ class Trekking {
       "Refreshment_point": _refreshment_point,
       "Picnic_area": _pic_nic_area,
       "Family_friendly": _family_firendly,
+      "Challenges": _challenges.map((i) => i.toString()).toList(),
     };
   }
 
@@ -149,6 +155,12 @@ class Trekking {
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];  
+    
+    // Convert List<dynamic> to List<String> for challenges
+    final List<String>  challenges = (map["Challenges"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? []; 
 
     // Create Trekking instance
     return Trekking(
@@ -172,6 +184,7 @@ class Trekking {
       refreshmentPoint: map["Refreshment_point"],
       picNicArea: map["Picnic_area"],
       familyFirendly: map["Family_friendly"],
+      challenges: challenges,
     );
   }
 }

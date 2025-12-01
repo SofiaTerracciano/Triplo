@@ -126,6 +126,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get save_trekking_button_label => 'Guardar';
 
   @override
+  String get challenges_trekking_label => 'Desafíos';
+
+  @override
   String get date_trecking_label => 'Fecha';
 
   @override
@@ -136,9 +139,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get photos_trekking_label => 'Fotos';
-
-  @override
-  String get challenges_trekking_label => 'Desafíos';
 
   @override
   String get refuge_trekking_label => 'Refugio';
