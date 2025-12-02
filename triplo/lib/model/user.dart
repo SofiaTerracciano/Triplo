@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'diary.dart';
+import 'trekking.dart';
 /**
  * Model representing a user in the Triplo app.
  * This class only stores basic information.
@@ -19,7 +20,7 @@ class Users {
   List<Users> _following;
   List<Diary> _publicDiaryPages;
   List<Diary> _privateDiaryPages;
-  List<Diary> _savedTrekkings;
+  List<Trekking> _savedTrekkings;
 
   /** Constructor for creating a full user object in memory */
   Users({
@@ -33,7 +34,7 @@ class Users {
     required List<Users> following,
     required List<Diary> publicDiaryPages,
     required List<Diary> privateDiaryPages,
-    required List<Diary> savedTrekkings,
+    required List<Trekking> savedTrekkings,
     String? photoProfile,
   }) : _uid = uid,
         _username = username,
@@ -60,7 +61,7 @@ class Users {
   List<Users> get following => _following;
   List<Diary> get publicDiaryPages => _publicDiaryPages;
   List<Diary> get privateDiaryPages => _privateDiaryPages;
-  List<Diary> get savedTrekkings => _savedTrekkings;
+  List<Trekking> get savedTrekkings => _savedTrekkings;
   String get uid => _uid;
 
   // Setters
@@ -74,7 +75,7 @@ class Users {
   set following(List<Users> following) => _following = following;
   set publicDiaryPages(List<Diary> pubblicPages) => _publicDiaryPages = pubblicPages;
   set privateDiaryPages(List<Diary> privatePages) => _privateDiaryPages = privatePages;
-  set savedTrekkings(List<Diary> savedTrekkings) => _savedTrekkings = savedTrekkings;
+  set savedTrekkings(List<Trekking> savedTrekkings) => _savedTrekkings = savedTrekkings;
 
   /*
   Map<String, dynamic> toMap() {
@@ -116,7 +117,7 @@ class Users {
 
       "Public_diary": _publicDiaryPages.map((d) => d.diaryId).toList(),
       "Private_diary": _privateDiaryPages.map((d) => d.diaryId).toList(),
-      "Saved_trekkings": _savedTrekkings.map((d) => d.diaryId).toList(),
+      "Saved_trekkings": _savedTrekkings.map((d) => d.documentId).toList(),
     };
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/controller/diary.dart';
+import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'search-page.dart';
 import 'setting-page.dart';
@@ -11,8 +13,18 @@ import 'trekking-page.dart';
 import 'package:triplo/controller/trekking.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.onLocaleChanged});
   final void Function(Locale) onLocaleChanged;
+  final TrekkingController trekkingController;
+  final DiaryController diaryController;
+  final UserController userController;
+
+  const MyHomePage({
+    super.key,
+    required this.onLocaleChanged,
+    required this.diaryController,
+    required this.trekkingController,
+    required this.userController
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -26,8 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
     fontStyle: FontStyle.italic,
   );
 
-  // Controllers
-  late TrekkingController controller;
   late MapController mapController;
 
   // Initial center of the map
@@ -36,14 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    
-    controller = TrekkingController(trekkings: []);
     mapController = MapController();
-
-    // Update UI after loading trekkings
-    controller.loadTrekking().then((_) {
-      setState(() {}); 
-    });
   }
 
   @override
@@ -59,7 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // Main map body
       body: ZoomAwareMap(
         mapController: mapController,
-        trekkingController: controller,
+        trekkingController: widget.trekkingController,
+        userController: widget.userController,
+        diaryController: widget.diaryController,
         onLocaleChanged: widget.onLocaleChanged,
       ),
 
@@ -109,8 +114,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        MyHomePage(onLocaleChanged: widget.onLocaleChanged),
+                    builder: (context) => MyHomePage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      diaryController: widget.diaryController,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                    ),
                   ),
                 );
               },
@@ -123,7 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        UserPage(onLocaleChanged: widget.onLocaleChanged),
+                        UserPage(
+                          onLocaleChanged: widget.onLocaleChanged,
+                          userController: widget.userController,
+                          diaryController: widget.diaryController,
+                          trekkingController: widget.trekkingController,
+                        ),
                   ),
                 );
               },
@@ -135,8 +149,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        SearchPage(onLocaleChanged: widget.onLocaleChanged),
+                    builder: (context) => SearchPage(
+                      diaryController: widget.diaryController,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      onLocaleChanged: widget.onLocaleChanged,
+                    ),
                   ),
                 );
               },
@@ -149,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SettingPage(onLocaleChanged: widget.onLocaleChanged),
+                        SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,),
                   ),
                 );
               },
@@ -165,12 +183,16 @@ class _MyHomePageState extends State<MyHomePage> {
 class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
   final TrekkingController trekkingController;
+  final UserController userController;
+  final DiaryController diaryController;
   final void Function(Locale) onLocaleChanged;
 
   const ZoomAwareMap({
     super.key,
     required this.mapController,
     required this.trekkingController,
+    required this.userController,
+    required this.diaryController,
     required this.onLocaleChanged,
   });
 
@@ -229,17 +251,21 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
         height: 40,
         child: GestureDetector(
           onTap: () {
+            final routeID = t.documentId;
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => TrekkingPage(
-                  trekking: t,
+                  trekkingId: routeID,
+                  trekkingController: widget.trekkingController,
+                  userController: widget.userController,
+                  diaryController: widget.diaryController,
                   onLocaleChanged: widget.onLocaleChanged,
                 ),
               ),
             );
           },
-          child: const Icon(Icons.flag, color: Colors.red, size: 40),
+          child: const Icon(Icons.add, color: Colors.red, size: 40),
         ),
       );
     }).toList();
@@ -270,13 +296,14 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
                 polylines: getPolylines(),
                 onTap: (tapped, pos) {
                   final routeID = tapped.first.tag as String;
-                  //final t =  tapped.first.tag!;
-                  final trekking = widget.trekkingController.getTrekkingById(routeID)!;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => TrekkingPage(
-                        trekking: trekking,
+                        trekkingId: routeID,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
                         onLocaleChanged: widget.onLocaleChanged,
                       ),
                     ),
@@ -285,10 +312,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               ),
 
             // Markers for each trekking start point (only at low zoom)
-            if (currentZoom < 12)
-              MarkerLayer(
-                markers: getMarkers(),
-              )
+            if (currentZoom < 12) MarkerLayer(markers: getMarkers()),
           ],
         ),
 
@@ -312,7 +336,6 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
     );
   }
 }
-
 
 // Function to convert difficulty level to color
 Color difficultyToColor(String difficulty) {

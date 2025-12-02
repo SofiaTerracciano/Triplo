@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
@@ -48,4 +49,16 @@ class TrekkingController extends ChangeNotifier {
       return null;
     }
   }
+
+  
+
+  // Fetch image URLs from Firebase Storage given their paths
+  Future<List<String>> getDownloadUrls(List<String> paths) async {
+    return await Future.wait(paths.map((path) async {
+      Reference ref = FirebaseStorage.instance.refFromURL(path);
+      return await ref.getDownloadURL();
+    }));
+  }
+
+
 }

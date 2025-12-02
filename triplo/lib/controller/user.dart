@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
+import '../model/trekking.dart';
 
 /**
  * Controller responsible for:
@@ -20,6 +21,9 @@ import '../model/diary.dart';
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  List<Users> _users;
+
+  UserController({required List<Users> users}) : _users = users;
 
   Users? _currentUser; // Local copy of logged user
   bool _loaded = false;
@@ -236,9 +240,9 @@ class UserController extends ChangeNotifier {
       if (d != null) privateDiary.add(d);
     }
 
-    List<Diary> savedTrek = [];
+    List<Trekking> savedTrek = [];
     for (final id in savedTrekkingIds) {
-      final d = await _fetchDiary(id);
+      final d = await _fetchTrekking(id);
       if (d != null) savedTrek.add(d);
     }
     /*
@@ -312,6 +316,12 @@ class UserController extends ChangeNotifier {
   }
 
 
+  Future<Trekking?> _fetchTrekking(String docId) async {
+    final snap = await _db.collection("trekking").doc(docId).get();
+    if (!snap.exists) return null;
+
+    return Trekking.fromMap(snap.data()!, docId: docId);
+  }
 
 
 
@@ -350,7 +360,7 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
+  
 
 
 
@@ -361,6 +371,60 @@ class UserController extends ChangeNotifier {
   /// This method throws FirebaseAuthException if something goes wrong.
   Future<void> sendPasswordReset(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  
+
+
+//FATTO DA MADDI E SOFI (LE COGLIONE)
+
+ //getter for all users
+  List<Users> get allUsers => _users;
+
+  //load users from Firestore
+  Future<void> loadAllUsers() async {
+    if(_loaded) { return;}
+    _loaded = true;
+    final snap = await _db.collection("users").get();
+    _users = snap.docs.map((doc) =>
+      Users.fromMap(doc.data(), uid: doc.id)
+    ).toList();
+    notifyListeners();
+  }
+
+  Users? getUserById(String uid) {
+    try {
+      return _users.firstWhere((user) => user.uid == uid);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> addTrekkingToSaved(String trekkingId) async {
+    final uid = _auth.currentUser!.uid;
+    // Aggiorna Firestore
+    await _db.collection("users").doc(uid).update({
+      "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
+    });
+    // Aggiorna la lista locale se il trekking esiste
+    final trek = await _fetchTrekking(trekkingId);
+    if (trek != null) {
+      _currentUser?.savedTrekkings.add(trek);
+      notifyListeners();
+    }
+  }
+
+  Future<void> removeTrekkingFromSaved(String trekkingId) async {
+    final uid = _auth.currentUser!.uid;
+    print("Prima di remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
+    // Rimuove dal DB
+    await _db.collection("users").doc(uid).update({
+      "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
+    });
+    // Rimuove dalla lista locale (oggetti Trekking)
+    _currentUser?.savedTrekkings.removeWhere((trek) => trek.documentId == trekkingId);
+    print("Dopo remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
+    notifyListeners();
   }
 
 }

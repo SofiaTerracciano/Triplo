@@ -1,22 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'setting-page.dart';
 import 'diary-page.dart';
+import '../controller/diary.dart';
+import '../controller/trekking.dart';
+import '../controller/user.dart';
 
 class SearchPage extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
+  final DiaryController diaryController;
+  final TrekkingController trekkingController;
+  final UserController userController;
+  final List<String> diaryId;
+  
   const SearchPage({
     super.key, 
-    required this.onLocaleChanged
-  });
+    required this.onLocaleChanged,
+    required this.diaryController,
+    required this.trekkingController,
+    required this.userController,
+  }): 
+  diaryId = const  [
+    '91BMskCNPqAm1BlgJEeJ', 
+    '91BMskCNPqAm1BlgJEeJ', 
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ',
+    '91BMskCNPqAm1BlgJEeJ'
+  ];
   
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -62,7 +87,6 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(local.search_page_title), centerTitle: true),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -139,7 +163,8 @@ class _SearchPageState extends State<SearchPage> {
                         MaterialPageRoute(
                           builder: (context) =>
                               DiaryPage(
-                                routeName: "Percorso $index",
+                                diaryId: widget.diaryId[1], // da cambiare dinamicamente
+                                diaryController: widget.diaryController,
                                 onLocaleChanged: widget.onLocaleChanged
                               ),
                         ),
@@ -244,7 +269,7 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged, diaryController: widget.diaryController, trekkingController: widget.trekkingController, userController: widget.userController)),
                 );
               },
             ),
@@ -257,7 +282,7 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged, userController: widget.userController, diaryController: widget.diaryController, trekkingController: widget.trekkingController)),
                 );
               },
             ),
@@ -270,7 +295,15 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(
+                    builder: (context) => 
+                    SearchPage(
+                      onLocaleChanged: widget.onLocaleChanged, 
+                      diaryController: widget.diaryController,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController
+                    )
+                  ),
                 );
               },
             ),
@@ -283,7 +316,7 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged, userController: widget.userController, trekkingController: widget.trekkingController, diaryController: widget.diaryController)),
                 );
               },
             ),

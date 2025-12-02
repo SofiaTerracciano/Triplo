@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'search-page.dart';
+import '../controller/trekking.dart';
+import '../controller/user.dart';
+import '../controller/diary.dart';
 
 class SettingPage extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
+  final TrekkingController trekkingController;
+  final UserController userController;
+  final DiaryController diaryController;
 
   const SettingPage({
     super.key, 
-    required this.onLocaleChanged
+    required this.onLocaleChanged,
+    required this.trekkingController,
+    required this.userController,
+    required this.diaryController,
   });
 
   @override
@@ -272,7 +276,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,)),
                 );
               },
             ),
@@ -285,7 +289,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged, userController: widget.userController, trekkingController: widget.trekkingController, diaryController: widget.diaryController,)),
                 );
               },
             ),
@@ -298,7 +302,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController)),
                 );
               },
             ),
@@ -311,7 +315,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
+                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,)),
                 );
               },
             ),

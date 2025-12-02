@@ -6,14 +6,26 @@ import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:triplo/controller/user.dart';
 import '../user-page.dart';
 import 'package:provider/provider.dart';
+import 'package:triplo/controller/trekking.dart';
+import 'package:triplo/controller/diary.dart';
 
 /**
  * Login Page for the Triplo App.
  * Email+password login + Google sign-in.
  */
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final TrekkingController trekkingController;
+  final DiaryController diaryController;
+  final UserController userController;
+  final void Function(Locale) onLocaleChanged;
 
+  const LoginPage({
+    super.key,
+    required this.trekkingController,
+    required this.diaryController,
+    required this.userController,
+    required this.onLocaleChanged,
+  });
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -22,10 +34,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-
-
-
 
   @override
   void dispose() {
@@ -59,7 +67,12 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => UserPage(onLocaleChanged: (l) {})),
+        MaterialPageRoute(
+          builder: (_) => UserPage(
+            trekkingController: widget.trekkingController,
+            userController: widget.userController,
+            diaryController: widget.diaryController,
+            onLocaleChanged: (l) {})),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,7 +113,13 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => UserPage(onLocaleChanged: (l) {})),
+        MaterialPageRoute(
+          builder: (_) => UserPage(
+            trekkingController: widget.trekkingController,
+            userController: widget.userController,
+            diaryController: widget.diaryController,
+            onLocaleChanged: (l) {}
+          )),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -135,6 +135,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get challenges_available_trekking_label => 'Non ci sono sfide disponibili per questo trekking';
 
   @override
+  String get hours_trekking_label => 'ore';
+
+  @override
+  String get hour_trekking_label => 'ora';
+
+  @override
+  String get minutes_trekking_label => 'minuti';
+
+  @override
   String get date_trecking_label => 'Data';
 
   @override

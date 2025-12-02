@@ -13,21 +13,30 @@ import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import '../user-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
+import 'package:triplo/controller/trekking.dart';
+import 'package:triplo/controller/diary.dart';
 
 
 /**
  * Registration page for creating a new Triplo profile, handles UI and validation.
  */
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+  final TrekkingController trekkingController;
+  final DiaryController diaryController;
+  final UserController userController;
+  final void Function(Locale) onLocaleChanged;
+
+  const RegistrationPage({
+    super.key,
+    required this.trekkingController,
+    required this.diaryController,
+    required this.userController,
+    required this.onLocaleChanged,
+  });
+
   @override
   State<StatefulWidget> createState() => _RegistrationPageState();
 }
-
-
-
-
-
 
 /**
  * Handles the registration by:
@@ -78,7 +87,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => UserPage(onLocaleChanged: (l) {})),
+        MaterialPageRoute(
+          builder: (_) => UserPage(
+            trekkingController: widget.trekkingController,
+            userController: widget.userController,
+            diaryController: widget.diaryController,
+            onLocaleChanged: (l) {}
+          )),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

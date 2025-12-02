@@ -4,10 +4,11 @@ import 'trekking.dart';
 class Diary {
   final String diaryId;
 
-  String routeId;               // <-- SOLO ID del trekking
-  DateTime date;
+  String userId;
+  String trekkigName;
+  String date;
   double duration;
-  List<String> friends;  //solo uid
+  List<String> friends;
   List<String> photos;
   List<String> challenges;
   String refreshmentPoint;
@@ -16,7 +17,8 @@ class Diary {
 
   Diary({
     required this.diaryId,
-    required this.routeId,
+    required this.userId,
+    required this.trekkigName,
     required this.date,
     required this.duration,
     required this.friends,
@@ -30,8 +32,9 @@ class Diary {
   // SERIALIZZAZIONE
   Map<String, dynamic> toMap() {
     return {
-      "RouteId": routeId,
-      "Date": date.toIso8601String(),
+      "UserId": userId,
+      "RouteId": trekkigName,
+      "Date": date, // la metteremo noi il giusto layout
       "Duration": duration,
       "Friends": friends,
       "Photos": photos,
@@ -61,8 +64,9 @@ class Diary {
   factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
     return Diary(
       diaryId: diaryId,
-      routeId: map["RouteId"] ?? "",
-      date: DateTime.parse(map["Date"]),
+      userId: map["UserId"],
+      trekkigName: map["Trekking_name"],
+      date: map["Date"],
       duration: (map["Duration"] as num).toDouble(),
       friends: List<String>.from(map["Friends"] ?? []),
       photos: List<String>.from(map["Photos"] ?? []),

@@ -3,13 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
+import 'package:triplo/pages/trekking-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
@@ -21,10 +17,23 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
+import '../controller/trekking.dart';
+import '../controller/diary.dart';
+import '../controller/user.dart';
 
 class UserPage extends StatefulWidget {
-  const UserPage({super.key, required this.onLocaleChanged});
   final void Function(Locale) onLocaleChanged;
+  final TrekkingController trekkingController;
+  final UserController userController;
+  final DiaryController diaryController;
+
+  const UserPage({
+    super.key,
+    required this.onLocaleChanged,
+    required this.trekkingController,
+    required this.userController,
+    required this.diaryController,
+  });
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -64,7 +73,7 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     super.initState();
   }
-/*
+  /*
   Future<void> _loadUser() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -85,14 +94,13 @@ class _UserPageState extends State<UserPage> {
         .doc(uid)
         .update({'photoURL': url});
 */
-    // Aggiorno i dati mostrati nella UI
+  // Aggiorno i dati mostrati nella UI
   /*
     setState(() {
       user.photoProfile != null
           ? NetworkImage(user.photoProfile!)
           : null    });
    */
-
 
   // TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
@@ -105,7 +113,7 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     final controller = Provider.of<UserController>(context);
     final user = controller.currentUser;
-/*
+    /*
     if (user == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -154,13 +162,15 @@ class _UserPageState extends State<UserPage> {
             IconButton(
               icon: Icon(Icons.logout),
               onPressed: () async {
-                final controller = Provider.of<UserController>(context, listen: false);
+                final controller = Provider.of<UserController>(
+                  context,
+                  listen: false,
+                );
 
                 await controller.logout();
 
                 Navigator.pushReplacementNamed(context, '/login');
               },
-
             ),
           ],
         ),
@@ -189,12 +199,13 @@ class _UserPageState extends State<UserPage> {
                           final file = File(picked.path);
 
                           await controller.updateProfilePhoto(file);
-
                         },
 
                         child: CircleAvatar(
                           radius: 40,
-                          backgroundImage: (user.photoProfile != null && user.photoProfile!.isNotEmpty)
+                          backgroundImage:
+                              (user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty)
                               ? NetworkImage(user.photoProfile!)
                               : null,
 
@@ -232,9 +243,18 @@ class _UserPageState extends State<UserPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(label: local.totals_trekking_label, value: '40'),
-                          _StatItem(label: local.published_trekking_label, value: '20'),
-                          _StatItem(label: local.private_trekking_label, value: '20'),
+                          _StatItem(
+                            label: local.totals_trekking_label,
+                            value: '40',
+                          ),
+                          _StatItem(
+                            label: local.published_trekking_label,
+                            value: '20',
+                          ),
+                          _StatItem(
+                            label: local.private_trekking_label,
+                            value: '20',
+                          ),
                         ],
                       ),
                     ],
@@ -259,6 +279,9 @@ class _UserPageState extends State<UserPage> {
                           MaterialPageRoute(
                             builder: (context) => SettingPage(
                               onLocaleChanged: widget.onLocaleChanged,
+                              trekkingController: widget.trekkingController,
+                              userController: widget.userController,
+                              diaryController: widget.diaryController,
                             ),
                           ),
                         );
@@ -315,7 +338,9 @@ class _UserPageState extends State<UserPage> {
                         10, //sarà dinamico -> numero di percorsi pubblici
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.published_trekking_label}  ${index + 1}'),
+                        title: Text(
+                          '${local.published_trekking_label}  ${index + 1}',
+                        ),
                         onTap: () {
                           showDialog(
                             context: context,
@@ -344,7 +369,9 @@ class _UserPageState extends State<UserPage> {
                     itemCount: 10, //sarà dinamico -> numero di percorsi privati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.private_trekking_label} ${index + 1}'),
+                        title: Text(
+                          '${local.private_trekking_label} ${index + 1}',
+                        ),
                         onTap: () {
                           // Azione al tap sul percorso privato
                         },
@@ -352,12 +379,28 @@ class _UserPageState extends State<UserPage> {
                     },
                   ),
                   ListView.builder(
-                    itemCount: 10, //sarà dinamico -> numero di percorsi salvati
+                    itemCount: user
+                        .savedTrekkings
+                        .length, //sarà dinamico -> numero di percorsi salvati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.save_trekking_button_label} ${index + 1}'),
+                        title: Text(
+                          '${local.save_trekking_button_label} ${user.savedTrekkings[index].name}',
+                        ),
                         onTap: () {
-                          // Azione al tap sul percorso salvato
+                          final routeID = user.savedTrekkings[index].documentId;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TrekkingPage(
+                                trekkingId: routeID,
+                                trekkingController: widget.trekkingController,
+                                userController: widget.userController,
+                                diaryController: widget.diaryController,
+                                onLocaleChanged: widget.onLocaleChanged,
+                              ),
+                            ),
+                          );
                         },
                       );
                     },
@@ -382,53 +425,69 @@ class _UserPageState extends State<UserPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.home),
-                title: Text(
-                  local.home_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.home_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged)),
+                    MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: Text(
-                  local.profile_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged)),
+                    MaterialPageRoute(
+                      builder: (context) => UserPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.search),
-                title: Text(
-                  local.search_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged)),
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: Text(
-                  local.settings_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged)),
+                    MaterialPageRoute(
+                      builder: (context) => SettingPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
+                      ),
+                    ),
                   );
                 },
               ),
@@ -445,10 +504,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({
-    required this.label, 
-    required this.value
-  });
+  const _StatItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

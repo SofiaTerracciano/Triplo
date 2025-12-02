@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/controller/diary.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:flutter/src/material/icons.dart';
+import '../controller/diary.dart';
 
 class DiaryPage extends StatefulWidget {
-  final String routeName;
+  DiaryController diaryController;
+  final String diaryId;
   final void Function(Locale) onLocaleChanged;
 
-  DiaryPage({super.key, required this.routeName, required this.onLocaleChanged});
+  DiaryPage({
+    super.key, 
+    required this.diaryId,
+    required this.diaryController,
+    required this.onLocaleChanged
+  });
 
   @override
   _DiaryPageState createState() => _DiaryPageState();
@@ -28,8 +31,9 @@ class _DiaryPageState extends State<DiaryPage> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.routeName), centerTitle: true),
+      appBar: AppBar(title: Text('da prender'), centerTitle: true),
 
       body: ListView(
         padding: const EdgeInsets.all(25.0),

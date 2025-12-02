@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/model/trekking.dart';
-class AddingDiaryPage extends StatefulWidget {
-  final Trekking trekking;
-  final void Function(Locale) onLocaleChanged;
+import 'package:triplo/controller/trekking.dart';
+import 'package:triplo/controller/user.dart';
+import 'package:triplo/controller/diary.dart';
 
-  const AddingDiaryPage({super.key, required this.trekking, required this.onLocaleChanged});
+class AddingDiaryPage extends StatefulWidget {
+  final void Function(Locale) onLocaleChanged;
+  final String trekkingId;
+  final TrekkingController trekkingController;
+  final UserController userController;
+  final DiaryController diaryController;
+
+  const AddingDiaryPage({
+    super.key,
+    required this.onLocaleChanged,
+    required this.trekkingId,
+    required this.trekkingController,
+    required this.userController,
+    required this.diaryController,
+  });
 
   @override
   AddingDiaryPageState createState() => AddingDiaryPageState();
@@ -16,10 +30,11 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Trekking trekking = widget.trekkingController.getTrekkingById(
+      widget.trekkingId,
+    )!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Add ${widget.trekking.name}"),
-      ),
+      appBar: AppBar(title: Text("Add ${trekking.name}")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -43,7 +58,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                 print("Diary entry: $text");
               },
               child: const Text("Save"),
-            )
+            ),
           ],
         ),
       ),

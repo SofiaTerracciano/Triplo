@@ -353,6 +353,24 @@ abstract class AppLocalizations {
   /// **'No challenges available for this trekking'**
   String get challenges_available_trekking_label;
 
+  /// No description provided for @hours_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get hours_trekking_label;
+
+  /// No description provided for @hour_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'hour'**
+  String get hour_trekking_label;
+
+  /// No description provided for @minutes_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes_trekking_label;
+
   /// No description provided for @date_trecking_label.
   ///
   /// In en, this message translates to:

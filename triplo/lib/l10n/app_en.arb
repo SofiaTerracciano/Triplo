@@ -49,6 +49,9 @@
     "save_trekking_button_label": "Save",
     "challenges_trekking_label": "Challenges",
     "challenges_available_trekking_label": "No challenges available for this trekking",
+    "hours_trekking_label": "hours",
+    "hour_trekking_label": "hour",
+    "minutes_trekking_label": "minutes",
 
     "date_trecking_label": "Date",
     "duration_trekking_label": "Duration",

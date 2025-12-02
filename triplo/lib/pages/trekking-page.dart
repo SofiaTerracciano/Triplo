@@ -1,18 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
 import '../controller/trekking.dart';
-import '../model/trekking.dart';
+import '../controller/user.dart';
+import '../controller/diary.dart';
 import 'adding-diary-page.dart';
 
 class TrekkingPage extends StatefulWidget {
-  final Trekking trekking;
+  final TrekkingController trekkingController;
+  final UserController userController;
+  final DiaryController diaryController;
+  final String trekkingId;
   final void Function(Locale) onLocaleChanged;
 
   TrekkingPage({
     super.key,
-    required this.trekking,
+    required this.trekkingController,
+    required this.userController,
+    required this.diaryController,
+    required this.trekkingId,
     required this.onLocaleChanged,
   });
 
@@ -21,8 +30,6 @@ class TrekkingPage extends StatefulWidget {
 }
 
 class _TrekkingPageState extends State<TrekkingPage> {
-  int currentIconIndex = 0;
-
   // Icons for the bookmark button (unsaved and saved) --> 0:not saved, 1:saved
   final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
 
@@ -36,7 +43,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
-    final trekking = widget.trekking;
+    final trekking = widget.trekkingController.getTrekkingById(widget.trekkingId)!;
+    final user = widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1')!; //dobbiamo girarci sempre lo userId in cui siamo, quindi questo sarà presa quando faccio il login
 
     return Scaffold(
       appBar: AppBar(
@@ -50,27 +58,38 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => AddingDiaryPage(
-                    trekking: widget.trekking,
+                    trekkingId: trekking.documentId,
+                    trekkingController: widget.trekkingController,
+                    diaryController: widget.diaryController,
+                    userController: widget.userController,
                     onLocaleChanged: widget.onLocaleChanged,
                   ),
                 ),
               );
             },
           ),
-          IconButton(
-            icon: icons[currentIconIndex],
-            onPressed: () {
-              setState(() {
-                if (currentIconIndex == 0) {
-                  currentIconIndex = 1;
-                  //add to saved trekkings
-                } else {
-                  currentIconIndex = 0;
-                  //remove from saved trekkings
-                }
-              });
-            },
-          ),
+
+          if (user.savedTrekkings.contains(trekking.documentId)) ...[
+            IconButton(
+              icon: icons[1],
+              onPressed: () {
+                setState(() {
+                  widget.userController.removeTrekkingFromSaved(
+                    trekking.documentId,
+                  );
+                });
+              },
+            ),
+          ] else ...[
+            IconButton(
+              icon: icons[0],
+              onPressed: () {
+                setState(() {
+                  widget.userController.addTrekkingToSaved(trekking.documentId);
+                });
+              },
+            ),
+          ],
         ],
       ),
       body: SingleChildScrollView(
@@ -112,12 +131,30 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 children: [
                   if (trekking.estimated_time < 60)
                     Text(
-                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} minutes",
+                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} ${local.minutes_trekking_label}",
                     ),
                   if (trekking.estimated_time >= 60)
-                    Text(
-                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} hours ${trekking.estimated_time % 60} minutes",
-                    ),
+                    if (trekking.estimated_time % 60 == 0) ...[
+                      if (trekking.estimated_time / 60 == 1) ...[
+                        Text(
+                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hour_trekking_label}",
+                        ),
+                      ] else ...[
+                        Text(
+                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hours_trekking_label}",
+                        ),
+                      ],
+                    ] else ...[
+                      if (trekking.estimated_time / 60 == 1) ...[
+                        Text(
+                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}",
+                        ),
+                      ] else ...[
+                        Text(
+                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}",
+                        ),
+                      ],
+                    ],
                 ],
               ),
               Row(
@@ -243,14 +280,51 @@ class _TrekkingPageState extends State<TrekkingPage> {
                     Icon(Icons.close, size: 16),
                 ],
               ),
-              Row(
-                children: [
-                  if (trekking.challenges.isNotEmpty)
-                    Text("${local.challenges_trekking_label}: ") //mettere le icone delle sfide
-                  else
-                    Text("${local.challenges_trekking_label}: ${local.challenges_available_trekking_label}"),
-                ],
-              ),
+              if (trekking.challenges.isNotEmpty) ...[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("${local.challenges_trekking_label}:"),
+                    SizedBox(
+                      height: 50, // altezza della riga immagini
+                      child: FutureBuilder<List<String>>(
+                        future: widget.trekkingController.getDownloadUrls(
+                          trekking.challenges,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Text('Errore: ${snapshot.error}');
+                          } else {
+                            List<String> urls = snapshot.data!;
+                            return ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: urls.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4.0,
+                                  ),
+                                  child: Image.network(
+                                    urls[index],
+                                    fit: BoxFit.contain,
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                Text(
+                  "${local.challenges_trekking_label}: ${local.challenges_available_trekking_label}",
+                ),
+              ],
             ],
           ),
         ),
