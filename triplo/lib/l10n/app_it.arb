@@ -44,7 +44,9 @@
     "refreshment_point_trekking_label": "Punti ristoro",
     "refreshment_point_available_trekking_label": "Non ci sono punti ristoro per questo trekking",
     "pic_nic_area_trekking_label": "Area Picnic",
+    "pic_nic_area_available_trekking_label": "Non ci sono aree picnic disponibili",
     "family_friendly_trekking_label": "Adatto alle famiglie",
+    "family_friendly_available_trekking_label": "Il percorso non è indicato per famiglie con bambini",
     "start_trekking_button_label": "Inizia",
     "save_trekking_button_label": "Salva",
     "challenges_trekking_label": "Sfide",
@@ -60,6 +62,8 @@
     "refuge_trekking_label": "Rifugio",
     "mood_trekking_label": "Mood",
     "notes_trekking_label": "Note",
+    "save_botton_label": "Salva",
+    "add_botton_label": "Aggiungi",
 
     "challeng_title": "Sfide",
     "photo_title_challeng": "Caccia Fotografica",

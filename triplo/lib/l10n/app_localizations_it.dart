@@ -120,7 +120,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pic_nic_area_trekking_label => 'Area Picnic';
 
   @override
+  String get pic_nic_area_available_trekking_label => 'Non ci sono aree picnic disponibili';
+
+  @override
   String get family_friendly_trekking_label => 'Adatto alle famiglie';
+
+  @override
+  String get family_friendly_available_trekking_label => 'Il percorso non è indicato per famiglie con bambini';
 
   @override
   String get start_trekking_button_label => 'Inizia';
@@ -163,6 +169,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get notes_trekking_label => 'Note';
+
+  @override
+  String get save_botton_label => 'Salva';
+
+  @override
+  String get add_botton_label => 'Aggiungi';
 
   @override
   String get challeng_title => 'Sfide';

@@ -323,11 +323,23 @@ abstract class AppLocalizations {
   /// **'Picnic Areas'**
   String get pic_nic_area_trekking_label;
 
+  /// No description provided for @pic_nic_area_available_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no picnic areas available'**
+  String get pic_nic_area_available_trekking_label;
+
   /// No description provided for @family_friendly_trekking_label.
   ///
   /// In en, this message translates to:
   /// **'Family Friendly'**
   String get family_friendly_trekking_label;
+
+  /// No description provided for @family_friendly_available_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'This trekking is not suitable for families with children'**
+  String get family_friendly_available_trekking_label;
 
   /// No description provided for @start_trekking_button_label.
   ///
@@ -412,6 +424,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes'**
   String get notes_trekking_label;
+
+  /// No description provided for @save_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save_botton_label;
+
+  /// No description provided for @add_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add_botton_label;
 
   /// No description provided for @challeng_title.
   ///

@@ -97,13 +97,14 @@ class _ChallengesPageState extends State<ChallengesPage> {
         itemCount: _challenges.length,
         itemBuilder: (context, index) {
           final challenge = _challenges[index];
+          // If the index is even, then the image is on the left, while if the index is odd, the image is on the right.
           final isEven = index % 2 == 0;
-
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                if (!isEven) _buildImage(challenge.photoUrl),
+                if (!isEven) 
+                  _buildImage(challenge.photoUrl),
 
                 Expanded(
                   child: Column(
@@ -127,7 +128,8 @@ class _ChallengesPageState extends State<ChallengesPage> {
                   ),
                 ),
 
-                if (isEven) _buildImage(challenge.photoUrl),
+                if (isEven) 
+                  _buildImage(challenge.photoUrl),
               ],
             ),
           );

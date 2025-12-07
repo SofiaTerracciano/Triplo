@@ -44,7 +44,9 @@
   "refreshment_point_trekking_label": "Puntos de descanso",
   "refreshment_point_available_trekking_label": "No hay puntos de descanso para esta ruta",
   "pic_nic_area_trekking_label": "Área de picnic",
+  "pic_nic_area_available_trekking_label": "No hay áreas de picnic disponibles",
   "family_friendly_trekking_label": "Apto para familias",
+  "family_friendly_available_trekking_label": "El recorrido no es adecuado para familias con niños",
   "start_trekking_button_label": "Comenzar",
   "save_trekking_button_label": "Guardar",
   "challenges_trekking_label": "Desafíos",
@@ -60,6 +62,8 @@
   "refuge_trekking_label": "Refugio",
   "mood_trekking_label": "Estado de ánimo",
   "notes_trekking_label": "Notas",
+  "save_botton_label": "Guardar",
+  "add_botton_label": "Añadir",
 
   "challeng_title": "Desafíos",
   "photo_title_challeng": "Búsqueda Fotográfica",

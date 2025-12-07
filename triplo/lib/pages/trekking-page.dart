@@ -35,10 +35,22 @@ class _TrekkingPageState extends State<TrekkingPage> {
   // Icons for the bookmark button (unsaved and saved) --> 0:not saved, 1:saved
   final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
 
-  static const TextStyle optionStyle = TextStyle(
-    fontSize: 20,
+  final titleStyle = TextStyle(
+    fontSize: 18,
     fontWeight: FontWeight.bold,
-    fontStyle: FontStyle.italic,
+    color: Colors.black87,
+  );
+
+  final labelStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600, // semibold
+    color: Colors.black87,
+  );
+
+  final valueStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.normal,
+    color: const Color.fromARGB(255, 0, 0, 0),
   );
 
   @override
@@ -48,9 +60,31 @@ class _TrekkingPageState extends State<TrekkingPage> {
     final trekking = widget.trekkingController.getTrekkingById(
       widget.trekkingId,
     )!;
-    //final user = widget.userController.currentUser!;
-    //per evitare di fare il login ogni volta, carico un user di test
-    //final user = widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1')!;
+
+    // To calculate the trekking durantion time
+    String formattedTime;
+    if (trekking.estimated_time < 60) {
+      formattedTime =
+          "${trekking.estimated_time} ${local.minutes_trekking_label}";
+    } else {
+      if (trekking.estimated_time % 60 == 0) {
+        if (trekking.estimated_time / 60 == 1) {
+          formattedTime =
+              "${trekking.estimated_time / 60} ${local.hour_trekking_label}";
+        } else {
+          formattedTime =
+              "${trekking.estimated_time / 60} ${local.hours_trekking_label}";
+        }
+      } else {
+        if (trekking.estimated_time / 60 == 1) {
+          formattedTime =
+              "${trekking.estimated_time / 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+        } else {
+          formattedTime =
+              "${trekking.estimated_time / 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+        }
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -76,10 +110,12 @@ class _TrekkingPageState extends State<TrekkingPage> {
           ),
 
           FutureBuilder<Users?>(
-            future: widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1'), 
+            future: widget.userController.getUserById(
+              'Aqcz7x94WnPJNYpb48CtuzMbsMj1',
+            ),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return SizedBox.shrink(); // Oppure loader
+                return SizedBox.shrink();
               }
 
               final user = snapshot.data!;
@@ -110,7 +146,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                       },
                     );
             },
-          )
+          ),
 
           /*if (user.savedTrekkings.any((t) => t.documentId == trekking.documentId,)) ...[
             IconButton(
@@ -146,188 +182,230 @@ class _TrekkingPageState extends State<TrekkingPage> {
               Row(
                 children: [
                   Text(
-                    "${trekking.name}",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ],
+                    trekking.name, 
+                    style: titleStyle
+                  )
+                ]
               ),
+              SizedBox(height: 3,),
               Row(
                 children: [
                   Text(
-                    "${local.starting_point_trekking_label}: ${trekking.starting_point_name}",
+                    "${local.starting_point_trekking_label}: ",
+                    style: labelStyle,
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text("${local.level_label}: ${trekking.difficulty_level}"),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(
-                    "${local.distance_trekking_label}: ${trekking.distance} km",
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  if (trekking.estimated_time < 60)
-                    Text(
-                      "${local.estimated_time_trekking_label}: ${trekking.estimated_time} ${local.minutes_trekking_label}",
+                  Expanded(
+                    child: Text(
+                      trekking.starting_point_name,
+                      style: valueStyle,
                     ),
-                  if (trekking.estimated_time >= 60)
-                    if (trekking.estimated_time % 60 == 0) ...[
-                      if (trekking.estimated_time / 60 == 1) ...[
-                        Text(
-                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hour_trekking_label}",
-                        ),
-                      ] else ...[
-                        Text(
-                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hours_trekking_label}",
-                        ),
-                      ],
-                    ] else ...[
-                      if (trekking.estimated_time / 60 == 1) ...[
-                        Text(
-                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}",
-                        ),
-                      ] else ...[
-                        Text(
-                          "${local.estimated_time_trekking_label}: ${trekking.estimated_time / 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}",
-                        ),
-                      ],
-                    ],
+                  ),
                 ],
               ),
+              SizedBox(height: 3,),
               Row(
                 children: [
-                  RichText(
-                    text: TextSpan(
+                  Text(
+                    "${local.level_label}: ", 
+                    style: labelStyle
+                  ),
+                  Expanded(
+                    child: Text(
+                      trekking.difficulty_level,
+                      style: valueStyle,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 3,),
+              Row(
+                children: [
+                  Text(
+                    "${local.distance_trekking_label}: ", 
+                    style: labelStyle
+                  ),
+                  Expanded(
+                    child: Text(
+                      "${trekking.distance} km", 
+                      style: valueStyle
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 3,),
+              Row(
+                children: [
+                  Text(
+                    "${local.estimated_time_trekking_label}: ",
+                    style: labelStyle,
+                  ),
+                  Expanded(
+                    child: Text(
+                      formattedTime, 
+                      style: valueStyle
+                    )
+                  ),
+                ],
+              ),
+              SizedBox(height: 3,),
+              Row(
+                children: [
+                  Text(
+                    "${local.elevaition_gain_trekking_label}: ",
+                    style: labelStyle,
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextSpan(
-                          text:
-                              '${local.elevaition_gain_trekking_label}: ${trekking.elevation_gain} m',
-                          style: TextStyle(color: Colors.black),
+                        Text(
+                          "${trekking.elevation_gain} m",
+                          style: valueStyle,
                         ),
                         if (trekking.upGain)
-                          WidgetSpan(child: Icon(Icons.arrow_upward, size: 16)),
-                        if (trekking.downGain)
-                          WidgetSpan(
-                            child: Icon(Icons.arrow_downward, size: 16),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Icon(Icons.arrow_upward, size: 16, color: Colors.black),
                           ),
-                      ],
-                    ),
+                        if (trekking.downGain)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Icon(Icons.arrow_downward, size: 16, color: Colors.black),
+                          ),
+                      ]
+                    )
                   ),
                 ],
               ),
+              SizedBox(height: 3,),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.ending_point_trekking_label}: ",
+                      style: labelStyle,
+                    ),
+                    TextSpan(
+                      text: trekking.ending_point_name,
+                      style: valueStyle,
+                    )
+                  ]
+                )
+              ),
+              /*Row(
+                children: [
+                  Text(
+                    "${local.ending_point_trekking_label}: ",
+                    style: labelStyle,
+                  ),
+                  Expanded(
+                    child: Text(
+                      trekking.ending_point_name,
+                      style: valueStyle,
+                    )
+                  )
+                ],
+              ),*/
+              //immagine ending point
+              Row(),
+              SizedBox(height: 3,),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.info_trekking_label}: ",
+                      style: labelStyle,
+                    ),
+                    TextSpan(
+                      text: trekking.info[getLanguageSelected(locale.languageCode)],
+                      style: valueStyle,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 3,),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.description_trekking_label}: ",
+                      style: labelStyle,
+                    ),
+                    TextSpan(
+                      text: trekking.description[getLanguageSelected(locale.languageCode)],
+                      style: valueStyle,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 3,),
               Row(
                 children: [
                   Text(
-                    "${local.ending_point_trekking_label}: ${trekking.ending_point_name}",
+                    "${local.refreshment_point_trekking_label}: ",
+                    style: labelStyle,
                   ),
-                ],
-              ),
-              //immagine ending point
-              Row(),
-              Row(
-                children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (locale.languageCode == 'de')
+                        if (trekking.refreshment_point != '') ...[
                           Text(
-                            "${local.info_trekking_label}: ${trekking.info[0]}",
+                            trekking.refreshment_point,
+                            style: valueStyle,
                           ),
-                        if (locale.languageCode == 'en')
+                        ] else ...[
                           Text(
-                            "${local.info_trekking_label}: ${trekking.info[1]}",
+                            local.refreshment_point_available_trekking_label,
+                            style: valueStyle,
                           ),
-                        if (locale.languageCode == 'es')
-                          Text(
-                            "${local.info_trekking_label}: ${trekking.info[2]}",
-                          ),
-                        if (locale.languageCode == 'fr')
-                          Text(
-                            "${local.info_trekking_label}: ${trekking.info[3]}",
-                          ),
-                        if (locale.languageCode == 'it')
-                          Text(
-                            "${local.info_trekking_label}: ${trekking.info[4]}",
-                          ),
-                      ],
-                    ),
+                        ],
+                      ]
+                    )
                   ),
                 ],
               ),
+              SizedBox(height: 3,),
               Row(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (locale.languageCode == 'de')
-                          Text(
-                            "${local.description_trekking_label}: ${trekking.description[0]}",
-                          ),
-                        if (locale.languageCode == 'en')
-                          Text(
-                            "${local.description_trekking_label}: ${trekking.description[1]}",
-                          ),
-                        if (locale.languageCode == 'es')
-                          Text(
-                            "${local.description_trekking_label}: ${trekking.description[2]}",
-                          ),
-                        if (locale.languageCode == 'fr')
-                          Text(
-                            "${local.description_trekking_label}: ${trekking.description[3]}",
-                          ),
-                        if (locale.languageCode == 'it')
-                          Text(
-                            "${local.description_trekking_label}: ${trekking.description[4]}",
-                          ),
-                      ],
-                    ),
+                  Text(
+                    "${local.pic_nic_area_trekking_label}: ", 
+                    style: labelStyle,
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  if (trekking.refreshment_point != '') ...[
-                    Text(
-                      "${local.refreshment_point_trekking_label}: ${trekking.refreshment_point}",
-                    ),
-                  ] else ...[
-                    Text(
-                      "${local.refreshment_point_trekking_label}: ${local.refreshment_point_available_trekking_label}",
-                    ),
-                  ],
-                ],
-              ),
-              Row(
-                children: [
-                  Text("${local.pic_nic_area_trekking_label}:"),
                   if (trekking.pic_nic_area)
-                    Icon(Icons.table_restaurant, color: Colors.grey, size: 16)
+                    Icon(Icons.table_restaurant, color: Colors.black, size: 16)
                   else
-                    Icon(Icons.close, size: 16),
+                    Text(
+                      local.pic_nic_area_available_trekking_label, 
+                      style: labelStyle,
+                    ),
                 ],
               ),
+              SizedBox(height: 3,),
               Row(
                 children: [
-                  Text("${local.family_friendly_trekking_label}:"),
+                  Text(
+                    "${local.family_friendly_trekking_label}: ", 
+                    style: labelStyle,
+                  ),
                   if (trekking.family_firendly)
-                    Icon(Icons.family_restroom, color: Colors.grey, size: 16)
+                    Icon(Icons.family_restroom, color: Colors.black, size: 16)
                   else
-                    Icon(Icons.close, size: 16),
+                    Text(
+                      local.family_friendly_available_trekking_label, 
+                      style: labelStyle,
+                    ),
                 ],
               ),
+              SizedBox(height: 3,),
               if (trekking.challenges.isNotEmpty) ...[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${local.challenges_trekking_label}:"),
+                    Text(
+                      "${local.challenges_trekking_label}:", 
+                      style: labelStyle
+                    ),
                     SizedBox(
                       height: 50, // altezza della riga immagini
                       child: FutureBuilder<List<String>>(
@@ -364,8 +442,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ],
                 ),
               ] else ...[
-                Text(
-                  "${local.challenges_trekking_label}: ${local.challenges_available_trekking_label}",
+                Row(
+                  children: [
+                    Text(
+                      "${local.challenges_trekking_label}: ",
+                      style: labelStyle,
+                    ),
+                    Expanded(
+                      child: Text(
+                        local.challenges_available_trekking_label,
+                        style: valueStyle
+                      ) 
+                    )
+                  ]
                 ),
               ],
             ],
@@ -375,3 +464,25 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 }
+
+int getLanguageSelected(String code) {
+  switch (code) {
+    case 'de': 
+      return 0;
+    case 'en': 
+      return 1;
+    case 'es': 
+      return 2;
+    case 'fr':
+      return 3;
+    case 'it': 
+      return 4;
+
+    default: return 1; 
+  }
+}
+
+/* TO DO: capire se serve Text.rich oppure una semplice Row -> TextRich va a capo
+incolonnato sotto il label mentre Row + Expanded va a capo ma non incolanna sotto 
+il label ma sotto il value -> va capito su tutte le righe (anche sulle icone per i non available*/
+

@@ -25,8 +25,7 @@ class AddingDiaryPage extends StatefulWidget {
 }
 
 class AddingDiaryPageState extends State<AddingDiaryPage> {
-  // Esempio: controller di un TextField
-  final TextEditingController diaryController = TextEditingController();
+  final TextEditingController textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
       widget.trekkingId,
     )!;
     return Scaffold(
-      appBar: AppBar(title: Text("Add ${trekking.name}")),
+      appBar: AppBar(title: Text("${trekking.name}")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -43,7 +42,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
             const Text("Write your diary entry:"),
             const SizedBox(height: 12),
             TextField(
-              controller: diaryController,
+              controller: textController,
               maxLines: 6,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -53,7 +52,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                final text = diaryController.text;
+                final text = textController.text;
                 // TODO: Gestisci salvataggio
                 print("Diary entry: $text");
               },
