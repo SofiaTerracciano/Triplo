@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
+import 'package:triplo/pages/challenges.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
@@ -491,6 +492,23 @@ class _UserPageState extends State<UserPage> {
                   );
                 },
               ),
+              ListTile(
+              leading: const Icon(Icons.emoji_events),
+              title: Text(local.challeng_title, style: optionStyle),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChallengesPage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
+                );
+              },
+            ),
             ],
           ),
         ),

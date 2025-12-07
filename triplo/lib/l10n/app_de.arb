@@ -59,5 +59,19 @@
   "photos_trekking_label": "Fotos",
   "refuge_trekking_label": "Hütte",
   "mood_trekking_label": "Stimmung",
-  "notes_trekking_label": "Notizen"
+  "notes_trekking_label": "Notizen",
+
+  "challeng_title": "Herausforderungen",
+  "photo_title_challeng": "Fotojagd",
+  "photo_description_challeng": "Mache ein Foto von etwas Besonderem auf der Strecke, wie einem Wasserfall, einem Tier oder einer seltenen Blume.",
+  "time_title_challeng": "Gegen die Uhr",
+  "time_description_challeng": "Schließe die Strecke innerhalb der geschätzten Zeit ab. Schaffst du es, die Uhr zu schlagen?",
+  "hi_title_challeng": "Grüße unterwegs",
+  "hi_description_challeng": "Grüße mindestens 4 Personen, die du auf der Strecke triffst. Soziale Kontakte knüpfen und Punkte sammeln!",
+  "orientiring_title_challeng": "Mini-Orientierung",
+  "orientiring_description_challeng": "Wenn du eine bestimmte Position erreichst, fragt dich die App, in welche Richtung du gehst (Nord, Süd, Ost, West). Beantworte richtig, um die Challenge zu gewinnen.",
+  "silent_walking_title_challeng": "Stiller Spaziergang",
+  "silent_walking_description_challeng": "Gehe für eine bestimmte Zeit still. Du erhältst eine Benachrichtigung von deiner smart watch und musst bestätigen, dass du die Challenge abgeschlossen hast.",
+  "balance_title_challeng": "Balance-Challenge",
+  "balance_description_challeng": "Finde einen Stein oder eine Wurzel und halte dein Gleichgewicht für eine bestimmte Zeit. Teste dein Gleichgewicht!"
 }

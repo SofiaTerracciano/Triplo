@@ -163,4 +163,43 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notes_trekking_label => 'Notizen';
+
+  @override
+  String get challeng_title => 'Herausforderungen';
+
+  @override
+  String get photo_title_challeng => 'Fotojagd';
+
+  @override
+  String get photo_description_challeng => 'Mache ein Foto von etwas Besonderem auf der Strecke, wie einem Wasserfall, einem Tier oder einer seltenen Blume.';
+
+  @override
+  String get time_title_challeng => 'Gegen die Uhr';
+
+  @override
+  String get time_description_challeng => 'Schließe die Strecke innerhalb der geschätzten Zeit ab. Schaffst du es, die Uhr zu schlagen?';
+
+  @override
+  String get hi_title_challeng => 'Grüße unterwegs';
+
+  @override
+  String get hi_description_challeng => 'Grüße mindestens 4 Personen, die du auf der Strecke triffst. Soziale Kontakte knüpfen und Punkte sammeln!';
+
+  @override
+  String get orientiring_title_challeng => 'Mini-Orientierung';
+
+  @override
+  String get orientiring_description_challeng => 'Wenn du eine bestimmte Position erreichst, fragt dich die App, in welche Richtung du gehst (Nord, Süd, Ost, West). Beantworte richtig, um die Challenge zu gewinnen.';
+
+  @override
+  String get silent_walking_title_challeng => 'Stiller Spaziergang';
+
+  @override
+  String get silent_walking_description_challeng => 'Gehe für eine bestimmte Zeit still. Du erhältst eine Benachrichtigung von deiner smart watch und musst bestätigen, dass du die Challenge abgeschlossen hast.';
+
+  @override
+  String get balance_title_challeng => 'Balance-Challenge';
+
+  @override
+  String get balance_description_challeng => 'Finde einen Stein oder eine Wurzel und halte dein Gleichgewicht für eine bestimmte Zeit. Teste dein Gleichgewicht!';
 }

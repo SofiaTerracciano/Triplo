@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/pages/challenges.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'search-page.dart';
@@ -316,6 +317,23 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,)),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.emoji_events),
+              title: Text(local.challeng_title, style: optionStyle),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChallengesPage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
                 );
               },
             ),

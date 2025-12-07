@@ -163,4 +163,43 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notes_trekking_label => 'Notes';
+
+  @override
+  String get challeng_title => 'Défis';
+
+  @override
+  String get photo_title_challeng => 'Chasse Photo';
+
+  @override
+  String get photo_description_challeng => 'Prenez une photo de quelque chose de spécial pendant le parcours, comme une cascade, un animal ou une fleur rare.';
+
+  @override
+  String get time_title_challeng => 'Contre la Montre';
+
+  @override
+  String get time_description_challeng => 'Terminez le parcours dans le temps estimé. Pouvez-vous battre le chronomètre?';
+
+  @override
+  String get hi_title_challeng => 'Salutations en Chemin';
+
+  @override
+  String get hi_description_challeng => 'Saluez au moins 4 personnes que vous rencontrez le long du parcours. Socialisez et gagnez des points!';
+
+  @override
+  String get orientiring_title_challeng => 'Mini‑Orienteering';
+
+  @override
+  String get orientiring_description_challeng => 'Lorsque vous arrivez à une certaine position, l’application vous demandera dans quelle direction vous allez (Nord, Sud, Est, Ouest). Répondez correctement pour gagner le défi.';
+
+  @override
+  String get silent_walking_title_challeng => 'Marche Silencieuse';
+
+  @override
+  String get silent_walking_description_challeng => 'Marchez en silence pendant un certain temps. Vous recevrez une notification de votre smart watch et devrez confirmer que vous avez terminé le défi.';
+
+  @override
+  String get balance_title_challeng => 'Défi d’Équilibre';
+
+  @override
+  String get balance_description_challeng => 'Trouvez une pierre ou une racine et maintenez votre équilibre pendant un temps déterminé. Testez votre équilibre!';
 }

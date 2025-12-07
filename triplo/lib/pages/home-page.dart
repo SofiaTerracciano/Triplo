@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/pages/challenges.dart';
 import 'search-page.dart';
 import 'setting-page.dart';
 import 'user-page.dart';
@@ -178,6 +179,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.emoji_events),
+              title: Text(local.challeng_title, style: optionStyle),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ChallengesPage(
+                          onLocaleChanged: widget.onLocaleChanged,
+                          trekkingController: widget.trekkingController,
+                          userController: widget.userController,
+                          diaryController: widget.diaryController,
+                        ),
+                  ),
+                );
+              },
+            )
           ],
         ),
       ),

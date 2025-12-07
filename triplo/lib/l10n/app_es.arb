@@ -59,5 +59,19 @@
   "photos_trekking_label": "Fotos",
   "refuge_trekking_label": "Refugio",
   "mood_trekking_label": "Estado de ánimo",
-  "notes_trekking_label": "Notas"
+  "notes_trekking_label": "Notas",
+
+  "challeng_title": "Desafíos",
+  "photo_title_challeng": "Búsqueda Fotográfica",
+  "photo_description_challeng": "Toma una foto de algo especial durante el recorrido, como una cascada, un animal o una flor rara.",
+  "time_title_challeng": "Contra el Reloj",
+  "time_description_challeng": "Completa el recorrido dentro del tiempo estimado. ¿Podrás vencer al reloj?",
+  "hi_title_challeng": "Saludos en el Camino",
+  "hi_description_challeng": "Saluda al menos a 4 personas que encuentres durante el recorrido. ¡Socializa y gana puntos!",
+  "orientiring_title_challeng": "Mini Orientación",
+  "orientiring_description_challeng": "Cuando llegues a cierta posición, la app te preguntará hacia qué dirección te diriges (Norte, Sur, Este, Oeste). Responde correctamente para ganar la challenge.",
+  "silent_walking_title_challeng": "Caminata Silenciosa",
+  "silent_walking_description_challeng": "Camina en silencio durante un tiempo determinado. Recibirás una notificación de tu Apple Watch y deberás confirmar que completaste el desafío.",
+  "balance_title_challeng": "Desafío de Equilibrio",
+  "balance_description_challeng": "Encuentra una piedra o raíz y mantén el equilibrio durante un período de tiempo determinado. ¡Pon a prueba tu equilibrio!"
 }

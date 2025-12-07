@@ -163,4 +163,43 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notes_trekking_label => 'Notas';
+
+  @override
+  String get challeng_title => 'Desafíos';
+
+  @override
+  String get photo_title_challeng => 'Búsqueda Fotográfica';
+
+  @override
+  String get photo_description_challeng => 'Toma una foto de algo especial durante el recorrido, como una cascada, un animal o una flor rara.';
+
+  @override
+  String get time_title_challeng => 'Contra el Reloj';
+
+  @override
+  String get time_description_challeng => 'Completa el recorrido dentro del tiempo estimado. ¿Podrás vencer al reloj?';
+
+  @override
+  String get hi_title_challeng => 'Saludos en el Camino';
+
+  @override
+  String get hi_description_challeng => 'Saluda al menos a 4 personas que encuentres durante el recorrido. ¡Socializa y gana puntos!';
+
+  @override
+  String get orientiring_title_challeng => 'Mini Orientación';
+
+  @override
+  String get orientiring_description_challeng => 'Cuando llegues a cierta posición, la app te preguntará hacia qué dirección te diriges (Norte, Sur, Este, Oeste). Responde correctamente para ganar la challenge.';
+
+  @override
+  String get silent_walking_title_challeng => 'Caminata Silenciosa';
+
+  @override
+  String get silent_walking_description_challeng => 'Camina en silencio durante un tiempo determinado. Recibirás una notificación de tu Apple Watch y deberás confirmar que completaste el desafío.';
+
+  @override
+  String get balance_title_challeng => 'Desafío de Equilibrio';
+
+  @override
+  String get balance_description_challeng => 'Encuentra una piedra o raíz y mantén el equilibrio durante un período de tiempo determinado. ¡Pon a prueba tu equilibrio!';
 }

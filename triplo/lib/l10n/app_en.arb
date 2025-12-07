@@ -59,5 +59,19 @@
     "photos_trekking_label": "Photos",
     "refuge_trekking_label": "Refuge",
     "mood_trekking_label": "Mood",
-    "notes_trekking_label": "Notes"
+    "notes_trekking_label": "Notes",
+
+    "challeng_title": "Challenges",
+    "photo_title_challeng": "Photo Hunt",
+    "photo_description_challeng": "Take a photo of something special during the route, like a waterfall, an animal, or a rare flower.",
+    "time_title_challeng": "Beat the Clock",
+    "time_description_challeng": "Complete the route within the estimated time. Can you beat the clock?",
+    "hi_title_challeng": "Greetings on the Way",
+    "hi_description_challeng": "Greet at least 4 people you meet along the route. Socialize and win!",
+    "orientiring_title_challeng": "Mini‑Orienteering",
+    "orientiring_description_challeng": "When you reach a certain position, the app will ask you which direction you are going (North, South, East, West). Answer correctly to win the challenge.",
+    "silent_walking_title_challeng": "Silent Walk",
+    "silent_walking_description_challeng": "Walk silently for a set amount of time. You will receive a notification from your smart watch and need to confirm you completed the challenge.",
+    "balance_title_challeng": "Balance Challenge",
+    "balance_description_challeng": "Find a stone or a root and maintain your balance for a set period of time. Test your balance!"
 }
