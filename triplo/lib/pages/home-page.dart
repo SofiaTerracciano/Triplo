@@ -93,8 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .endFloat, // Positioning the button to the bottom right
+      // Positioning the button to the bottom right
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, 
+
       //Drawer to control the navigation among pages
       drawer: Drawer(
         child: ListView(
@@ -167,7 +168,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,),
+                        SettingPage(
+                          onLocaleChanged: widget.onLocaleChanged, 
+                          trekkingController: widget.trekkingController, 
+                          userController: widget.userController, 
+                          diaryController: widget.diaryController,
+                        ),
                   ),
                 );
               },
@@ -312,7 +318,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               ),
 
             // Markers for each trekking start point (only at low zoom)
-            if (currentZoom < 12) MarkerLayer(markers: getMarkers()),
+            if (currentZoom < 12) 
+              MarkerLayer(markers: getMarkers()),
           ],
         ),
 

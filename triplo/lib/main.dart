@@ -64,21 +64,15 @@ class _MyAppState extends State<MyApp> {
       setState(() {});
     });
 
-    diaryController = DiaryController(diaries: []);
-    diaryController.loadDiary().then((_) {
-      setState(() {});
-    });
+    diaryController = DiaryController();
 
-    userController = UserController(users: []);
-    userController.loadAllUsers().then((_) {
-      setState(() {});
-    });
+    userController = UserController();
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserController(users: []))],
+      providers: [ChangeNotifierProvider(create: (_) => UserController())],
       child: MaterialApp(
         title: 'Triplo',
         debugShowCheckedModeBanner: false,
@@ -110,11 +104,12 @@ class _MyAppState extends State<MyApp> {
             diaryController: diaryController,
             onLocaleChanged: setLocale,
           ), // o LandingPage() se la tua classe si chiama così
-          '/login': (context) =>  LoginPage(
+          '/login': (context) => LoginPage(
             trekkingController: trekkingController,
             userController: userController,
             diaryController: diaryController,
-            onLocaleChanged: setLocale,),
+            onLocaleChanged: setLocale,
+          ),
           '/registration': (context) => RegistrationPage(
             trekkingController: trekkingController,
             userController: userController,

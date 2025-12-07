@@ -21,9 +21,8 @@ import '../model/trekking.dart';
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  List<Users> _users;
 
-  UserController({required List<Users> users}) : _users = users;
+  UserController();
 
   Users? _currentUser; // Local copy of logged user
   bool _loaded = false;
@@ -245,6 +244,7 @@ class UserController extends ChangeNotifier {
       final d = await _fetchTrekking(id);
       if (d != null) savedTrek.add(d);
     }
+
     /*
     _currentUser = Users(
       uid: uid,
@@ -373,31 +373,15 @@ class UserController extends ChangeNotifier {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
-  
+  // da buttare via
+  Future<Users?> getUserById(String uid) async {
+     final snap = await _db
+        .collection('users') // andrà messo trekking
+        .get();
 
+    _currentUser = Users.fromMap(snap.docs.first.data(), uid: uid);
+    return _currentUser;
 
-//FATTO DA MADDI E SOFI (LE COGLIONE)
-
- //getter for all users
-  List<Users> get allUsers => _users;
-
-  //load users from Firestore
-  Future<void> loadAllUsers() async {
-    if(_loaded) { return;}
-    _loaded = true;
-    final snap = await _db.collection("users").get();
-    _users = snap.docs.map((doc) =>
-      Users.fromMap(doc.data(), uid: doc.id)
-    ).toList();
-    notifyListeners();
-  }
-
-  Users? getUserById(String uid) {
-    try {
-      return _users.firstWhere((user) => user.uid == uid);
-    } catch (e) {
-      return null;
-    }
   }
 
   Future<void> addTrekkingToSaved(String trekkingId) async {
@@ -426,5 +410,4 @@ class UserController extends ChangeNotifier {
     print("Dopo remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
     notifyListeners();
   }
-
 }

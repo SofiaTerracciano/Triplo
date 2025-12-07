@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
+import 'package:triplo/model/user.dart';
+import 'package:triplo/pages/adding-diary-page.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
 import '../controller/diary.dart';
@@ -43,8 +45,12 @@ class _TrekkingPageState extends State<TrekkingPage> {
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context);
-    final trekking = widget.trekkingController.getTrekkingById(widget.trekkingId)!;
-    final user = widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1')!; //dobbiamo girarci sempre lo userId in cui siamo, quindi questo sarà presa quando faccio il login
+    final trekking = widget.trekkingController.getTrekkingById(
+      widget.trekkingId,
+    )!;
+    //final user = widget.userController.currentUser!;
+    //per evitare di fare il login ogni volta, carico un user di test
+    //final user = widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1')!;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,7 +75,44 @@ class _TrekkingPageState extends State<TrekkingPage> {
             },
           ),
 
-          if (user.savedTrekkings.contains(trekking.documentId)) ...[
+          FutureBuilder<Users?>(
+            future: widget.userController.getUserById('Aqcz7x94WnPJNYpb48CtuzMbsMj1'), 
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return SizedBox.shrink(); // Oppure loader
+              }
+
+              final user = snapshot.data!;
+
+              final isSaved = user.savedTrekkings.any(
+                (t) => t.documentId == trekking.documentId,
+              );
+
+              return isSaved
+                  ? IconButton(
+                      icon: icons[1],
+                      onPressed: () {
+                        setState(() {
+                          widget.userController.removeTrekkingFromSaved(
+                            trekking.documentId,
+                          );
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: icons[0],
+                      onPressed: () {
+                        setState(() {
+                          widget.userController.addTrekkingToSaved(
+                            trekking.documentId,
+                          );
+                        });
+                      },
+                    );
+            },
+          )
+
+          /*if (user.savedTrekkings.any((t) => t.documentId == trekking.documentId,)) ...[
             IconButton(
               icon: icons[1],
               onPressed: () {
@@ -89,7 +132,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 });
               },
             ),
-          ],
+          ],*/
         ],
       ),
       body: SingleChildScrollView(

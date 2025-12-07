@@ -61,9 +61,14 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final controller = Provider.of<UserController>(context, listen: false);
+    final uid = controller.currentUser!.uid;
 
     try {
       await controller.login(email, password);
+      await widget.diaryController.loadPrivateDiary(uid);
+      await widget.diaryController.loadPrivateDiary(uid);
+
+      
 
       Navigator.pushReplacement(
         context,
@@ -72,16 +77,18 @@ class _LoginPageState extends State<LoginPage> {
             trekkingController: widget.trekkingController,
             userController: widget.userController,
             diaryController: widget.diaryController,
-            onLocaleChanged: (l) {})),
+            onLocaleChanged: (l) {},
+          ),
+        ),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Logged in")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Logged in")));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login failed: $e")));
     }
   }
 
@@ -118,13 +125,14 @@ class _LoginPageState extends State<LoginPage> {
             trekkingController: widget.trekkingController,
             userController: widget.userController,
             diaryController: widget.diaryController,
-            onLocaleChanged: (l) {}
-          )),
+            onLocaleChanged: (l) {},
+          ),
+        ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google login failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Google login failed: $e")));
     }
   }
 
@@ -178,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     width: 250,
                     child: ElevatedButton(
-
                       onPressed: () => _loginEmailPwd(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
@@ -201,7 +208,11 @@ class _LoginPageState extends State<LoginPage> {
                     width: 250,
                     child: OutlinedButton.icon(
                       onPressed: () => _loginGoogle(context),
-                      icon: Image.asset('images/google_logo.png', width: 18, height: 18),
+                      icon: Image.asset(
+                        'images/google_logo.png',
+                        width: 18,
+                        height: 18,
+                      ),
                       label: const Text(
                         'Sign-in with Google',
                         style: TextStyle(fontSize: 16, color: Colors.black87),
@@ -220,7 +231,8 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 24),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/registration'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/registration'),
                   child: const Text(
                     "Don't have an account? Sign up",
                     style: TextStyle(fontSize: 16, color: Colors.blueAccent),
@@ -230,7 +242,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 8),
 
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/forgotten_password'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/forgotten_password'),
                   child: const Text(
                     'Forgot password?',
                     style: TextStyle(

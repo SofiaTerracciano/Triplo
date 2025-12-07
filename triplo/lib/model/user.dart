@@ -37,18 +37,17 @@ class Users {
     required List<Trekking> savedTrekkings,
     String? photoProfile,
   }) : _uid = uid,
-        _username = username,
+       _username = username,
        _name = name,
        _surname = surname,
        _birthdate = birthdate,
        _email = email,
        _followers = followers,
        _following = following,
-      _publicDiaryPages = publicDiaryPages,
-      _privateDiaryPages = privateDiaryPages,
-      _savedTrekkings = savedTrekkings,
-        _photoProfile = photoProfile ?? "";
-
+       _publicDiaryPages = publicDiaryPages,
+       _privateDiaryPages = privateDiaryPages,
+       _savedTrekkings = savedTrekkings,
+       _photoProfile = photoProfile ?? "";
 
   // Getters
   String get username => _username;
@@ -73,9 +72,12 @@ class Users {
   set email(String email) => _email = email;
   set followers(List<Users> followers) => _followers = followers;
   set following(List<Users> following) => _following = following;
-  set publicDiaryPages(List<Diary> pubblicPages) => _publicDiaryPages = pubblicPages;
-  set privateDiaryPages(List<Diary> privatePages) => _privateDiaryPages = privatePages;
-  set savedTrekkings(List<Trekking> savedTrekkings) => _savedTrekkings = savedTrekkings;
+  set publicDiaryPages(List<Diary> pubblicPages) =>
+      _publicDiaryPages = pubblicPages;
+  set privateDiaryPages(List<Diary> privatePages) =>
+      _privateDiaryPages = privatePages;
+  set savedTrekkings(List<Trekking> savedTrekkings) =>
+      _savedTrekkings = savedTrekkings;
 
   /*
   Map<String, dynamic> toMap() {
@@ -137,16 +139,6 @@ class Users {
     );
   }
    */
-
-
-
-
-
-
-
-
-
-
 
   /**
    * Creates a Users object from Firestore data (a Map<String, dynamic>).

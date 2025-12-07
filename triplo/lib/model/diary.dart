@@ -14,6 +14,7 @@ class Diary {
   String refreshmentPoint;
   String mood;
   String notes;
+  bool isPublic;
 
   Diary({
     required this.diaryId,
@@ -27,6 +28,7 @@ class Diary {
     required this.refreshmentPoint,
     required this.mood,
     required this.notes,
+    required this.isPublic,
   });
 
   // SERIALIZZAZIONE
@@ -42,6 +44,7 @@ class Diary {
       "Refreshment_point": refreshmentPoint,
       "Mood": mood,
       "Notes": notes,
+      "Is_public": isPublic,
     };
   }
   /*
@@ -61,7 +64,7 @@ class Diary {
   }
  */
 
-  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
+  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId,}) {
     return Diary(
       diaryId: diaryId,
       userId: map["UserId"],
@@ -74,6 +77,7 @@ class Diary {
       refreshmentPoint: map["Refreshment_point"] ?? "",
       mood: map["Mood"] ?? "",
       notes: map["Notes"] ?? "",
+      isPublic: map["Is_public"], 
     );
   }
 }
