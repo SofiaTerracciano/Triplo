@@ -40,20 +40,21 @@ class DiaryController extends ChangeNotifier {
 
     // Map documents to Diary objects and store in the list --> this function create a
     //list of instance of diary (model)
-    _diaries = snap.docs
-        .map(
-          (doc) => Diary.fromMap(doc.data(), diaryId: doc.id),
-        )
+    /*_diaries = snap.docs
+        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
+        .toList();*/
+
+    final publicDiaries = snap.docs
+        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
+
+    _diaries.addAll(publicDiaries);
 
     notifyListeners();
   }
 
   // Load private diaries from Firestore
   Future<void> loadPrivateDiary(String userId) async {
-    if (_loaded) return; // To avoid reloading
-    _loaded = true;
-
     // Fetch diary documents from Firestore
     final snap = await _db
         .collection('diary')
@@ -63,12 +64,18 @@ class DiaryController extends ChangeNotifier {
 
     // Map documents to Diary objects and store in the list --> this function create a
     //list of instance of diary (model)
-    _diaries = snap.docs
+    /*_diaries = snap.docs
         .map(
           (doc) => Diary.fromMap(doc.data(), diaryId: doc.id),
         )
+        .toList();*/
+
+    final privateDiaries = snap.docs
+        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
 
+    _diaries.addAll(privateDiaries);
+    
     notifyListeners();
   }
 
@@ -96,7 +103,7 @@ class DiaryController extends ChangeNotifier {
     String diaryId,
   ) async {
     final uid = _auth.currentUser!.uid;
-    Diary page; 
+    Diary page;
     if (!modify) {
       var newId = Uuid().v4();
 
@@ -128,7 +135,7 @@ class DiaryController extends ChangeNotifier {
         // Update local list
         _currentUser!.publicDiaryPages.add(page);
       } else {
-            // Update DB
+        // Update DB
         await _db.collection("users").doc(uid).update({
           "Private_Diary": FieldValue.arrayUnion([page.diaryId]),
         });
@@ -184,7 +191,7 @@ class DiaryController extends ChangeNotifier {
   Future<void> removeDiary(String diaryId) async {
     final page = getDiaryById(diaryId)!;
     final uid = _auth.currentUser!.uid;
-    
+
     await _db.collection("diary").doc(diaryId).delete();
     _diaries.removeWhere((diary) => diary.diaryId == diaryId);
 
@@ -197,11 +204,11 @@ class DiaryController extends ChangeNotifier {
       _currentUser?.publicDiaryPages.remove(page);
     } else {
       // Remove from DB
-    await _db.collection("users").doc(uid).update({
-      "Private_Diary": FieldValue.arrayRemove([page.diaryId]),
-    });
-    // Remove from local list
-    _currentUser?.privateDiaryPages.remove(page);
+      await _db.collection("users").doc(uid).update({
+        "Private_Diary": FieldValue.arrayRemove([page.diaryId]),
+      });
+      // Remove from local list
+      _currentUser?.privateDiaryPages.remove(page);
     }
 
     notifyListeners();

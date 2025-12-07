@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       await controller.login(email, password);
-      await widget.diaryController.loadPrivateDiary(uid);
+      await widget.diaryController.loadPublicDiary(uid);
       await widget.diaryController.loadPrivateDiary(uid);
 
       
