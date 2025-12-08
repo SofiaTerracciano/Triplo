@@ -9,7 +9,6 @@ import 'package:triplo/pages/adding-diary-page.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
 import '../controller/diary.dart';
-import 'adding-diary-page.dart';
 
 class TrekkingPage extends StatefulWidget {
   final TrekkingController trekkingController;
@@ -94,7 +93,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => AddingDiaryPage(

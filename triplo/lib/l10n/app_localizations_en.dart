@@ -150,7 +150,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get minutes_trekking_label => 'minutes';
 
   @override
-  String get date_trecking_label => 'Date';
+  String get date_trekking_label => 'Date';
+
+  @override
+  String get day_trekking_label => 'Day';
+
+  @override
+  String get month_trekking_label => 'Month';
+
+  @override
+  String get year_trekking_label => 'Year';
 
   @override
   String get duration_trekking_label => 'Duration';
@@ -162,19 +171,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photos_trekking_label => 'Photos';
 
   @override
-  String get refuge_trekking_label => 'Refuge';
+  String get refuge_trekking_label => '“Did you eat there?”';
+
+  @override
+  String get yes_botton_label => 'Yes';
+
+  @override
+  String get no_botton_label => 'No';
 
   @override
   String get mood_trekking_label => 'Mood';
 
   @override
+  String get mood_love_label => 'In love';
+
+  @override
+  String get mood_happy_label => 'Happy';
+
+  @override
+  String get mood_relaxed_label => 'Relaxed';
+
+  @override
+  String get mood_tired_label => 'Tired';
+
+  @override
+  String get mood_proud_label => 'Proud';
+
+  @override
+  String get mood_sad_label => 'Disappointed';
+
+  @override
+  String get mood_excited_label => 'Excited';
+
+  @override
   String get notes_trekking_label => 'Notes';
+
+  @override
+  String get notes_placeholder_trekking_label => 'Add your notes';
 
   @override
   String get save_botton_label => 'Save';
 
   @override
   String get add_botton_label => 'Add';
+
+  @override
+  String get public_botton_label => 'Public';
+
+  @override
+  String get private_botton_label => 'Private';
+
+  @override
+  String get public_private_label => 'How do you want to set the diary visibility?';
 
   @override
   String get challeng_title => 'Challenges';

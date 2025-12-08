@@ -65,7 +65,7 @@ class _DiaryPageState extends State<DiaryPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          '${local.date_trecking_label}', // da prendere dal db
+                          '${local.date_trekking_label}', // da prendere dal db
                           style: TextStyle(fontSize: 14),
                         ),
                       ],

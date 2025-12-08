@@ -383,11 +383,29 @@ abstract class AppLocalizations {
   /// **'minutes'**
   String get minutes_trekking_label;
 
-  /// No description provided for @date_trecking_label.
+  /// No description provided for @date_trekking_label.
   ///
   /// In en, this message translates to:
   /// **'Date'**
-  String get date_trecking_label;
+  String get date_trekking_label;
+
+  /// No description provided for @day_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get day_trekking_label;
+
+  /// No description provided for @month_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month_trekking_label;
+
+  /// No description provided for @year_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year_trekking_label;
 
   /// No description provided for @duration_trekking_label.
   ///
@@ -410,8 +428,20 @@ abstract class AppLocalizations {
   /// No description provided for @refuge_trekking_label.
   ///
   /// In en, this message translates to:
-  /// **'Refuge'**
+  /// **'“Did you eat there?”'**
   String get refuge_trekking_label;
+
+  /// No description provided for @yes_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes_botton_label;
+
+  /// No description provided for @no_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no_botton_label;
 
   /// No description provided for @mood_trekking_label.
   ///
@@ -419,11 +449,59 @@ abstract class AppLocalizations {
   /// **'Mood'**
   String get mood_trekking_label;
 
+  /// No description provided for @mood_love_label.
+  ///
+  /// In en, this message translates to:
+  /// **'In love'**
+  String get mood_love_label;
+
+  /// No description provided for @mood_happy_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy'**
+  String get mood_happy_label;
+
+  /// No description provided for @mood_relaxed_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxed'**
+  String get mood_relaxed_label;
+
+  /// No description provided for @mood_tired_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired'**
+  String get mood_tired_label;
+
+  /// No description provided for @mood_proud_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Proud'**
+  String get mood_proud_label;
+
+  /// No description provided for @mood_sad_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Disappointed'**
+  String get mood_sad_label;
+
+  /// No description provided for @mood_excited_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Excited'**
+  String get mood_excited_label;
+
   /// No description provided for @notes_trekking_label.
   ///
   /// In en, this message translates to:
   /// **'Notes'**
   String get notes_trekking_label;
+
+  /// No description provided for @notes_placeholder_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your notes'**
+  String get notes_placeholder_trekking_label;
 
   /// No description provided for @save_botton_label.
   ///
@@ -436,6 +514,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add'**
   String get add_botton_label;
+
+  /// No description provided for @public_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get public_botton_label;
+
+  /// No description provided for @private_botton_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get private_botton_label;
+
+  /// No description provided for @public_private_label.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want to set the diary visibility?'**
+  String get public_private_label;
 
   /// No description provided for @challeng_title.
   ///

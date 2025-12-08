@@ -50,7 +50,6 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-
   // Fetch image URLs from Firebase Storage given their paths
   Future<List<String>> getDownloadUrls(List<String> paths) async {
     return await Future.wait(paths.map((path) async {
@@ -59,5 +58,10 @@ class TrekkingController extends ChangeNotifier {
     }));
   }
 
+  // Fetch image URL from Firebase Storage given challenge path
+  Future<String> getDownloadUrl(String path) async {
+    Reference ref = FirebaseStorage.instance.refFromURL(path);
+    return await ref.getDownloadURL();
+  }
 
 }

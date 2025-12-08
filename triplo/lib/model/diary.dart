@@ -12,7 +12,7 @@ class Diary {
   List<String> photos;
   List<String> challenges;
   String refreshmentPoint;
-  String mood;
+  List<String> mood;
   String notes;
   bool isPublic;
 
@@ -75,7 +75,7 @@ class Diary {
       photos: List<String>.from(map["Photos"] ?? []),
       challenges: List<String>.from(map["Challenges"] ?? []),
       refreshmentPoint: map["Refreshment_point"] ?? "",
-      mood: map["Mood"] ?? "",
+      mood: List<String>.from(map["Mood"] ?? []),
       notes: map["Notes"] ?? "",
       isPublic: map["Is_public"], 
     );

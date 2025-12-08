@@ -410,4 +410,10 @@ class UserController extends ChangeNotifier {
     print("Dopo remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
     notifyListeners();
   }
+
+  // Fetch image URL from Firebase Storage given photoProfile path
+  Future<String> getDownloadUrl(String path) async {
+    Reference ref = FirebaseStorage.instance.refFromURL(path);
+    return await ref.getDownloadURL();
+  }
 }

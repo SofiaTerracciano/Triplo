@@ -1,15 +1,11 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/user.dart';
-
-import '../model/diary.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:uuid/uuid.dart';
 
 class DiaryController extends ChangeNotifier {
@@ -75,7 +71,7 @@ class DiaryController extends ChangeNotifier {
         .toList();
 
     _diaries.addAll(privateDiaries);
-    
+
     notifyListeners();
   }
 
@@ -97,7 +93,7 @@ class DiaryController extends ChangeNotifier {
     List<String> photos,
     List<String> challenges,
     String refreshmentPoint,
-    String mood,
+    List<String> mood,
     String notes,
     bool modify,
     String diaryId,
@@ -172,7 +168,7 @@ class DiaryController extends ChangeNotifier {
     List<String> photos,
     List<String> challenges,
     String refreshmentPoint,
-    String mood,
+    List<String> mood,
     String notes,
   ) {
     page.date = date;
@@ -213,4 +209,49 @@ class DiaryController extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<List<Diary>?> fetchDiaryById(String userId) async {
+    final doc = await _db
+        .collection('diary')
+        .where('UserId', isEqualTo: userId)
+        .get();
+
+    if (doc.docs.isNotEmpty) {
+      return doc.docs
+          .map(
+            (docSnapshot) =>
+                Diary.fromMap(docSnapshot.data(), diaryId: docSnapshot.id),
+          )
+          .toList();
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<String>> uploadDiaryImages(List<File> images) async {
+    List<String> paths = [];
+
+    for (File image in images) {
+      String extension = image.path.split('.').last.toLowerCase();
+      if (!['jpg', 'jpeg', 'png', 'heic'].contains(extension)) continue;
+
+      String fileName =
+          DateTime.now().millisecondsSinceEpoch.toString() + '.$extension';
+      final path = 'Diary_photos/$fileName';
+      final ref = FirebaseStorage.instance.ref().child(path);
+
+      try {
+        // Upload file
+        await ref.putFile(image);
+        // Aggiungi il path 
+        paths.add(path);
+      } catch (e) {
+        debugPrint('Errore caricando immagine: $e');
+      }
+    }
+
+    return paths;
+  }
 }
+
+
