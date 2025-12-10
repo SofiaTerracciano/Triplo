@@ -104,6 +104,7 @@ class Users {
    * Only the IDs (e.g., user IDs or diary IDs) of related objects are saved on firestore.
    * The actual reconstruction of related Users and Diary objects happens inside the Controller where each ID is fetched and converted back into a full object.
    */
+
   Map<String, dynamic> toMap() {
     return {
       "Uid": _uid,
@@ -172,22 +173,26 @@ class Users {
     );
   }
    */
+
   factory Users.fromMap(Map<String, dynamic> map, {required String uid}) {
     return Users(
       uid: uid,
-      username: (map["Username"] ?? map["username"] ?? "") as String,
-      name: (map["Name"] ?? "") as String,
-      surname: (map["Surname"] ?? "") as String,
-      email: (map["Email"] ?? map["email"] ?? "") as String,
+      username: (map["Username"] ?? map["username"] ?? "").toString(),
+      name: (map["Name"] ?? "").toString(),
+      surname: (map["Surname"] ?? "").toString(),
+      email: (map["Email"] ?? map["email"] ?? "").toString(),
       birthdate: _parseBirthdate(map),
-      photoProfile: (map["Photo_profile"] ?? map["photoURL"] ?? "") as String?,
-      followers: [],
-      following: [],
-      publicDiaryPages: [],
-      privateDiaryPages: [],
-      savedTrekkings: [],
+      photoProfile: (map["Photo_profile"] ?? map["photoURL"] ?? "").toString(),
+      followers: const [],
+      following: const [],
+      publicDiaryPages: const [],
+      privateDiaryPages: const [],
+      savedTrekkings: const [],
     );
   }
+
+
+
 
   static DateTime _defaultBirthdate = DateTime(2000, 1, 1);
   /** Helper for parsing the birthdate */
@@ -198,7 +203,22 @@ class Users {
     }
     // gestione legacy: se esiste un timestamp "registerdate"
     final reg = map["registerdate"];
-    if (reg is DateTime) return reg;
+    //if (reg is DateTime) return reg;
+    //return _defaultBirthdate;
+
+    if (reg != null) {
+      if (reg is DateTime) return reg;
+      if (reg is String) {
+        return DateTime.tryParse(reg) ?? _defaultBirthdate;
+      }
+    }
+
     return _defaultBirthdate;
+
+
   }
+
+
+
+
 }

@@ -61,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final controller = Provider.of<UserController>(context, listen: false);
-
     try {
       await controller.login(email, password);
       final uid = controller.currentUser!.uid;

@@ -64,20 +64,39 @@ class Diary {
   }
  */
 
-  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId,}) {
+  //factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId,}) {
+  //  return Diary(
+  //    diaryId: diaryId,
+  //    userId: map["UserId"],
+  //    trekkigName: map["Trekking_name"],
+  //    date: map["Date"],
+  //    duration: (map["Duration"] as num).toDouble(),
+  //    friends: List<String>.from(map["Friends"] ?? []),
+  //    photos: List<String>.from(map["Photos"] ?? []),
+  //    challenges: List<String>.from(map["Challenges"] ?? []),
+  //    refreshmentPoint: map["Refreshment_point"] ?? "",
+  //    mood: List<String>.from(map["Mood"] ?? []),
+  //    notes: map["Notes"] ?? "",
+  //    isPublic: map["Is_public"],
+  //  );
+  //}
+
+ //null safe version
+  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
     return Diary(
       diaryId: diaryId,
-      userId: map["UserId"],
-      trekkigName: map["Trekking_name"],
-      date: map["Date"],
-      duration: (map["Duration"] as num).toDouble(),
+      userId: map["UserId"] ?? "",
+      trekkigName: map["Trekking_name"] ?? map["RouteId"] ?? "Unknown Trek",
+      date: map["Date"] ?? "",
+      duration: (map["Duration"] ?? 0).toDouble(),
       friends: List<String>.from(map["Friends"] ?? []),
       photos: List<String>.from(map["Photos"] ?? []),
       challenges: List<String>.from(map["Challenges"] ?? []),
       refreshmentPoint: map["Refreshment_point"] ?? "",
       mood: List<String>.from(map["Mood"] ?? []),
       notes: map["Notes"] ?? "",
-      isPublic: map["Is_public"], 
+      isPublic: map["Is_public"] ?? false,   // <= prima causa del crash
     );
   }
+
 }
