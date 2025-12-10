@@ -234,7 +234,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   Text(
                     friends.isEmpty
-                        ? "Nessun amico selezionato" //da mettere nel dizionario
+                        ? local.friends_selected_label 
                         : user.currentUser!.following
                               .where((u) => friends.contains(u.uid))
                               .map((u) => u.username)
@@ -247,7 +247,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                   const SizedBox(height: 12),
 
                   ExpansionTile(
-                    title: Text("Seleziona amici"), // da mettere nel dizionario
+                    title: Text(local.choose_friend_label), 
                     children: [
                       SizedBox(
                         height: 220, // lista scrollabile
@@ -346,9 +346,8 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                   if (usedRefreshmentPoint)
                     TextField(
                       controller: refreshmentController,
-                      decoration: const InputDecoration(
-                        labelText:
-                            "Descrivi il refreshment point", //da mettere nel dizionario
+                      decoration: InputDecoration(
+                        labelText: local.notes_placeholder_trekking_label,
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 1,
@@ -371,8 +370,8 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   // Mostra immagini selezionate
                   challenges.isEmpty
-                      ? const Text(
-                          "Nessuna challenge selezionata", // da mettere nel dizionario
+                      ? Text(
+                          local.challenge_selected_label, 
                           style: TextStyle(fontSize: 16),
                         )
                       : Wrap(
@@ -413,9 +412,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   // TENDINA
                   ExpansionTile(
-                    title: const Text(
-                      "Seleziona challenges",
-                    ), // da metter enel dizionario
+                    title: Text(local.choose_challenge_label), 
                     children: [
                       SizedBox(
                         height: 260,
@@ -516,7 +513,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   Text(
                     mood.isEmpty
-                        ? "Nessun mood selezionato" // da mettere nel dizionario
+                        ? local.mood_selected_label
                         : mood.join(
                             ", ",
                           ), // mostra solo gli emoji separati da virgola
@@ -526,7 +523,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                   const SizedBox(height: 12),
 
                   ExpansionTile(
-                    title: Text("Seleziona mood"), // da mmettere nel dizionario
+                    title: Text(local.choose_mood_label), 
                     children: [
                       SizedBox(
                         height: 220, // altezza della lista scrollabile

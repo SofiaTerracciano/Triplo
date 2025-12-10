@@ -419,6 +419,18 @@ abstract class AppLocalizations {
   /// **'Friends'**
   String get friends_trekking_label;
 
+  /// No description provided for @friends_selected_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends selected'**
+  String get friends_selected_label;
+
+  /// No description provided for @choose_friend_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Select friends'**
+  String get choose_friend_label;
+
   /// No description provided for @photos_trekking_label.
   ///
   /// In en, this message translates to:
@@ -448,6 +460,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mood'**
   String get mood_trekking_label;
+
+  /// No description provided for @mood_selected_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No mood selected'**
+  String get mood_selected_label;
+
+  /// No description provided for @choose_mood_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Select mood'**
+  String get choose_mood_label;
 
   /// No description provided for @mood_love_label.
   ///
@@ -532,6 +556,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How do you want to set the diary visibility?'**
   String get public_private_label;
+
+  /// No description provided for @challenge_selected_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenge selected'**
+  String get challenge_selected_label;
+
+  /// No description provided for @choose_challenge_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the challenges completed'**
+  String get choose_challenge_label;
 
   /// No description provided for @challeng_title.
   ///

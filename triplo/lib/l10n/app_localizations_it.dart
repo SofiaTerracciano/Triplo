@@ -168,6 +168,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get friends_trekking_label => 'Amici';
 
   @override
+  String get friends_selected_label => 'Nessun amico selezionato';
+
+  @override
+  String get choose_friend_label => 'Seleziona amici';
+
+  @override
   String get photos_trekking_label => 'Foto';
 
   @override
@@ -181,6 +187,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get mood_trekking_label => 'Mood';
+
+  @override
+  String get mood_selected_label => 'Nessun mood selezionato';
+
+  @override
+  String get choose_mood_label => 'Seleziona mood';
 
   @override
   String get mood_love_label => 'Innamorato';
@@ -223,6 +235,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get public_private_label => 'Come vuoi impostare la visibilità del diario?';
+
+  @override
+  String get challenge_selected_label => 'Nessuna challenge selezionata';
+
+  @override
+  String get choose_challenge_label => 'Seleziona le sfide superate';
 
   @override
   String get challeng_title => 'Sfide';

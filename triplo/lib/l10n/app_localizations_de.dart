@@ -168,6 +168,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get friends_trekking_label => 'Freunde';
 
   @override
+  String get friends_selected_label => 'Keine Freunde ausgewählt';
+
+  @override
+  String get choose_friend_label => 'Freunde auswählen';
+
+  @override
   String get photos_trekking_label => 'Fotos';
 
   @override
@@ -181,6 +187,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get mood_trekking_label => 'Stimmung';
+
+  @override
+  String get mood_selected_label => 'Keine Stimmung ausgewählt';
+
+  @override
+  String get choose_mood_label => 'Stimmung auswählen';
 
   @override
   String get mood_love_label => 'Verliebt';
@@ -223,6 +235,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get public_private_label => 'Wie möchtest du die Sichtbarkeit des Tagebuchs festlegen?';
+
+  @override
+  String get challenge_selected_label => 'Keine Challenge ausgewählt';
+
+  @override
+  String get choose_challenge_label => 'Wählen Sie die abgeschlossenen Challenges aus';
 
   @override
   String get challeng_title => 'Herausforderungen';
