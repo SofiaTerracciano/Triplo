@@ -30,7 +30,6 @@ class UserController extends ChangeNotifier {
 
   Users? get currentUser => _currentUser;
 
-
   /**
    * Registers a new user using email and password.
    * Steps:
@@ -91,10 +90,16 @@ class UserController extends ChangeNotifier {
       email: email,
       password: password,
     );
-    await loadUser(credential.user!.uid);
+    //await loadUser(credential.user!.uid);
+
+    final user = credential.user;
+    if (user == null) {
+      throw StateError("Login riuscito ma FirebaseAuth user è null");
+    }
+
+    final uid = user.uid;
 
 
-    final uid = credential.user!.uid;
 
     //se il documento non esiste, crealo con la struttura del MODEL
     await _ensureFirestoreUserExists(
@@ -103,9 +108,11 @@ class UserController extends ChangeNotifier {
       username: email.split('@')[0],
       photoURL: "",
     );
-
     // poi carica il MODEL
     await loadUser(uid);
+    if (_currentUser == null) {
+      throw StateError("Profilo utente non caricato dopo il login");
+    }
   }
 
   /**

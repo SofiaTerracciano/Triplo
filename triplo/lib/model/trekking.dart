@@ -165,7 +165,13 @@ class Trekking {
     final List<String>  challenges = (map["Challenges"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
-      ?? []; 
+      ?? [];
+
+    double _safeDouble(dynamic v) {
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
+    }
 
     // Create Trekking instance
     //return Trekking(
@@ -197,9 +203,12 @@ class Trekking {
       name: map["Name"] ?? "",
       mapPhoto: map["Map_photo"] ?? "",
       difficultyLevel: map["Difficulty_level"] ?? "",
-      distance: (map["Distance"] ?? 0).toDouble(),
-      estimatedTime: (map["Estimated_time"] ?? 0).toDouble(),
-      elevationGain: (map["Elevation_gain"] ?? 0).toDouble(),
+      //distance: (map["Distance"] ?? 0).toDouble(),
+      //estimatedTime: (map["Estimated_time"] ?? 0).toDouble(),
+      //elevationGain: (map["Elevation_gain"] ?? 0).toDouble(),
+      distance: _safeDouble(map["Distance"]),
+      estimatedTime: _safeDouble(map["Estimated_time"]),
+      elevationGain: _safeDouble(map["Elevation_gain"]),
       upGain: map["Up_gain"] ?? false,
       downGain: map["Down_gain"] ?? false,
       startingPoint: pts.isNotEmpty ? pts.first : const LatLng(0,0),
