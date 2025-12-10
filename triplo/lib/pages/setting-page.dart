@@ -118,7 +118,7 @@ class _SettingPageState extends State<SettingPage> {
                     CircleAvatar(
                       radius: 50,
                       backgroundImage: AssetImage(
-                        'assets/profile_placeholder.png',
+                        'images/prova.jpeg',
                       ),
                     ),
                     const SizedBox(height: 4),

@@ -159,17 +159,19 @@ class _SearchPageState extends State<SearchPage> {
                   return InkWell(
                     // Animation on tap
                     onTap: () {
-                      Navigator.push(
+                      /*Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
                               DiaryPage(
                                 diaryId: widget.diaryId[1], // da cambiare dinamicamente
                                 diaryController: widget.diaryController,
+                                userController: widget.userController,
+                                trekkingController: widget.trekkingController,
                                 onLocaleChanged: widget.onLocaleChanged
                               ),
                         ),
-                      );
+                      );*/
                     },
                     child: Container(
                       decoration: BoxDecoration(

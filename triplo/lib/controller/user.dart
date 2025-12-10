@@ -81,8 +81,6 @@ class UserController extends ChangeNotifier {
 
     // poi carica il MODEL
     await loadUser(uid);
-
-
   }
 
   /**
@@ -216,13 +214,13 @@ class UserController extends ChangeNotifier {
     // Conversione ID --> Oggetti Users (Followers, Following)
     List<Users> followers = [];
     for (final id in followersIds) {
-      final u = await _fetchUserById(id);
+      final u = await fetchUserById(id);
       if (u != null) followers.add(u);
     }
 
     List<Users> following = [];
     for (final id in followingIds) {
-      final u = await _fetchUserById(id);
+      final u = await fetchUserById(id);
       if (u != null) following.add(u);
     }
 
@@ -284,7 +282,7 @@ class UserController extends ChangeNotifier {
    * Fetches a user document by UID and converts it into a Users object.
    * Used by loadUser() to reconstruct followers and following lists.
    */
-  Future<Users?> _fetchUserById(String uid) async {
+  Future<Users?> fetchUserById(String uid) async { // da rimettere privato?
     final snap = await _db.collection("users").doc(uid).get();
     if (!snap.exists) return null;
 
@@ -373,15 +371,14 @@ class UserController extends ChangeNotifier {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
-  // da buttare via
   Future<Users?> getUserById(String uid) async {
-     final snap = await _db
-        .collection('users') // andrà messo trekking
-        .get();
+    final snap = await _db.collection('users').doc(uid).get();
 
-    _currentUser = Users.fromMap(snap.docs.first.data(), uid: uid);
-    return _currentUser;
+    if (!snap.exists) {
+      return null;   // The user doesn't exist
+    }
 
+    return Users.fromMap(snap.data()!, uid: uid);
   }
 
   Future<void> addTrekkingToSaved(String trekkingId) async {
@@ -412,8 +409,18 @@ class UserController extends ChangeNotifier {
   }
 
   // Fetch image URL from Firebase Storage given photoProfile path
-  Future<String> getDownloadUrl(String path) async {
-    Reference ref = FirebaseStorage.instance.refFromURL(path);
-    return await ref.getDownloadURL();
+  Future<String?> getDownloadUrl(String? path) async {
+    // If you donn't have the profile photo return null
+    if (path == null || path.isEmpty) {
+      return null;
+    }
+
+    try {
+      Reference ref = FirebaseStorage.instance.refFromURL(path);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      debugPrint('Error: $e');
+      return null;
+    }
   }
 }

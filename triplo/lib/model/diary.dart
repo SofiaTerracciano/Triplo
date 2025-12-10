@@ -35,7 +35,7 @@ class Diary {
   Map<String, dynamic> toMap() {
     return {
       "UserId": userId,
-      "RouteId": trekkigName,
+      "Trekking_name": trekkigName,
       "Date": date, // la metteremo noi il giusto layout
       "Duration": duration,
       "Friends": friends,

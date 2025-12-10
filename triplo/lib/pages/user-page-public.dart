@@ -18,25 +18,29 @@ import '../controller/user.dart';
 
 import 'package:image_picker/image_picker.dart';
 
-
 //DA CAPIRE LA COSA DEL POP
 
 class UserPagePublic extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
+  final String userId;
   final TrekkingController trekkingController;
   final DiaryController diaryController;
   final UserController userController;
 
-    const UserPagePublic({super.key, required this.onLocaleChanged, required this.trekkingController, required this.diaryController, required this.userController});
+  const UserPagePublic({
+    super.key,
+    required this.onLocaleChanged,
+    required this.userId,
+    required this.trekkingController,
+    required this.diaryController,
+    required this.userController,
+  });
 
   @override
   State<UserPagePublic> createState() => _UserPageState();
 }
 
 class _UserPageState extends State<UserPagePublic> {
-
-
-
   Map<String, dynamic>? userData;
 
   final ImagePicker _picker = ImagePicker();
@@ -44,6 +48,7 @@ class _UserPageState extends State<UserPagePublic> {
   Future<XFile?> _pickImage() async {
     return await _picker.pickImage(source: ImageSource.gallery);
   }
+
   //load firebase storage
   Future<String?> uploadProfilePicture(File image) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -63,7 +68,6 @@ class _UserPageState extends State<UserPagePublic> {
       return null;
     }
   }
-
 
   @override
   void initState() {
@@ -86,10 +90,9 @@ class _UserPageState extends State<UserPagePublic> {
 
   Future<void> _saveProfileURL(String url) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .update({'photoURL': url});
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'photoURL': url,
+    });
 
     // Aggiorno i dati mostrati nella UI
     setState(() {
@@ -193,9 +196,18 @@ class _UserPageState extends State<UserPagePublic> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(label: local.totals_trekking_label, value: '40'),
-                          _StatItem(label: local.published_trekking_label, value: '20'),
-                          _StatItem(label: local.private_trekking_label, value: '20'),
+                          _StatItem(
+                            label: local.totals_trekking_label,
+                            value: '40',
+                          ),
+                          _StatItem(
+                            label: local.published_trekking_label,
+                            value: '20',
+                          ),
+                          _StatItem(
+                            label: local.private_trekking_label,
+                            value: '20',
+                          ),
                         ],
                       ),
                     ],
@@ -279,7 +291,9 @@ class _UserPageState extends State<UserPagePublic> {
                         10, //sarà dinamico -> numero di percorsi pubblici
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.published_trekking_label}  ${index + 1}'),
+                        title: Text(
+                          '${local.published_trekking_label}  ${index + 1}',
+                        ),
                         onTap: () {
                           showDialog(
                             context: context,
@@ -308,7 +322,9 @@ class _UserPageState extends State<UserPagePublic> {
                     itemCount: 10, //sarà dinamico -> numero di percorsi privati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.private_trekking_label} ${index + 1}'),
+                        title: Text(
+                          '${local.private_trekking_label} ${index + 1}',
+                        ),
                         onTap: () {
                           // Azione al tap sul percorso privato
                         },
@@ -319,7 +335,9 @@ class _UserPageState extends State<UserPagePublic> {
                     itemCount: 10, //sarà dinamico -> numero di percorsi salvati
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text('${local.save_trekking_button_label} ${index + 1}'),
+                        title: Text(
+                          '${local.save_trekking_button_label} ${index + 1}',
+                        ),
                         onTap: () {
                           // Azione al tap sul percorso salvato
                         },
@@ -346,53 +364,69 @@ class _UserPageState extends State<UserPagePublic> {
               ),
               ListTile(
                 leading: const Icon(Icons.home),
-                title: Text(
-                  local.home_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.home_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, diaryController: widget.diaryController, userController: widget.userController,)),
+                    MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        diaryController: widget.diaryController,
+                        userController: widget.userController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: Text(
-                  local.profile_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged, diaryController: widget.diaryController, trekkingController: widget.trekkingController, userController: widget.userController,)),
+                    MaterialPageRoute(
+                      builder: (context) => UserPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        diaryController: widget.diaryController,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.search),
-                title: Text(
-                  local.search_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged, diaryController: widget.diaryController, trekkingController: widget.trekkingController, userController: widget.userController,)),
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        diaryController: widget.diaryController,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                      ),
+                    ),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: Text(
-                  local.settings_page_title, 
-                  style: optionStyle
-                ),
+                title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, diaryController: widget.diaryController, userController: widget.userController,)),
+                    MaterialPageRoute(
+                      builder: (context) => SettingPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        diaryController: widget.diaryController,
+                        userController: widget.userController,
+                      ),
+                    ),
                   );
                 },
               ),
@@ -409,10 +443,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({
-    required this.label, 
-    required this.value
-  });
+  const _StatItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

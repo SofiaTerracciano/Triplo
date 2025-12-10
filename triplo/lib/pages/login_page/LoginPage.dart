@@ -61,14 +61,16 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final controller = Provider.of<UserController>(context, listen: false);
-    final uid = controller.currentUser!.uid;
 
     try {
       await controller.login(email, password);
+      final uid = controller.currentUser!.uid;
+      print(uid);
+      widget.diaryController.currentUser = controller.currentUser!;
+      print(widget.diaryController.currentUser!.uid);
+      print("following = ${widget.userController.currentUser!.following}");
       await widget.diaryController.loadPublicDiary(uid);
       await widget.diaryController.loadPrivateDiary(uid);
-
-      
 
       Navigator.pushReplacement(
         context,

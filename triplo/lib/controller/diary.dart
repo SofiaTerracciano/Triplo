@@ -15,10 +15,14 @@ class DiaryController extends ChangeNotifier {
   List<Diary> _diaries = [];
   bool _loaded = false;
   Users? _currentUser;
+
   Users? get currentUser => _currentUser;
 
-  DiaryController();
+  set currentUser(Users user) {
+    _currentUser = user;
+  }
 
+  DiaryController();
   // Getter for all diaries
   List<Diary> get allDiaries => _diaries;
 
@@ -136,7 +140,7 @@ class DiaryController extends ChangeNotifier {
           "Private_Diary": FieldValue.arrayUnion([page.diaryId]),
         });
         // Update local list
-        _currentUser?.privateDiaryPages.add(page);
+        _currentUser!.privateDiaryPages.add(page);
       }
       await _db.collection("diary").doc(page.diaryId).set(page.toMap());
     } else {
@@ -243,7 +247,7 @@ class DiaryController extends ChangeNotifier {
       try {
         // Upload file
         await ref.putFile(image);
-        // Aggiungi il path 
+        // Aggiungi il path
         paths.add(path);
       } catch (e) {
         debugPrint('Errore caricando immagine: $e');
@@ -252,6 +256,37 @@ class DiaryController extends ChangeNotifier {
 
     return paths;
   }
+
+  // Fetch image URL from Firebase Storage given their path
+  Future<String?> getDownloadUrlChild(String? path) async {
+    // If you don't have any photos return null
+    if (path == null || path.isEmpty) 
+      return null;
+
+    try {
+      Reference ref = FirebaseStorage.instance.ref().child(path);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      debugPrint('Error: $e');
+      return null;
+    }
+  }
+
+  Future<String?> getDownloadUr(String? path) async {
+    // If you don't have any challenges return null
+    if (path == null || path.isEmpty) 
+      return null;
+
+    try {
+      Reference ref = FirebaseStorage.instance.refFromURL(path);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      debugPrint('Error: $e');
+      return null;
+    }
+  }
 }
 
-
+/*Future<void> deleteFromDb(List<String> paths) async {
+  
+}*/
