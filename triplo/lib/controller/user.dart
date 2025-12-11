@@ -30,7 +30,6 @@ class UserController extends ChangeNotifier {
 
   Users? get currentUser => _currentUser;
 
-
   /**
    * Registers a new user using email and password.
    * Steps:
@@ -50,8 +49,33 @@ class UserController extends ChangeNotifier {
 
     // Crea documento Firestore coerente con il MODEL
     await _createFirestoreUser(uid, email);
+    try {
+      await _createUserIndex(uid, email.split('@')[0]);
+    } catch (e, st) {
+      if (kDebugMode) {
+        print("Failed to create user_index for $uid: $e\n$st");
+      }
+    }
 
     await loadUser(uid);
+
+  //  Future<List<Users>> searchUsers(String query) async {
+  //    final snap = await _db
+  //        .collection("users_index")
+  //        .where("username", isGreaterThanOrEqualTo: query)
+  //        .where("username", isLessThanOrEqualTo: "$query\uf8ff")
+  //        .get();
+
+      //final List<Users> results = [];
+
+    //  for (var d in snap.docs) {
+    //    final uid = d["uid"];
+    //    final user = await _fetchUserById(uid);  // usa già fromMap corretta
+    //    if (user != null) results.add(user);
+    //  }
+
+    //  return results;
+   // }
   }
 
   /**
@@ -66,10 +90,16 @@ class UserController extends ChangeNotifier {
       email: email,
       password: password,
     );
-    await loadUser(credential.user!.uid);
+    //await loadUser(credential.user!.uid);
+
+    final user = credential.user;
+    if (user == null) {
+      throw StateError("Login riuscito ma FirebaseAuth user è null");
+    }
+
+    final uid = user.uid;
 
 
-    final uid = credential.user!.uid;
 
     //se il documento non esiste, crealo con la struttura del MODEL
     await _ensureFirestoreUserExists(
@@ -78,9 +108,11 @@ class UserController extends ChangeNotifier {
       username: email.split('@')[0],
       photoURL: "",
     );
-
     // poi carica il MODEL
     await loadUser(uid);
+    if (_currentUser == null) {
+      throw StateError("Profilo utente non caricato dopo il login");
+    }
   }
 
   /**
@@ -120,7 +152,6 @@ class UserController extends ChangeNotifier {
   /** Creates a new user document in Firestore matching the User model fields */
   Future<void> _createFirestoreUser(String uid, String email) async {
     await _db.collection("users").doc(uid).set({
-
       "Username": email.split('@')[0],
       "Photo_profile": "",
       "Name": "",
@@ -128,12 +159,14 @@ class UserController extends ChangeNotifier {
       "Birthdate": DateTime.now().toIso8601String(),
       "Email": email,
 
-      "Followers": [],           // List<String>
-      "Following": [],           // List<String>
-      "Public_diary": [],        // List<String>
-      "Private_diary": [],       // List<String>
-      "Saved_trekkings": [],     // List<String>
+      // sempre presenti
+      "Followers": <String>[],
+      "Following": <String>[],
+      "Public_diary": <String>[],
+      "Private_diary": <String>[],
+      "Saved_trekkings": <String>[],
     });
+
   }
 
   /**
@@ -164,6 +197,14 @@ class UserController extends ChangeNotifier {
         "Private_diary": [],
         "Saved_trekkings": [],
       });
+      try {
+        await _createUserIndex(uid, username);
+      } catch (e, st) {
+        if (kDebugMode) {
+          print("Failed to create user_index (google login) for $uid: $e\n$st");
+        }
+      }
+
     }
   }
 
@@ -174,6 +215,7 @@ class UserController extends ChangeNotifier {
    * Reads lists of IDs (followers, following, diaries...)
    * Builds from each ID a full Users/Diary object using helper methods
    */
+  /*
   Future<void> loadUser(String uid) async {
 
     //if (_loaded) return;
@@ -243,21 +285,118 @@ class UserController extends ChangeNotifier {
       if (d != null) savedTrek.add(d);
     }
 
-    /*
+
+    //_currentUser = Users(
+    //  uid: uid,
+    //  username: data["Username"],
+    //  name: data["Name"],
+    //  surname: data["Surname"],
+    //  birthdate: DateTime.parse(data["Birthdate"]),
+    //  email: data["Email"],
+    //  photoProfile: data["Photo_profile"],
+    //  followers: followers,
+    //  following: following,
+    //  publicDiaryPages: publicDiary,
+    // privateDiaryPages: privateDiary,
+    //  savedTrekkings: savedTrek,
+    //
     _currentUser = Users(
       uid: uid,
-      username: data["Username"],
-      name: data["Name"],
-      surname: data["Surname"],
-      birthdate: DateTime.parse(data["Birthdate"]),
-      email: data["Email"],
-      photoProfile: data["Photo_profile"],
+      username: username,
+      name: name,
+      surname: surname,
+      birthdate: birthdate,
+      email: email,
+      photoProfile: photoProfile,
       followers: followers,
       following: following,
       publicDiaryPages: publicDiary,
       privateDiaryPages: privateDiary,
       savedTrekkings: savedTrek,
-     */
+    );
+
+    notifyListeners();
+  }
+   */
+  Future<void> loadUser(String uid) async {
+    _loaded = true;
+
+    final snap = await _db.collection("users").doc(uid).get();
+    if (!snap.exists) return;
+
+    final data = snap.data()!;
+
+    // campi semplici, con fallback per documenti vecchi
+    final username = (data["Username"] ?? data["username"] ?? "") as String;
+    final name = (data["Name"] ?? "") as String;
+    final surname = (data["Surname"] ?? "") as String;
+    final email = (data["Email"] ?? data["email"] ?? "") as String;
+    final photoProfile =
+    (data["Photo_profile"] ?? data["photoURL"] ?? "") as String;
+
+    final birthdate = () {
+      final rawBirth = data["Birthdate"];
+      if (rawBirth is String && rawBirth.isNotEmpty) {
+        return DateTime.tryParse(rawBirth) ?? DateTime(2000, 1, 1);
+      }
+      final reg = data["registerdate"];
+      if (reg is Timestamp) return reg.toDate();
+      return DateTime(2000, 1, 1);
+    }();
+
+    // Liste di ID
+    final followersIds =
+    List<String>.from(data["Followers"] ?? const <String>[]);
+    final followingIds =
+    List<String>.from(data["Following"] ?? const <String>[]);
+
+    final publicDiaryIds = List<String>.from(
+      data["Public_diary"] ?? data["Public_Diary"] ?? const <String>[],
+    );
+    final privateDiaryIds = List<String>.from(
+      data["Private_diary"] ?? data["Private_Diary"] ?? const <String>[],
+    );
+
+    final savedTrekkingIds =
+    List<String>.from(data["Saved_trekkings"] ?? const <String>[]);
+
+    // Conversione ID -> Oggetti
+
+    // Followers
+    final followers = (await Future.wait(
+      followersIds.map(fetchUserById),
+    ))
+        .whereType<Users>()
+        .toList();
+
+    // Following
+    final following = (await Future.wait(
+      followingIds.map(fetchUserById),
+    ))
+        .whereType<Users>()
+        .toList();
+
+    // Diary pubblici
+    final publicDiary = (await Future.wait(
+      publicDiaryIds.map(_fetchDiary),
+    ))
+        .whereType<Diary>()
+        .toList();
+
+    // Diary privati
+    final privateDiary = (await Future.wait(
+      privateDiaryIds.map(_fetchDiary),
+    ))
+        .whereType<Diary>()
+        .toList();
+
+    // Trekking salvati
+    final savedTrek = (await Future.wait(
+      savedTrekkingIds.map(_fetchTrekking),
+    ))
+        .whereType<Trekking>()
+        .toList();
+
     _currentUser = Users(
       uid: uid,
       username: username,
@@ -312,6 +451,7 @@ class UserController extends ChangeNotifier {
     _loaded = false;
     notifyListeners();
   }
+
 
 
   Future<Trekking?> _fetchTrekking(String docId) async {
@@ -423,4 +563,33 @@ class UserController extends ChangeNotifier {
       return null;
     }
   }
+
+
+  Future<List<Users>> searchUsers(String query) async {
+    final snap = await _db
+        .collection("users_index")
+        .where("username", isGreaterThanOrEqualTo: query)
+        .where("username", isLessThanOrEqualTo: "$query\uf8ff")
+        .get();
+
+    final List<Users> results = [];
+
+    for (var d in snap.docs) {
+      final uid = d["uid"];
+      final user = await fetchUserById(uid);  // usa già fromMap corretta
+      if (user != null) results.add(user);
+    }
+
+    return results;
+  }
+
+
+  Future<void> _createUserIndex(String uid, String username) async {
+    await _db.collection("users_index").doc(uid).set({
+      "uid": uid,
+      "username": username,
+      "normalized": username.toLowerCase(),
+    });
+  }
+
 }

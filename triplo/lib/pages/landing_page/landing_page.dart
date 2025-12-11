@@ -21,6 +21,10 @@ import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/user.dart';
 
+
+import '../../update_user_index.dart';
+import '../user_search_page/user_search_page.dart';
+
 class Landing_Page extends StatefulWidget {
   final TrekkingController trekkingController;
   final DiaryController diaryController;
@@ -115,6 +119,23 @@ class _Landing_PageState extends State<Landing_Page> {
                 MaterialPageRoute(builder: (_) => const AdminUploadPage()),
               );
             },
+          ),
+          ElevatedButton(
+            child: Text("🔍 Cerca utenti"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UserSearchPage(
+                    userController: widget.userController, // <- PRIMA MANCAVA
+                  ),
+                ),
+              );
+            },
+          ),
+          ElevatedButton(
+            onPressed: () => updateUsersIndex(),
+            child: Text("Update Users Index"),
           ),
         ],
       ),

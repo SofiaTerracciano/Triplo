@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/controller/API.dart';
 
 class WeatherPage extends StatelessWidget {
   final Map<String, dynamic> weather;
   final List<Map<String, dynamic>> forecast;
 
 
-  const WeatherPage({
+  WeatherPage({
     Key? key,
     required this.weather,
     required this.forecast,
   }) : super(key: key);
 
-
+  final API api = API();
 
 
 
@@ -50,7 +51,7 @@ class WeatherPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Image.network("https://openweathermap.org/img/wn/$icon@2x.png", width: 100),
+            Image.network(api.weatherIconUrl(icon), width: 100),
             Text("$temp°C",
                 style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
             Text(description.capitalize(),
@@ -64,17 +65,18 @@ class WeatherPage extends StatelessWidget {
                 itemCount: forecast.length,
                 itemBuilder: (context, index) {
                   final f = forecast[index];
-                  final dt = DateTime.parse(f['dt_txt']);
-                  final t = f['main']['temp'].round();
-                  final ic = f['weather'][0]['icon'];
-                  final rawDescriptionDay =
-                  (f['weather'][0]['description'] ?? "-").toString().toLowerCase();
-                  final descriptionDay = rawDescriptionDay;
+                  //final dt = DateTime.parse(f['dt_txt']);
+                  //final t = f['main']['temp'].round();
+                  //final ic = f['weather'][0]['icon'];
+                  //final rawDescriptionDay =
+                  //(f['weather'][0]['description'] ?? "-").toString().toLowerCase();
+                  //final descriptionDay = rawDescriptionDay;
 
                   return ListTile(
-                    leading: Image.network("https://openweathermap.org/img/wn/$ic.png"),
-                    title: Text("${dt.day}/${dt.month} – ${descriptionDay.capitalize()}"),
-                    trailing: Text("$t°C", style: const TextStyle(fontSize: 18)),
+                    leading: Image.network(api.weatherIconUrl(f["icon"], big: false)),
+                    title: Text("${f["date"].day}/${f["date"].month} – ${f["description"].capitalize()}"),
+                    trailing: Text("${f["temp"]}°C",
+                        style: const TextStyle(fontSize: 18)),
                   );
                 },
               ),

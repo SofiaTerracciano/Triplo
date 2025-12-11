@@ -61,14 +61,21 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final controller = Provider.of<UserController>(context, listen: false);
-
     try {
       await controller.login(email, password);
-      final uid = controller.currentUser!.uid;
+      //final uid = controller.currentUser!.uid;
+      final user = controller.currentUser;
+      if (user == null) {
+        throw StateError("currentUser è null dopo il login");
+      }
+      final uid = user.uid;
       print(uid);
-      widget.diaryController.currentUser = controller.currentUser!;
+      //widget.diaryController.currentUser = controller.currentUser!;
+      //print(widget.diaryController.currentUser!.uid);
+      //print("following = ${widget.userController.currentUser!.following}");
+      widget.diaryController.currentUser = user;
       print(widget.diaryController.currentUser!.uid);
-      print("following = ${widget.userController.currentUser!.following}");
+      print("following = ${user.following}");
       await widget.diaryController.loadPublicDiary(uid);
       await widget.diaryController.loadPrivateDiary(uid);
 
@@ -88,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Logged in")));
     } catch (e) {
+      debugPrint("Login error: $e\n");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Login failed: $e")));

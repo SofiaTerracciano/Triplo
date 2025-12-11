@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:triplo/pages/user-page-public.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -121,7 +122,18 @@ class _MyAppState extends State<MyApp> {
 
           // bottone per caricare i punti di un trekking
           '/admin_upload': (context) => const AdminUploadPage(),
-        },
+
+            "/userProfileRemote": (context) => UserPagePublic(
+              userId: ModalRoute.of(context)!.settings.arguments as String,
+              diaryController: diaryController,
+              trekkingController: trekkingController,
+              userController: userController,
+              onLocaleChanged: (l) {},
+            ),
+          },
+
+
+
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/challenges.dart';
 import 'package:triplo/pages/trekking-page.dart';
+import 'diary-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
@@ -334,6 +335,7 @@ class _UserPageState extends State<UserPage> {
             Expanded(
               child: TabBarView(
                 children: [
+                  /*
                   ListView.builder(
                     itemCount:
                         10, //sarà dinamico -> numero di percorsi pubblici
@@ -366,6 +368,33 @@ class _UserPageState extends State<UserPage> {
                       );
                     },
                   ),
+                   */
+                  // Tab percorsi/diari pubblici
+                  ListView.builder(
+                    itemCount: user.publicDiaryPages.length,
+                    itemBuilder: (context, index) {
+                      final diary = user.publicDiaryPages[index];
+                      return ListTile(
+                        title: Text(diary.trekkigName),
+                        subtitle: Text(diary.date),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DiaryPage(
+                                diaryId: user.publicDiaryPages[index].diaryId, // FIX
+                                diaryController: widget.diaryController,
+                                userController: widget.userController,
+                                trekkingController: widget.trekkingController,
+                                onLocaleChanged: widget.onLocaleChanged,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  /*
                   ListView.builder(
                     itemCount: 10, //sarà dinamico -> numero di percorsi privati
                     itemBuilder: (context, index) {
@@ -379,6 +408,22 @@ class _UserPageState extends State<UserPage> {
                       );
                     },
                   ),
+                  */
+                  // Tab percorsi/diari privati
+                  ListView.builder(
+                    itemCount: user.privateDiaryPages.length,
+                    itemBuilder: (context, index) {
+                      final diary = user.privateDiaryPages[index];
+                      return ListTile(
+                        title: Text(diary.trekkigName),
+                        subtitle: Text(diary.date),
+                        onTap: () {
+                          // ...
+                        },
+                      );
+                    },
+                  ),
+
                   ListView.builder(
                     itemCount: user
                         .savedTrekkings

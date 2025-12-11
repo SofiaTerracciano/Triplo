@@ -10,14 +10,18 @@ import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/change-diary-page.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import '../controller/diary.dart';
+import '../controller/trekking.dart';
+import '../controller/user.dart';
+
+
 
 class DiaryPage extends StatefulWidget {
+
   final DiaryController diaryController;
   final UserController userController;
   final TrekkingController trekkingController;
   final String diaryId;
   final void Function(Locale) onLocaleChanged;
-
   DiaryPage({
     super.key,
     required this.diaryId,

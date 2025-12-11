@@ -26,7 +26,7 @@ class TrekkingController extends ChangeNotifier {
 
     // Fetch trekking documents from Firestore
     final snap = await _db
-        .collection('trekkings') // andrà messo trekking
+        .collection('trekking') // andrà messo trekking
         .get();
 
     // Map documents to Trekking objects and store in the list --> this function create a 

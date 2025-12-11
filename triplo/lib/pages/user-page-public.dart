@@ -1,22 +1,19 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:flutter/services.dart'; // For Clipboard
-import 'package:flutter/src/material/icons.dart';
-import 'home-page.dart';
-import 'setting-page.dart';
-import 'search-page.dart';
-import 'user-page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import '../controller/diary.dart';
-import '../controller/trekking.dart';
-import '../controller/user.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../controller/user.dart';
+import '../controller/trekking.dart';
+import '../controller/diary.dart';
+import '../model/user.dart';
+import '../model/diary.dart';
+import '../model/trekking.dart';
+
+
 
 //DA CAPIRE LA COSA DEL POP
 
@@ -37,37 +34,12 @@ class UserPagePublic extends StatefulWidget {
   });
 
   @override
-  State<UserPagePublic> createState() => _UserPageState();
+  State<UserPagePublic> createState() => _UserPagePublicState();
 }
 
-class _UserPageState extends State<UserPagePublic> {
-  Map<String, dynamic>? userData;
-
-  final ImagePicker _picker = ImagePicker();
-  //open image from phone
-  Future<XFile?> _pickImage() async {
-    return await _picker.pickImage(source: ImageSource.gallery);
-  }
-
-  //load firebase storage
-  Future<String?> uploadProfilePicture(File image) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('profile_photos')
-        .child(uid)
-        .child('$uid.jpg');
-
-    try {
-      await ref.putFile(image);
-      final url = await ref.getDownloadURL();
-      return url;
-    } catch (e) {
-      print('Errore upload: $e');
-      return null;
-    }
-  }
+class _UserPagePublicState extends State<UserPagePublic> {
+  Users? user;
+  bool loading = true;
 
   @override
   void initState() {
@@ -76,385 +48,167 @@ class _UserPageState extends State<UserPagePublic> {
   }
 
   Future<void> _loadUser() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
+    final u = await widget.userController.getUserById(widget.userId);
+    if (!mounted) return;
 
     setState(() {
-      userData = doc.data();
+      user = u;
+      loading = false;
     });
   }
-
-  Future<void> _saveProfileURL(String url) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance.collection('users').doc(uid).update({
-      'photoURL': url,
-    });
-
-    // Aggiorno i dati mostrati nella UI
-    setState(() {
-      userData?['photoURL'] = url;
-    });
-  }
-
-  // TextStyle for texts
-  static const TextStyle optionStyle = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-    fontStyle: FontStyle.italic,
-  );
 
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
 
-    // TabController for tabs in the body (public, private, saved)
+    if (loading) {
+      return Scaffold(
+        appBar: AppBar(title: Text(local.profile_page_title)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(local.profile_page_title)),
+        body: const Center(child: Text("User not found")),
+      );
+    }
+
+    // Shortcut
+    final u = user!;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(local.profile_page_title),
-          centerTitle: true, // Forced center the title
+          title: Text("${u.username}"),
+          centerTitle: true,
           actions: [
             IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, '/login');
+              icon: const Icon(Icons.person_add),
+              onPressed: () {
+                // LOGICA DEL FOLLOW QUI
               },
-            ),
+            )
           ],
         ),
 
         body: Column(
           children: [
+
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Avatar + username column
-                Container(
-                  width: 200,
-                  // Padding on all sides
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
+                // FOTO PROFILO
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: CircleAvatar(
+                    radius: 40,
+
+                    backgroundImage: (u.photoProfile != null && u.photoProfile!.isNotEmpty)
+                        ? NetworkImage(u.photoProfile!)
+                        : null,
+
+                    child: (u.photoProfile == null || u.photoProfile!.isEmpty)
+                        ? const Icon(Icons.person, size: 42)
+                        : null,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final picked = await _pickImage();
-                          if (picked == null) return;
 
-                          final file = File(picked.path);
-
-                          final url = await uploadProfilePicture(file);
-                          if (url != null) {
-                            await _saveProfileURL(url);
-                          }
-                        },
-
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage: userData?['photoURL'] != null
-                              ? NetworkImage(userData!['photoURL'])
-                              : null,
-                          backgroundColor: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        local.username_label,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text('${local.level_label} : ${local.advanced_level}'),
-                    ],
-                  ),
                 ),
 
-                // Statistics column
-                Container(
-                  width: 200,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        local.done_trekking_label,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _StatItem(
-                            label: local.totals_trekking_label,
-                            value: '40',
-                          ),
-                          _StatItem(
-                            label: local.published_trekking_label,
-                            value: '20',
-                          ),
-                          _StatItem(
-                            label: local.private_trekking_label,
-                            value: '20',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 12),
-
-            // Setting and share buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Setting button
+                // INFO UTENTE
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              diaryController: widget.diaryController,
-                              userController: widget.userController,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(local.follow_label),
+                    Text(
+                      u.username,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ],
-                ),
-                SizedBox(width: 7),
-                // Copy URL button
-                Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Funzione che fa copiare URL
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Marcipises Alert!'),
-                              content: Text('Yout are on the marcipises 2!'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Text(local.share_profile_button_label),
-                    ),
+                    Text("Followers: ${u.followers.length}"),
+                    Text("Following: ${u.following.length}"),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 23),
-            // Tabs for public, private, saved paths
+
+            const SizedBox(height: 10),
+
             const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.label_important)),
+                Tab(icon: Icon(Icons.public)),
                 Tab(icon: Icon(Icons.lock)),
                 Tab(icon: Icon(Icons.bookmark)),
               ],
             ),
+
             Expanded(
               child: TabBarView(
                 children: [
-                  ListView.builder(
-                    itemCount:
-                        10, //sarà dinamico -> numero di percorsi pubblici
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.published_trekking_label}  ${index + 1}',
-                        ),
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Marcipises Alert!'),
-                                content: Text(
-                                  'Yout are on the marcipises on public path!',
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
+                  // ----------- TAB 1: DIARI PUBBLICI -----------
+                  _buildPublicDiaryTab(u),
+
+                  // ----------- TAB 2: DIARI PRIVATI -----------
+                  const Center(
+                    child: Text("Private diaries are not visible"),
                   ),
-                  ListView.builder(
-                    itemCount: 10, //sarà dinamico -> numero di percorsi privati
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.private_trekking_label} ${index + 1}',
-                        ),
-                        onTap: () {
-                          // Azione al tap sul percorso privato
-                        },
-                      );
-                    },
-                  ),
-                  ListView.builder(
-                    itemCount: 10, //sarà dinamico -> numero di percorsi salvati
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.save_trekking_button_label} ${index + 1}',
-                        ),
-                        onTap: () {
-                          // Azione al tap sul percorso salvato
-                        },
-                      );
-                    },
-                  ),
+
+                  // ----------- TAB 3: TREKKING SALVATI -----------
+                  _buildSavedTrekkingTab(u),
                 ],
               ),
             ),
           ],
         ),
-
-        //Drawer to control the navigation among pages
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                decoration: BoxDecoration(color: Colors.greenAccent),
-                child: Text(
-                  local.menu_title,
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.home),
-                title: Text(local.home_page_title, style: optionStyle),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyHomePage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        diaryController: widget.diaryController,
-                        userController: widget.userController,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(local.profile_page_title, style: optionStyle),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        diaryController: widget.diaryController,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.search),
-                title: Text(local.search_page_title, style: optionStyle),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        diaryController: widget.diaryController,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: Text(local.settings_page_title, style: optionStyle),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        diaryController: widget.diaryController,
-                        userController: widget.userController,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
-}
 
-// Widget for individual statistic item
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
+  // --- PUBLIC DIARY LIST ---
+  Widget _buildPublicDiaryTab(Users u) {
+    final List<Diary> list = u.publicDiaryPages;
 
-  const _StatItem({required this.label, required this.value});
+    if (list.isEmpty) {
+      return const Center(child: Text("No public diaries"));
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        Text(label),
-      ],
+    return ListView.builder(
+      itemCount: list.length,
+      itemBuilder: (_, i) {
+        final d = list[i];
+        return ListTile(
+          title: Text(d.trekkigName),
+          subtitle: Text(d.date),
+          onTap: () {
+            // APRI DIARIO (se vuoi)
+          },
+        );
+      },
+    );
+  }
+
+  // --- SAVED TREKKINGS ---
+  Widget _buildSavedTrekkingTab(Users u) {
+    final List<Trekking> list = u.savedTrekkings;
+
+    if (list.isEmpty) {
+      return const Center(child: Text("No saved trekking"));
+    }
+
+    return ListView.builder(
+      itemCount: list.length,
+      itemBuilder: (_, i) {
+        final t = list[i];
+        return ListTile(
+          title: Text(t.name),
+          subtitle: Text("Distance: ${t.distance} km"),
+          onTap: () {
+            // APRI DETTAGLI TREKKING
+          },
+        );
+      },
     );
   }
 }

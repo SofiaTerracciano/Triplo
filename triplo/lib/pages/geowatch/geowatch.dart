@@ -8,10 +8,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:triplo/pages/geowatch/weather_page.dart';
 import 'package:triplo/pages/geowatch/google_satellite_page.dart';
 
+import '../../controller/API.dart';
+import '../../widgets_for_pages/mini_map/mini_map.dart';
+import '../../widgets_for_pages/weather/weather.dart';
+
 
 class GeoWatchPage extends StatefulWidget {
   const GeoWatchPage({Key? key}) : super(key: key);
-
 
   @override
   State<GeoWatchPage> createState() => _GeoWatchPageState();
@@ -31,17 +34,20 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   String? _weatherError;
   Map<String, dynamic>? _weather;
   List<Map<String, dynamic>> _forecast = [];
-  late String _openWeatherApiKey;
+  //late String _openWeatherApiKey;
+
+
+  final API api = API();
 
 
   @override
   void initState() {
     super.initState();
-    _openWeatherApiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
-    _getUserLocation();
+    //_openWeatherApiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
+    _loadAll();
   }
 
-
+  /*
   // --- GEOLOCALIZZAZIONE ---
   Future<void> _getUserLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -118,6 +124,30 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       debugPrint("Errore previsioni: $e");
     }
   }
+   */
+
+
+
+
+
+
+  Future<void> _loadAll() async {
+    final pos = await api.userLocation();
+    if (pos == null) {
+      setState(() => _weatherError = "Location unavailable");
+      return;
+    }
+
+    setState(() => _center = pos);
+
+    final weather = await api.weather(pos.latitude, pos.longitude);
+    final forecast = await api.forecast(pos.latitude, pos.longitude);
+
+    setState(() {
+      _weather = weather;
+      _forecast = forecast ?? [];
+    });
+  }
 
   // --- UI ---
   @override
@@ -129,7 +159,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
         actions: [
           IconButton(
             tooltip: "Aggiorna dati",
-            onPressed: _getUserLocation,
+            onPressed: _loadAll,
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -152,11 +182,15 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                 );
               }
             },
-            child: _buildWeatherPreview(),
+            child: Weather(
+              weather: _weather,
+              loading: _loadingWeather,
+              error: _weatherError,
+            ),
           ),
           const SizedBox(height: 12),
           // Mappa
-          _buildMiniMap(),
+          Mini_Map(center: _center),
           const SizedBox(height: 10),
           // Bottone per aprire la mappa completa
           ElevatedButton.icon(
@@ -220,7 +254,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
 
 
-
+/*
   // Anteprima Meteo
   Widget _buildWeatherPreview() {
     if (_loadingWeather) {
@@ -302,4 +336,5 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       ),
     );
   }
+ */
 }

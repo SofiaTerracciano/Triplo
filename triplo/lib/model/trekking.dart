@@ -140,9 +140,14 @@ class Trekking {
   // Firestore --> Model
   factory Trekking.fromMap(Map<String, dynamic> map, {required String docId}) {
     // Convert Firestore GeoPoint to LatLng
-    List<LatLng> pts = (map["Points"] as List<dynamic>)
-      .map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
-      .toList();
+    //List<LatLng> pts = (map["Points"] as List<dynamic>)
+    //  .map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
+    //  .toList();
+
+
+    final pts = (map["Points"] as List<dynamic>?)
+        ?.map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
+        .toList() ?? [];
 
     // Convert List<dynamic> to List<String> for info
     final List<String>  info = (map["Info"] as List<dynamic>?)
@@ -160,31 +165,64 @@ class Trekking {
     final List<String>  challenges = (map["Challenges"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
-      ?? []; 
+      ?? [];
+
+    double _safeDouble(dynamic v) {
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
+    }
 
     // Create Trekking instance
+    //return Trekking(
+    //  documentId: docId,
+    //  name: map["Name"],
+    //  mapPhoto: map["Map_photo"],
+    //  difficultyLevel: map["Difficulty_level"],
+    //  distance: (map["Distance"] as num).toDouble(),
+    //  estimatedTime: (map["Estimated_time"] as num).toDouble(),
+    //  elevationGain: (map["Elevation_gain"] as num).toDouble(),
+    //  upGain: map["Up_gain"],
+    //  downGain: map["Down_gain"],
+    //  startingPoint: pts.first,
+    //  endingPoint: pts.last,
+    //  points: pts,
+    //  startingPointName: map["Starting_point_name"],
+    //  endingPointName: map["Ending_point_name"],
+    //  info: info,
+    //  endingPointPhoto: map["Photo_ending_point"],
+    //  description: description,
+    //  refreshmentPoint: map["Refreshment_point"],
+    //  picNicArea: map["Picnic_area"],
+    //  familyFirendly: map["Family_friendly"],
+    //  challenges: challenges,
+    //);
+
     return Trekking(
       documentId: docId,
-      name: map["Name"],
-      mapPhoto: map["Map_photo"],
-      difficultyLevel: map["Difficulty_level"],
-      distance: (map["Distance"] as num).toDouble(),
-      estimatedTime: (map["Estimated_time"] as num).toDouble(),
-      elevationGain: (map["Elevation_gain"] as num).toDouble(),
-      upGain: map["Up_gain"],
-      downGain: map["Down_gain"],
-      startingPoint: pts.first,
-      endingPoint: pts.last,
+      name: map["Name"] ?? "",
+      mapPhoto: map["Map_photo"] ?? "",
+      difficultyLevel: map["Difficulty_level"] ?? "",
+      //distance: (map["Distance"] ?? 0).toDouble(),
+      //estimatedTime: (map["Estimated_time"] ?? 0).toDouble(),
+      //elevationGain: (map["Elevation_gain"] ?? 0).toDouble(),
+      distance: _safeDouble(map["Distance"]),
+      estimatedTime: _safeDouble(map["Estimated_time"]),
+      elevationGain: _safeDouble(map["Elevation_gain"]),
+      upGain: map["Up_gain"] ?? false,
+      downGain: map["Down_gain"] ?? false,
+      startingPoint: pts.isNotEmpty ? pts.first : const LatLng(0,0),
+      endingPoint: pts.isNotEmpty ? pts.last : const LatLng(0,0),
       points: pts,
-      startingPointName: map["Starting_point_name"],
-      endingPointName: map["Ending_point_name"],
-      info: info,
-      endingPointPhoto: map["Photo_ending_point"],
-      description: description,
-      refreshmentPoint: map["Refreshment_point"],
-      picNicArea: map["Picnic_area"],
-      familyFirendly: map["Family_friendly"],
-      challenges: challenges,
+      startingPointName: map["Starting_point_name"] ?? "",
+      endingPointName: map["Ending_point_name"] ?? "",
+      info: (map["Info"] as List?)?.map((e)=>e.toString()).toList() ?? [],
+      endingPointPhoto: map["Ending_point_photo"] ?? "",
+      description: (map["Description"] as List?)?.map((e)=>e.toString()).toList() ?? [],
+      refreshmentPoint: map["Refreshment_point"] ?? "",
+      picNicArea: map["Picnic_area"] ?? false,
+      familyFirendly: map["Family_friendly"] ?? false,
+      challenges: (map["Challenges"] as List?)?.map((e)=>e.toString()).toList() ?? [],
     );
   }
 }
