@@ -4,7 +4,7 @@ import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_ti
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:triplo/widgets_for_pages/weather_legend/weather_layer.dart';
-
+import 'package:triplo/controller/API.dart';
 /// This page shows a Google Satellite map
 /// with several optional weather layers from OpenWeatherMap.
 
@@ -22,8 +22,13 @@ class GoogleSatellitePage extends StatefulWidget {
 }
 
 class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
+  final API api = API();
+
+
+
+
   // Variable to store the API key loaded from .env
-  late String _openWeatherApiKey;
+  //late String _openWeatherApiKey;
 
   // Boolean variables to know which layer is currently visible
   bool showPrecip = false;
@@ -33,12 +38,12 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
   bool showSnow = false;
   bool showWind = false;
   final MapController _mapController = MapController();
-  @override
-  void initState() {
-    super.initState();
+  //@override
+  //void initState() {
+  //  super.initState();
     // Get the OpenWeather API key from .env file
-    _openWeatherApiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
-  }
+  //  _openWeatherApiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
+  //}
 
   @override
   Widget build(BuildContext context) {
@@ -91,12 +96,12 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
               ),
 
               // Use our WeatherLayer helper class for dynamic layers
-              if (showPrecip) WeatherLayer.build('precipitation', _openWeatherApiKey),
-              if (showSnow) WeatherLayer.build('snow', _openWeatherApiKey),
-              if (showWind) WeatherLayer.build('wind', _openWeatherApiKey),
-              if (showClouds) WeatherLayer.build('clouds_new', _openWeatherApiKey),
-              if (showTemp) WeatherLayer.build('temp_new', _openWeatherApiKey),
-              if (showPressure) WeatherLayer.build('pressure_new', _openWeatherApiKey),
+              if (showPrecip) WeatherLayer.build(api.resolveLayer('precip')!, api.openWeatherKey),
+              if (showSnow) WeatherLayer.build(api.resolveLayer('snow')!, api.openWeatherKey),
+              if (showWind) WeatherLayer.build(api.resolveLayer('wind')!, api.openWeatherKey),
+              if (showClouds) WeatherLayer.build(api.resolveLayer('clouds')!, api.openWeatherKey),
+              if (showTemp) WeatherLayer.build(api.resolveLayer('temp')!, api.openWeatherKey),
+              if (showPressure) WeatherLayer.build(api.resolveLayer('pressure')!, api.openWeatherKey),
             ],
           ),
 
