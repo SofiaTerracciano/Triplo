@@ -552,7 +552,7 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch image URL from Firebase Storage given photoProfile path
+  // Fetch image URL from Firebase Storage given complete firestore url
   Future<String?> getDownloadUrl(String? path) async {
     // If you donn't have the profile photo return null
     if (path == null || path.isEmpty) {

@@ -272,7 +272,7 @@ class ChallengesController extends ChangeNotifier {
     }
   }
 
-  // Fetch image URL from Firebase Storage given challenge path
+  // Fetch image URL from Firebase Storage given challenge complete firestore url
   Future<String> getDownloadUrl(String path) async {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();

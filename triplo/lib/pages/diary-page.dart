@@ -390,7 +390,7 @@ class _DiaryPageState extends State<DiaryPage> {
                 child: Row(
                   children: diary.challenges.map((path) {
                     return FutureBuilder<String?>(
-                      future: widget.diaryController.getDownloadUr(path),
+                      future: widget.diaryController.getDownloadUrl(path),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

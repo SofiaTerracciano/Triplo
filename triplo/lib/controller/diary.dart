@@ -288,7 +288,7 @@ class DiaryController extends ChangeNotifier {
     return paths;
   }
 
-  // Fetch image URL from Firebase Storage given their path
+  // Fetch image URL from Firebase Storage given only path
   Future<String?> getDownloadUrlChild(String? path) async {
     // If you don't have any photos return null
     if (path == null || path.isEmpty) return null;
@@ -302,8 +302,9 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  Future<String?> getDownloadUr(String? path) async {
-    // If you don't have any challenges return null
+  // Fetch image URL from Firebase Storage given complete firestore url
+  Future<String?> getDownloadUrl(String? path) async {
+    // If you don't have any return null
     if (path == null || path.isEmpty) return null;
 
     try {
@@ -317,16 +318,16 @@ class DiaryController extends ChangeNotifier {
 
   Future<void> deletePhotoFromDb(String diaryId, String photoPath) async {
     try {
-      // 1️⃣ Rimuove dal Firestore
+      // Remove from Firestore
       await _db.collection('diary').doc(diaryId).update({
         "Photos": FieldValue.arrayRemove([photoPath]),
       });
 
-      // 2️⃣ Elimina da Firebase Storage usando PATH
+      // Delete from firebase Storage using path
       final ref = FirebaseStorage.instance.ref().child(photoPath);
       await ref.delete();
 
-      // 3️⃣ Aggiorna stato locale
+      // Update locale state
       final diary = getDiaryById(diaryId);
       diary?.photos.remove(photoPath);
 
