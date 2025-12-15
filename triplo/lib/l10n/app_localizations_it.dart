@@ -244,40 +244,4 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get challeng_title => 'Sfide';
-
-  @override
-  String get photo_title_challeng => 'Caccia Fotografica';
-
-  @override
-  String get photo_description_challeng => 'Scatta una foto a qualcosa di particolare durante il percorso, come una cascata, un animale o un fiore raro.';
-
-  @override
-  String get time_title_challeng => 'Contro il Tempo';
-
-  @override
-  String get time_description_challeng => 'Completa il percorso entro il tempo stimato. Riuscirai a battere il cronometro?';
-
-  @override
-  String get hi_title_challeng => 'Saluti in Cammino';
-
-  @override
-  String get hi_description_challeng => 'Saluta almeno 4 persone che incontri lungo il percorso. Socializza e avinci la sfida!';
-
-  @override
-  String get orientiring_title_challeng => 'Mini‑Orienteering';
-
-  @override
-  String get orientiring_description_challeng => 'Quando arrivi in una certa posizione, l’app ti chiederà in quale direzione stai andando (Nord, Sud, Est, Ovest). Rispondi correttamente per vincere la sfida.';
-
-  @override
-  String get silent_walking_title_challeng => 'Camminata Silenziosa';
-
-  @override
-  String get silent_walking_description_challeng => 'Cammina in silenzio per un tempo prestabilito. Riceverai una notifica dal tuo smart watch e dovrai confermare di aver completato la sfida.';
-
-  @override
-  String get balance_title_challeng => 'Sfida d’Equilibrio';
-
-  @override
-  String get balance_description_challeng => 'Trova un sasso o una radice e mantieniti in equilibrio per un determinato periodo di tempo. Metti alla prova il tuo equilibrio!';
 }

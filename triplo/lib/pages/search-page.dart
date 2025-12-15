@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/challenges.dart';
+import 'package:triplo/pages/challenges-page.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'setting-page.dart';

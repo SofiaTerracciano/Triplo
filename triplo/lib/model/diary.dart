@@ -36,7 +36,7 @@ class Diary {
     return {
       "UserId": userId,
       "Trekking_name": trekkigName,
-      "Date": date, // la metteremo noi il giusto layout
+      "Date": date, 
       "Duration": duration,
       "Friends": friends,
       "Photos": photos,
@@ -83,17 +83,32 @@ class Diary {
 
  //null safe version
   factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
+    final List<String>  photos = (map["Photos"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? [];
+    
+    final List<String>  challenges = (map["Challenges"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? [];
+
+    final List<String>  mood = (map["Mood"] as List<dynamic>?)
+      ?.map((item) => item.toString()) 
+      .toList() 
+      ?? [];
+
     return Diary(
       diaryId: diaryId,
       userId: map["UserId"] ?? "",
-      trekkigName: map["Trekking_name"] ?? map["RouteId"] ?? "Unknown Trek",
+      trekkigName: map["Trekking_name"] ?? "Unknown Trek",
       date: map["Date"] ?? "",
       duration: (map["Duration"] ?? 0).toDouble(),
       friends: List<String>.from(map["Friends"] ?? []),
-      photos: List<String>.from(map["Photos"] ?? []),
-      challenges: List<String>.from(map["Challenges"] ?? []),
+      photos: photos,
+      challenges: challenges,
       refreshmentPoint: map["Refreshment_point"] ?? "",
-      mood: List<String>.from(map["Mood"] ?? []),
+      mood: mood,
       notes: map["Notes"] ?? "",
       isPublic: map["Is_public"] ?? false,   // <= prima causa del crash
     );

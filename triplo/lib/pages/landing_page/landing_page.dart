@@ -136,7 +136,7 @@ class _Landing_PageState extends State<Landing_Page> {
           ElevatedButton(
             onPressed: () => updateUsersIndex(),
             child: Text("Update Users Index"),
-          ),
+          )
         ],
       ),
     );

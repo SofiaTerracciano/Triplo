@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/controller/API.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/challenges.dart';
+import 'package:triplo/pages/challenges-page.dart';
 import 'search-page.dart';
 import 'setting-page.dart';
 import 'user-page.dart';
@@ -229,6 +230,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   double currentZoom = 12.0;
   LatLng currentCenter = LatLng(46.230, 10.831);
   bool showRecenter = false;
+  final api = API();
 
   // Bounds of the map area
   final LatLngBounds bounds = LatLngBounds(
@@ -310,8 +312,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-              subdomains: const ['a', 'b', 'c'],
+              urlTemplate: api.openTopoMapTile(),
+              subdomains: api.openTopoMapSubdomains(),
             ),
 
             // Polylines only at high zoom of all trekkings available
@@ -368,7 +370,7 @@ Color difficultyToColor(String difficulty) {
   switch (difficulty.toLowerCase()) {
     case "easy":
       return Colors.lightBlue;
-    case "medium":
+    case "intermediate":
       return Colors.red;
     case "hard":
       return Colors.black;

@@ -69,15 +69,13 @@ class _LoginPageState extends State<LoginPage> {
         throw StateError("currentUser è null dopo il login");
       }
       final uid = user.uid;
-      print(uid);
-      //widget.diaryController.currentUser = controller.currentUser!;
-      //print(widget.diaryController.currentUser!.uid);
-      //print("following = ${widget.userController.currentUser!.following}");
+      //assign current user instance to _currentUser attribute of diaryController
       widget.diaryController.currentUser = user;
-      print(widget.diaryController.currentUser!.uid);
-      print("following = ${user.following}");
+      //assign current user instance to _currentUser attribute of userController
+      widget.userController.currentUser = user;
       await widget.diaryController.loadPublicDiary(uid);
       await widget.diaryController.loadPrivateDiary(uid);
+      print(widget.diaryController.allDiaries);
 
       Navigator.pushReplacement(
         context,

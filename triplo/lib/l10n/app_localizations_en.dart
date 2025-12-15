@@ -244,40 +244,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get challeng_title => 'Challenges';
-
-  @override
-  String get photo_title_challeng => 'Photo Hunt';
-
-  @override
-  String get photo_description_challeng => 'Take a photo of something special during the route, like a waterfall, an animal, or a rare flower.';
-
-  @override
-  String get time_title_challeng => 'Beat the Clock';
-
-  @override
-  String get time_description_challeng => 'Complete the route within the estimated time. Can you beat the clock?';
-
-  @override
-  String get hi_title_challeng => 'Greetings on the Way';
-
-  @override
-  String get hi_description_challeng => 'Greet at least 4 people you meet along the route. Socialize and win!';
-
-  @override
-  String get orientiring_title_challeng => 'Mini‑Orienteering';
-
-  @override
-  String get orientiring_description_challeng => 'When you reach a certain position, the app will ask you which direction you are going (North, South, East, West). Answer correctly to win the challenge.';
-
-  @override
-  String get silent_walking_title_challeng => 'Silent Walk';
-
-  @override
-  String get silent_walking_description_challeng => 'Walk silently for a set amount of time. You will receive a notification from your smart watch and need to confirm you completed the challenge.';
-
-  @override
-  String get balance_title_challeng => 'Balance Challenge';
-
-  @override
-  String get balance_description_challeng => 'Find a stone or a root and maintain your balance for a set period of time. Test your balance!';
 }

@@ -30,6 +30,10 @@ class UserController extends ChangeNotifier {
 
   Users? get currentUser => _currentUser;
 
+  set currentUser(Users user) {
+    _currentUser = user;
+  }
+
   /**
    * Registers a new user using email and password.
    * Steps:

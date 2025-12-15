@@ -51,7 +51,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
   String notesText = '';
 
   bool isPublic =
-      false; // forse va usata una terza variabile per non avere private bototn selezionato di default --> poi fai un cast
+      false; 
 
   final List<String> friends = [];
   final List<int> selectedIndexFriends = [];
@@ -252,7 +252,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                       SizedBox(
                         height: 220, // lista scrollabile
                         child: ListView.builder(
-                          itemCount: user.currentUser!.following.length,
+                          itemCount: user.currentUser!.following.length, //da cambiare con following index
                           itemBuilder: (context, index) {
                             final followingUser =
                                 user.currentUser!.following[index]; 
@@ -262,9 +262,14 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                             return ListTile(
                               leading: CircleAvatar(
-                                child: Text(
-                                  followingUser.username[0].toUpperCase(),
-                                ),
+                                backgroundImage: followingUser.photoProfile != null &&
+                                        followingUser.photoProfile!.isNotEmpty
+                                    ? NetworkImage(followingUser.photoProfile!)
+                                    : null,
+                                child: followingUser.photoProfile == null ||
+                                        followingUser.photoProfile!.isEmpty
+                                    ? const Icon(Icons.person)
+                                    : null,
                               ),
                               title: Text(followingUser.username),
                               trailing: Icon(
@@ -410,7 +415,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   const SizedBox(height: 8),
 
-                  // TENDINA
+                  // Challenges
                   ExpansionTile(
                     title: Text(local.choose_challenge_label), 
                     children: [
@@ -640,7 +645,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("${local.public_private_label}"),
+                  Text(local.public_private_label),
 
                   const SizedBox(height: 12),
 
@@ -696,7 +701,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                           elevation: !isPublic
                               ? 4
                               : 0, // ombra SOLO quando selezionato
-                        ),
+                        ), 
                         onPressed: () {
                           setState(() {
                             isPublic = false;
@@ -757,6 +762,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                           false,
                           '',
                         );
+                        
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -768,18 +774,6 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                             ),
                           ),
                         );
-                        /*Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DiaryPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryId: "jKMlKXDvpfPjsKS9aalh",
-                              diaryController: widget.diaryController,
-                            ),
-                          ),
-                        );*/
                       },
                       child: Text(local.save_botton_label),
                     ),

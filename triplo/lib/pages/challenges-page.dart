@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/controller/API.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
@@ -7,18 +8,6 @@ import 'package:triplo/pages/home-page.dart';
 import 'package:triplo/pages/search-page.dart';
 import 'package:triplo/pages/setting-page.dart';
 import 'package:triplo/pages/user-page.dart';
-
-class Challenge {
-  final String title;
-  final String description;
-  final String photoUrl;
-
-  Challenge({
-    required this.title,
-    required this.description,
-    required this.photoUrl,
-  });
-}
 
 class ChallengesPage extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
@@ -39,102 +28,154 @@ class ChallengesPage extends StatefulWidget {
 }
 
 class _ChallengesPageState extends State<ChallengesPage> {
+  late ChallengesController _challengesController;
+  bool _loading = true;
+  Map<String, String> _downloadUrls = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _challengesController = ChallengesController();
+    _loadChallenges();
+  }
+
+  Future<void> _loadChallenges() async {
+    await _challengesController.loadChallenges();
+    setState(() {
+      _loading = false;
+    });
+  }
+
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
 
-  late List<Challenge> _challenges;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final local = AppLocalizations.of(context)!;
-
-    _challenges = [
-      Challenge(
-        title: local.photo_title_challeng,
-        description: local.photo_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-      Challenge(
-        title: local.time_title_challeng,
-        description: local.time_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-      Challenge(
-        title: local.hi_title_challeng,
-        description: local.hi_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-      Challenge(
-        title: local.orientiring_title_challeng,
-        description: local.orientiring_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-      Challenge(
-        title: local.silent_walking_title_challeng,
-        description: local.silent_walking_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-      Challenge(
-        title: local.balance_title_challeng,
-        description: local.balance_description_challeng,
-        photoUrl: 'https://picsum.photos/200',
-      ),
-    ];
+  // Determine language index in the List<String> based on current locale
+  int _languageIndex(Locale locale) {
+    switch (locale.languageCode) {
+      case 'de':
+        return 0;
+      case 'en':
+        return 1;
+      case 'es':
+        return 2;
+      case 'fr':
+        return 3;
+      case 'it':
+        return 4;
+      default:
+        return 1; // default English
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
 
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final challenges = _challengesController.allChallenges;
+    final langIndex = _languageIndex(Localizations.localeOf(context));
+
     return Scaffold(
       appBar: AppBar(title: Text(local.challeng_title)),
+      body: challenges.isEmpty
+          ? Center(child: Text("No challenges available"))
+          : ListView.builder(
+              itemCount: challenges.length,
+              itemBuilder: (context, index) {
+                final challenge = challenges[index];
 
-      body: ListView.builder(
-        itemCount: _challenges.length,
-        itemBuilder: (context, index) {
-          final challenge = _challenges[index];
-          // If the index is even, then the image is on the left, while if the index is odd, the image is on the right.
-          final isEven = index % 2 == 0;
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                if (!isEven) 
-                  _buildImage(challenge.photoUrl),
+                // Selezione titolo e descrizione in base alla lingua
+                final title = (challenge.title.length > langIndex)
+                    ? challenge.title[langIndex]
+                    : challenge.title.isNotEmpty
+                        ? challenge.title[0]
+                        : "No title";
 
-                Expanded(
-                  child: Column(
+                final description = (challenge.description.length > langIndex)
+                    ? challenge.description[langIndex]
+                    : challenge.description.isNotEmpty
+                        ? challenge.description[0]
+                        : "No description";
+
+                // Future per scaricare immagine da Firebase Storage
+                final photoFuture = _downloadUrls.containsKey(challenge.documentId)
+                    ? Future.value(_downloadUrls[challenge.documentId]!)
+                    : _challengesController
+                        .getDownloadUrl(challenge.photo)
+                        .then((url) {
+                        _downloadUrls[challenge.documentId] = url;
+                        return url;
+                      });
+
+                final isEven = index % 2 == 0;
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        challenge.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      if (!isEven)
+                        FutureBuilder<String>(
+                          future: photoFuture,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
+                            return _buildImage(snapshot.data!);
+                          },
                         ),
-                        softWrap: true,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              softWrap: true,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              description,
+                              style: const TextStyle(fontSize: 16),
+                              softWrap: true,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        challenge.description,
-                        style: const TextStyle(fontSize: 16),
-                        softWrap: true,
-                      ),
+                      if (isEven)
+                        FutureBuilder<String>(
+                          future: photoFuture,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const SizedBox(
+                                width: 100,
+                                height: 100,
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
+                            return _buildImage(snapshot.data!);
+                          },
+                        ),
                     ],
                   ),
-                ),
-
-                if (isEven) 
-                  _buildImage(challenge.photoUrl),
-              ],
+                );
+              },
             ),
-          );
-        },
-      ),
 
       drawer: Drawer(
         child: ListView(
@@ -243,15 +284,14 @@ class _ChallengesPageState extends State<ChallengesPage> {
   }
 
   Widget _buildImage(String url) {
-    return Flexible(
-      flex: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        width: 100,
+        height: 100,
         child: Image.network(
           url,
-          width: 100,
-          height: 100,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain, // mantiene l'immagine intera senza tagli
           errorBuilder: (context, error, stackTrace) {
             return Container(
               width: 100,

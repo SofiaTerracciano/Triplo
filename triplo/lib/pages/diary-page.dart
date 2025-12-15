@@ -9,14 +9,8 @@ import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/change-diary-page.dart';
 import 'package:triplo/pages/user-page-public.dart';
-import '../controller/diary.dart';
-import '../controller/trekking.dart';
-import '../controller/user.dart';
-
-
 
 class DiaryPage extends StatefulWidget {
-
   final DiaryController diaryController;
   final UserController userController;
   final TrekkingController trekkingController;
@@ -42,10 +36,43 @@ class _DiaryPageState extends State<DiaryPage> {
     fontStyle: FontStyle.italic,
   );
 
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDiaries();
+  }
+
+  Future<void> _loadDiaries() async {
+    final currentUserId = widget.diaryController.currentUser!.uid;
+
+    // aspettiamo i due caricamenti
+    await widget.diaryController.loadPublicDiary(currentUserId);
+    await widget.diaryController.loadPrivateDiary(currentUserId);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    final diary = widget.diaryController.getDiaryById(widget.diaryId)!;
+
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final diary = widget.diaryController.getDiaryById(widget.diaryId);
+    if (diary == null) {
+      return const Scaffold(
+        body: Center(child: Text('Diary not found')),
+      );
+    }
+
 
     String formattedTime;
     if (diary.duration < 60) {
@@ -68,9 +95,9 @@ class _DiaryPageState extends State<DiaryPage> {
         }
       }
     }
+
     return FutureBuilder<Users?>(
-      //future: widget.userController.getUserById(diary.userId),
-      future: widget.userController.fetchUserById("Aqcz7x94WnPJNYpb48CtuzMbsMj1"),
+      future: widget.userController.getUserById(diary.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -98,8 +125,8 @@ class _DiaryPageState extends State<DiaryPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ModifyDiaryPage(
-                        trekkingId: diary.trekkigName,
-                        diaryId: widget.diaryId, 
+                        trekkingId: widget.trekkingController.getTrekkingId(diary.trekkigName)!,
+                        diaryId: widget.diaryId,
                         trekkingController: widget.trekkingController,
                         diaryController: widget.diaryController,
                         userController: widget.userController,
@@ -111,7 +138,6 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ],
           ),
-
 
           body: ListView(
             padding: const EdgeInsets.all(25.0),
@@ -351,10 +377,11 @@ class _DiaryPageState extends State<DiaryPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
-                    '${local.challenges_trekking_label}: ',
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  if (diary.challenges != [])
+                    Text(
+                      '${local.challenges_trekking_label}: ',
+                      style: TextStyle(fontSize: 14),
+                    ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -409,7 +436,7 @@ class _DiaryPageState extends State<DiaryPage> {
                 children: [
                   if (diary.refreshmentPoint != '')
                     Text(
-                      '${local.refuge_trekking_label}: ${diary.refreshmentPoint}',
+                      '${local.refreshment_point_trekking_label}: ${diary.refreshmentPoint}',
                       style: TextStyle(fontSize: 14),
                     ),
                 ],

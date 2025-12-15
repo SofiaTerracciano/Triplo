@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
@@ -37,9 +38,90 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
   final TextEditingController refreshmentController = TextEditingController();
   final ImagePicker picker = ImagePicker();
 
+  late Diary diaryPage;
+
+  int? selectedDay;
+  int? selectedMonth;
+  int? selectedYear;
+
+  int? selectedHour;
+  int? selectedMinute;
+
+  final List<File> images = [];
+  late List<String> photos;
+  List<String> addedPhotos = [];
+
+  bool usedRefreshmentPoint = false;
+  late String refreshmentText;
+
+  late String notesText;
+  bool isPublic = false;
+
+  late List<String> friends;
+  late List<String> challenges;
+  late List<String> mood;
+
+  final List<int> selectedIndexChallenge = [];
+  final List<int> selectedIndexMood = [];
+
   @override
   void initState() {
     super.initState();
+    diaryPage = widget.diaryController.getDiaryById(widget.diaryId)!;
+
+    // DATE
+    final diaryParts = diaryPage.date.split('/');
+    selectedDay = int.parse(diaryParts[0]);
+    selectedMonth = int.parse(diaryParts[1]);
+    selectedYear = int.parse(diaryParts[2]);
+
+    // DURATION
+    selectedHour = (diaryPage.duration / 60).toInt();
+    selectedMinute = (diaryPage.duration % 60).toInt();
+
+    // 🔥 CLONI (IMPORTANTISSIMO)
+    photos = List<String>.from(diaryPage.photos);
+    friends = List<String>.from(diaryPage.friends);
+    challenges = List<String>.from(diaryPage.challenges);
+    mood = List<String>.from(diaryPage.mood);
+
+    // TEXT
+    notesText = diaryPage.notes;
+    notesController.text = notesText;
+
+    refreshmentText = diaryPage.refreshmentPoint;
+    refreshmentController.text = refreshmentText;
+
+    isPublic = diaryPage.isPublic;
+
+    // CHALLENGES SELECTED
+    final trekking = widget.trekkingController.getTrekkingById(widget.trekkingId)!;
+    selectedIndexChallenge.addAll(
+      trekking.challenges
+          .asMap()
+          .entries
+          .where((e) => challenges.contains(e.value))
+          .map((e) => e.key),
+    );
+
+    final List<String> availableMoods = [
+      "😍",
+      "😁",
+      "🥰",
+      "😅",
+      "😎",
+      "😞",
+      "🤩",
+    ];
+
+    // MOOD SELECTED
+    selectedIndexMood.addAll(
+      availableMoods
+          .asMap()
+          .entries
+          .where((e) => mood.contains(e.value))
+          .map((e) => e.key),
+    );
   }
 
   @override
@@ -47,7 +129,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     final Trekking trekkingName = widget.trekkingController.getTrekkingById(
       widget.trekkingId,
     )!;
-
     final local = AppLocalizations.of(context)!;
 
     final List<int> days = List<int>.generate(31, (i) => i + 1);
@@ -77,60 +158,12 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
       local.mood_sad_label,
       local.mood_excited_label,
     ];
-
+    
     final user = widget.userController;
     final diary = widget.diaryController;
     final trekking = widget.trekkingController;
 
-    final diaryPage = diary.getDiaryById(widget.diaryId)!;
-
-    List<String> diaryParts = diaryPage.date.split('/');
-    int? selectedDay = int.parse(diaryParts[0]);
-    int? selectedMonth = int.parse(diaryParts[1]);
-    int? selectedYear = int.parse(diaryParts[2]);
-
-    int? selectedHour = (diaryPage.duration / 60).toInt();
-    int? selectedMinute = (diaryPage.duration % 60).toInt();
-
-    final List<File> images = [];
-    List<String> photos = diaryPage.photos;
-    List<String> addedPhotos = [];
-    List<String> removedPhotos = [];
-
-    bool usedRefreshmentPoint = false;
-    String refreshmentText = diaryPage.refreshmentPoint;
-
-    String notesText = diaryPage.notes;
-
-    bool isPublic = diaryPage.isPublic;
-
-    final List<String> friends = diaryPage.friends;
-
-    final List<String> challenges = diaryPage.challenges;
-
-    final List<String> mood = diaryPage.mood;
-
-    final List<int> selectedIndexChallenge = [];
-
-    selectedIndexChallenge.addAll(
-      trekking
-          .getTrekkingById(widget.trekkingId)!
-          .challenges
-          .asMap()
-          .entries
-          .where((entry) => diaryPage.challenges.contains(entry.value))
-          .map((entry) => entry.key),
-    );
-
-    final List<int> selectedIndexMood = [];
-
-    selectedIndexMood.addAll(
-      availableMoodsLabels
-          .asMap()
-          .entries
-          .where((entry) => diaryPage.mood.contains(entry.value))
-          .map((entry) => entry.key),
-    );
+    final validPhotos = photos.where((p) => p.isNotEmpty).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(trekkingName.name)),
@@ -265,7 +298,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   Text(
                     friends.isEmpty
-                        ? "Nessun amico selezionato" //da mettere nel dizionario
+                        ? local.friends_trekking_label //da mettere nel dizionario
                         : user.currentUser!.following
                               .where((u) => friends.contains(u.uid))
                               .map((u) => u.username)
@@ -278,7 +311,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   const SizedBox(height: 12),
 
                   ExpansionTile(
-                    title: Text("Seleziona amici"), // da mettere nel dizionario
+                    title: Text(local.choose_friend_label),
                     children: [
                       SizedBox(
                         height: 220, // lista scrollabile
@@ -377,12 +410,13 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   if (usedRefreshmentPoint)
                     TextField(
                       controller: refreshmentController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText:
-                            "Descrivi il refreshment point", //da mettere nel dizionario
+                            local.refreshment_point_trekking_label, //da mettere nel dizionario
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 1,
+                      onChanged: (value) {refreshmentText = value;},
                     ),
                 ],
               ),
@@ -402,8 +436,8 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   // Mostra immagini selezionate
                   challenges.isEmpty
-                      ? const Text(
-                          "Nessuna challenge selezionata", // da mettere nel dizionario
+                      ? Text(
+                          local.challenge_selected_label, 
                           style: TextStyle(fontSize: 16),
                         )
                       : Wrap(
@@ -442,11 +476,11 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   const SizedBox(height: 8),
 
-                  // TENDINA
+                  // Challenges
                   ExpansionTile(
-                    title: const Text(
-                      "Seleziona challenges",
-                    ), // da metter enel dizionario
+                    title: Text(
+                      local.choose_challenge_label,
+                    ),
                     children: [
                       SizedBox(
                         height: 260,
@@ -547,7 +581,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   Text(
                     mood.isEmpty
-                        ? "Nessun mood selezionato" // da mettere nel dizionario
+                        ? local.mood_selected_label 
                         : mood.join(
                             ", ",
                           ), // mostra solo gli emoji separati da virgola
@@ -557,7 +591,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   const SizedBox(height: 12),
 
                   ExpansionTile(
-                    title: Text("Seleziona mood"), // da mmettere nel dizionario
+                    title: Text(local.choose_mood_label), 
                     children: [
                       SizedBox(
                         height: 220, // altezza della lista scrollabile
@@ -614,7 +648,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
               ),
               const SizedBox(height: 8),
               // Photos
-              Column(
+              /*Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -668,10 +702,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                     ),
                   ],
                 ],
-              ),
+              ),*/
 
               // Photos
-              /*Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -701,46 +735,107 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ),
 
                   const SizedBox(height: 8),
+                  
 
                   // Mostrare tutte le immagini (vecchie e nuove) con possibilità di rimuovere
                   if (photos.isNotEmpty || images.isNotEmpty) ...[
                     const SizedBox(height: 8),
+
                     SizedBox(
                       height: 100,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: photos.length + images.length,
+                        itemCount: validPhotos.length + images.length,
                         itemBuilder: (_, index) {
-                          bool isExisting = index < photos.length;
-                          String imagePath = isExisting
-                              ? photos[index]
-                              : images[index - photos.length].path;
+                          final isExisting = index < validPhotos.length;
 
                           return Padding(
                             padding: const EdgeInsets.all(4.0),
                             child: Stack(
                               children: [
-                                Image.file(
-                                  File(imagePath),
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                ),
+                                if (isExisting)
+                                  FutureBuilder<String?>(
+                                    future: widget.diaryController
+                                        .getDownloadUrlChild(validPhotos[index]),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const SizedBox(
+                                          width: 100,
+                                          height: 100,
+                                          child: Center(
+                                            child:
+                                                CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                        );
+                                      }
+
+                                      final url = snapshot.data;
+
+                                      if (url == null || url.isEmpty) {
+                                        return _photoPlaceholder();
+                                      }
+
+                                      return ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          url,
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              _photoPlaceholder(),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                else
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      images[index - validPhotos.length],
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                // Bottone X in alto a destra
                                 Positioned(
                                   top: 0,
                                   right: 0,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: () async {
                                         if (isExisting) {
-                                          //deleteFromDb(photos(index));
-                                          photos.removeAt(index);
+                                          await widget.diaryController.deletePhotoFromDb(
+                                            widget.diaryId,
+                                            validPhotos[index],
+                                          );
+                                          setState(() {
+                                            photos.remove(validPhotos[index]);
+                                          });
                                         } else {
-                                          images.removeAt(index - photos.length);
+                                          setState(() {
+                                            images.removeAt(index - validPhotos.length);
+                                          });
                                         }
-                                      });
-                                    },
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.5),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: const Icon(
+                                          Icons.close,
+                                          size: 18,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -750,8 +845,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                       ),
                     ),
                   ],
+
                 ],
-              ),*/
+              ),
               const SizedBox(height: 8),
               // Public/Private botton
               Column(
@@ -903,7 +999,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           mood,
                           notesText,
                           true,
-                          '',
+                          diaryPage.diaryId,
                         );
                         Navigator.pushReplacement(
                           context,
@@ -942,3 +1038,19 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     }
   }
 }
+
+Widget _photoPlaceholder() {
+  return Container(
+    width: 100,
+    height: 100,
+    decoration: BoxDecoration(
+      color: Colors.grey.shade300,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: const Icon(
+      Icons.image_not_supported,
+      size: 40,
+    ),
+  );
+}
+

@@ -34,7 +34,7 @@ class DiaryController extends ChangeNotifier {
     // Fetch diary documents from Firestore
     final snap = await _db
         .collection('diary')
-        .where('userId', isEqualTo: userId)
+        .where('UserId', isEqualTo: userId)
         .where('Is_public', isEqualTo: true)
         .get();
 
@@ -58,7 +58,7 @@ class DiaryController extends ChangeNotifier {
     // Fetch diary documents from Firestore
     final snap = await _db
         .collection('diary')
-        .where('userId', isEqualTo: userId)
+        .where('UserId', isEqualTo: userId)
         .where('Is_public', isEqualTo: false)
         .get();
 
@@ -76,7 +76,35 @@ class DiaryController extends ChangeNotifier {
 
     _diaries.addAll(privateDiaries);
 
+    print(privateDiaries);
+    print(_diaries);
+
     notifyListeners();
+  }
+
+  Diary updateDiary(
+    Diary page,
+    bool isPublic,
+    String date,
+    double duration,
+    List<String> friends,
+    List<String> photos,
+    List<String> challenges,
+    String refreshmentPoint,
+    List<String> mood,
+    String notes,
+  ) {
+    page.date = date;
+    page.duration = duration;
+    page.friends = friends;
+    page.photos = photos;
+    page.challenges = challenges;
+    page.refreshmentPoint = refreshmentPoint;
+    page.mood = mood;
+    page.notes = notes;
+    page.isPublic = isPublic;
+
+    return page;
   }
 
   // Getter diaries per documentId
@@ -130,21 +158,23 @@ class DiaryController extends ChangeNotifier {
       if (page.isPublic) {
         // Update DB
         await _db.collection("users").doc(uid).update({
-          "Public_Diary": FieldValue.arrayUnion([page.diaryId]),
+          "Public_diary": FieldValue.arrayUnion([page.diaryId]),
         });
         // Update local list
         _currentUser!.publicDiaryPages.add(page);
       } else {
         // Update DB
         await _db.collection("users").doc(uid).update({
-          "Private_Diary": FieldValue.arrayUnion([page.diaryId]),
+          "Private_diary": FieldValue.arrayUnion([page.diaryId]),
         });
         // Update local list
         _currentUser!.privateDiaryPages.add(page);
       }
       await _db.collection("diary").doc(page.diaryId).set(page.toMap());
     } else {
+      final uid = _auth.currentUser!.uid;
       page = getDiaryById(diaryId)!;
+      final oldIsPublic = page.isPublic;
       page = updateDiary(
         page,
         isPublic,
@@ -157,35 +187,36 @@ class DiaryController extends ChangeNotifier {
         mood,
         notes,
       );
-      await _db.collection("diary").doc(page.diaryId).set(page.toMap());
+
+      // Update diary document
+      await _db
+      .collection("diary")
+      .doc(page.diaryId)
+      .update(page.toMap());
+
+
+      // Se cambia pubblico / privato
+      if (oldIsPublic != isPublic) {
+        await _db.collection("users").doc(uid).update({
+          oldIsPublic ? "Public_diary" : "Private_diary":
+              FieldValue.arrayRemove([page.diaryId]),
+          isPublic ? "Public_diary" : "Private_diary": FieldValue.arrayUnion([
+            page.diaryId,
+          ]),
+        });
+
+        // Update local lists
+        if (oldIsPublic) {
+          _currentUser!.publicDiaryPages.remove(page);
+          _currentUser!.privateDiaryPages.add(page);
+        } else {
+          _currentUser!.privateDiaryPages.remove(page);
+          _currentUser!.publicDiaryPages.add(page);
+        }
+      }
+
+      notifyListeners();
     }
-    // Aggiorna la lista locale se il trekking esiste
-    notifyListeners();
-  }
-
-  Diary updateDiary(
-    Diary page,
-    bool isPublic,
-    String date,
-    double duration,
-    List<String> friends,
-    List<String> photos,
-    List<String> challenges,
-    String refreshmentPoint,
-    List<String> mood,
-    String notes,
-  ) {
-    page.date = date;
-    page.duration = duration;
-    page.friends = friends;
-    page.photos = photos;
-    page.challenges = challenges;
-    page.refreshmentPoint = refreshmentPoint;
-    page.mood = mood;
-    page.notes = notes;
-    page.isPublic = isPublic;
-
-    return page;
   }
 
   Future<void> removeDiary(String diaryId) async {
@@ -198,14 +229,14 @@ class DiaryController extends ChangeNotifier {
     if (page.isPublic) {
       // Remove from DB
       await _db.collection("users").doc(uid).update({
-        "Public_Diary": FieldValue.arrayRemove([page.diaryId]),
+        "Public_diary": FieldValue.arrayRemove([page.diaryId]),
       });
       // Remove from local list
       _currentUser?.publicDiaryPages.remove(page);
     } else {
       // Remove from DB
       await _db.collection("users").doc(uid).update({
-        "Private_Diary": FieldValue.arrayRemove([page.diaryId]),
+        "Private_diary": FieldValue.arrayRemove([page.diaryId]),
       });
       // Remove from local list
       _currentUser?.privateDiaryPages.remove(page);
@@ -260,8 +291,7 @@ class DiaryController extends ChangeNotifier {
   // Fetch image URL from Firebase Storage given their path
   Future<String?> getDownloadUrlChild(String? path) async {
     // If you don't have any photos return null
-    if (path == null || path.isEmpty) 
-      return null;
+    if (path == null || path.isEmpty) return null;
 
     try {
       Reference ref = FirebaseStorage.instance.ref().child(path);
@@ -274,8 +304,7 @@ class DiaryController extends ChangeNotifier {
 
   Future<String?> getDownloadUr(String? path) async {
     // If you don't have any challenges return null
-    if (path == null || path.isEmpty) 
-      return null;
+    if (path == null || path.isEmpty) return null;
 
     try {
       Reference ref = FirebaseStorage.instance.refFromURL(path);
@@ -285,8 +314,25 @@ class DiaryController extends ChangeNotifier {
       return null;
     }
   }
-}
 
-/*Future<void> deleteFromDb(List<String> paths) async {
-  
-}*/
+  Future<void> deletePhotoFromDb(String diaryId, String photoPath) async {
+    try {
+      // 1️⃣ Rimuove dal Firestore
+      await _db.collection('diary').doc(diaryId).update({
+        "Photos": FieldValue.arrayRemove([photoPath]),
+      });
+
+      // 2️⃣ Elimina da Firebase Storage usando PATH
+      final ref = FirebaseStorage.instance.ref().child(photoPath);
+      await ref.delete();
+
+      // 3️⃣ Aggiorna stato locale
+      final diary = getDiaryById(diaryId);
+      diary?.photos.remove(photoPath);
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error deleting photo: $e");
+    }
+  }
+}

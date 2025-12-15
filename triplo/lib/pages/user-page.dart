@@ -1,27 +1,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
-import 'package:triplo/pages/challenges.dart';
+import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import 'diary-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:image_picker/image_picker.dart';
-
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import '../controller/trekking.dart';
 import '../controller/diary.dart';
-import '../controller/user.dart';
+import '../pages/users-list-page.dart';
 
 class UserPage extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
@@ -115,11 +109,6 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     final controller = Provider.of<UserController>(context);
     final user = controller.currentUser;
-    /*
-    if (user == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
- */
 
     if (user == null) {
       return Scaffold(
@@ -216,14 +205,16 @@ class _UserPageState extends State<UserPage> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        //local.username_label,
                         user.username,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      //if (user.)
                       Text('${local.level_label} : ${local.advanced_level}'),
+                      //else
+                      //else
                     ],
                   ),
                 ),
@@ -245,17 +236,47 @@ class _UserPageState extends State<UserPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(
-                            label: local.totals_trekking_label,
-                            value: '40',
+                          GestureDetector(
+                            onTap: () {}, // do nothing
+                            child: _StatItem(
+                              label: local.totals_trekking_label,
+                              value: '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
+                            ),
                           ),
-                          _StatItem(
-                            label: local.published_trekking_label,
-                            value: '20',
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(context, MaterialPageRoute(
+                                  builder: (_) => UsersList(
+                                    onLocaleChanged: widget.onLocaleChanged,
+                                    trekkingController: widget.trekkingController,
+                                    userController: widget.userController,
+                                    diaryController: widget.diaryController,
+                                    listName: 'Followers',
+                                  ),
+                                ),);
+                            },
+                            child: _StatItem(
+                              label: 'Follower',
+                              value: '${user.followers.length}',
+                            ),
                           ),
-                          _StatItem(
-                            label: local.private_trekking_label,
-                            value: '20',
+                          
+                          GestureDetector( 
+                            onTap: () {
+                              Navigator.pushReplacement(context, MaterialPageRoute(
+                                  builder: (_) => UsersList(
+                                    onLocaleChanged: widget.onLocaleChanged,
+                                    trekkingController: widget.trekkingController,
+                                    userController: widget.userController,
+                                    diaryController: widget.diaryController,
+                                    listName: 'Following',
+                                  ),
+                                ),);
+                            },
+                            child: _StatItem(
+                              label: 'Following',
+                              value: '${user.following.length}',
+                            ),
                           ),
                         ],
                       ),
@@ -335,122 +356,88 @@ class _UserPageState extends State<UserPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  /*
-                  ListView.builder(
-                    itemCount:
-                        10, //sarà dinamico -> numero di percorsi pubblici
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.published_trekking_label}  ${index + 1}',
-                        ),
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Marcipises Alert!'),
-                                content: Text(
-                                  'Yout are on the marcipises on public path!',
+                  // Tab percorsi/diari pubblici
+                  user.publicDiaryPages.isEmpty
+                  ? const Center(child: Text("No public diary pages"))
+                  : ListView.builder(
+                      itemCount: user.publicDiaryPages.length,
+                      itemBuilder: (context, index) {
+                        final diary = user.publicDiaryPages[index];
+                        return ListTile(
+                          title: Text(diary.trekkigName), 
+                          subtitle: Text(diary.date),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DiaryPage(
+                                  diaryId: diary.diaryId,
+                                  diaryController: widget.diaryController,
+                                  userController: widget.userController,
+                                  trekkingController: widget.trekkingController,
+                                  onLocaleChanged: widget.onLocaleChanged,
                                 ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+
+                  // Tab percorsi/diari privati
+                  user.privateDiaryPages.isEmpty
+                    ? const Center(child: Text("No private diary pages"))
+                    : ListView.builder(
+                        itemCount: user.privateDiaryPages.length,
+                        itemBuilder: (context, index) {
+                          final diary = user.privateDiaryPages[index];
+                          return ListTile(
+                            title: Text(diary.trekkigName), // attenzione al nome della proprietà
+                            subtitle: Text(diary.date),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DiaryPage(
+                                    diaryId: diary.diaryId,
+                                    diaryController: widget.diaryController,
+                                    userController: widget.userController,
+                                    trekkingController: widget.trekkingController,
+                                    onLocaleChanged: widget.onLocaleChanged,
                                   ),
-                                ],
+                                ),
                               );
                             },
                           );
                         },
-                      );
-                    },
-                  ),
-                   */
-                  // Tab percorsi/diari pubblici
-                  ListView.builder(
-                    itemCount: user.publicDiaryPages.length,
-                    itemBuilder: (context, index) {
-                      final diary = user.publicDiaryPages[index];
-                      return ListTile(
-                        title: Text(diary.trekkigName),
-                        subtitle: Text(diary.date),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DiaryPage(
-                                diaryId: user.publicDiaryPages[index].diaryId, // FIX
-                                diaryController: widget.diaryController,
-                                userController: widget.userController,
-                                trekkingController: widget.trekkingController,
-                                onLocaleChanged: widget.onLocaleChanged,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  /*
-                  ListView.builder(
-                    itemCount: 10, //sarà dinamico -> numero di percorsi privati
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.private_trekking_label} ${index + 1}',
-                        ),
-                        onTap: () {
-                          // Azione al tap sul percorso privato
-                        },
-                      );
-                    },
-                  ),
-                  */
-                  // Tab percorsi/diari privati
-                  ListView.builder(
-                    itemCount: user.privateDiaryPages.length,
-                    itemBuilder: (context, index) {
-                      final diary = user.privateDiaryPages[index];
-                      return ListTile(
-                        title: Text(diary.trekkigName),
-                        subtitle: Text(diary.date),
-                        onTap: () {
-                          // ...
-                        },
-                      );
-                    },
-                  ),
+                      ),
 
-                  ListView.builder(
-                    itemCount: user
-                        .savedTrekkings
-                        .length, //sarà dinamico -> numero di percorsi salvati
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${local.save_trekking_button_label} ${user.savedTrekkings[index].name}',
-                        ),
-                        onTap: () {
-                          final routeID = user.savedTrekkings[index].documentId;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TrekkingPage(
-                                trekkingId: routeID,
-                                trekkingController: widget.trekkingController,
-                                userController: widget.userController,
-                                diaryController: widget.diaryController,
-                                onLocaleChanged: widget.onLocaleChanged,
+                  user.savedTrekkings.isEmpty
+                  ? const Center(child: Text("No saved trekking"))
+                  : ListView.builder(
+                      itemCount: user.savedTrekkings.length,
+                      itemBuilder: (context, index) {
+                        final trekking = user.savedTrekkings[index];
+                        return ListTile(
+                          title: Text(trekking.name),
+                          onTap: () {
+                            final routeID = trekking.documentId;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TrekkingPage(
+                                  trekkingId: routeID,
+                                  trekkingController: widget.trekkingController,
+                                  userController: widget.userController,
+                                  diaryController: widget.diaryController,
+                                  onLocaleChanged: widget.onLocaleChanged,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                            );
+                          },
+                        );
+                      },
+                    )
                 ],
               ),
             ),
@@ -538,22 +525,22 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-              leading: const Icon(Icons.emoji_events),
-              title: Text(local.challeng_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChallengesPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
+                leading: const Icon(Icons.emoji_events),
+                title: Text(local.challeng_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChallengesPage(
+                        onLocaleChanged: widget.onLocaleChanged,
+                        trekkingController: widget.trekkingController,
+                        userController: widget.userController,
+                        diaryController: widget.diaryController,
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
             ],
           ),
         ),

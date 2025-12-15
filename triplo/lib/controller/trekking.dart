@@ -2,8 +2,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 
 class TrekkingController extends ChangeNotifier {
@@ -26,7 +24,7 @@ class TrekkingController extends ChangeNotifier {
 
     // Fetch trekking documents from Firestore
     final snap = await _db
-        .collection('trekking') // andrà messo trekking
+        .collection('trekking') 
         .get();
 
     // Map documents to Trekking objects and store in the list --> this function create a 
@@ -45,6 +43,15 @@ class TrekkingController extends ChangeNotifier {
   Trekking? getTrekkingById(String documentId) {
     try {
       return _trekkings.firstWhere((t) => t.documentId == documentId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  //Getter trekkingID by name
+  String? getTrekkingId(String name) {
+    try {
+      return _trekkings.firstWhere((t) => t.name == name).documentId;
     } catch (_) {
       return null;
     }

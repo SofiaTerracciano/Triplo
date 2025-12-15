@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -60,6 +61,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
       widget.trekkingId,
     )!;
 
+    final user = widget.userController.currentUser!;
+
     // To calculate the trekking durantion time
     String formattedTime;
     if (trekking.estimated_time < 60) {
@@ -69,21 +72,23 @@ class _TrekkingPageState extends State<TrekkingPage> {
       if (trekking.estimated_time % 60 == 0) {
         if (trekking.estimated_time / 60 == 1) {
           formattedTime =
-              "${trekking.estimated_time / 60} ${local.hour_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hour_trekking_label}";
         } else {
           formattedTime =
-              "${trekking.estimated_time / 60} ${local.hours_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hours_trekking_label}";
         }
       } else {
         if (trekking.estimated_time / 60 == 1) {
           formattedTime =
-              "${trekking.estimated_time / 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
         } else {
           formattedTime =
-              "${trekking.estimated_time / 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
         }
       }
     }
+
+    final bool isSaved = user.savedTrekkings.any((t) => t.documentId == trekking.documentId);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,42 +113,20 @@ class _TrekkingPageState extends State<TrekkingPage> {
             },
           ),
 
-          FutureBuilder<Users?>(
-            future: widget.userController.getUserById(
-              'Aqcz7x94WnPJNYpb48CtuzMbsMj1',
-            ),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return SizedBox.shrink();
+          IconButton(
+            icon: isSaved ? icons[1] : icons[0],
+            onPressed: () async {
+              if (isSaved) {
+                await widget.userController.removeTrekkingFromSaved(
+                  trekking.documentId,
+                );
+              } else {
+                await widget.userController.addTrekkingToSaved(
+                  trekking.documentId,
+                );
               }
 
-              final user = snapshot.data!;
-
-              final isSaved = user.savedTrekkings.any(
-                (t) => t.documentId == trekking.documentId,
-              );
-
-              return isSaved
-                  ? IconButton(
-                      icon: icons[1],
-                      onPressed: () {
-                        setState(() {
-                          widget.userController.removeTrekkingFromSaved(
-                            trekking.documentId,
-                          );
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: icons[0],
-                      onPressed: () {
-                        setState(() {
-                          widget.userController.addTrekkingToSaved(
-                            trekking.documentId,
-                          );
-                        });
-                      },
-                    );
+              setState(() {}); // ricostruisce l'AppBar
             },
           ),
 

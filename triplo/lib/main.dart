@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:triplo/controller/API.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import 'firebase_options.dart';
 
@@ -73,7 +74,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserController())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserController()),
+        ],
       child: MaterialApp(
         title: 'Triplo',
         debugShowCheckedModeBanner: false,
