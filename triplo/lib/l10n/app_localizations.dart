@@ -143,16 +143,10 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get email_label;
 
-  /// No description provided for @done_trekking_label.
-  ///
-  /// In en, this message translates to:
-  /// **'My journeys'**
-  String get done_trekking_label;
-
   /// No description provided for @totals_trekking_label.
   ///
   /// In en, this message translates to:
-  /// **'Totals'**
+  /// **'My journeys'**
   String get totals_trekking_label;
 
   /// No description provided for @published_trekking_label.

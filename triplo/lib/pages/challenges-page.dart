@@ -52,36 +52,16 @@ class _ChallengesPageState extends State<ChallengesPage> {
     fontStyle: FontStyle.italic,
   );
 
-  // Determine language index in the List<String> based on current locale
-  int _languageIndex(Locale locale) {
-    switch (locale.languageCode) {
-      case 'de':
-        return 0;
-      case 'en':
-        return 1;
-      case 'es':
-        return 2;
-      case 'fr':
-        return 3;
-      case 'it':
-        return 4;
-      default:
-        return 1; // default English
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context);
 
     if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final challenges = _challengesController.allChallenges;
-    final langIndex = _languageIndex(Localizations.localeOf(context));
 
     return Scaffold(
       appBar: AppBar(title: Text(local.challeng_title)),
@@ -92,28 +72,32 @@ class _ChallengesPageState extends State<ChallengesPage> {
               itemBuilder: (context, index) {
                 final challenge = challenges[index];
 
+                // Selezione lingua
+                final langIndex = getLanguageSelected(locale.languageCode);
+
                 // Selezione titolo e descrizione in base alla lingua
                 final title = (challenge.title.length > langIndex)
                     ? challenge.title[langIndex]
                     : challenge.title.isNotEmpty
-                        ? challenge.title[0]
-                        : "No title";
+                    ? challenge.title[0]
+                    : "No title";
 
                 final description = (challenge.description.length > langIndex)
                     ? challenge.description[langIndex]
                     : challenge.description.isNotEmpty
-                        ? challenge.description[0]
-                        : "No description";
+                    ? challenge.description[0]
+                    : "No description";
 
                 // Future per scaricare immagine da Firebase Storage
-                final photoFuture = _downloadUrls.containsKey(challenge.documentId)
+                final photoFuture =
+                    _downloadUrls.containsKey(challenge.documentId)
                     ? Future.value(_downloadUrls[challenge.documentId]!)
                     : _challengesController
-                        .getDownloadUrl(challenge.photo)
-                        .then((url) {
-                        _downloadUrls[challenge.documentId] = url;
-                        return url;
-                      });
+                          .getDownloadUrl(challenge.photo)
+                          .then((url) {
+                            _downloadUrls[challenge.documentId] = url;
+                            return url;
+                          });
 
                 final isEven = index % 2 == 0;
 
@@ -130,7 +114,9 @@ class _ChallengesPageState extends State<ChallengesPage> {
                               return const SizedBox(
                                 width: 100,
                                 height: 100,
-                                child: Center(child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                             }
                             return _buildImage(snapshot.data!);
@@ -165,7 +151,9 @@ class _ChallengesPageState extends State<ChallengesPage> {
                               return const SizedBox(
                                 width: 100,
                                 height: 100,
-                                child: Center(child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                             }
                             return _buildImage(snapshot.data!);
@@ -303,5 +291,23 @@ class _ChallengesPageState extends State<ChallengesPage> {
         ),
       ),
     );
+  }
+}
+
+int getLanguageSelected(String code) {
+  switch (code) {
+    case 'de':
+      return 0;
+    case 'en':
+      return 1;
+    case 'es':
+      return 2;
+    case 'fr':
+      return 3;
+    case 'it':
+      return 4;
+
+    default:
+      return 1;
   }
 }

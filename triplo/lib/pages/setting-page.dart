@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'home-page.dart';
@@ -8,7 +7,7 @@ import 'search-page.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
 import '../controller/diary.dart';
-
+import '../model/user.dart';
 class SettingPage extends StatefulWidget {
   final void Function(Locale) onLocaleChanged;
   final TrekkingController trekkingController;
@@ -16,7 +15,7 @@ class SettingPage extends StatefulWidget {
   final DiaryController diaryController;
 
   const SettingPage({
-    super.key, 
+    super.key,
     required this.onLocaleChanged,
     required this.trekkingController,
     required this.userController,
@@ -35,10 +34,39 @@ class _SettingPageState extends State<SettingPage> {
     fontStyle: FontStyle.italic,
   );
 
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  late Users userAccount;
+
+  late String name;
+  late String surname;
+  late String username;
+  late DateTime birthdate;
+  late String photoProfile;
+  late String email;
+  late String password; //da chiedere a Giulio per l'impkementazione
+
+
+  void initState() {
+    super.initState();
+    userAccount = widget.userController.currentUser!;
+    name = userAccount.name;
+    surname = userAccount.surname;
+    username = userAccount.username;
+    birthdate = userAccount.birthdate;
+    photoProfile = userAccount.photoProfile!;
+    email = userAccount.email;
+  }
+
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    
+    final user = widget.userController.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(local.settings_page_title),
@@ -74,10 +102,10 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                       ],
                     ),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 0, bottom: 8.0),
                       child: Text(
-                        'username_placeholder', // da prendere dal database
+                        username, // da prendere dal database
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
@@ -92,7 +120,7 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                         IconButton(
                           onPressed: () {
-                            // to do modifica password
+                            // to do modifica password -> GIULIO
                           },
                           icon: const Icon(Icons.edit, size: 16),
                         ),
@@ -117,9 +145,7 @@ class _SettingPageState extends State<SettingPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: AssetImage(
-                        'images/prova.jpeg',
-                      ),
+                      backgroundImage: AssetImage('images/prova.jpeg'),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -148,10 +174,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                local.name_field_label, 
-                style: TextStyle(fontSize: 14)
-              ),
+              Text(local.name_field_label, style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica name
@@ -168,10 +191,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                local.surname_field_label, 
-                style: TextStyle(fontSize: 14)
-              ),
+              Text(local.surname_field_label, style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica surname
@@ -188,10 +208,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                local.birthdate_field_label, 
-                style: TextStyle(fontSize: 14)
-              ),
+              Text(local.birthdate_field_label, style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica bithdate
@@ -208,10 +225,7 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                local.email_label, 
-                style: TextStyle(fontSize: 14)
-              ),
+              Text(local.email_label, style: TextStyle(fontSize: 14)),
               IconButton(
                 onPressed: () {
                   // to do modifica email
@@ -228,12 +242,9 @@ class _SettingPageState extends State<SettingPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                local.language_field_label, 
-                style: TextStyle(fontSize: 14)
-              ),
+              Text(local.language_field_label, style: TextStyle(fontSize: 14)),
               IconButton(
-                onPressed: (){
+                onPressed: () {
                   showDialog(
                     context: context,
                     builder: (context) => LanguageDialog(
@@ -270,53 +281,69 @@ class _SettingPageState extends State<SettingPage> {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: Text(
-                local.home_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.home_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,)),
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.person),
-              title: Text(
-                local.profile_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.profile_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) =>  UserPage(onLocaleChanged: widget.onLocaleChanged, userController: widget.userController, trekkingController: widget.trekkingController, diaryController: widget.diaryController,)),
+                  MaterialPageRoute(
+                    builder: (context) => UserPage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      userController: widget.userController,
+                      trekkingController: widget.trekkingController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.search),
-              title: Text(
-                local.search_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.search_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController)),
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: Text(
-                local.settings_page_title, 
-                style: optionStyle
-              ),
+              title: Text(local.settings_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingPage(onLocaleChanged: widget.onLocaleChanged, trekkingController: widget.trekkingController, userController: widget.userController, diaryController: widget.diaryController,)),
+                  MaterialPageRoute(
+                    builder: (context) => SettingPage(
+                      onLocaleChanged: widget.onLocaleChanged,
+                      trekkingController: widget.trekkingController,
+                      userController: widget.userController,
+                      diaryController: widget.diaryController,
+                    ),
+                  ),
                 );
               },
             ),
@@ -348,15 +375,12 @@ class _SettingPageState extends State<SettingPage> {
 class LanguageDialog extends StatelessWidget {
   final void Function(Locale) onLocaleSelected;
 
-  const LanguageDialog({
-    super.key, 
-    required this.onLocaleSelected
-  });
+  const LanguageDialog({super.key, required this.onLocaleSelected});
 
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    
+
     return AlertDialog(
       title: Text(local.language_selection_label),
       content: Column(

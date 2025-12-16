@@ -226,7 +226,7 @@ class _UserPageState extends State<UserPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        local.done_trekking_label,
+                        "${user.name} ${user.surname}",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

@@ -336,4 +336,69 @@ class DiaryController extends ChangeNotifier {
       debugPrint("Error deleting photo: $e");
     }
   }
+
+  Future<List<Diary>> getRandomPublicDiariesFromFollowing({
+    required List<String> followingIds,
+    required int limit,
+  }) async {
+    final snap = await _db
+        .collection('diary')
+        .where('UserId', whereIn: followingIds)
+        .where('Is_public', isEqualTo: true)
+        .get();
+
+    final diaries = snap.docs.map((doc) {
+      final data = doc.data();
+
+      // Normalizza Friends
+      List<String> friends = [];
+      if (data["Friends"] is List) {
+        friends = List<String>.from(data["Friends"]);
+      }
+
+      // Normalizza Photos
+      List<String> photos = [];
+      if (data["Photos"] is List) {
+        photos = List<String>.from(data["Photos"]);
+      } else if (data["Photos"] is String) {
+        photos = [data["Photos"]];
+      }
+
+      // Normalizza Challenges
+      List<String> challenges = [];
+      if (data["Challenges"] is List) {
+        challenges = List<String>.from(data["Challenges"]);
+      } else if (data["Challenges"] is String) {
+        challenges = [data["Challenges"]];
+      }
+
+      // Normalizza Mood
+      List<String> mood = [];
+      if (data["Mood"] is List) {
+        mood = List<String>.from(data["Mood"]);
+      } else if (data["Mood"] is String) {
+        mood = [data["Mood"]];
+      }
+
+      return Diary(
+        diaryId: doc.id,
+        userId: data["UserId"] ?? "",
+        trekkigName: data["Trekking_name"] ?? "Unknown Trek",
+        date: data["Date"] ?? "",
+        duration: (data["Duration"] ?? 0).toDouble(),
+        friends: friends,
+        photos: photos,
+        challenges: challenges,
+        refreshmentPoint: data["Refreshment_point"] ?? "",
+        mood: mood,
+        notes: data["Notes"] ?? "",
+        isPublic: data["Is_public"] ?? false,
+      );
+    }).toList();
+
+    diaries.shuffle();
+    return diaries.take(limit).toList();
+  }
+
+
 }

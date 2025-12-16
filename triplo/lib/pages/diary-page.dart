@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
@@ -76,23 +75,12 @@ class _DiaryPageState extends State<DiaryPage> {
 
     String formattedTime;
     if (diary.duration < 60) {
-      formattedTime = "${diary.duration} ${local.minutes_trekking_label}";
+      formattedTime = "${diary.duration} m";
     } else {
       if (diary.duration % 60 == 0) {
-        if (diary.duration / 60 == 1) {
-          formattedTime = "${diary.duration / 60} ${local.hour_trekking_label}";
-        } else {
-          formattedTime =
-              "${diary.duration / 60} ${local.hours_trekking_label}";
-        }
+        formattedTime = "${diary.duration / 60} h";
       } else {
-        if (diary.duration / 60 == 1) {
-          formattedTime =
-              "${diary.duration / 60} ${local.hour_trekking_label} ${diary.duration % 60} ${local.minutes_trekking_label}";
-        } else {
-          formattedTime =
-              "${diary.duration / 60} ${local.hours_trekking_label} ${diary.duration % 60} ${local.minutes_trekking_label}";
-        }
+        formattedTime = "${diary.duration ~/ 60} h ${diary.duration % 60} m";
       }
     }
 
@@ -294,9 +282,7 @@ class _DiaryPageState extends State<DiaryPage> {
                           radius: 50,
                           backgroundImage:
                               (widget.userController.getDownloadUrl(
-                                    user.photoProfile,
-                                  ) !=
-                                  null)
+                                    user.photoProfile,) != null)
                               ? NetworkImage(user.photoProfile!)
                                     as ImageProvider
                               : null,
@@ -374,73 +360,79 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
               const SizedBox(height: 20),
               // Challenges
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  if (diary.challenges != [])
+              if (diary.challenges.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
                     Text(
                       '${local.challenges_trekking_label}: ',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: diary.challenges.map((path) {
-                    return FutureBuilder<String?>(
-                      future: widget.diaryController.getDownloadUrl(path),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Container(
-                            width: 150,
-                            height: 100,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: diary.challenges.map((path) {
+                      return FutureBuilder<String?>(
+                        future: widget.diaryController.getDownloadUrl(path),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Container(
+                              width: 150,
+                              height: 100,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+
+                          if (!snapshot.hasData || snapshot.data == null) {
+                            return Container(
+                              width: 150,
+                              height: 100,
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.image_not_supported),
+                            );
+                          }
+
+                          final url = snapshot.data!;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 3),
+                            child: Image.network(
+                              url,
+                              width: 150,
+                              height: 100,
+                              fit: BoxFit.cover,
                             ),
                           );
-                        }
-
-                        if (!snapshot.hasData || snapshot.data == null) {
-                          return Container(
-                            width: 150,
-                            height: 100,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported),
-                          );
-                        }
-
-                        final url = snapshot.data!;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 3),
-                          child: Image.network(
-                            url,
-                            width: 150,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
+                        },
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
+              ],
 
               const SizedBox(height: 15),
               // Reshment point
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  if (diary.refreshmentPoint != '')
+              if (diary.refreshmentPoint != '')
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      '${local.refreshment_point_trekking_label}: ${diary.refreshmentPoint}',
-                      style: TextStyle(fontSize: 14),
+                      '${local.refreshment_point_trekking_label}: ',
+                      style: const TextStyle(fontSize: 14),
                     ),
-                ],
-              ),
+                    Expanded(
+                      child: Text(
+                        diary.refreshmentPoint,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 15),
               // Mood
               Row(
@@ -454,15 +446,22 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
               const SizedBox(height: 15),
               // Notes
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    '${local.notes_trekking_label}: ${diary.notes}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
+              if (diary.notes != '')
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${local.notes_trekking_label}: ',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    Expanded(
+                      child: Text(
+                        diary.notes,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         );

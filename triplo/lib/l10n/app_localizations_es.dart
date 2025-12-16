@@ -30,10 +30,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get email_label => 'Email';
 
   @override
-  String get done_trekking_label => 'Rutas completadas';
-
-  @override
-  String get totals_trekking_label => 'Total';
+  String get totals_trekking_label => 'Rutas completadas';
 
   @override
   String get published_trekking_label => 'Publicadas';

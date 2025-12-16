@@ -129,28 +129,6 @@ class _TrekkingPageState extends State<TrekkingPage> {
               setState(() {}); // ricostruisce l'AppBar
             },
           ),
-
-          /*if (user.savedTrekkings.any((t) => t.documentId == trekking.documentId,)) ...[
-            IconButton(
-              icon: icons[1],
-              onPressed: () {
-                setState(() {
-                  widget.userController.removeTrekkingFromSaved(
-                    trekking.documentId,
-                  );
-                });
-              },
-            ),
-          ] else ...[
-            IconButton(
-              icon: icons[0],
-              onPressed: () {
-                setState(() {
-                  widget.userController.addTrekkingToSaved(trekking.documentId);
-                });
-              },
-            ),
-          ],*/
         ],
       ),
       body: SingleChildScrollView(
@@ -161,6 +139,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             children: [
               //placeholder dell'immagine del percorso (facciamo lo screen)
               Row(),
+              // Trekking name
               Row(
                 children: [
                   Text(
@@ -170,6 +149,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ]
               ),
               SizedBox(height: 3,),
+              // Starting point
               Row(
                 children: [
                   Text(
@@ -185,6 +165,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               SizedBox(height: 3,),
+              // Difficulty
               Row(
                 children: [
                   Text(
@@ -200,6 +181,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               SizedBox(height: 3,),
+              // Distance
               Row(
                 children: [
                   Text(
@@ -215,6 +197,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               SizedBox(height: 3,),
+              // Estimated time
               Row(
                 children: [
                   Text(
@@ -230,6 +213,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               SizedBox(height: 3,),
+              // Elevation gain
               Row(
                 children: [
                   Text(
@@ -260,6 +244,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ],
               ),
               SizedBox(height: 3,),
+              // Ending point 
               Text.rich(
                 TextSpan(
                   children: [
@@ -274,21 +259,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ]
                 )
               ),
-              /*Row(
-                children: [
-                  Text(
-                    "${local.ending_point_trekking_label}: ",
-                    style: labelStyle,
-                  ),
-                  Expanded(
-                    child: Text(
-                      trekking.ending_point_name,
-                      style: valueStyle,
-                    )
-                  )
-                ],
-              ),*/
-              //immagine ending point
+              // Ending point image
               Row(),
               SizedBox(height: 3,),
               Text.rich(
@@ -305,7 +276,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ],
                 ),
               ),
+
               SizedBox(height: 3,),
+              // Description 
               Text.rich(
                 TextSpan(
                   children: [
@@ -321,65 +294,78 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ),
               ),
               SizedBox(height: 3,),
-              Row(
-                children: [
-                  Text(
-                    "${local.refreshment_point_trekking_label}: ",
-                    style: labelStyle,
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (trekking.refreshment_point != '') ...[
-                          Text(
-                            trekking.refreshment_point,
-                            style: valueStyle,
-                          ),
-                        ] else ...[
-                          Text(
-                            local.refreshment_point_available_trekking_label,
-                            style: valueStyle,
-                          ),
-                        ],
-                      ]
-                    )
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              Row(
-                children: [
-                  Text(
-                    "${local.pic_nic_area_trekking_label}: ", 
-                    style: labelStyle,
-                  ),
-                  if (trekking.pic_nic_area)
-                    Icon(Icons.table_restaurant, color: Colors.black, size: 16)
-                  else
-                    Text(
-                      local.pic_nic_area_available_trekking_label, 
+              // Refreshment point 
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.refreshment_point_trekking_label}: ",
                       style: labelStyle,
                     ),
-                ],
+                    if (trekking.refreshment_point != '') ...[
+                      TextSpan(
+                        text: trekking.refreshment_point,
+                        style: valueStyle,
+                      ),
+                    ] else ...[
+                      TextSpan(
+                        text: local.refreshment_point_available_trekking_label,
+                        style: valueStyle,
+                      ),
+                    ],
+                  ],
+                ),
               ),
+
               SizedBox(height: 3,),
-              Row(
-                children: [
-                  Text(
-                    "${local.family_friendly_trekking_label}: ", 
-                    style: labelStyle,
-                  ),
-                  if (trekking.family_firendly)
-                    Icon(Icons.family_restroom, color: Colors.black, size: 16)
-                  else
-                    Text(
-                      local.family_friendly_available_trekking_label, 
+              // Pic nic area
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.pic_nic_area_trekking_label}: ",
                       style: labelStyle,
                     ),
-                ],
+                    if (trekking.refreshment_point != '') ...[
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Icon(Icons.table_restaurant, color: Colors.black, size: 16),
+                      )
+                    ] else ...[
+                      TextSpan(
+                        text: local.pic_nic_area_available_trekking_label,
+                        style: valueStyle,
+                      ),
+                    ],
+                  ],
+                ),
               ),
+          
               SizedBox(height: 3,),
+              // Family friendly
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${local.family_friendly_trekking_label}: ",
+                      style: labelStyle,
+                    ),
+                    if (trekking.family_firendly)
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Icon(Icons.family_restroom, color: Colors.black, size: 16),
+                      )
+                    else
+                      TextSpan(
+                        text: local.family_friendly_available_trekking_label, 
+                        style: labelStyle,
+                      ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 3,),
+              // Challenges
               if (trekking.challenges.isNotEmpty) ...[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,19 +410,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   ],
                 ),
               ] else ...[
-                Row(
-                  children: [
-                    Text(
-                      "${local.challenges_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    Expanded(
-                      child: Text(
-                        local.challenges_available_trekking_label,
-                        style: valueStyle
-                      ) 
-                    )
-                  ]
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "${local.challenges_trekking_label}: ",
+                        style: labelStyle,
+                      ),
+                      TextSpan(
+                        text: local.challenges_available_trekking_label,
+                        style: valueStyle,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ],
@@ -463,8 +449,4 @@ int getLanguageSelected(String code) {
     default: return 1; 
   }
 }
-
-/* TO DO: capire se serve Text.rich oppure una semplice Row -> TextRich va a capo
-incolonnato sotto il label mentre Row + Expanded va a capo ma non incolanna sotto 
-il label ma sotto il value -> va capito su tutte le righe (anche sulle icone per i non available*/
 

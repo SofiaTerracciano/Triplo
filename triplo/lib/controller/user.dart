@@ -456,20 +456,12 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   Future<Trekking?> _fetchTrekking(String docId) async {
     final snap = await _db.collection("trekking").doc(docId).get();
     if (!snap.exists) return null;
 
     return Trekking.fromMap(snap.data()!, docId: docId);
   }
-
-
-
-
-
-
 
   /// Updates the profile picture of the current user.
   /// This method uploads the selected image file to Firebase Storage
@@ -501,13 +493,6 @@ class UserController extends ChangeNotifier {
     _currentUser?.photoProfile = url;
     notifyListeners();
   }
-
-  
-
-
-
-
-
 
   /// Sends a password reset link to the given email.
   /// This method throws FirebaseAuthException if something goes wrong.

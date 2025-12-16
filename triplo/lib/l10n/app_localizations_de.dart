@@ -30,10 +30,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get email_label => 'Email';
 
   @override
-  String get done_trekking_label => 'Abgeschlossene Routen';
-
-  @override
-  String get totals_trekking_label => 'Gesamt';
+  String get totals_trekking_label => 'Abgeschlossene Routen';
 
   @override
   String get published_trekking_label => 'Veröffentlicht';
