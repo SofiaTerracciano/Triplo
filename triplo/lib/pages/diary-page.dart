@@ -78,7 +78,7 @@ class _DiaryPageState extends State<DiaryPage> {
       formattedTime = "${diary.duration} m";
     } else {
       if (diary.duration % 60 == 0) {
-        formattedTime = "${diary.duration / 60} h";
+        formattedTime = "${diary.duration ~/ 60} h";
       } else {
         formattedTime = "${diary.duration ~/ 60} h ${diary.duration % 60} m";
       }
@@ -127,7 +127,7 @@ class _DiaryPageState extends State<DiaryPage> {
             ],
           ),
 
-          body: ListView(
+          /*body: ListView(
             padding: const EdgeInsets.all(25.0),
             children: [
               // Profile info + profile pictures
@@ -463,9 +463,228 @@ class _DiaryPageState extends State<DiaryPage> {
                   ],
                 ),
             ],
-          ),
+          ),*/
+          body: ListView(
+            padding: const EdgeInsets.all(25.0),
+            children: [
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 36,
+                        backgroundImage: user.photoProfile != null && user.photoProfile!.isNotEmpty
+                            ? NetworkImage(user.photoProfile!)
+                            : null,
+                        backgroundColor: Colors.grey[300],
+                        child: user.photoProfile == null || user.photoProfile!.isEmpty
+                            ? const Icon(Icons.person, size: 40)
+                            : null,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                user.username,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            const SizedBox(height: 6),
+                            infoRow(Icons.calendar_today, '${local.date_trekking_label}: ${diary.date}'),
+                            infoRow(Icons.timer, '${local.duration_trekking_label}: $formattedTime'),
+                          ]
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Freinds 
+              if (diary.friends.isNotEmpty) ...[
+                SectionTitle(text: local.friends_trekking_label, icon: Icons.group),
+                Wrap(
+                  spacing: 8,
+                  children: diary.friends.map((id) {
+                    return FutureBuilder<Users?>(
+                      future: widget.userController.getUserById(id),
+                      builder: (_, snap) {
+                        if (!snap.hasData) return const SizedBox.shrink();
+                        final friend = snap.data!;
+                        return ActionChip(
+                          label: Text(friend.username),
+                          avatar: const Icon(Icons.person, size: 18),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => UserPagePublic(
+                                  userId: friend.uid,
+                                  diaryController: widget.diaryController,
+                                  userController: widget.userController,
+                                  trekkingController: widget.trekkingController,
+                                  onLocaleChanged: widget.onLocaleChanged,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
+
+              // Photos and challenges
+              SectionTitle(text: local.photos_trekking_label, icon: Icons.photo),
+              imageScroller(
+                diary.photos,
+                widget.diaryController.getDownloadUrlChild,
+              ),
+
+              if (diary.challenges.isNotEmpty) ...[
+                SectionTitle(text: local.challenges_trekking_label, icon: Icons.flag),
+                imageScroller(
+                  diary.challenges,
+                  widget.diaryController.getDownloadUrl,
+                ),
+              ],
+
+              // Mood
+              SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
+              Wrap(
+                spacing: 8,
+                children: diary.mood.map((m) {
+                  return Chip(
+                    label: Text(
+                      m,
+                      style: const TextStyle(
+                        fontSize: 22, 
+                      ),
+                    ),
+                    backgroundColor: Theme.of(context).cardColor, 
+                    elevation: 2,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              // Notes and refreshment point
+              if (diary.refreshmentPoint.isNotEmpty) ...[
+                SectionTitle(text: local.refreshment_point_trekking_label, icon: Icons.local_cafe),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(diary.refreshmentPoint),
+                  ),
+                ),
+              ],
+
+              if (diary.notes.isNotEmpty) ...[
+                SectionTitle(text: local.notes_trekking_label, icon: Icons.notes),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(diary.notes),
+                  ),
+                ),
+              ],
+            ]
+          )
         );
       },
     );
   }
 }
+class SectionTitle extends StatelessWidget {
+  final String text;
+  final IconData icon;
+
+  const SectionTitle({super.key, required this.text, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+Widget infoRow(IconData icon, String text) {
+  return Row(
+    children: [
+      Icon(icon, size: 16, color: Colors.grey),
+      const SizedBox(width: 6),
+      Expanded(
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 14),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget imageScroller(
+  List<String> images,
+  Future<String?> Function(String) loader,
+) {
+  return SizedBox(
+    height: 120,
+    child: ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: images.length,
+      separatorBuilder: (_, __) => const SizedBox(width: 8),
+      itemBuilder: (_, i) {
+        return FutureBuilder<String?>(
+          future: loader(images[i]),
+          builder: (_, snap) {
+            if (!snap.hasData) {
+              return Container(
+                width: 160,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              );
+            }
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                snap.data!,
+                width: 160,
+                fit: BoxFit.cover,
+              ),
+            );
+          },
+        );
+      },
+    ),
+  );
+}
+
+
