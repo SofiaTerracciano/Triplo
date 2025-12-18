@@ -1,11 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
-import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/adding-diary-page.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
@@ -67,7 +62,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     String formattedTime;
     if (trekking.estimated_time < 60) {
       formattedTime =
-          "${trekking.estimated_time} ${local.minutes_trekking_label}";
+          "${(trekking.estimated_time).toInt()} ${local.minutes_trekking_label}";
     } else {
       if (trekking.estimated_time % 60 == 0) {
         if (trekking.estimated_time / 60 == 1) {
@@ -80,20 +75,22 @@ class _TrekkingPageState extends State<TrekkingPage> {
       } else {
         if (trekking.estimated_time / 60 == 1) {
           formattedTime =
-              "${trekking.estimated_time ~/ 60} ${local.hour_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hour_trekking_label} ${(trekking.estimated_time % 60).toInt()} ${local.minutes_trekking_label}";
         } else {
           formattedTime =
-              "${trekking.estimated_time ~/ 60} ${local.hours_trekking_label} ${trekking.estimated_time % 60} ${local.minutes_trekking_label}";
+              "${trekking.estimated_time ~/ 60} ${local.hours_trekking_label} ${(trekking.estimated_time % 60).toInt()} ${local.minutes_trekking_label}";
         }
       }
     }
 
-    final bool isSaved = user.savedTrekkings.any((t) => t.documentId == trekking.documentId);
+    final bool isSaved = user.savedTrekkings.any(
+      (t) => t.documentId == trekking.documentId,
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(trekking.name),
-        centerTitle: true, // Forced center the title
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -132,321 +129,333 @@ class _TrekkingPageState extends State<TrekkingPage> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //placeholder dell'immagine del percorso (facciamo lo screen)
-              Row(),
-              // Trekking name
-              Row(
-                children: [
-                  Text(
-                    trekking.name, 
-                    style: titleStyle
-                  )
-                ]
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // MAP PHOTO
+            _photoSection(
+              widget.trekkingController.getDownloadUrl(trekking.mapPhoto),
+            ),
+
+            const SizedBox(height: 16),
+
+            // TITLE
+            Text(
+              trekking.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 16),
+
+            // INFO CARD
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(height: 3,),
-              // Starting point
-              Row(
-                children: [
-                  Text(
-                    "${local.starting_point_trekking_label}: ",
-                    style: labelStyle,
-                  ),
-                  Expanded(
-                    child: Text(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    _infoRichRow(
+                      Icons.place,
+                      local.starting_point_trekking_label,
                       trekking.starting_point_name,
-                      style: valueStyle,
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              // Difficulty
-              Row(
-                children: [
-                  Text(
-                    "${local.level_label}: ", 
-                    style: labelStyle
-                  ),
-                  Expanded(
-                    child: Text(
+                    _infoRichRow(
+                      Icons.flag,
+                      local.ending_point_trekking_label,
+                      trekking.ending_point_name,
+                    ),
+                    _infoRow(
+                      Icons.terrain,
+                      local.level_label,
                       trekking.difficulty_level,
-                      style: valueStyle,
+                      valueColor: _difficultyColor(trekking.difficulty_level),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              // Distance
-              Row(
-                children: [
-                  Text(
-                    "${local.distance_trekking_label}: ", 
-                    style: labelStyle
-                  ),
-                  Expanded(
-                    child: Text(
-                      "${trekking.distance} km", 
-                      style: valueStyle
+                    _infoRow(
+                      Icons.straighten,
+                      local.distance_trekking_label,
+                      "${trekking.distance} km",
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              // Estimated time
-              Row(
-                children: [
-                  Text(
-                    "${local.estimated_time_trekking_label}: ",
-                    style: labelStyle,
-                  ),
-                  Expanded(
-                    child: Text(
-                      formattedTime, 
-                      style: valueStyle
-                    )
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              // Elevation gain
-              Row(
-                children: [
-                  Text(
-                    "${local.elevaition_gain_trekking_label}: ",
-                    style: labelStyle,
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "${trekking.elevation_gain} m",
-                          style: valueStyle,
-                        ),
-                        if (trekking.upGain)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Icon(Icons.arrow_upward, size: 16, color: Colors.black),
-                          ),
-                        if (trekking.downGain)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4),
-                            child: Icon(Icons.arrow_downward, size: 16, color: Colors.black),
-                          ),
-                      ]
-                    )
-                  ),
-                ],
-              ),
-              SizedBox(height: 3,),
-              // Ending point 
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.ending_point_trekking_label}: ",
-                      style: labelStyle,
+                    _infoRow(
+                      Icons.schedule,
+                      local.estimated_time_trekking_label,
+                      formattedTime,
                     ),
-                    TextSpan(
-                      text: trekking.ending_point_name,
-                      style: valueStyle,
-                    )
-                  ]
-                )
-              ),
-              // Ending point image
-              Row(),
-              SizedBox(height: 3,),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.info_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    TextSpan(
-                      text: trekking.info[getLanguageSelected(locale.languageCode)],
-                      style: valueStyle,
+                    _elevationRow(
+                      local.elevaition_gain_trekking_label,
+                      trekking.elevation_gain,
+                      trekking.upGain,
+                      trekking.downGain,
                     ),
                   ],
                 ),
               ),
+            ),
 
-              SizedBox(height: 3,),
-              // Description 
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.description_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    TextSpan(
-                      text: trekking.description[getLanguageSelected(locale.languageCode)],
-                      style: valueStyle,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 3,),
-              // Refreshment point 
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.refreshment_point_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    if (trekking.refreshment_point != '') ...[
-                      TextSpan(
-                        text: trekking.refreshment_point,
-                        style: valueStyle,
-                      ),
-                    ] else ...[
-                      TextSpan(
-                        text: local.refreshment_point_available_trekking_label,
-                        style: valueStyle,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+            const SizedBox(height: 24),
 
-              SizedBox(height: 3,),
-              // Pic nic area
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.pic_nic_area_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    if (trekking.refreshment_point != '') ...[
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: Icon(Icons.table_restaurant, color: Colors.black, size: 16),
-                      )
-                    ] else ...[
-                      TextSpan(
-                        text: local.pic_nic_area_available_trekking_label,
-                        style: valueStyle,
-                      ),
-                    ],
-                  ],
-                ),
+            // ENDING POINT PHOTO
+            _photoSection(
+              widget.trekkingController.getDownloadUrl(
+                trekking.endingPointPhoto,
               ),
-          
-              SizedBox(height: 3,),
-              // Family friendly
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "${local.family_friendly_trekking_label}: ",
-                      style: labelStyle,
-                    ),
-                    if (trekking.family_firendly)
-                      WidgetSpan(
-                        alignment: PlaceholderAlignment.middle,
-                        child: Icon(Icons.family_restroom, color: Colors.black, size: 16),
-                      )
-                    else
-                      TextSpan(
-                        text: local.family_friendly_available_trekking_label, 
-                        style: labelStyle,
-                      ),
-                  ],
-                ),
-              ),
+            ),
 
-              SizedBox(height: 3,),
-              // Challenges
-              if (trekking.challenges.isNotEmpty) ...[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${local.challenges_trekking_label}:", 
-                      style: labelStyle
+            const SizedBox(height: 24),
+
+            // INFO
+            _sectionTitle(local.info_trekking_label),
+            Text(trekking.info[getLanguageSelected(locale.languageCode)]),
+
+            const SizedBox(height: 16),
+
+            // DESCRIPTION
+            _sectionTitle(local.description_trekking_label),
+            Text(
+              trekking.description[getLanguageSelected(locale.languageCode)],
+            ),
+
+            const SizedBox(height: 16),
+
+            // SERVICES
+            _serviceRow(
+              Icons.restaurant,
+              local.refreshment_point_trekking_label,
+              trekking.refreshment_point.isNotEmpty
+                  ? trekking.refreshment_point
+                  : local.refreshment_point_available_trekking_label,
+            ),
+            _serviceRow(
+              Icons.family_restroom,
+              local.family_friendly_trekking_label,
+              trekking.family_firendly
+                  ? local.yes_botton_label
+                  : local.no_botton_label,
+            ),
+
+            const SizedBox(height: 16),
+
+            // CHALLENGES
+            _sectionTitle(local.challenges_trekking_label),
+            trekking.challenges.isNotEmpty
+                ? FutureBuilder<List<String>>(
+                    future: widget.trekkingController.getDownloadUrls(
+                      trekking.challenges,
                     ),
-                    SizedBox(
-                      height: 50, // altezza della riga immagini
-                      child: FutureBuilder<List<String>>(
-                        future: widget.trekkingController.getDownloadUrls(
-                          trekking.challenges,
-                        ),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Text('Errore: ${snapshot.error}');
-                          } else {
-                            List<String> urls = snapshot.data!;
-                            return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: urls.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4.0,
-                                  ),
-                                  child: Image.network(
-                                    urls[index],
-                                    fit: BoxFit.contain,
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ] else ...[
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "${local.challenges_trekking_label}: ",
-                        style: labelStyle,
-                      ),
-                      TextSpan(
-                        text: local.challenges_available_trekking_label,
-                        style: valueStyle,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const CircularProgressIndicator();
+                      }
+                      return Wrap(
+                        spacing: 8,
+                        children: snapshot.data!
+                            .map(
+                              (url) => Chip(
+                                avatar: const Icon(Icons.warning, size: 16),
+                                label: Image.network(url, height: 24),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
+                  )
+                : Text(local.challenges_available_trekking_label),
+            
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
   }
+
+  int getLanguageSelected(String code) {
+    switch (code) {
+      case 'de':
+        return 0;
+      case 'en':
+        return 1;
+      case 'es':
+        return 2;
+      case 'fr':
+        return 3;
+      case 'it':
+        return 4;
+      default:
+        return 1;
+    }
+  }
+
+  Widget _photoSection(Future<String> future) {
+    return FutureBuilder<String>(
+      future: future,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Container(
+            height: 200,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(),
+          );
+        }
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            snapshot.data!,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _infoRow(
+    IconData icon,
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 8),
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600)),
+          Expanded(
+            child: Text(value, style: TextStyle(color: valueColor)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRichRow(
+  IconData icon,
+  String label,
+  String value,
+) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: "$label:\n",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextSpan(
+                  text: value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
-int getLanguageSelected(String code) {
-  switch (code) {
-    case 'de': 
-      return 0;
-    case 'en': 
-      return 1;
-    case 'es': 
-      return 2;
-    case 'fr':
-      return 3;
-    case 'it': 
-      return 4;
+  Widget _serviceRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool highlight = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8),
+          Text("$label: "),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: highlight ? Colors.green : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    default: return 1; 
+  Widget _sectionTitle(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Color _difficultyColor(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case "easy":
+        return Colors.lightBlue;
+      case "intermediate":
+        return Colors.red;
+      case "hard":
+        return Colors.black;
+      default:
+        return Colors.blueGrey; // fallback
+    }
   }
 }
 
+Widget _elevationRow(
+  String label,
+  double elevation,
+  bool upGain,
+  bool downGain,
+) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      children: [
+        const Icon(Icons.trending_up, size: 18),
+        const SizedBox(width: 8),
+
+        Text(
+          "$label: ",
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+
+        Text("$elevation m"),
+
+        const SizedBox(width: 6),
+
+        if (upGain)
+          const Icon(
+            Icons.arrow_upward,
+            size: 16,
+            color: Colors.black,
+          ),
+
+        if (downGain)
+          const Icon(
+            Icons.arrow_downward,
+            size: 16,
+            color: Colors.black,
+          ),
+      ],
+    ),
+  );
+}

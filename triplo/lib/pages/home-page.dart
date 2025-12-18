@@ -272,6 +272,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   // Function to get markers for each trekking start point
   List<Marker> getMarkers() {
     return widget.trekkingController.allTrekkings.map((t) {
+      final markerColor = difficultyToColor(t.difficulty_level);
+
       return Marker(
         point: t.starting_point,
         width: 40,
@@ -292,7 +294,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
               ),
             );
           },
-          child: const Icon(Icons.add, color: Colors.red, size: 40),
+          child: Icon(Icons.place, color: markerColor, size: 40),
         ),
       );
     }).toList();
