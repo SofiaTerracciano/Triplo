@@ -373,7 +373,7 @@ class _SettingPageState extends State<SettingPage> {
             ],
           ),
           const SizedBox(height: 32),
-
+          /*
           Divider(),
 
           const SizedBox(height: 16),
@@ -399,15 +399,12 @@ class _SettingPageState extends State<SettingPage> {
           ),
 
           const SizedBox(height: 12),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () async {
                 await widget.userController.requestPasswordReset();
-
                 if (!context.mounted) return;
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text("Password reset email sent"),
@@ -417,7 +414,84 @@ class _SettingPageState extends State<SettingPage> {
               icon: const Icon(Icons.email_outlined),
               label: const Text("Send password reset email"),
             ),
-          )
+          ),
+        if (context.read<UserController>().isGoogleUser)
+              TextButton.icon(
+                  icon: const Icon(Icons.refresh),
+                  label: const Text("Restore Google photo"),
+                  onPressed: widget.userController.restoreGoogleProfilePhoto,
+              ),
+        ],
+
+
+
+
+
+           */
+        if (context.read<UserController>().isPasswordUser) ...[
+          const SizedBox(height: 32),
+          const Divider(),
+          const SizedBox(height: 16),
+
+          Text(
+            "Password",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+
+
+          Text(
+            "If you want to change your password or if you forgot it, "
+            "we can send you a password reset link to the email associated "
+            "with your account.",
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.black54,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+            onPressed: () async {
+            await widget.userController.requestPasswordReset();
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+              content: Text("Password reset email sent"),
+              ),
+            );
+            },
+            icon: const Icon(Icons.email_outlined),
+            label: const Text("Send password reset email"),
+            ),
+          ),
+
+        ],
+
+
+
+
+
+
+
+
+          if (context.read<UserController>().isGoogleUser) ...[
+                const SizedBox(height: 24),
+
+                TextButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text("Restore Google profile photo"),
+                    onPressed: widget.userController.restoreGoogleProfilePhoto,
+                ),
+          ]
         ],
       ),
 
