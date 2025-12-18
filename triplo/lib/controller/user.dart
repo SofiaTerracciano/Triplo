@@ -581,4 +581,12 @@ class UserController extends ChangeNotifier {
     });
   }
 
+  Future<List<String>> getFollowingIds(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    if (!snap.exists) return [];
+
+    return List<String>.from(snap.data()?["Following"] ?? []);
+  }
+
+
 }

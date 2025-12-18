@@ -5,6 +5,8 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/challenges-page.dart';
+import '../enum/SearchMode.dart';
+import '../widgets_for_pages/filter/filter.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'setting-page.dart';
@@ -34,7 +36,11 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late final TextEditingController _searchController;
   late final FocusNode _focusNode;
-
+  SearchMode _searchMode = SearchMode.all;
+  bool _isSearching = false;
+  List<Users> _userResults = [];
+  List<Diary> _diaryResults = [];
+  List<Trekking> _trekkingResults = [];
   List<Diary> randomDiaries = [];
   bool loading = true;
 
@@ -67,7 +73,10 @@ class _SearchPageState extends State<SearchPage> {
     final user = widget.userController.currentUser;
     if (user == null) return;
 
-    final followingIds = user.following.map((u) => u.uid).toList();
+    //final followingIds = user.following.map((u) => u.uid).toList();
+    final uid = widget.userController.currentUser!.uid;
+    final followingIds =
+    await widget.userController.getFollowingIds(uid);
 
     final diaries = await widget.diaryController
         .getRandomPublicDiariesFromFollowing(
@@ -94,7 +103,6 @@ class _SearchPageState extends State<SearchPage> {
     final bool isFocused = _focusNode.hasFocus;
     final bool hasText = _searchController.text.isNotEmpty;
     final local = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: AppBar(title: Text(local.search_page_title), centerTitle: true),
       body: Padding(
@@ -130,8 +138,11 @@ class _SearchPageState extends State<SearchPage> {
                         vertical: 10,
                       ),
                     ),
-                    onChanged: (_) {
-                      setState(() {}); // Update state to show/hide the X
+                    onChanged: (value) { //setState(() {}); // Update state to show/hide the X
+                      if (_searchMode == SearchMode.users ||
+                          _searchMode == SearchMode.all) {
+                        _runSearch(value);
+                      }
                     },
                   ),
                 ),
@@ -153,7 +164,46 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ],
             ),
+            const SizedBox(height: 8),
 
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Filter(
+                    mode: SearchMode.all,
+                    selectedMode: _searchMode,
+                    label: "All",
+                    onSelected: _onSearchModeChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  Filter(
+                    mode: SearchMode.users,
+                    selectedMode: _searchMode,
+                    label: "Users",
+                    onSelected: _onSearchModeChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  Filter(
+                    mode: SearchMode.diary,
+                    selectedMode: _searchMode,
+                    label: "Diary",
+                    onSelected: _onSearchModeChanged,
+                  ),
+                  const SizedBox(width: 8),
+                  Filter(
+                    mode: SearchMode.trekking,
+                    selectedMode: _searchMode,
+                    label: "Trekking",
+                    onSelected: _onSearchModeChanged,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: _buildBody(),
+            ),
+            /*
             // Suggestion section (trekking path of your friends)
             Expanded(
               child: GridView.builder(
@@ -277,6 +327,7 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
+             */
           ],
         ),
       ),
@@ -383,6 +434,234 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
   }
+
+  /*
+  void _onSearchModeChanged(SearchMode mode) {
+    setState(() {
+      _searchMode = mode;
+      // pulizia risultati
+      _userResults.clear();
+      _diaryResults.clear();
+      _trekkingResults.clear();
+    });
+
+    // se c'è già testo, rilancia la ricerca
+    if (_searchController.text.isNotEmpty) {
+      _runSearch(_searchController.text);
+    }
+  }
+ */
+  void _onSearchModeChanged(SearchMode mode) {
+    setState(() {
+      _searchMode = mode;
+      _userResults.clear();
+    });
+
+    if (_searchController.text.isNotEmpty &&
+        (mode == SearchMode.users || mode == SearchMode.all)) {
+      _runSearch(_searchController.text);
+    }
+  }
+
+
+
+
+  Future<void> _runSearch(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _isSearching = false;
+        _userResults.clear();
+        _diaryResults.clear();
+        _trekkingResults.clear();
+
+      });
+      return;
+    }
+
+
+
+    _userResults.clear();
+    _diaryResults.clear();
+    _trekkingResults.clear();
+
+
+    setState(() => _isSearching = true);
+
+    if (_searchMode == SearchMode.all || _searchMode == SearchMode.users) {
+      _userResults = await widget.userController.searchUsers(query);
+    }
+
+    setState(() => _isSearching = false);
+  }
+
+
+
+  Widget _buildRandomDiaryGrid() {
+    return GridView.builder(
+         padding: const EdgeInsets.only(top: 16),
+         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+           crossAxisCount: 2, // 2 element for each row
+           mainAxisSpacing: 10,
+           crossAxisSpacing: 10,
+           childAspectRatio: 1.2, // To modify the ratio
+         ),
+         itemCount: randomDiaries.length,
+         itemBuilder: (context, index) {
+           final diary = randomDiaries[index];
+
+           return FutureBuilder<Users?>(
+             future: widget.userController.getUserById(diary.userId),
+             builder: (context, snapshot) {
+               if (!snapshot.hasData) {
+                 return const Center(child: CircularProgressIndicator());
+               }
+
+               final user = snapshot.data!;
+               final username = user.username;
+
+               return InkWell(
+                 // Animation on tap
+                 onTap: () {
+                   Navigator.push(
+                     context,
+                     MaterialPageRoute(
+                       builder: (context) => DiaryPage(
+                         diaryId: diary.diaryId,
+                         diaryController: widget.diaryController,
+                         userController: widget.userController,
+                         trekkingController: widget.trekkingController,
+                         onLocaleChanged: widget.onLocaleChanged,
+                       ),
+                     ),
+                   );
+                 },
+                 child: Container(
+                   decoration: BoxDecoration(
+                     color: Colors.white,
+                     borderRadius: BorderRadius.circular(12),
+                     boxShadow: [
+                       BoxShadow(
+                         color: Colors.black.withOpacity(0.1),
+                         blurRadius: 5,
+                         spreadRadius: 1,
+                       ),
+                     ],
+                   ),
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       // Image of the trekking trip (presa dal db in base a quelle caricate nella diary page)
+                       Expanded(
+                         child: ClipRRect(
+                           borderRadius: const BorderRadius.vertical(
+                             top: Radius.circular(12),
+                           ),
+                           child: ClipRRect(
+                             borderRadius: const BorderRadius.vertical(
+                               top: Radius.circular(12),
+                             ),
+                             child: _DiaryCoverImage(
+                               diary: diary,
+                               diaryController: widget.diaryController,
+                               trekkingController:
+                               widget.trekkingController,
+                             ),
+                           ),
+                         ),
+                       ),
+
+                       // Text
+                       Padding(
+                         padding: const EdgeInsets.symmetric(
+                           horizontal: 8,
+                           vertical: 6,
+                         ),
+                         child: Row(
+                           mainAxisAlignment:
+                           MainAxisAlignment.spaceBetween,
+                           children: [
+                             // Username
+                             Flexible(
+                               child: Text(
+                                 username, // oppure username se lo hai
+                                 style: const TextStyle(
+                                   fontSize: 14,
+                                   fontWeight: FontWeight.bold,
+                                 ),
+                                 overflow: TextOverflow.ellipsis,
+                               ),
+                             ),
+
+                             const SizedBox(width: 6),
+
+                             // Trekking name
+                             Flexible(
+                               child: Text(
+                                 diary.trekkigName,
+                                 style: const TextStyle(
+                                   fontSize: 12,
+                                   color: Colors.grey,
+                                 ),
+                                 overflow: TextOverflow.ellipsis,
+                                 textAlign: TextAlign.right,
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ],
+                   ),
+                 ),
+               );
+             },
+           );
+         },
+       );
+
+   }
+
+  Widget _buildBody() {
+    if (_isSearching) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+
+
+
+    if (_searchMode == SearchMode.diary) {
+      return _buildRandomDiaryGrid();
+    }
+
+
+    if (_searchController.text.isNotEmpty &&
+        (_searchMode == SearchMode.users || _searchMode == SearchMode.all)) {
+      if (_userResults.isEmpty) {
+        return const Center(child: Text("No results"));
+      }
+
+      return ListView.builder(
+        itemCount: _userResults.length,
+        itemBuilder: (context, index) {
+          final u = _userResults[index];
+          return ListTile(
+            leading: const Icon(Icons.person),
+            title: Text(u.username),
+            subtitle: Text(u.email),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                "/userProfileRemote",
+                arguments: u.uid,
+              );
+            },
+          );
+        },
+      );
+    }
+    //All senza testo mostra la random diary
+    return _buildRandomDiaryGrid();
+  }
+
 }
 
 class _DiaryCoverImage extends StatelessWidget {
