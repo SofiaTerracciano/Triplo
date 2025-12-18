@@ -189,7 +189,8 @@ class UserController extends ChangeNotifier {
     if (!doc.exists) {
       await _db.collection("users").doc(uid).set({
         "Username": username,
-        "Photo_profile": photoURL,
+        //"Photo_profile": photoURL,
+        if (photoURL.isNotEmpty) "Photo_profile": photoURL,
         "Name": "",
         "Surname": "",
         "Birthdate": DateTime.now().toIso8601String(),
@@ -581,4 +582,149 @@ class UserController extends ChangeNotifier {
     });
   }
 
+  Future<List<String>> getFollowingIds(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    if (!snap.exists) return [];
+
+    return List<String>.from(snap.data()?["Following"] ?? []);
+  }
+  /*
+  Future<void> updateUsername(String newUsername) async {
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Username": newUsername,
+    });
+
+    await _db.collection("users_index").doc(uid).update({
+      "username": newUsername,
+      "normalized": newUsername.toLowerCase(),
+    });
+
+    _currentUser?.username = newUsername;
+
+
+
+    notifyListeners();
+  }
+
+   */
+  Future<void> updateUsername(String newUsername) async {
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Username": newUsername,
+    });
+
+    await _db.collection("users_index").doc(uid).update({
+      "username": newUsername,
+      "normalized": newUsername.toLowerCase(),
+    });
+
+    _currentUser?.username = newUsername;
+    notifyListeners();
+  }
+
+  Future<void> updateName(String newName) async {
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Name": newName,
+    });
+
+    _currentUser?.name = newName;
+    notifyListeners();
+  }
+
+
+
+
+
+  Future<void> updateSurname(String newSurname) async {
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Surname": newSurname,
+    });
+
+    _currentUser?.surname = newSurname;
+    notifyListeners();
+  }
+
+  /*
+  Future<void> updateBirthdate(DateTime date) async {
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Birthdate": date.toIso8601String(),
+    });
+
+    _currentUser?.birthdate = date;
+    notifyListeners();
+  }
+  */
+
+
+
+
+
+
+  Future<void> requestPasswordReset() async {
+    final email = _currentUser?.email;
+    if (email == null || email.isEmpty) return;
+
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> updateBirthdate(DateTime birthdate) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _db.collection("users").doc(uid).update({
+      "Birthdate": birthdate.toIso8601String(),
+    });
+
+    _currentUser?.birthdate = birthdate;
+    notifyListeners();
+  }
+
+  Future<void> restoreGoogleProfilePhoto() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final googlePhoto = user.photoURL;
+    if (googlePhoto == null || googlePhoto.isEmpty) return;
+
+    await _db.collection("users").doc(user.uid).update({
+      "Photo_profile": googlePhoto,
+    });
+
+    _currentUser?.photoProfile = googlePhoto;
+    notifyListeners();
+  }
+
+  bool get isGoogleUser {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+
+    return user.providerData.any(
+          (p) => p.providerId == 'google.com',
+    );
+  }
+
+
+
+
+
+
+
+
+  bool get isPasswordUser {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+
+    return user.providerData.any(
+          (p) => p.providerId == 'password',
+    );
+  }
 }

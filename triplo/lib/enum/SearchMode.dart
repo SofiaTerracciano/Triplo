@@ -1,0 +1,1 @@
+enum SearchMode { all, users, diary, trekking }
