@@ -187,12 +187,15 @@ class _UserPageState extends State<UserPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
+                      // bisogna sistemare quando lo username è troppo lungo --> crea opverflow
                       Text(
                         user.username,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
+                        maxLines: 1,                 
+                        overflow: TextOverflow.ellipsis, 
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -213,15 +216,15 @@ class _UserPageState extends State<UserPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${user.name} ${user.surname}",
+                          '${user.name} ${user.surname}',
                           style: const TextStyle(
-                            fontSize: 20,
                             fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                        ),
-
+                          maxLines: 1,                 // Una sola riga
+                          overflow: TextOverflow.ellipsis, // Mostra "..." se troppo lungo
+                        ),     
                         const SizedBox(height: 6),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
