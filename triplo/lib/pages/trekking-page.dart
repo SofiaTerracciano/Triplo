@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/adding-diary-page.dart';
+import 'package:triplo/pages/geowatch/geowatch.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
-import '../controller/diary.dart';
+import 'package:provider/provider.dart';
 
 class TrekkingPage extends StatefulWidget {
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
   final String trekkingId;
-  final void Function(Locale) onLocaleChanged;
 
   TrekkingPage({
     super.key,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
     required this.trekkingId,
-    required this.onLocaleChanged,
   });
 
   @override
@@ -51,12 +45,15 @@ class _TrekkingPageState extends State<TrekkingPage> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context);
-    final trekking = widget.trekkingController.getTrekkingById(
-      widget.trekkingId,
-    )!;
+    final languageController = context.watch<Language>();
+    final langCode = languageController.locale.languageCode;
+    final langIndex = getLanguageSelected(langCode);
 
-    final user = widget.userController.currentUser!;
+    final trekkingController =context.watch<TrekkingController>();
+    final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
+
+    final userController = context.watch<UserController>();
+    final user = userController.currentUser!;
 
     // To calculate the trekking durantion time
     String formattedTime;
@@ -87,6 +84,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
       (t) => t.documentId == trekking.documentId,
     );
 
+    print(trekking.endingPointPhoto);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(trekking.name),
@@ -100,10 +99,6 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 MaterialPageRoute(
                   builder: (context) => AddingDiaryPage(
                     trekkingId: trekking.documentId,
-                    trekkingController: widget.trekkingController,
-                    diaryController: widget.diaryController,
-                    userController: widget.userController,
-                    onLocaleChanged: widget.onLocaleChanged,
                   ),
                 ),
               );
@@ -114,11 +109,11 @@ class _TrekkingPageState extends State<TrekkingPage> {
             icon: isSaved ? icons[1] : icons[0],
             onPressed: () async {
               if (isSaved) {
-                await widget.userController.removeTrekkingFromSaved(
+                await userController.removeTrekkingFromSaved(
                   trekking.documentId,
                 );
               } else {
-                await widget.userController.addTrekkingToSaved(
+                await userController.addTrekkingToSaved(
                   trekking.documentId,
                 );
               }
@@ -135,7 +130,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
           children: [
             // MAP PHOTO
             _photoSection(
-              widget.trekkingController.getDownloadUrl(trekking.mapPhoto),
+              trekkingController.getDownloadUrl(trekking.mapPhoto),
             ),
 
             const SizedBox(height: 16),
@@ -199,7 +194,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             // ENDING POINT PHOTO
             _photoSection(
-              widget.trekkingController.getDownloadUrl(
+              trekkingController.getDownloadUrl(
                 trekking.endingPointPhoto,
               ),
             ),
@@ -208,27 +203,28 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             // INFO
             _sectionTitle(local.info_trekking_label),
-            Text(trekking.info[getLanguageSelected(locale.languageCode)]),
+            Text(trekking.info[langIndex]),
 
             const SizedBox(height: 16),
 
             // DESCRIPTION
             _sectionTitle(local.description_trekking_label),
             Text(
-              trekking.description[getLanguageSelected(locale.languageCode)],
+              trekking.description[langIndex],
             ),
 
             const SizedBox(height: 16),
 
-            // SERVICES
-            _serviceRow(
-              Icons.restaurant,
+            // Refreshment point
+            _refreshmentRow(
               local.refreshment_point_trekking_label,
               trekking.refreshment_point.isNotEmpty
                   ? trekking.refreshment_point
                   : local.refreshment_point_available_trekking_label,
             ),
-            _serviceRow(
+
+            // Family friendly
+            _familyRow(
               Icons.family_restroom,
               local.family_friendly_trekking_label,
               trekking.family_firendly
@@ -242,7 +238,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             _sectionTitle(local.challenges_trekking_label),
             trekking.challenges.isNotEmpty
                 ? FutureBuilder<List<String>>(
-                    future: widget.trekkingController.getDownloadUrls(
+                    future: trekkingController.getDownloadUrls(
                       trekking.challenges,
                     ),
                     builder: (context, snapshot) {
@@ -263,8 +259,24 @@ class _TrekkingPageState extends State<TrekkingPage> {
                     },
                   )
                 : Text(local.challenges_available_trekking_label),
-            
+
             const SizedBox(height: 16),
+
+            // WEATHER
+            _sectionTitle(local.weather_trekking_label),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GeoWatchPage(), // i controller?
+                  ),
+                );
+              },
+              child: Text(local.weather_trekking_botton),
+            ),
+
+            const SizedBox(width: 10,)
           ],
         ),
       ),
@@ -333,45 +345,54 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
-  Widget _infoRichRow(
-  IconData icon,
-  String label,
-  String value,
-) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18),
-        const SizedBox(width: 8),
+  Widget _infoRichRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 8),
 
-        Expanded(
-          child: Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: "$label:\n",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: "$label:\n",
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ),
-                TextSpan(
-                  text: value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.normal,
+                  TextSpan(
+                    text: value,
+                    style: const TextStyle(fontWeight: FontWeight.normal),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-  Widget _serviceRow(
+  Widget _refreshmentRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.restaurant, size: 18),
+          const SizedBox(width: 8),
+
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600)),
+
+          Expanded(child: Text(value, softWrap: true)),
+        ],
+      ),
+    );
+  }
+
+  Widget _familyRow(
     IconData icon,
     String label,
     String value, {
@@ -383,7 +404,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
         children: [
           Icon(icon),
           const SizedBox(width: 8),
-          Text("$label: "),
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600)),
           Text(
             value,
             style: TextStyle(
@@ -418,44 +439,33 @@ class _TrekkingPageState extends State<TrekkingPage> {
         return Colors.blueGrey; // fallback
     }
   }
-}
 
-Widget _elevationRow(
-  String label,
-  double elevation,
-  bool upGain,
-  bool downGain,
-) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      children: [
-        const Icon(Icons.trending_up, size: 18),
-        const SizedBox(width: 8),
+  Widget _elevationRow(
+    String label,
+    double elevation,
+    bool upGain,
+    bool downGain,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          const Icon(Icons.trending_up, size: 18),
+          const SizedBox(width: 8),
 
-        Text(
-          "$label: ",
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
+          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600)),
 
-        Text("$elevation m"),
+          Text("$elevation m"),
 
-        const SizedBox(width: 6),
+          const SizedBox(width: 6),
 
-        if (upGain)
-          const Icon(
-            Icons.arrow_upward,
-            size: 16,
-            color: Colors.black,
-          ),
+          if (upGain)
+            const Icon(Icons.arrow_upward, size: 16, color: Colors.black),
 
-        if (downGain)
-          const Icon(
-            Icons.arrow_downward,
-            size: 16,
-            color: Colors.black,
-          ),
-      ],
-    ),
-  );
+          if (downGain)
+            const Icon(Icons.arrow_downward, size: 16, color: Colors.black),
+        ],
+      ),
+    );
+  }
 }

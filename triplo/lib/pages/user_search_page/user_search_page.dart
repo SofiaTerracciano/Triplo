@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../controller/user.dart';
+import 'package:triplo/controller/user.dart';
 import '../../model/user.dart';
+import 'package:provider/provider.dart';
 
 class UserSearchPage extends StatefulWidget {
-  final UserController userController;
-
-  const UserSearchPage({super.key, required this.userController});
+  const UserSearchPage({super.key});
 
   @override
   State<UserSearchPage> createState() => _UserSearchPageState();
@@ -24,7 +23,9 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
     setState(() => loading = true);
 
-    results = await widget.userController.searchUsers(query);
+    final userController = context.read<UserController>();
+    results = await userController.searchUsers(query);
+
 
     setState(() => loading = false);
   }
@@ -54,21 +55,23 @@ class _UserSearchPageState extends State<UserSearchPage> {
                 : results.isEmpty
                 ? Center(child: Text("No results"))
                 : ListView.builder(
-              itemCount: results.length,
-              itemBuilder: (context, i) {
-                final u = results[i];
-                return ListTile(
-                  title: Text(u.username),
-                  subtitle: Text(u.email),
-                  onTap: () {
-                    Navigator.pushNamed(context, "/userProfileRemote",
-                      arguments: u.uid,
-                    );
-                  },
-                );
-              },
-            ),
-          )
+                    itemCount: results.length,
+                    itemBuilder: (context, i) {
+                      final u = results[i];
+                      return ListTile(
+                        title: Text(u.username),
+                        subtitle: Text(u.email),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/userProfileRemote",
+                            arguments: u.uid,
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
         ],
       ),
     );

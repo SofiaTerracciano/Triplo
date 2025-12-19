@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/user.dart';
-import '../controller/trekking.dart';
-import '../controller/diary.dart';
 import 'package:triplo/model/user.dart';
 import '../pages/user-page-public.dart';
-import 'package:triplo/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 
 class UsersList extends StatefulWidget {
   final String listName;
 
-  final void Function(Locale) onLocaleChanged;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
-
   const UsersList({
     super.key,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
     required this.listName,
-    required this.onLocaleChanged,
   });
 
   @override
@@ -34,16 +23,16 @@ class _UsersListState extends State<UsersList> {
   @override
   void initState() {
     super.initState();
+    final userController = context.read<UserController>();
     if(widget.listName == 'Followers') {
-      users = widget.userController.currentUser!.followers;
+      users = userController.currentUser!.followers;
     } else {
-      users = widget.userController.currentUser!.following;
+      users = userController.currentUser!.following;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.listName),
@@ -63,10 +52,6 @@ class _UsersListState extends State<UsersList> {
             onTap: () {
               Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (_) => UserPagePublic(
-                    onLocaleChanged: widget.onLocaleChanged,
-                    trekkingController: widget.trekkingController,
-                    userController: widget.userController,
-                    diaryController: widget.diaryController,
                     userId: user.uid,
                   ),
                 ),

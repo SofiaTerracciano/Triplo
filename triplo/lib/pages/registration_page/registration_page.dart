@@ -2,36 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 
 import '../user-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
-import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/controller/diary.dart';
 
 
 /**
  * Registration page for creating a new Triplo profile, handles UI and validation.
  */
 class RegistrationPage extends StatefulWidget {
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
-  final void Function(Locale) onLocaleChanged;
 
   const RegistrationPage({
     super.key,
-    required this.trekkingController,
-    required this.diaryController,
-    required this.userController,
-    required this.onLocaleChanged,
   });
 
   @override
@@ -76,10 +61,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     setState(() => _isLoading = true);
 
-    final controller = Provider.of<UserController>(context, listen: false);
+    final userController = context.read<UserController>();
 
     try {
-      await controller.register(email, password);
+      await userController.register(email, password);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Registration successful")),
@@ -88,12 +73,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => UserPage(
-            trekkingController: widget.trekkingController,
-            userController: widget.userController,
-            diaryController: widget.diaryController,
-            onLocaleChanged: (l) {}
-          )),
+          builder: (_) => UserPage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

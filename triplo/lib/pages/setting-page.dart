@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'search-page.dart';
-import '../controller/trekking.dart';
 import '../controller/user.dart';
-import '../controller/diary.dart';
-import '../model/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -16,19 +14,9 @@ import 'package:provider/provider.dart';
 
 
 class SettingPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
-
-
 
   SettingPage({
     super.key,
-    required this.onLocaleChanged,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
   });
 
   @override
@@ -81,7 +69,11 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    final user = context.watch<UserController>().currentUser;
+    final userController = context.watch<UserController>();
+    final user = userController.currentUser;
+
+    final languageController = context.watch<Language>();
+
     if (user == null) {
       return Scaffold(
         appBar: AppBar(
@@ -147,7 +139,7 @@ class _SettingPageState extends State<SettingPage> {
                             _editField(
                               title: local.username_label,
                               initialValue: user.username,
-                              onSave: widget.userController.updateUsername,
+                              onSave: userController.updateUsername,
                             );
                           },
                           icon: const Icon(Icons.edit, size: 16),
@@ -277,7 +269,7 @@ class _SettingPageState extends State<SettingPage> {
                   _editField(
                     title: local.name_field_label,
                     initialValue: user.name,
-                    onSave: widget.userController.updateName,
+                    onSave: userController.updateName,
                   );
 
                 },
@@ -299,7 +291,7 @@ class _SettingPageState extends State<SettingPage> {
                   _editField(
                     title: local.surname_field_label,
                     initialValue: user.surname,
-                    onSave: widget.userController.updateSurname,
+                    onSave: userController.updateSurname,
                   );
                 },
                 icon: const Icon(Icons.edit, size: 16),
@@ -357,7 +349,7 @@ class _SettingPageState extends State<SettingPage> {
                     context: context,
                     builder: (context) => LanguageDialog(
                       onLocaleSelected: (locale) {
-                        widget.onLocaleChanged(locale);
+                        languageController.setLocale(locale); // <-- cambia lingua(locale);
                       },
                     ),
                   );
@@ -366,8 +358,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               const Spacer(),
               Text(
-                //però dovrebbe essere dinamico in base alla lingua selezionata
-                'language_placeholder',
+                _getLanguageName(languageController.locale.languageCode),
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
@@ -461,7 +452,7 @@ class _SettingPageState extends State<SettingPage> {
             width: double.infinity,
             child: ElevatedButton.icon(
             onPressed: () async {
-            await widget.userController.requestPasswordReset();
+            await userController.requestPasswordReset();
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -476,20 +467,13 @@ class _SettingPageState extends State<SettingPage> {
 
         ],
 
-
-
-
-
-
-
-
           if (context.read<UserController>().isGoogleUser) ...[
                 const SizedBox(height: 24),
 
                 TextButton.icon(
                     icon: const Icon(Icons.refresh),
                     label: const Text("Restore Google profile photo"),
-                    onPressed: widget.userController.restoreGoogleProfilePhoto,
+                    onPressed: userController.restoreGoogleProfilePhoto,
                 ),
           ]
         ],
@@ -514,12 +498,7 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (context) => MyHomePage(),
                   ),
                 );
               },
@@ -531,12 +510,7 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      userController: widget.userController,
-                      trekkingController: widget.trekkingController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (context) => UserPage(),
                   ),
                 );
               },
@@ -548,12 +522,7 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SearchPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (context) => SearchPage(),
                   ),
                 );
               },
@@ -565,12 +534,7 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SettingPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (context) => SettingPage(),
                   ),
                 );
               },
@@ -582,12 +546,7 @@ class _SettingPageState extends State<SettingPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChallengesPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (_) => ChallengesPage(),
                   ),
                 );
               },
@@ -599,10 +558,12 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Future<void> _pickProfileImage() async {
+    final userController = context.read<UserController>();
     final picked = await _picker.pickImage(source: ImageSource.gallery);
+
     if (picked == null) return;
 
-    await widget.userController.updateProfilePhoto(File(picked.path));
+    await userController.updateProfilePhoto(File(picked.path));
   }
 
 
@@ -641,6 +602,7 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
   Future<void> _pickBirthdate(DateTime initial) async {
+    final userController = context.read<UserController>();
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -650,7 +612,7 @@ class _SettingPageState extends State<SettingPage> {
 
     if (picked == null) return;
 
-    await widget.userController.updateBirthdate(picked);
+    await userController.updateBirthdate(picked);
   }
 
 }
@@ -696,3 +658,20 @@ class LanguageDialog extends StatelessWidget {
     );
   }
 }
+
+String _getLanguageName(String code) {
+    switch (code) {
+      case 'en':
+        return 'English';
+      case 'it':
+        return 'Italiano';
+      case 'es':
+        return 'Español';
+      case 'de':
+        return 'Deutsch';
+      case 'fr':
+        return 'Français';
+      default:
+        return 'Unknown';
+    }
+  }

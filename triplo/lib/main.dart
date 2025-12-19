@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/language.dart';
+import 'package:triplo/controller/language.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import 'firebase_options.dart';
 
@@ -52,23 +54,9 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  late TrekkingController trekkingController;
-  late DiaryController diaryController;
-  late UserController userController;
-
   @override
   void initState() {
     super.initState();
-
-    trekkingController = TrekkingController(trekkings: []);
-    // Update UI after loading trekkings
-    trekkingController.loadTrekking().then((_) {
-      setState(() {});
-    });
-
-    diaryController = DiaryController();
-
-    userController = UserController();
   }
 
   @override
@@ -76,67 +64,47 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => DiaryController()),
+        ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
+        ChangeNotifierProvider(create: (_) => Language()),
         ],
-      child: MaterialApp(
-        title: 'Triplo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
-          useMaterial3: true,
-        ),
-        locale: _locale,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('it'),
-          Locale('es'),
-          Locale('de'),
-          Locale('fr'),
-        ],
-
-        // Usa le routes (niente 'home:' in questo caso)
-        initialRoute: '/landing_page',
-        routes: {
-          '/landing_page': (context) => Landing_Page(
-            trekkingController: trekkingController,
-            userController: userController,
-            diaryController: diaryController,
-            onLocaleChanged: setLocale,
-          ), // o LandingPage() se la tua classe si chiama così
-          '/login': (context) => LoginPage(
-            trekkingController: trekkingController,
-            userController: userController,
-            diaryController: diaryController,
-            onLocaleChanged: setLocale,
-          ),
-          '/registration': (context) => RegistrationPage(
-            trekkingController: trekkingController,
-            userController: userController,
-            diaryController: diaryController,
-            onLocaleChanged: setLocale,
-          ),
-          '/forgotten_password': (context) => ForgottenPasswordPage(),
-          '/geowatch': (context) => const GeoWatchPage(),
-
-          // bottone per caricare i punti di un trekking
-          '/admin_upload': (context) => const AdminUploadPage(),
-
-            "/userProfileRemote": (context) => UserPagePublic(
-              userId: ModalRoute.of(context)!.settings.arguments as String,
-              diaryController: diaryController,
-              trekkingController: trekkingController,
-              userController: userController,
-              onLocaleChanged: (l) {},
+      child: Consumer<Language>(
+        builder: (context, lang, child) {
+          return MaterialApp(
+            title: 'Triplo',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+              useMaterial3: true,
             ),
-          },
-
-
-
+            locale: lang.locale, // <-- qui la lingua dinamica
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('it'),
+              Locale('es'),
+              Locale('de'),
+              Locale('fr'),
+            ],
+            initialRoute: '/landing_page',
+            routes: {
+              '/landing_page': (context) => Landing_Page(),
+              '/login': (context) => LoginPage(),
+              '/registration': (context) => RegistrationPage(),
+              '/forgotten_password': (context) => ForgottenPasswordPage(),
+              '/geowatch': (context) => const GeoWatchPage(),
+              '/admin_upload': (context) => const AdminUploadPage(),
+              "/userProfileRemote": (context) => UserPagePublic(
+                    userId: ModalRoute.of(context)!.settings.arguments as String,
+                  ),
+            },
+          );
+        },
       ),
     );
   }

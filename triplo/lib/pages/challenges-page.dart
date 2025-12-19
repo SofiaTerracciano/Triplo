@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/API.dart';
-import 'package:triplo/controller/diary.dart';
-import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/home-page.dart';
 import 'package:triplo/pages/search-page.dart';
@@ -10,18 +7,9 @@ import 'package:triplo/pages/setting-page.dart';
 import 'package:triplo/pages/user-page.dart';
 
 class ChallengesPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
 
   const ChallengesPage({
-    super.key,
-    required this.onLocaleChanged,
-    required this.diaryController,
-    required this.trekkingController,
-    required this.userController,
-  });
+    super.key});
 
   @override
   State<ChallengesPage> createState() => _ChallengesPageState();
@@ -184,12 +172,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MyHomePage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                    ),
+                    builder: (_) => MyHomePage(),
                   ),
                 );
               },
@@ -202,12 +185,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => UserPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                    ),
+                    builder: (_) => UserPage(),
                   ),
                 );
               },
@@ -220,12 +198,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SearchPage(
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      onLocaleChanged: widget.onLocaleChanged,
-                    ),
+                    builder: (_) => SearchPage(),
                   ),
                 );
               },
@@ -238,12 +211,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SettingPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (_) => SettingPage(),
                   ),
                 );
               },
@@ -255,12 +223,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChallengesPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (_) => ChallengesPage(),
                   ),
                 );
               },

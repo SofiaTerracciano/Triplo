@@ -53,6 +53,8 @@
   "hours_trekking_label": "horas",
   "hour_trekking_label": "hora",
   "minutes_trekking_label": "minutos",
+  "weather_trekking_label": "Tiempo",
+  "weather_trekking_botton": "Haz clic aquí para descubrir el tiempo",
 
   "date_trekking_label": "Fecha",
   "day_trekking_label": "Día",

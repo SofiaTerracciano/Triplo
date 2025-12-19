@@ -14,18 +14,9 @@ import 'package:triplo/controller/diary.dart';
  * Email+password login + Google sign-in.
  */
 class LoginPage extends StatefulWidget {
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
-  final void Function(Locale) onLocaleChanged;
 
   const LoginPage({
-    super.key,
-    required this.trekkingController,
-    required this.diaryController,
-    required this.userController,
-    required this.onLocaleChanged,
-  });
+    super.key,});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -60,32 +51,30 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final controller = Provider.of<UserController>(context, listen: false);
+    final userController = context.read<UserController>();
+    final diaryController = context.read<DiaryController>();
+    final trekkingController = context.read<TrekkingController>();
     try {
-      await controller.login(email, password);
+      await userController.login(email, password);
       //final uid = controller.currentUser!.uid;
-      final user = controller.currentUser;
+      final user = userController.currentUser;
       if (user == null) {
         throw StateError("currentUser è null dopo il login");
       }
       final uid = user.uid;
       //assign current user instance to _currentUser attribute of diaryController
-      widget.diaryController.currentUser = user;
-      //assign current user instance to _currentUser attribute of userController
-      widget.userController.currentUser = user;
-      await widget.diaryController.loadPublicDiary(uid);
-      await widget.diaryController.loadPrivateDiary(uid);
-      print(widget.diaryController.allDiaries);
+      diaryController.currentUser = user;
+      await diaryController.loadPublicDiary(uid);
+      await diaryController.loadPrivateDiary(uid);
+
+      trekkingController.loadTrekking().then((_) {
+        setState(() {});
+      });
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => UserPage(
-            trekkingController: widget.trekkingController,
-            userController: widget.userController,
-            diaryController: widget.diaryController,
-            onLocaleChanged: (l) {},
-          ),
+          builder: (_) => UserPage(),
         ),
       );
 
@@ -129,12 +118,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => UserPage(
-            trekkingController: widget.trekkingController,
-            userController: widget.userController,
-            diaryController: widget.diaryController,
-            onLocaleChanged: (l) {},
-          ),
+          builder: (_) => UserPage(),
         ),
       );
     } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
@@ -16,18 +17,9 @@ import '../controller/trekking.dart';
 import '../controller/user.dart';
 
 class SearchPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
-  final DiaryController diaryController;
-  final TrekkingController trekkingController;
-  final UserController userController;
 
   const SearchPage({
-    super.key,
-    required this.onLocaleChanged,
-    required this.diaryController,
-    required this.trekkingController,
-    required this.userController,
-  });
+    super.key,});
   
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -70,15 +62,18 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _loadRandomDiaries() async {
-    final user = widget.userController.currentUser;
+    final userController = context.watch<UserController>();
+    final diaryController = context.watch<DiaryController>();
+
+    final user = userController.currentUser;
     if (user == null) return;
 
     //final followingIds = user.following.map((u) => u.uid).toList();
-    final uid = widget.userController.currentUser!.uid;
+    final uid = userController.currentUser!.uid;
     final followingIds =
-    await widget.userController.getFollowingIds(uid);
+    await userController.getFollowingIds(uid);
 
-    final diaries = await widget.diaryController
+    final diaries = await diaryController
         .getRandomPublicDiariesFromFollowing(
           followingIds: followingIds,
           limit: 10,
@@ -102,7 +97,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final bool isFocused = _focusNode.hasFocus;
     final bool hasText = _searchController.text.isNotEmpty;
-    final local = AppLocalizations.of(context)!;
+    final userController = context.watch<UserController>();
+    final diaryController = context.watch<DiaryController>();
+    final trekkingController = context.watch<TrekkingController>();
+     final local = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(local.search_page_title), centerTitle: true),
       body: Padding(
@@ -203,7 +201,6 @@ class _SearchPageState extends State<SearchPage> {
             Expanded(
               child: _buildBody(),
             ),
-            /*
             // Suggestion section (trekking path of your friends)
             Expanded(
               child: GridView.builder(
@@ -219,7 +216,7 @@ class _SearchPageState extends State<SearchPage> {
                   final diary = randomDiaries[index];
 
                   return FutureBuilder<Users?>(
-                    future: widget.userController.getUserById(diary.userId),
+                    future: userController.getUserById(diary.userId),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
@@ -236,10 +233,6 @@ class _SearchPageState extends State<SearchPage> {
                             MaterialPageRoute(
                               builder: (context) => DiaryPage(
                                 diaryId: diary.diaryId,
-                                diaryController: widget.diaryController,
-                                userController: widget.userController,
-                                trekkingController: widget.trekkingController,
-                                onLocaleChanged: widget.onLocaleChanged,
                               ),
                             ),
                           );
@@ -271,9 +264,8 @@ class _SearchPageState extends State<SearchPage> {
                                     ),
                                     child: _DiaryCoverImage(
                                       diary: diary,
-                                      diaryController: widget.diaryController,
-                                      trekkingController:
-                                          widget.trekkingController,
+                                      diaryController:diaryController,
+                                      trekkingController :trekkingController,
                                     ),
                                   ),
                                 ),
@@ -327,7 +319,6 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
-             */
           ],
         ),
       ),
@@ -351,12 +342,7 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                    ),
+                    builder: (context) => MyHomePage(),
                   ),
                 );
               },
@@ -368,12 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                    ),
+                    builder: (context) => UserPage(),
                   ),
                 );
               },
@@ -385,12 +366,7 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SearchPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                    ),
+                    builder: (context) => SearchPage(),
                   ),
                 );
               },
@@ -402,12 +378,7 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SettingPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      userController: widget.userController,
-                      trekkingController: widget.trekkingController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (context) => SettingPage(),
                   ),
                 );
               },
@@ -419,12 +390,7 @@ class _SearchPageState extends State<SearchPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChallengesPage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      diaryController: widget.diaryController,
-                    ),
+                    builder: (_) => ChallengesPage(),
                   ),
                 );
               },
@@ -467,6 +433,8 @@ class _SearchPageState extends State<SearchPage> {
 
 
   Future<void> _runSearch(String query) async {
+    final userController = context.read<UserController>();
+
     if (query.isEmpty) {
       setState(() {
         _isSearching = false;
@@ -488,7 +456,7 @@ class _SearchPageState extends State<SearchPage> {
     setState(() => _isSearching = true);
 
     if (_searchMode == SearchMode.all || _searchMode == SearchMode.users) {
-      _userResults = await widget.userController.searchUsers(query);
+      _userResults = await userController.searchUsers(query);
     }
 
     setState(() => _isSearching = false);
@@ -497,6 +465,10 @@ class _SearchPageState extends State<SearchPage> {
 
 
   Widget _buildRandomDiaryGrid() {
+    final userController = context.read<UserController>();
+    final diaryController = context.read<DiaryController>();
+    final trekkingController = context.read<TrekkingController>();
+
     return GridView.builder(
          padding: const EdgeInsets.only(top: 16),
          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -510,7 +482,7 @@ class _SearchPageState extends State<SearchPage> {
            final diary = randomDiaries[index];
 
            return FutureBuilder<Users?>(
-             future: widget.userController.getUserById(diary.userId),
+             future: userController.getUserById(diary.userId),
              builder: (context, snapshot) {
                if (!snapshot.hasData) {
                  return const Center(child: CircularProgressIndicator());
@@ -527,11 +499,7 @@ class _SearchPageState extends State<SearchPage> {
                      MaterialPageRoute(
                        builder: (context) => DiaryPage(
                          diaryId: diary.diaryId,
-                         diaryController: widget.diaryController,
-                         userController: widget.userController,
-                         trekkingController: widget.trekkingController,
-                         onLocaleChanged: widget.onLocaleChanged,
-                       ),
+                        ),
                      ),
                    );
                  },
@@ -562,9 +530,9 @@ class _SearchPageState extends State<SearchPage> {
                              ),
                              child: _DiaryCoverImage(
                                diary: diary,
-                               diaryController: widget.diaryController,
+                               diaryController: diaryController,
                                trekkingController:
-                               widget.trekkingController,
+                               trekkingController,
                              ),
                            ),
                          ),

@@ -7,27 +7,15 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import 'package:triplo/pages/user-page.dart';
-import 'package:triplo/pages/diary-page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 class ModifyDiaryPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
   final String trekkingId;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
   final String diaryId;
 
-  ModifyDiaryPage({
-    super.key,
-    required this.onLocaleChanged,
-    required this.trekkingId,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
-    required this.diaryId,
-  });
+  ModifyDiaryPage({super.key, required this.trekkingId, required this.diaryId});
 
   @override
   ModifyDiaryPageState createState() => ModifyDiaryPageState();
@@ -67,7 +55,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
   @override
   void initState() {
     super.initState();
-    diaryPage = widget.diaryController.getDiaryById(widget.diaryId)!;
+    final diaryController = context.read<DiaryController>();
+    final trekkingController = context.read<TrekkingController>();
+    diaryPage = diaryController.getDiaryById(widget.diaryId)!;
 
     // DATE
     final diaryParts = diaryPage.date.split('/');
@@ -95,7 +85,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     isPublic = diaryPage.isPublic;
 
     // CHALLENGES SELECTED
-    final trekking = widget.trekkingController.getTrekkingById(widget.trekkingId)!;
+    final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
     selectedIndexChallenge.addAll(
       trekking.challenges
           .asMap()
@@ -126,7 +116,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Trekking trekkingName = widget.trekkingController.getTrekkingById(
+    final trekkingController = context.watch<TrekkingController>();
+    final userController = context.watch<UserController>();
+    final diaryController = context.watch<DiaryController>();
+    final Trekking trekkingName = trekkingController.getTrekkingById(
       widget.trekkingId,
     )!;
     final local = AppLocalizations.of(context)!;
@@ -158,10 +151,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
       local.mood_sad_label,
       local.mood_excited_label,
     ];
-    
-    final user = widget.userController;
-    final diary = widget.diaryController;
-    final trekking = widget.trekkingController;
 
     final validPhotos = photos.where((p) => p.isNotEmpty).toList();
 
@@ -298,8 +287,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   Text(
                     friends.isEmpty
-                        ? local.friends_trekking_label //da mettere nel dizionario
-                        : user.currentUser!.following
+                        ? local
+                              .friends_trekking_label //da mettere nel dizionario
+                        : userController.currentUser!.following
                               .where((u) => friends.contains(u.uid))
                               .map((u) => u.username)
                               .join(
@@ -316,10 +306,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                       SizedBox(
                         height: 220, // lista scrollabile
                         child: ListView.builder(
-                          itemCount: user.currentUser!.following.length,
+                          itemCount: userController.currentUser!.following.length,
                           itemBuilder: (context, index) {
                             final followingUser =
-                                user.currentUser!.following[index];
+                                userController.currentUser!.following[index];
                             final isSelected = friends.contains(
                               followingUser.uid,
                             );
@@ -411,12 +401,14 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                     TextField(
                       controller: refreshmentController,
                       decoration: InputDecoration(
-                        labelText:
-                            local.refreshment_point_trekking_label, //da mettere nel dizionario
+                        labelText: local
+                            .refreshment_point_trekking_label, //da mettere nel dizionario
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 1,
-                      onChanged: (value) {refreshmentText = value;},
+                      onChanged: (value) {
+                        refreshmentText = value;
+                      },
                     ),
                 ],
               ),
@@ -437,7 +429,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   // Mostra immagini selezionate
                   challenges.isEmpty
                       ? Text(
-                          local.challenge_selected_label, 
+                          local.challenge_selected_label,
                           style: TextStyle(fontSize: 16),
                         )
                       : Wrap(
@@ -445,7 +437,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           runSpacing: 8,
                           children: challenges.map((challenge) {
                             return FutureBuilder<String>(
-                              future: trekking.getDownloadUrl(challenge),
+                              future: trekkingController.getDownloadUrl(challenge),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
@@ -478,18 +470,16 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   // Challenges
                   ExpansionTile(
-                    title: Text(
-                      local.choose_challenge_label,
-                    ),
+                    title: Text(local.choose_challenge_label),
                     children: [
                       SizedBox(
                         height: 260,
                         child: FutureBuilder(
                           future: Future.wait(
-                            trekking
+                            trekkingController
                                 .getTrekkingById(widget.trekkingId)!
                                 .challenges
-                                .map((c) => trekking.getDownloadUrl(c)),
+                                .map((c) => trekkingController.getDownloadUrl(c)),
                           ),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
@@ -511,7 +501,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                                   ),
                               itemCount: urls.length,
                               itemBuilder: (context, index) {
-                                final challengeName = trekking
+                                final challengeName = trekkingController
                                     .getTrekkingById(widget.trekkingId)!
                                     .challenges[index];
 
@@ -581,7 +571,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                   Text(
                     mood.isEmpty
-                        ? local.mood_selected_label 
+                        ? local.mood_selected_label
                         : mood.join(
                             ", ",
                           ), // mostra solo gli emoji separati da virgola
@@ -591,7 +581,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   const SizedBox(height: 12),
 
                   ExpansionTile(
-                    title: Text(local.choose_mood_label), 
+                    title: Text(local.choose_mood_label),
                     children: [
                       SizedBox(
                         height: 220, // altezza della lista scrollabile
@@ -735,7 +725,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ),
 
                   const SizedBox(height: 8),
-                  
 
                   // Mostrare tutte le immagini (vecchie e nuove) con possibilità di rimuovere
                   if (photos.isNotEmpty || images.isNotEmpty) ...[
@@ -755,8 +744,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                               children: [
                                 if (isExisting)
                                   FutureBuilder<String?>(
-                                    future: widget.diaryController
-                                        .getDownloadUrlChild(validPhotos[index]),
+                                    future: diaryController
+                                        .getDownloadUrlChild(
+                                          validPhotos[index],
+                                        ),
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
@@ -764,8 +755,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                                           width: 100,
                                           height: 100,
                                           child: Center(
-                                            child:
-                                                CircularProgressIndicator(strokeWidth: 2),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
                                           ),
                                         );
                                       }
@@ -810,16 +802,19 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () async {
                                         if (isExisting) {
-                                          await widget.diaryController.deletePhotoFromDb(
-                                            widget.diaryId,
-                                            validPhotos[index],
-                                          );
+                                          await diaryController
+                                              .deletePhotoFromDb(
+                                                widget.diaryId,
+                                                validPhotos[index],
+                                              );
                                           setState(() {
                                             photos.remove(validPhotos[index]);
                                           });
                                         } else {
                                           setState(() {
-                                            images.removeAt(index - validPhotos.length);
+                                            images.removeAt(
+                                              index - validPhotos.length,
+                                            );
                                           });
                                         }
                                       },
@@ -845,7 +840,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                       ),
                     ),
                   ],
-
                 ],
               ),
               const SizedBox(height: 8),
@@ -883,14 +877,16 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         onPressed: () {
                           setState(() {
                             isPublic = true;
-                            if (!user.currentUser!.publicDiaryPages.contains(
-                              diaryPage,
-                            )) {
-                              user.currentUser!.publicDiaryPages.add(diaryPage);
-                              user.currentUser!.privateDiaryPages.remove(
-                                diaryPage,
-                              );
+
+                            final user = userController.currentUser!;
+
+                            // Aggiungi a pubblico se non c'è già
+                            if (!user.publicDiaryPages.any((d) => d.diaryId == diaryPage.diaryId)) {
+                              user.publicDiaryPages.add(diaryPage);
                             }
+
+                            // Rimuovi dalla lista privata usando diaryId
+                            user.privateDiaryPages.removeWhere((d) => d.diaryId == diaryPage.diaryId);
                           });
                         },
                         child: Text(local.public_botton_label),
@@ -921,16 +917,16 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         onPressed: () {
                           setState(() {
                             isPublic = false;
-                            if (!user.currentUser!.privateDiaryPages.contains(
-                              diaryPage,
-                            )) {
-                              user.currentUser!.privateDiaryPages.add(
-                                diaryPage,
-                              );
-                              user.currentUser!.publicDiaryPages.remove(
-                                diaryPage,
-                              );
+
+                            final user = userController.currentUser!;
+
+                            // Aggiungi a privato se non c'è già
+                            if (!user.privateDiaryPages.any((d) => d.diaryId == diaryPage.diaryId)) {
+                              user.privateDiaryPages.add(diaryPage);
                             }
+
+                            // Rimuovi dalla lista pubblica usando diaryId
+                            user.publicDiaryPages.removeWhere((d) => d.diaryId == diaryPage.diaryId);
                           });
                         },
                         child: Text(local.private_botton_label),
@@ -940,7 +936,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                 ],
               ),
               const SizedBox(height: 8),
-              // Add/Cancel botton
+              // Save/Cancel botton
               Row(
                 children: [
                   Expanded(
@@ -951,10 +947,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           MaterialPageRoute(
                             builder: (context) => TrekkingPage(
                               trekkingId: trekkingName.documentId,
-                              trekkingController: widget.trekkingController,
-                              diaryController: widget.diaryController,
-                              userController: widget.userController,
-                              onLocaleChanged: widget.onLocaleChanged,
                             ),
                           ),
                         );
@@ -985,9 +977,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         double summedDuation =
                             selectedHour!.toDouble() * 60 +
                             selectedMinute!.toDouble();
-                        addedPhotos = await diary.uploadDiaryImages(images);
+                        addedPhotos = await diaryController.uploadDiaryImages(images);
                         photos.addAll(addedPhotos);
-                        widget.diaryController.addDiary(
+                        diaryController.addDiary(
                           trekkingName.name,
                           isPublic,
                           castedDate,
@@ -1004,12 +996,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => UserPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryController: widget.diaryController,
-                            ),
+                            builder: (context) => UserPage(),
                           ),
                         );
                       },
@@ -1047,10 +1034,6 @@ Widget _photoPlaceholder() {
       color: Colors.grey.shade300,
       borderRadius: BorderRadius.circular(8),
     ),
-    child: const Icon(
-      Icons.image_not_supported,
-      size: 40,
-    ),
+    child: const Icon(Icons.image_not_supported, size: 40),
   );
 }
-

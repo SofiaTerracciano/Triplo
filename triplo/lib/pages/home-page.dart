@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/controller/API.dart';
-import 'package:triplo/controller/diary.dart';
-import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'search-page.dart';
@@ -13,20 +10,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
 import 'trekking-page.dart';
 import 'package:triplo/controller/trekking.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
-
-  const MyHomePage({
-    super.key,
-    required this.onLocaleChanged,
-    required this.diaryController,
-    required this.trekkingController,
-    required this.userController
-  });
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -62,13 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       // Main map body
-      body: ZoomAwareMap(
-        mapController: mapController,
-        trekkingController: widget.trekkingController,
-        userController: widget.userController,
-        diaryController: widget.diaryController,
-        onLocaleChanged: widget.onLocaleChanged,
-      ),
+      body: ZoomAwareMap(mapController: mapController),
 
       // Zoom buttons
       floatingActionButton: Column(
@@ -96,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       // Positioning the button to the bottom right
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, 
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       //Drawer to control the navigation among pages
       drawer: Drawer(
@@ -116,14 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                      onLocaleChanged: widget.onLocaleChanged,
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
                 );
               },
             ),
@@ -133,15 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        UserPage(
-                          onLocaleChanged: widget.onLocaleChanged,
-                          userController: widget.userController,
-                          diaryController: widget.diaryController,
-                          trekkingController: widget.trekkingController,
-                        ),
-                  ),
+                  MaterialPageRoute(builder: (context) => UserPage()),
                 );
               },
             ),
@@ -151,14 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchPage(
-                      diaryController: widget.diaryController,
-                      trekkingController: widget.trekkingController,
-                      userController: widget.userController,
-                      onLocaleChanged: widget.onLocaleChanged,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (context) => SearchPage()),
                 );
               },
             ),
@@ -168,15 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        SettingPage(
-                          onLocaleChanged: widget.onLocaleChanged, 
-                          trekkingController: widget.trekkingController, 
-                          userController: widget.userController, 
-                          diaryController: widget.diaryController,
-                        ),
-                  ),
+                  MaterialPageRoute(builder: (context) => SettingPage()),
                 );
               },
             ),
@@ -186,18 +137,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ChallengesPage(
-                          onLocaleChanged: widget.onLocaleChanged,
-                          trekkingController: widget.trekkingController,
-                          userController: widget.userController,
-                          diaryController: widget.diaryController,
-                        ),
-                  ),
+                  MaterialPageRoute(builder: (context) => ChallengesPage()),
                 );
               },
-            )
+            ),
           ],
         ),
       ),
@@ -208,19 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
 // Widget that updates its content based on the zoom level
 class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
-  final void Function(Locale) onLocaleChanged;
 
-  const ZoomAwareMap({
-    super.key,
-    required this.mapController,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
-    required this.onLocaleChanged,
-  });
+  const ZoomAwareMap({super.key, required this.mapController});
 
   @override
   _ZoomAwareMapState createState() => _ZoomAwareMapState();
@@ -259,7 +191,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
 
   // Function to get polylines for each trekking route
   List<TaggedPolyline> getPolylines() {
-    return widget.trekkingController.allTrekkings.map((t) {
+    final trekkingController = context.watch<TrekkingController>();
+    return trekkingController.allTrekkings.map((t) {
       return TaggedPolyline(
         tag: t.documentId,
         points: t.points,
@@ -271,7 +204,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
 
   // Function to get markers for each trekking start point
   List<Marker> getMarkers() {
-    return widget.trekkingController.allTrekkings.map((t) {
+    final trekkingController = context.watch<TrekkingController>();
+    return trekkingController.allTrekkings.map((t) {
       final markerColor = difficultyToColor(t.difficulty_level);
 
       return Marker(
@@ -284,13 +218,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TrekkingPage(
-                  trekkingId: routeID,
-                  trekkingController: widget.trekkingController,
-                  userController: widget.userController,
-                  diaryController: widget.diaryController,
-                  onLocaleChanged: widget.onLocaleChanged,
-                ),
+                builder: (context) => TrekkingPage(trekkingId: routeID),
               ),
             );
           },
@@ -328,21 +256,14 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TrekkingPage(
-                        trekkingId: routeID,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                        onLocaleChanged: widget.onLocaleChanged,
-                      ),
+                      builder: (context) => TrekkingPage(trekkingId: routeID),
                     ),
                   );
                 },
               ),
 
             // Markers for each trekking start point (only at low zoom)
-            if (currentZoom < 12) 
-              MarkerLayer(markers: getMarkers()),
+            if (currentZoom < 12) MarkerLayer(markers: getMarkers()),
           ],
         ),
 

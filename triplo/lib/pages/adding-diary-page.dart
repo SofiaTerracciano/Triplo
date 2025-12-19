@@ -2,28 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/controller/user.dart';
-import 'package:triplo/controller/diary.dart';
-import 'package:triplo/pages/diary-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/controller/user.dart';
+import 'package:triplo/controller/diary.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:provider/provider.dart';
 class AddingDiaryPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
   final String trekkingId;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
 
   const AddingDiaryPage({
     super.key,
-    required this.onLocaleChanged,
     required this.trekkingId,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
   });
 
   @override
@@ -64,7 +55,11 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Trekking trekkingName = widget.trekkingController.getTrekkingById(
+    final trekkingController = context.watch<TrekkingController>();
+    final userController = context.watch<UserController>();
+    final diaryController = context.watch<DiaryController>();
+
+    final Trekking trekkingName = trekkingController.getTrekkingById(
       widget.trekkingId,
     )!;
     final local = AppLocalizations.of(context)!;
@@ -96,10 +91,6 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
       local.mood_sad_label,
       local.mood_excited_label,
     ];
-
-    final user = widget.userController;
-    final diary = widget.diaryController;
-    final trekking = widget.trekkingController;
 
     return Scaffold(
       appBar: AppBar(title: Text(trekkingName.name)),
@@ -235,7 +226,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                   Text(
                     friends.isEmpty
                         ? local.friends_selected_label 
-                        : user.currentUser!.following
+                        : userController.currentUser!.following
                               .where((u) => friends.contains(u.uid))
                               .map((u) => u.username)
                               .join(
@@ -252,10 +243,10 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                       SizedBox(
                         height: 220, // lista scrollabile
                         child: ListView.builder(
-                          itemCount: user.currentUser!.following.length, //da cambiare con following index
+                          itemCount: userController.currentUser!.following.length, //da cambiare con following index
                           itemBuilder: (context, index) {
                             final followingUser =
-                                user.currentUser!.following[index]; 
+                                userController.currentUser!.following[index]; 
                             final isSelected = friends.contains(
                               followingUser.uid,
                             );
@@ -384,7 +375,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                           runSpacing: 8,
                           children: challenges.map((challenge) {
                             return FutureBuilder<String>(
-                              future: trekking.getDownloadUrl(challenge),
+                              future: trekkingController.getDownloadUrl(challenge),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                         ConnectionState.done &&
@@ -423,10 +414,10 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                         height: 260,
                         child: FutureBuilder(
                           future: Future.wait(
-                            trekking
+                            trekkingController
                                 .getTrekkingById(widget.trekkingId)!
                                 .challenges
-                                .map((c) => trekking.getDownloadUrl(c)),
+                                .map((c) => trekkingController.getDownloadUrl(c)),
                           ),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
@@ -448,7 +439,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                                   ),
                               itemCount: urls.length,
                               itemBuilder: (context, index) {
-                                final challengeName = trekking
+                                final challengeName = trekkingController
                                     .getTrekkingById(widget.trekkingId)!
                                     .challenges[index];
 
@@ -725,10 +716,6 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                           MaterialPageRoute(
                             builder: (context) => TrekkingPage(
                               trekkingId: trekkingName.documentId,
-                              trekkingController: widget.trekkingController,
-                              diaryController: widget.diaryController,
-                              userController: widget.userController,
-                              onLocaleChanged: widget.onLocaleChanged,
                             ),
                           ),
                         );
@@ -747,8 +734,8 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                         double summedDuation =
                             selectedHour!.toDouble() * 60 +
                             selectedMinute!.toDouble();
-                        photos = await diary.uploadDiaryImages(_images);
-                        widget.diaryController.addDiary(
+                        photos = await diaryController.uploadDiaryImages(_images);
+                        diaryController.addDiary(
                           trekkingName.name,
                           isPublic,
                           castedDate,
@@ -766,12 +753,7 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => UserPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryController: widget.diaryController,
-                            ),
+                            builder: (context) => UserPage(),
                           ),
                         );
                       },

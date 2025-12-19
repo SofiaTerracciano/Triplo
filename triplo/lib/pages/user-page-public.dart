@@ -5,32 +5,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../controller/user.dart';
-import '../controller/trekking.dart';
-import '../controller/diary.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
 
 
-
-//DA CAPIRE LA COSA DEL POP
-
 class UserPagePublic extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
   final String userId;
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
 
   const UserPagePublic({
     super.key,
-    required this.onLocaleChanged,
     required this.userId,
-    required this.trekkingController,
-    required this.diaryController,
-    required this.userController,
   });
 
   @override
@@ -48,7 +36,8 @@ class _UserPagePublicState extends State<UserPagePublic> {
   }
 
   Future<void> _loadUser() async {
-    final u = await widget.userController.getUserById(widget.userId);
+    final userController = context.read<UserController>();
+    final u = await userController.getUserById(widget.userId);
     if (!mounted) return;
 
     setState(() {

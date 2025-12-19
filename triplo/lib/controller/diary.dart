@@ -205,14 +205,16 @@ class DiaryController extends ChangeNotifier {
           ]),
         });
 
-        // Update local lists
+        /*Update local lists
         if (oldIsPublic) {
-          _currentUser!.publicDiaryPages.remove(page);
+          _currentUser!.publicDiaryPages
+              .removeWhere((p) => p.diaryId == page.diaryId);
           _currentUser!.privateDiaryPages.add(page);
         } else {
-          _currentUser!.privateDiaryPages.remove(page);
+          _currentUser!.privateDiaryPages
+              .removeWhere((p) => p.diaryId == page.diaryId);
           _currentUser!.publicDiaryPages.add(page);
-        }
+        }*/
       }
 
       notifyListeners();
@@ -399,6 +401,4 @@ class DiaryController extends ChangeNotifier {
     diaries.shuffle();
     return diaries.take(limit).toList();
   }
-
-
 }

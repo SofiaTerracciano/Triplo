@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
-import 'package:triplo/model/diary.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import 'diary-page.dart';
@@ -14,23 +13,10 @@ import 'search-page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
-import '../controller/trekking.dart';
-import '../controller/diary.dart';
 import '../pages/users-list-page.dart';
 
 class UserPage extends StatefulWidget {
-  final void Function(Locale) onLocaleChanged;
-  final TrekkingController trekkingController;
-  final UserController userController;
-  final DiaryController diaryController;
-
-  const UserPage({
-    super.key,
-    required this.onLocaleChanged,
-    required this.trekkingController,
-    required this.userController,
-    required this.diaryController,
-  });
+  const UserPage({super.key});
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -108,8 +94,8 @@ class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<UserController>(context);
-    final user = controller.currentUser;
+    final userController = context.watch<UserController>();
+    final user = userController.currentUser;
 
     if (user == null) {
       return Scaffold(
@@ -167,283 +153,6 @@ class _UserPageState extends State<UserPage> {
           ],
         ),
 
-        /*body: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // Avatar + username column
-                Container(
-                  width: 200,
-                  // Padding on all sides
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final picked = await _pickImage();
-                          if (picked == null) return;
-
-                          final file = File(picked.path);
-
-                          await controller.updateProfilePhoto(file);
-                        },
-
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage:
-                              (user.photoProfile != null &&
-                                  user.photoProfile!.isNotEmpty)
-                              ? NetworkImage(user.photoProfile!)
-                              : null,
-
-                          backgroundColor: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        user.username,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      //if (user.)
-                      Text('${local.level_label} : ${local.advanced_level}'),
-                      //else
-                      //else
-                    ],
-                  ),
-                ),
-
-                // Statistics column
-                Container(
-                  width: 200,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${user.name} ${user.surname}",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {}, // do nothing
-                            child: _StatItem(
-                              label: local.totals_trekking_label,
-                              value: '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(
-                                  builder: (_) => UsersList(
-                                    onLocaleChanged: widget.onLocaleChanged,
-                                    trekkingController: widget.trekkingController,
-                                    userController: widget.userController,
-                                    diaryController: widget.diaryController,
-                                    listName: 'Followers',
-                                  ),
-                                ),);
-                            },
-                            child: _StatItem(
-                              label: 'Follower',
-                              value: '${user.followers.length}',
-                            ),
-                          ),
-                          
-                          GestureDetector( 
-                            onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(
-                                  builder: (_) => UsersList(
-                                    onLocaleChanged: widget.onLocaleChanged,
-                                    trekkingController: widget.trekkingController,
-                                    userController: widget.userController,
-                                    diaryController: widget.diaryController,
-                                    listName: 'Following',
-                                  ),
-                                ),);
-                            },
-                            child: _StatItem(
-                              label: 'Following',
-                              value: '${user.following.length}',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 12),
-
-            // Setting and share buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Setting button
-                Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SettingPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryController: widget.diaryController,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(local.settings_page_title),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 7),
-                // Copy URL button
-                Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Funzione che fa copiare URL
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Marcipises Alert!'),
-                              content: Text('Yout are on the marcipises 2!'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Text(local.share_profile_button_label),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 23),
-            // Tabs for public, private, saved paths
-            const TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.label_important)),
-                Tab(icon: Icon(Icons.lock)),
-                Tab(icon: Icon(Icons.bookmark)),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  // Tab percorsi/diari pubblici
-                  user.publicDiaryPages.isEmpty
-                  ? const Center(child: Text("No public diary pages"))
-                  : ListView.builder(
-                      itemCount: user.publicDiaryPages.length,
-                      itemBuilder: (context, index) {
-                        final diary = user.publicDiaryPages[index];
-                        return ListTile(
-                          title: Text(diary.trekkigName), 
-                          subtitle: Text(diary.date),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DiaryPage(
-                                  diaryId: diary.diaryId,
-                                  diaryController: widget.diaryController,
-                                  userController: widget.userController,
-                                  trekkingController: widget.trekkingController,
-                                  onLocaleChanged: widget.onLocaleChanged,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-
-                  // Tab percorsi/diari privati
-                  user.privateDiaryPages.isEmpty
-                    ? const Center(child: Text("No private diary pages"))
-                    : ListView.builder(
-                        itemCount: user.privateDiaryPages.length,
-                        itemBuilder: (context, index) {
-                          final diary = user.privateDiaryPages[index];
-                          return ListTile(
-                            title: Text(diary.trekkigName), // attenzione al nome della proprietà
-                            subtitle: Text(diary.date),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DiaryPage(
-                                    diaryId: diary.diaryId,
-                                    diaryController: widget.diaryController,
-                                    userController: widget.userController,
-                                    trekkingController: widget.trekkingController,
-                                    onLocaleChanged: widget.onLocaleChanged,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-
-                  user.savedTrekkings.isEmpty
-                  ? const Center(child: Text("No saved trekking"))
-                  : ListView.builder(
-                      itemCount: user.savedTrekkings.length,
-                      itemBuilder: (context, index) {
-                        final trekking = user.savedTrekkings[index];
-                        return ListTile(
-                          title: Text(trekking.name),
-                          onTap: () {
-                            final routeID = trekking.documentId;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TrekkingPage(
-                                  trekkingId: routeID,
-                                  trekkingController: widget.trekkingController,
-                                  userController: widget.userController,
-                                  diaryController: widget.diaryController,
-                                  onLocaleChanged: widget.onLocaleChanged,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    )
-                ],
-              ),
-            ),
-          ],
-        ),*/
         body: Column(
           children: [
             // Top page --> general info
@@ -458,15 +167,21 @@ class _UserPageState extends State<UserPage> {
                         onTap: () async {
                           final picked = await _pickImage();
                           if (picked == null) return;
-                          await controller.updateProfilePhoto(File(picked.path));
+                          await userController.updateProfilePhoto(
+                            File(picked.path),
+                          );
                         },
                         child: CircleAvatar(
                           radius: 36,
-                          backgroundImage: user.photoProfile != null && user.photoProfile!.isNotEmpty
+                          backgroundImage:
+                              user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty
                               ? NetworkImage(user.photoProfile!)
                               : null,
                           backgroundColor: Colors.grey[300],
-                          child: user.photoProfile == null || user.photoProfile!.isEmpty
+                          child:
+                              user.photoProfile == null ||
+                                  user.photoProfile!.isEmpty
                               ? const Icon(Icons.person, size: 40)
                               : null,
                         ),
@@ -513,20 +228,16 @@ class _UserPageState extends State<UserPage> {
                           children: [
                             _StatItem(
                               label: local.totals_trekking_label,
-                              value: '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
+                              value:
+                                  '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
                             ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(
-                                      onLocaleChanged: widget.onLocaleChanged,
-                                      trekkingController: widget.trekkingController,
-                                      userController: widget.userController,
-                                      diaryController: widget.diaryController,
-                                      listName: 'Followers',
-                                    ),
+                                    builder: (_) =>
+                                        UsersList(listName: 'Followers'),
                                   ),
                                 );
                               },
@@ -540,13 +251,8 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(
-                                      onLocaleChanged: widget.onLocaleChanged,
-                                      trekkingController: widget.trekkingController,
-                                      userController: widget.userController,
-                                      diaryController: widget.diaryController,
-                                      listName: 'Following',
-                                    ),
+                                    builder: (_) =>
+                                        UsersList(listName: 'Following'),
                                   ),
                                 );
                               },
@@ -575,14 +281,7 @@ class _UserPageState extends State<UserPage> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => SettingPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryController: widget.diaryController,
-                            ),
-                          ),
+                          MaterialPageRoute(builder: (_) => SettingPage()),
                         );
                       },
                       child: Text(local.settings_page_title),
@@ -613,7 +312,6 @@ class _UserPageState extends State<UserPage> {
               ),
             ),
 
-
             const SizedBox(height: 9),
             // Tabs for public, private, saved paths
             const TabBar(
@@ -628,6 +326,29 @@ class _UserPageState extends State<UserPage> {
                 children: [
                   // Tab percorsi/diari pubblici
                   user.publicDiaryPages.isEmpty
+                      ? const Center(child: Text("No public diary pages"))
+                      : ListView.separated(
+                          itemCount: user.publicDiaryPages.length,
+                          separatorBuilder: (_, __) => Divider(),
+                          itemBuilder: (context, index) {
+                            final diary = user.publicDiaryPages[index];
+                            return ListTile(
+                              title: Text(diary.trekkigName),
+                              subtitle: Text(diary.date),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DiaryPage(
+                                      diaryId: diary.diaryId,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                  /*user.publicDiaryPages.isEmpty
                   ? const Center(child: Text("No public diary pages"))
                   : ListView.builder(
                       itemCount: user.publicDiaryPages.length,
@@ -642,20 +363,39 @@ class _UserPageState extends State<UserPage> {
                               MaterialPageRoute(
                                 builder: (context) => DiaryPage(
                                   diaryId: diary.diaryId,
-                                  diaryController: widget.diaryController,
-                                  userController: widget.userController,
-                                  trekkingController: widget.trekkingController,
-                                  onLocaleChanged: widget.onLocaleChanged,
                                 ),
                               ),
                             );
                           },
                         );
                       },
-                    ),
+                    ),*/
 
                   // Tab percorsi/diari privati
                   user.privateDiaryPages.isEmpty
+                      ? const Center(child: Text("No public diary pages"))
+                      : ListView.separated(
+                          itemCount: user.privateDiaryPages.length,
+                          separatorBuilder: (_, __) => Divider(),
+                          itemBuilder: (context, index) {
+                            final diary = user.privateDiaryPages[index];
+                            return ListTile(
+                              title: Text(diary.trekkigName),
+                              subtitle: Text(diary.date),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DiaryPage(diaryId: diary.diaryId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+
+                  /*user.privateDiaryPages.isEmpty
                     ? const Center(child: Text("No private diary pages"))
                     : ListView.builder(
                         itemCount: user.privateDiaryPages.length,
@@ -670,44 +410,34 @@ class _UserPageState extends State<UserPage> {
                                 MaterialPageRoute(
                                   builder: (context) => DiaryPage(
                                     diaryId: diary.diaryId,
-                                    diaryController: widget.diaryController,
-                                    userController: widget.userController,
-                                    trekkingController: widget.trekkingController,
-                                    onLocaleChanged: widget.onLocaleChanged,
                                   ),
                                 ),
                               );
                             },
                           );
                         },
-                      ),
-
+                      ),*/
                   user.savedTrekkings.isEmpty
-                  ? const Center(child: Text("No saved trekking"))
-                  : ListView.builder(
-                      itemCount: user.savedTrekkings.length,
-                      itemBuilder: (context, index) {
-                        final trekking = user.savedTrekkings[index];
-                        return ListTile(
-                          title: Text(trekking.name),
-                          onTap: () {
-                            final routeID = trekking.documentId;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TrekkingPage(
-                                  trekkingId: routeID,
-                                  trekkingController: widget.trekkingController,
-                                  userController: widget.userController,
-                                  diaryController: widget.diaryController,
-                                  onLocaleChanged: widget.onLocaleChanged,
-                                ),
-                              ),
+                      ? const Center(child: Text("No saved trekking"))
+                      : ListView.builder(
+                          itemCount: user.savedTrekkings.length,
+                          itemBuilder: (context, index) {
+                            final trekking = user.savedTrekkings[index];
+                            return ListTile(
+                              title: Text(trekking.name),
+                              onTap: () {
+                                final routeID = trekking.documentId;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TrekkingPage(trekkingId: routeID),
+                                  ),
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                    )
+                        ),
                 ],
               ),
             ),
@@ -731,14 +461,7 @@ class _UserPageState extends State<UserPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => MyHomePage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => MyHomePage()),
                   );
                 },
               ),
@@ -748,14 +471,7 @@ class _UserPageState extends State<UserPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => UserPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => UserPage()),
                   );
                 },
               ),
@@ -765,14 +481,7 @@ class _UserPageState extends State<UserPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => SearchPage()),
                   );
                 },
               ),
@@ -782,14 +491,7 @@ class _UserPageState extends State<UserPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => SettingPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => SettingPage()),
                   );
                 },
               ),
@@ -799,14 +501,7 @@ class _UserPageState extends State<UserPage> {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => ChallengesPage(
-                        onLocaleChanged: widget.onLocaleChanged,
-                        trekkingController: widget.trekkingController,
-                        userController: widget.userController,
-                        diaryController: widget.diaryController,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (_) => ChallengesPage()),
                   );
                 },
               ),
@@ -843,10 +538,7 @@ class _StatItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const _StatItem({
-    required this.label,
-    required this.value,
-  });
+  const _StatItem({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -855,10 +547,7 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 2),
         SizedBox(
@@ -868,14 +557,10 @@ class _StatItem extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ),
       ],
     );
   }
 }
-

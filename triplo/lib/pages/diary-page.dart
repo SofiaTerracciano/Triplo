@@ -8,21 +8,12 @@ import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/change-diary-page.dart';
 import 'package:triplo/pages/user-page-public.dart';
+import 'package:provider/provider.dart';
 
 class DiaryPage extends StatefulWidget {
-  final DiaryController diaryController;
-  final UserController userController;
-  final TrekkingController trekkingController;
   final String diaryId;
-  final void Function(Locale) onLocaleChanged;
-  DiaryPage({
-    super.key,
-    required this.diaryId,
-    required this.diaryController,
-    required this.userController,
-    required this.trekkingController,
-    required this.onLocaleChanged,
-  });
+
+  DiaryPage({super.key, required this.diaryId});
 
   @override
   _DiaryPageState createState() => _DiaryPageState();
@@ -44,11 +35,12 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 
   Future<void> _loadDiaries() async {
-    final currentUserId = widget.diaryController.currentUser!.uid;
+    final diaryController = context.read<DiaryController>();
+    final currentUserId = diaryController.currentUser!.uid;
 
     // aspettiamo i due caricamenti
-    await widget.diaryController.loadPublicDiary(currentUserId);
-    await widget.diaryController.loadPrivateDiary(currentUserId);
+    await diaryController.loadPublicDiary(currentUserId);
+    await diaryController.loadPrivateDiary(currentUserId);
 
     setState(() {
       _isLoading = false;
@@ -58,20 +50,18 @@ class _DiaryPageState extends State<DiaryPage> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+    final diaryController = context.watch<DiaryController>();
+    final userController = context.watch<UserController>();
+    final trekkingController = context.watch<TrekkingController>();
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final diary = widget.diaryController.getDiaryById(widget.diaryId);
+    final diary = diaryController.getDiaryById(widget.diaryId);
     if (diary == null) {
-      return const Scaffold(
-        body: Center(child: Text('Diary not found')),
-      );
+      return const Scaffold(body: Center(child: Text('Diary not found')));
     }
-
 
     String formattedTime;
     if (diary.duration < 60) {
@@ -85,7 +75,7 @@ class _DiaryPageState extends State<DiaryPage> {
     }
 
     return FutureBuilder<Users?>(
-      future: widget.userController.getUserById(diary.userId),
+      future: userController.getUserById(diary.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -113,12 +103,10 @@ class _DiaryPageState extends State<DiaryPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ModifyDiaryPage(
-                        trekkingId: widget.trekkingController.getTrekkingId(diary.trekkigName)!,
+                        trekkingId: trekkingController.getTrekkingId(
+                          diary.trekkigName,
+                        )!,
                         diaryId: widget.diaryId,
-                        trekkingController: widget.trekkingController,
-                        diaryController: widget.diaryController,
-                        userController: widget.userController,
-                        onLocaleChanged: widget.onLocaleChanged,
                       ),
                     ),
                   );
@@ -469,18 +457,24 @@ class _DiaryPageState extends State<DiaryPage> {
             children: [
               Card(
                 elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 36,
-                        backgroundImage: user.photoProfile != null && user.photoProfile!.isNotEmpty
+                        backgroundImage:
+                            user.photoProfile != null &&
+                                user.photoProfile!.isNotEmpty
                             ? NetworkImage(user.photoProfile!)
                             : null,
                         backgroundColor: Colors.grey[300],
-                        child: user.photoProfile == null || user.photoProfile!.isEmpty
+                        child:
+                            user.photoProfile == null ||
+                                user.photoProfile!.isEmpty
                             ? const Icon(Icons.person, size: 40)
                             : null,
                       ),
@@ -490,16 +484,22 @@ class _DiaryPageState extends State<DiaryPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                user.username,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              user.username,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
                             const SizedBox(height: 6),
-                            infoRow(Icons.calendar_today, '${local.date_trekking_label}: ${diary.date}'),
-                            infoRow(Icons.timer, '${local.duration_trekking_label}: $formattedTime'),
-                          ]
+                            infoRow(
+                              Icons.calendar_today,
+                              '${local.date_trekking_label}: ${diary.date}',
+                            ),
+                            infoRow(
+                              Icons.timer,
+                              '${local.duration_trekking_label}: $formattedTime',
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -507,14 +507,17 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ),
 
-              // Freinds 
+              // Freinds
               if (diary.friends.isNotEmpty) ...[
-                SectionTitle(text: local.friends_trekking_label, icon: Icons.group),
+                SectionTitle(
+                  text: local.friends_trekking_label,
+                  icon: Icons.group,
+                ),
                 Wrap(
                   spacing: 8,
                   children: diary.friends.map((id) {
                     return FutureBuilder<Users?>(
-                      future: widget.userController.getUserById(id),
+                      future: userController.getUserById(id),
                       builder: (_, snap) {
                         if (!snap.hasData) return const SizedBox.shrink();
                         final friend = snap.data!;
@@ -527,10 +530,6 @@ class _DiaryPageState extends State<DiaryPage> {
                               MaterialPageRoute(
                                 builder: (_) => UserPagePublic(
                                   userId: friend.uid,
-                                  diaryController: widget.diaryController,
-                                  userController: widget.userController,
-                                  trekkingController: widget.trekkingController,
-                                  onLocaleChanged: widget.onLocaleChanged,
                                 ),
                               ),
                             );
@@ -543,17 +542,23 @@ class _DiaryPageState extends State<DiaryPage> {
               ],
 
               // Photos and challenges
-              SectionTitle(text: local.photos_trekking_label, icon: Icons.photo),
+              SectionTitle(
+                text: local.photos_trekking_label,
+                icon: Icons.photo,
+              ),
               imageScroller(
                 diary.photos,
-                widget.diaryController.getDownloadUrlChild,
+                diaryController.getDownloadUrlChild,
               ),
 
               if (diary.challenges.isNotEmpty) ...[
-                SectionTitle(text: local.challenges_trekking_label, icon: Icons.flag),
+                SectionTitle(
+                  text: local.challenges_trekking_label,
+                  icon: Icons.flag,
+                ),
                 imageScroller(
                   diary.challenges,
-                  widget.diaryController.getDownloadUrl,
+                  diaryController.getDownloadUrl,
                 ),
               ],
 
@@ -563,15 +568,13 @@ class _DiaryPageState extends State<DiaryPage> {
                 spacing: 8,
                 children: diary.mood.map((m) {
                   return Chip(
-                    label: Text(
-                      m,
-                      style: const TextStyle(
-                        fontSize: 22, 
-                      ),
-                    ),
-                    backgroundColor: Theme.of(context).cardColor, 
+                    label: Text(m, style: const TextStyle(fontSize: 22)),
+                    backgroundColor: Theme.of(context).cardColor,
                     elevation: 2,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -581,7 +584,10 @@ class _DiaryPageState extends State<DiaryPage> {
 
               // Notes and refreshment point
               if (diary.refreshmentPoint.isNotEmpty) ...[
-                SectionTitle(text: local.refreshment_point_trekking_label, icon: Icons.local_cafe),
+                SectionTitle(
+                  text: local.refreshment_point_trekking_label,
+                  icon: Icons.local_cafe,
+                ),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(12),
@@ -591,7 +597,10 @@ class _DiaryPageState extends State<DiaryPage> {
               ],
 
               if (diary.notes.isNotEmpty) ...[
-                SectionTitle(text: local.notes_trekking_label, icon: Icons.notes),
+                SectionTitle(
+                  text: local.notes_trekking_label,
+                  icon: Icons.notes,
+                ),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(12),
@@ -599,13 +608,14 @@ class _DiaryPageState extends State<DiaryPage> {
                   ),
                 ),
               ],
-            ]
-          )
+            ],
+          ),
         );
       },
     );
   }
 }
+
 class SectionTitle extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -622,10 +632,7 @@ class SectionTitle extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -633,18 +640,12 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
-
 Widget infoRow(IconData icon, String text) {
   return Row(
     children: [
       Icon(icon, size: 16, color: Colors.grey),
       const SizedBox(width: 6),
-      Expanded(
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 14),
-        ),
-      ),
+      Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
     ],
   );
 }
@@ -674,11 +675,7 @@ Widget imageScroller(
             }
             return ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                snap.data!,
-                width: 160,
-                fit: BoxFit.cover,
-              ),
+              child: Image.network(snap.data!, width: 160, fit: BoxFit.cover),
             );
           },
         );
@@ -686,5 +683,3 @@ Widget imageScroller(
     ),
   );
 }
-
-

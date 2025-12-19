@@ -147,6 +147,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get minutes_trekking_label => 'minuten';
 
   @override
+  String get weather_trekking_label => 'Wetter';
+
+  @override
+  String get weather_trekking_botton => 'Klicken Sie hier, um das Wetter zu entdecken';
+
+  @override
   String get date_trekking_label => 'Datum';
 
   @override

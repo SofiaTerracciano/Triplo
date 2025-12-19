@@ -26,17 +26,9 @@ import '../../update_user_index.dart';
 import '../user_search_page/user_search_page.dart';
 
 class Landing_Page extends StatefulWidget {
-  final TrekkingController trekkingController;
-  final DiaryController diaryController;
-  final UserController userController;
-  final void Function(Locale) onLocaleChanged;
 
   const Landing_Page({
     super.key,
-    required this.trekkingController,
-    required this.diaryController,
-    required this.userController,
-    required this.onLocaleChanged,
   });
 
   @override
@@ -54,52 +46,28 @@ class _Landing_PageState extends State<Landing_Page> {
           _buildNavButton(
             context,
             'Home Page',
-            MyHomePage(
-              trekkingController: widget.trekkingController,
-              userController: widget.userController,
-              diaryController: widget.diaryController,
-              onLocaleChanged: widget.onLocaleChanged
-            ),
+            MyHomePage(),
           ),
           _buildNavButton(
             context,
             'Search Page',
-            SearchPage(
-              trekkingController: widget.trekkingController,
-              userController: widget.userController,
-              diaryController: widget.diaryController,
-              onLocaleChanged: widget.onLocaleChanged
-            ),
+            SearchPage(),
           ),
           _buildNavButton(
             context,
             'Setting Page',
-            SettingPage(
-              trekkingController: widget.trekkingController,
-              userController: widget.userController,
-              diaryController: widget.diaryController,
-              onLocaleChanged: widget.onLocaleChanged
-            ),
+            SettingPage(),
           ),
           // _buildNavButton(context, 'Splash Screen',  SplashScreen(onLocaleChanged: widget.onLocaleChanged)),
           _buildNavButton(
             context,
             'User Page',
-            UserPage(
-              trekkingController: widget.trekkingController,
-              userController: widget.userController,
-              diaryController: widget.diaryController,
-              onLocaleChanged: widget.onLocaleChanged),
+            UserPage(),
           ),
           _buildNavButton(
             context, 
             'Login Page', 
-            LoginPage(
-              trekkingController: widget.trekkingController,
-              userController: widget.userController,
-              diaryController: widget.diaryController,
-              onLocaleChanged: widget.onLocaleChanged
-            ),
+            LoginPage(),
           ),
           _buildNavButton(context, 'GeoWatch', GeoWatchPage()),
 
@@ -126,10 +94,8 @@ class _Landing_PageState extends State<Landing_Page> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => UserSearchPage(
-                    userController: widget.userController, // <- PRIMA MANCAVA
-                  ),
-                ),
+                  builder: (_) => UserSearchPage(),
+                )
               );
             },
           ),
