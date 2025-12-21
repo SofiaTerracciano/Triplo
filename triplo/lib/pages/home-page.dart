@@ -196,7 +196,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
       return TaggedPolyline(
         tag: t.documentId,
         points: t.points,
-        strokeWidth: 5,
+        strokeWidth: 3,
         color: difficultyToColor(t.difficulty_level),
       );
     }).toList();
