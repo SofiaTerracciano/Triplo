@@ -59,32 +59,30 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     final trekkingController = context.read<TrekkingController>();
     diaryPage = diaryController.getDiaryById(widget.diaryId)!;
 
-    // DATE
+    // Date
     final diaryParts = diaryPage.date.split('/');
     selectedDay = int.parse(diaryParts[0]);
     selectedMonth = int.parse(diaryParts[1]);
     selectedYear = int.parse(diaryParts[2]);
 
-    // DURATION
+    // Duration
     selectedHour = (diaryPage.duration / 60).toInt();
     selectedMinute = (diaryPage.duration % 60).toInt();
 
-    // 🔥 CLONI (IMPORTANTISSIMO)
     photos = List<String>.from(diaryPage.photos);
     friends = List<String>.from(diaryPage.friends);
     challenges = List<String>.from(diaryPage.challenges);
     mood = List<String>.from(diaryPage.mood);
 
-    // TEXT
+    // Notes and Refreshment controller and text
     notesText = diaryPage.notes;
     notesController.text = notesText;
-
     refreshmentText = diaryPage.refreshmentPoint;
     refreshmentController.text = refreshmentText;
 
     isPublic = diaryPage.isPublic;
 
-    // CHALLENGES SELECTED
+    // Challenges selected
     final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
     selectedIndexChallenge.addAll(
       trekking.challenges
@@ -94,6 +92,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
           .map((e) => e.key),
     );
 
+    // Mood available 
     final List<String> availableMoods = [
       "😍",
       "😁",
@@ -104,7 +103,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
       "🤩",
     ];
 
-    // MOOD SELECTED
+    // Mood selected
     selectedIndexMood.addAll(
       availableMoods
           .asMap()

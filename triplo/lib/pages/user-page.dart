@@ -92,6 +92,7 @@ class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     final userController = context.watch<UserController>();
     final user = userController.currentUser;
 
@@ -125,8 +126,6 @@ class _UserPageState extends State<UserPage> {
       );
     }
 
-    final local = AppLocalizations.of(context)!;
-
     // TabController for tabs in the body (public, private, saved)
     return DefaultTabController(
       length: 3,
@@ -145,7 +144,10 @@ class _UserPageState extends State<UserPage> {
 
                 await controller.logout();
 
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacementNamed(
+                  context, 
+                  '/login'
+                );
               },
             ),
           ],
@@ -161,6 +163,7 @@ class _UserPageState extends State<UserPage> {
                   // Avatar + username + level
                   Column(
                     children: [
+                      // Profile photo
                       GestureDetector(
                         onTap: () async {
                           final picked = await _pickImage();
@@ -186,6 +189,7 @@ class _UserPageState extends State<UserPage> {
                       ),
                       const SizedBox(height: 8),
                       // bisogna sistemare quando lo username è troppo lungo --> crea opverflow
+                      // username
                       Text(
                         user.username,
                         style: const TextStyle(
@@ -196,8 +200,9 @@ class _UserPageState extends State<UserPage> {
                         overflow: TextOverflow.ellipsis, 
                       ),
                       const SizedBox(height: 2),
+                      // Level
                       Text(
-                        '${local.level_label}: ${local.advanced_level}',
+                        '${local.level_label}: ${user.level}',
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.black54,
@@ -213,6 +218,7 @@ class _UserPageState extends State<UserPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Name and surname
                         Text(
                           '${user.name} ${user.surname}',
                           style: const TextStyle(
@@ -223,15 +229,18 @@ class _UserPageState extends State<UserPage> {
                           overflow: TextOverflow.ellipsis, // Mostra "..." se troppo lungo
                         ),     
                         const SizedBox(height: 6),
+                        // Stats: total trekking, followers, following
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Total trekking
                             _StatItem(
                               label: local.totals_trekking_label,
                               value:
                                   '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
                             ),
+                            // Followers
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
@@ -247,6 +256,7 @@ class _UserPageState extends State<UserPage> {
                                 value: '${user.followers.length}',
                               ),
                             ),
+                            // Following
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
@@ -506,7 +516,7 @@ class _StatItem extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         SizedBox(
-          width: 70, // forza il testo su due righe
+          width: 70,
           child: Text(
             label,
             textAlign: TextAlign.center,
@@ -519,3 +529,5 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
+
+

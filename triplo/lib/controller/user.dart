@@ -169,6 +169,9 @@ class UserController extends ChangeNotifier {
       "Public_diary": <String>[],
       "Private_diary": <String>[],
       "Saved_trekkings": <String>[],
+      "Level": "Beginner",
+      "Advanced": 0,
+      "Intermediate": 0,
     });
 
   }
@@ -189,8 +192,8 @@ class UserController extends ChangeNotifier {
     if (!doc.exists) {
       await _db.collection("users").doc(uid).set({
         "Username": username,
-        //"Photo_profile": photoURL,
-        if (photoURL.isNotEmpty) "Photo_profile": photoURL,
+        if (photoURL.isNotEmpty) 
+          "Photo_profile": photoURL,
         "Name": "",
         "Surname": "",
         "Birthdate": DateTime.now().toIso8601String(),
@@ -201,6 +204,9 @@ class UserController extends ChangeNotifier {
         "Public_diary": [],
         "Private_diary": [],
         "Saved_trekkings": [],
+        "Level": "Beginner",
+        "Advanced": 0,
+        "Intermediate": 0,
       });
       try {
         await _createUserIndex(uid, username);
@@ -401,6 +407,12 @@ class UserController extends ChangeNotifier {
     ))
         .whereType<Trekking>()
         .toList();
+    
+    //Level
+    final level = (data["Level"] ?? "") as String;
+
+    final advanced = (data["Advanced"] ?? 0) as int;
+    final intermediate = (data["Intermediate"] ?? 0) as int;
 
     _currentUser = Users(
       uid: uid,
@@ -415,6 +427,9 @@ class UserController extends ChangeNotifier {
       publicDiaryPages: publicDiary,
       privateDiaryPages: privateDiary,
       savedTrekkings: savedTrek,
+      level: level,
+      advanced: advanced,
+      intermediate: intermediate,
     );
 
     notifyListeners();
@@ -712,13 +727,6 @@ class UserController extends ChangeNotifier {
     );
   }
 
-
-
-
-
-
-
-
   bool get isPasswordUser {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -727,4 +735,47 @@ class UserController extends ChangeNotifier {
           (p) => p.providerId == 'password',
     );
   }
+
+  // Upadates user level based on trekking difficulty
+  Future<void> updateUserLevel(String difficultyLevel) async {
+    final uid = _auth.currentUser!.uid;
+    final userDoc = _db.collection("users").doc(uid);
+    final userSnapshot = await userDoc.get();
+    if (!userSnapshot.exists) 
+      return;
+
+    int intermediate = _currentUser!.intermediate;
+    int advanced = _currentUser!.advanced;
+
+    // Aggiorna i counts in base alla difficoltà del trekking
+    if (difficultyLevel == 'Intermediate') {
+      intermediate += 1;
+    } else if (difficultyLevel == 'Advanced') {
+      advanced += 1;
+    }
+
+    // Calcola il nuovo livello
+    String newLevel;
+    if (advanced >= 5) {
+      newLevel = 'Advanced';
+    } else if (intermediate >= 5) {
+      newLevel = 'Intermediate';
+    } else {
+      newLevel = 'Beginner';
+    }
+
+    // Aggiorna Firebase
+    await userDoc.update({
+      "Intermediate": intermediate,
+      "Advanced": advanced,
+      "Level": newLevel,
+    });
+
+    // Aggiorna anche il modello locale
+    _currentUser?.intermediate = intermediate;
+    _currentUser?.advanced = advanced;
+    _currentUser?.level = newLevel;
+    notifyListeners();
+  }
+
 }

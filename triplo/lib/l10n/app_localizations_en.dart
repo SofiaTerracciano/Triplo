@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get level_label => 'Level';
 
   @override
-  String get begginer_level => 'Beginner';
+  String get beginner_level => 'Beginner';
 
   @override
   String get intermediate_level => 'Intermediate';
@@ -210,7 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get photos_trekking_label => 'Photos';
 
   @override
-  String get refuge_trekking_label => '“Did you eat there?”';
+  String get refuge_trekking_label => 'Did you eat there?';
 
   @override
   String get yes_botton_label => 'Yes';

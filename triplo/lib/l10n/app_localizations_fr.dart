@@ -51,7 +51,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get level_label => 'Niveau';
 
   @override
-  String get begginer_level => 'Débutant';
+  String get beginner_level => 'Débutant';
 
   @override
   String get intermediate_level => 'Intermédiaire';

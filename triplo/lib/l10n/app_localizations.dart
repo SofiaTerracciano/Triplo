@@ -185,11 +185,11 @@ abstract class AppLocalizations {
   /// **'Level'**
   String get level_label;
 
-  /// No description provided for @begginer_level.
+  /// No description provided for @beginner_level.
   ///
   /// In en, this message translates to:
   /// **'Beginner'**
-  String get begginer_level;
+  String get beginner_level;
 
   /// No description provided for @intermediate_level.
   ///
@@ -506,7 +506,7 @@ abstract class AppLocalizations {
   /// No description provided for @refuge_trekking_label.
   ///
   /// In en, this message translates to:
-  /// **'“Did you eat there?”'**
+  /// **'Did you eat there?'**
   String get refuge_trekking_label;
 
   /// No description provided for @yes_botton_label.

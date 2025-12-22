@@ -1,5 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'diary.dart';
 import 'trekking.dart';
 /**
@@ -21,6 +19,9 @@ class Users {
   List<Diary> _publicDiaryPages;
   List<Diary> _privateDiaryPages;
   List<Trekking> _savedTrekkings;
+  String _level;
+  int _advanced;
+  int _intermediate;
 
   /** Constructor for creating a full user object in memory */
   Users({
@@ -35,6 +36,9 @@ class Users {
     required List<Diary> publicDiaryPages,
     required List<Diary> privateDiaryPages,
     required List<Trekking> savedTrekkings,
+    required String level,
+    required int advanced,
+    required int intermediate,
     String? photoProfile,
   }) : _uid = uid,
        _username = username,
@@ -47,7 +51,10 @@ class Users {
        _publicDiaryPages = publicDiaryPages,
        _privateDiaryPages = privateDiaryPages,
        _savedTrekkings = savedTrekkings,
-       _photoProfile = photoProfile ?? "";
+       _photoProfile = photoProfile ?? "",
+       _level = level,
+       _advanced = advanced,
+       _intermediate = intermediate;
 
   // Getters
   String get username => _username;
@@ -62,6 +69,9 @@ class Users {
   List<Diary> get privateDiaryPages => _privateDiaryPages;
   List<Trekking> get savedTrekkings => _savedTrekkings;
   String get uid => _uid;
+  String get level => _level;
+  int get advanced => _advanced;
+  int get intermediate => _intermediate;
 
   // Setters
   set username(String username) => _username = username;
@@ -78,6 +88,9 @@ class Users {
       _privateDiaryPages = privatePages;
   set savedTrekkings(List<Trekking> savedTrekkings) =>
       _savedTrekkings = savedTrekkings;
+  set level(String level) => _level = level;
+  set advanced(int advanced) => _advanced = advanced;
+  set intermediate(int intermediate) => _intermediate = intermediate;
 
   /*
   Map<String, dynamic> toMap() {
@@ -121,6 +134,9 @@ class Users {
       "Public_diary": _publicDiaryPages.map((d) => d.diaryId).toList(),
       "Private_diary": _privateDiaryPages.map((d) => d.diaryId).toList(),
       "Saved_trekkings": _savedTrekkings.map((d) => d.documentId).toList(),
+      "Level": _level,
+      "Advanced": _advanced.toInt(),
+      "Intermediate": _intermediate.toInt(),
     };
   }
 
@@ -188,11 +204,16 @@ class Users {
       publicDiaryPages: const [],
       privateDiaryPages: const [],
       savedTrekkings: const [],
+      level:  (map["Level"] ?? ""),
+      advanced: map["Advanced"] is int
+      ? map["Advanced"]
+      : int.tryParse(map["Advanced"]?.toString() ?? "0") ?? 0,
+
+      intermediate: map["Intermediate"] is int
+          ? map["Intermediate"]
+          : int.tryParse(map["Intermediate"]?.toString() ?? "0") ?? 0,
     );
   }
-
-
-
 
   static DateTime _defaultBirthdate = DateTime(2000, 1, 1);
   /** Helper for parsing the birthdate */

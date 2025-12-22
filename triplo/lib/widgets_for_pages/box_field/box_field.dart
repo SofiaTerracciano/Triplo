@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/l10n/app_localizations_de.dart';
-import 'package:triplo/l10n/app_localizations_it.dart';
-import 'package:triplo/l10n/app_localizations_en.dart';
-import 'package:triplo/l10n/app_localizations_fr.dart';
-import 'package:triplo/l10n/app_localizations_es.dart';
 
 // A reusable text input field used for login and forms (optional password hiding)
 class BoxField extends StatefulWidget {

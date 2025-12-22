@@ -612,7 +612,6 @@ class _StorageImage extends StatelessWidget {
   );
 }
 
-
 // Cache for search page data
 class SearchCache {
   static List<Diary>? randomDiaries;

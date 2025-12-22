@@ -1,6 +1,3 @@
-import 'user.dart';
-import 'trekking.dart';
-
 class Diary {
   final String diaryId;
 

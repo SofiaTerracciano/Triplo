@@ -9,7 +9,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:triplo/model/challenges.dart';
-import 'package:triplo/pages/challenges-page.dart';
 
 class API {
   late final String openWeatherKey;

@@ -51,7 +51,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get level_label => 'Nivel';
 
   @override
-  String get begginer_level => 'Principiante';
+  String get beginner_level => 'Principiante';
 
   @override
   String get intermediate_level => 'Intermedio';

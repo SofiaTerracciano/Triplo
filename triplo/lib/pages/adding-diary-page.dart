@@ -63,6 +63,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
     final userController = context.watch<UserController>();
+    final user = userController.currentUser!;
     final diaryController = context.watch<DiaryController>();
     final local = AppLocalizations.of(context)!;
 
@@ -276,7 +277,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // PREVIEW challenge selezionate
+                  // Preview challenge selected
                   challenges.isEmpty
                       ? Text(
                           local.challenge_selected_label,
@@ -540,6 +541,8 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                         false,
                         '',
                       );
+
+                      await userController.updateUserLevel(trekking.difficulty_level);
 
                       Navigator.pushReplacement(
                         context,

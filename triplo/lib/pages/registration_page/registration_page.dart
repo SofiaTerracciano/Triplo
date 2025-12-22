@@ -1,10 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:triplo/l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
-
 import '../user-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';

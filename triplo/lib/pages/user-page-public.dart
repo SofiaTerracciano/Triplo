@@ -102,7 +102,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${local.level_label}: ${local.advanced_level}',
+                      '${local.level_label}: ${u.level}',
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.black54,
