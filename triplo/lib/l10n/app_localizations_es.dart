@@ -42,6 +42,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get share_profile_button_label => 'Compartir perfil';
 
   @override
+  String get watch_profile_dialog_level => '¡Mira mi perfil en Triplo!';
+
+  @override
+  String get my_profile_dialog_level => 'Mi perfil Triplo';
+
+  @override
   String get level_label => 'Nivel';
 
   @override
@@ -54,6 +60,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get advanced_level => 'Experto';
 
   @override
+  String get no_public_diary_label => 'No hay diarios públicos';
+
+  @override
+  String get no_private_diary_label => 'No hay diarios privados';
+
+  @override
+  String get no_saved_trekking_label => 'No hay rutas guardadas';
+
+  @override
   String get follow_label => 'Seguir';
 
   @override
@@ -64,6 +79,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get cancel_button_label => 'Cancelar';
+
+  @override
+  String get user_label => 'Usuarios';
+
+  @override
+  String get trekking_label => 'Rutas';
+
+  @override
+  String get no_user_found_label => 'No se encontraron usuarios';
+
+  @override
+  String get no_trekking_found_label => 'No se encontraron rutas';
+
+  @override
+  String get no_diary_found_label => 'No hay diarios públicos';
 
   @override
   String get settings_page_title => 'Configuración';

@@ -167,6 +167,18 @@ abstract class AppLocalizations {
   /// **'Share Profile'**
   String get share_profile_button_label;
 
+  /// No description provided for @watch_profile_dialog_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch my profile on Triplo!'**
+  String get watch_profile_dialog_level;
+
+  /// No description provided for @my_profile_dialog_level.
+  ///
+  /// In en, this message translates to:
+  /// **'My Triplo Profile'**
+  String get my_profile_dialog_level;
+
   /// No description provided for @level_label.
   ///
   /// In en, this message translates to:
@@ -191,6 +203,24 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get advanced_level;
 
+  /// No description provided for @no_public_diary_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No public diary'**
+  String get no_public_diary_label;
+
+  /// No description provided for @no_private_diary_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No private diary'**
+  String get no_private_diary_label;
+
+  /// No description provided for @no_saved_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved trekking'**
+  String get no_saved_trekking_label;
+
   /// No description provided for @follow_label.
   ///
   /// In en, this message translates to:
@@ -214,6 +244,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel_button_label;
+
+  /// No description provided for @user_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get user_label;
+
+  /// No description provided for @trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trekking'**
+  String get trekking_label;
+
+  /// No description provided for @no_user_found_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No user found'**
+  String get no_user_found_label;
+
+  /// No description provided for @no_trekking_found_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No trekking found'**
+  String get no_trekking_found_label;
+
+  /// No description provided for @no_diary_found_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No public diary'**
+  String get no_diary_found_label;
 
   /// No description provided for @settings_page_title.
   ///

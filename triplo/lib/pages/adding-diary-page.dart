@@ -1,88 +1,83 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/pages/trekking-page.dart';
-import 'package:triplo/pages/user-page.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/diary.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:provider/provider.dart';
+import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/loading-page.dart';
+
 class AddingDiaryPage extends StatefulWidget {
   final String trekkingId;
-
+  
   const AddingDiaryPage({
-    super.key,
-    required this.trekkingId,
+    super.key, 
+    required this.trekkingId
   });
 
   @override
-  AddingDiaryPageState createState() => AddingDiaryPageState();
+  State<AddingDiaryPage> createState() => _AddingDiaryPageState();
 }
 
-class AddingDiaryPageState extends State<AddingDiaryPage> {
-  final TextEditingController notesController = TextEditingController();
-  final TextEditingController refreshmentController = TextEditingController();
-  final ImagePicker picker = ImagePicker();
+class _AddingDiaryPageState extends State<AddingDiaryPage> {
+  final _notesController = TextEditingController();
+  final _refreshmentController = TextEditingController();
+  final _picker = ImagePicker();
 
-  int? selectedDay = 1;
-  int? selectedMonth = 1;
-  int? selectedYear = 2000;
-
-  int? selectedHour = 0;
-  int? selectedMinute = 0;
+  // Date variables
+  late int selectedDay;
+  late int selectedMonth;
+  late int selectedYear;
+  int selectedHours = 0;
+  int selectedMinutes = 0;
 
   final List<File> _images = [];
-  List<String> photos = [];
-
-  bool usedRefreshmentPoint = false;
-  String refreshmentText = '';
-
-  String notesText = '';
-
-  bool isPublic =
-      false; 
-
   final List<String> friends = [];
-  final List<int> selectedIndexFriends = [];
-
   final List<String> challenges = [];
-  final List<int> selectedIndexChallenge = [];
+  final List<int> selectedChallengeIndexes = [];
+  final List<String> moods = [];
 
-  final List<String> mood = [];
-  final List<int> selectedIndexMood = [];
+  bool usedRefreshment = false;
+  bool isPublic = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    selectedDay = now.day;
+    selectedMonth = now.month;
+    selectedYear = now.year;
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    _refreshmentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
     final userController = context.watch<UserController>();
     final diaryController = context.watch<DiaryController>();
-
-    final Trekking trekkingName = trekkingController.getTrekkingById(
-      widget.trekkingId,
-    )!;
     final local = AppLocalizations.of(context)!;
 
-    final List<int> days = List<int>.generate(31, (i) => i + 1);
-    final List<int> months = List<int>.generate(12, (i) => i + 1);
-    final List<int> years = List<int>.generate(
-      100,
-      (i) => 2025 - i,
-    ); // ultimi 100 anni
-    final List<int> hours = List<int>.generate(24, (i) => i); // 0–23
-    final List<int> minutes = List<int>.generate(60, (i) => i); // 0–59
+    final Trekking trekking = trekkingController.getTrekkingById(
+      widget.trekkingId,
+    )!;
 
-    final List<String> availableMoods = [
-      "😍",
-      "😁",
-      "🥰",
-      "😅",
-      "😎",
-      "😞",
-      "🤩",
-    ];
-    final List<String> availableMoodsLabels = [
+    final days = List.generate(31, (i) => i + 1);
+    final months = List.generate(12, (i) => i + 1);
+    final years = List.generate(100, (i) => DateTime.now().year - i);
+    final hoursList = List.generate(24, (i) => i);
+    final minutesList = List.generate(60, (i) => i);
+
+    final availableMoods = ["😍", "😁", "🥰", "😅", "😎", "😞", "🤩"];
+    final moodLabels = [
       local.mood_love_label,
       local.mood_happy_label,
       local.mood_relaxed_label,
@@ -93,310 +88,221 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(trekkingName.name)),
+      appBar: AppBar(title: Text(trekking.name), centerTitle: true),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Date
-              Text("${local.date_trekking_label}:"),
-              SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            // Date picker
+            _section(
+              context,
+              local.date_trekking_label,
+              Icons.calendar_today,
+              Column(
                 children: [
-                  // Day
-                  DropdownButton<int>(
-                    hint: Text(local.day_trekking_label),
-                    value: selectedDay,
-                    onChanged: (value) {
-                      setState(() => selectedDay = value);
-                    },
-                    items: days
-                        .map(
-                          (day) => DropdownMenuItem(
-                            value: day,
-                            child: Text(day.toString()),
-                          ),
-                        )
-                        .toList(),
-                  ),
-
-                  SizedBox(width: 16),
-
-                  // Month
-                  DropdownButton<int>(
-                    hint: Text(local.month_trekking_label),
-                    value: selectedMonth,
-                    onChanged: (value) {
-                      setState(() => selectedMonth = value);
-                    },
-                    items: months
-                        .map(
-                          (month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month.toString()),
-                          ),
-                        )
-                        .toList(),
-                  ),
-
-                  SizedBox(width: 16),
-
-                  // Year
-                  DropdownButton<int>(
-                    hint: Text(local.year_trekking_label),
-                    value: selectedYear,
-                    onChanged: (value) {
-                      setState(() => selectedYear = value);
-                    },
-                    items: years
-                        .map(
-                          (year) => DropdownMenuItem(
-                            value: year,
-                            child: Text(year.toString()),
-                          ),
-                        )
-                        .toList(),
-                  ),
+                  _rowDropdown([
+                    _dropdown(
+                      selectedDay,
+                      days,
+                      (v) => setState(() => selectedDay = v),
+                    ),
+                    _dropdown(
+                      selectedMonth,
+                      months,
+                      (v) => setState(() => selectedMonth = v),
+                    ),
+                    _dropdown(
+                      selectedYear,
+                      years,
+                      (v) => setState(() => selectedYear = v),
+                    ),
+                  ]),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Duration
-              Text("${local.duration_trekking_label}:"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            const SizedBox(height: 8),
+            // Duration picker
+            _section(
+              context,
+              local.duration_trekking_label,
+              Icons.timer, 
+              Column(
                 children: [
-                  // Hours
-                  DropdownButton<int>(
-                    hint: Text(local.hours_trekking_label),
-                    value: selectedHour,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedHour = value;
-                      });
-                    },
-                    items: hours
-                        .map(
-                          (hour) => DropdownMenuItem(
-                            value: hour,
-                            child: Text(hour.toString().padLeft(2, '0')),
-                          ),
-                        )
-                        .toList(),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  // Minutes
-                  DropdownButton<int>(
-                    hint: Text(local.minutes_trekking_label),
-                    value: selectedMinute,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMinute = value;
-                      });
-                    },
-                    items: minutes
-                        .map(
-                          (min) => DropdownMenuItem(
-                            value: min,
-                            child: Text(min.toString().padLeft(2, '0')),
-                          ),
-                        )
-                        .toList(),
-                  ),
+                  _rowDropdown([
+                    _dropdown(
+                      selectedHours,
+                      hoursList,
+                      (v) => setState(() => selectedHours = v),
+                      pad: true,
+                    ),
+                    _dropdown(
+                      selectedMinutes,
+                      minutesList,
+                      (v) => setState(() => selectedMinutes = v),
+                      pad: true,
+                    ),
+                  ]),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Friends
+            ),
+            const SizedBox(height: 8),
+            // Friends selector
+            _section(
+              context,
+              local.friends_trekking_label,
+              Icons.group,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${local.friends_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    friends.isEmpty
-                        ? local.friends_selected_label 
-                        : userController.currentUser!.following
-                              .where((u) => friends.contains(u.uid))
-                              .map((u) => u.username)
-                              .join(
-                                ", ",
-                              ), // visualizzati del tipo Friends: amico1, amico2, amico3
-                    style: const TextStyle(fontSize: 16),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  ExpansionTile(
-                    title: Text(local.choose_friend_label), 
-                    children: [
-                      SizedBox(
-                        height: 220, // lista scrollabile
-                        child: ListView.builder(
-                          itemCount: userController.currentUser!.following.length, //da cambiare con following index
-                          itemBuilder: (context, index) {
-                            final followingUser =
-                                userController.currentUser!.following[index]; 
-                            final isSelected = friends.contains(
-                              followingUser.uid,
-                            );
-
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: followingUser.photoProfile != null &&
-                                        followingUser.photoProfile!.isNotEmpty
-                                    ? NetworkImage(followingUser.photoProfile!)
-                                    : null,
-                                child: followingUser.photoProfile == null ||
-                                        followingUser.photoProfile!.isEmpty
-                                    ? const Icon(Icons.person)
-                                    : null,
-                              ),
-                              title: Text(followingUser.username),
-                              trailing: Icon(
-                                isSelected
-                                    ? Icons.check_circle
-                                    : Icons.circle_outlined,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    friends.remove(followingUser.uid);
-                                  } else {
-                                    friends.add(followingUser.uid);
-                                  }
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-              // Notes
-              Text("${local.notes_trekking_label}: "),
-              TextField(
-                controller: notesController,
-                decoration: InputDecoration(
-                  hintText: local.notes_placeholder_trekking_label,
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.text_fields),
-                ),
-                onChanged: (value) {
-                  notesText = value;
-                },
-              ),
-              const SizedBox(height: 8),
-              // Refreshment
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.refuge_trekking_label}: ",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Row(
-                    children: [
-                      Radio<bool>(
-                        value: true,
-                        groupValue: usedRefreshmentPoint,
-                        onChanged: (val) {
-                          setState(() {
-                            usedRefreshmentPoint = val!;
-                          });
-                        },
-                      ),
-                      Text(local.yes_botton_label),
-                      const SizedBox(width: 20),
-                      Radio<bool>(
-                        value: false,
-                        groupValue: usedRefreshmentPoint,
-                        onChanged: (val) {
-                          setState(() {
-                            usedRefreshmentPoint = val!;
-                          });
-                        },
-                      ),
-                      Text(local.no_botton_label),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  if (usedRefreshmentPoint)
-                    TextField(
-                      controller: refreshmentController,
-                      decoration: InputDecoration(
-                        labelText: local.notes_placeholder_trekking_label,
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 1,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              // Challenges
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.challenges_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Mostra immagini selezionate
-                  challenges.isEmpty
+                  // Preview friends selected
+                  friends.isEmpty
                       ? Text(
-                          local.challenge_selected_label, 
-                          style: TextStyle(fontSize: 16),
+                          local.friends_selected_label, // "No friends selected"
+                          style: const TextStyle(fontSize: 14),
                         )
                       : Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: challenges.map((challenge) {
+                          children: userController.currentUser!.following
+                              .where((u) => friends.contains(u.uid))
+                              .map(
+                                (u) => Chip(
+                                  avatar: CircleAvatar(
+                                    backgroundImage:
+                                        (u.photoProfile?.isNotEmpty ?? false)
+                                            ? NetworkImage(u.photoProfile!)
+                                            : null,
+                                    child: (u.photoProfile?.isEmpty ?? true)
+                                        ? const Icon(Icons.person, size: 14)
+                                        : null,
+                                  ),
+                                  label: Text(u.username),
+                                  onDeleted: () {
+                                    setState(() => friends.remove(u.uid));
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        ),
+
+                  const SizedBox(height: 8),
+                  // Selection of friends
+                  ExpansionTile(
+                    title: Text(local.choose_friend_label),
+                    children: userController.currentUser!.following.map((u) {
+                      final selected = friends.contains(u.uid);
+                      return ListTile(
+                        dense: true,
+                        leading: CircleAvatar(
+                          radius: 16,
+                          backgroundImage: (u.photoProfile?.isNotEmpty ?? false)
+                              ? NetworkImage(u.photoProfile!)
+                              : null,
+                          child: (u.photoProfile?.isEmpty ?? true)
+                              ? const Icon(Icons.person, size: 18)
+                              : null,
+                        ),
+                        title: Text(u.username, style: const TextStyle(fontSize: 14)),
+                        trailing: Icon(
+                          selected ? Icons.check_circle : Icons.circle_outlined,
+                        ),
+                        onTap: () => setState(() {
+                          selected ? friends.remove(u.uid) : friends.add(u.uid);
+                        }),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Notes input
+            _section(
+              context,
+              local.notes_trekking_label,
+              Icons.notes,
+              TextField(
+                controller: _notesController,
+                maxLines: 3,
+                style: const TextStyle(fontSize: 14),
+                decoration: _input(local.notes_placeholder_trekking_label),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Refreshment input
+            _section(
+              context,
+              local.refuge_trekking_label,
+              Icons.restaurant,
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ChoiceChip(
+                        label: Text(local.yes_botton_label),
+                        selected: usedRefreshment,
+                        onSelected: (_) =>
+                            setState(() => usedRefreshment = true),
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: Text(local.no_botton_label),
+                        selected: !usedRefreshment,
+                        onSelected: (_) =>
+                            setState(() => usedRefreshment = false),
+                      ),
+                    ],
+                  ),
+                  if (usedRefreshment) ...[
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _refreshmentController,
+                      style: const TextStyle(fontSize: 14),
+                      decoration: _input(
+                        local.refreshment_point_trekking_label,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Challenges selector
+            _section(
+              context,
+              local.challenges_trekking_label,
+              Icons.flag,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // PREVIEW challenge selezionate
+                  challenges.isEmpty
+                      ? Text(
+                          local.challenge_selected_label,
+                          style: const TextStyle(fontSize: 14),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: challenges.map((c) {
                             return FutureBuilder<String>(
-                              future: trekkingController.getDownloadUrl(challenge),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.hasData) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      snapshot.data!,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    ),
+                              future: trekkingController.getDownloadUrl(c),
+                              builder: (_, snap) {
+                                if (!snap.hasData) {
+                                  return const SizedBox(
+                                    width: 60,
+                                    height: 60,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
                                   );
                                 }
-                                return const SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    snap.data!,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
                                   ),
                                 );
                               },
@@ -406,24 +312,20 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   const SizedBox(height: 8),
 
-                  // Challenges
+                  // Selection of challenges
                   ExpansionTile(
-                    title: Text(local.choose_challenge_label), 
+                    title: Text(local.choose_challenge_label),
                     children: [
                       SizedBox(
                         height: 260,
-                        child: FutureBuilder(
+                        child: FutureBuilder<List<String>>(
                           future: Future.wait(
-                            trekkingController
-                                .getTrekkingById(widget.trekkingId)!
-                                .challenges
+                            trekking.challenges
                                 .map((c) => trekkingController.getDownloadUrl(c)),
                           ),
-                          builder: (context, snapshot) {
+                          builder: (_, snapshot) {
                             if (!snapshot.hasData) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              return const Center(child: CircularProgressIndicator());
                             }
 
                             final urls = snapshot.data!;
@@ -432,53 +334,41 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                               padding: const EdgeInsets.all(8),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        4, // 4 per riga --> si crea uan cosa Nx4
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
-                                  ),
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                              ),
                               itemCount: urls.length,
-                              itemBuilder: (context, index) {
-                                final challengeName = trekkingController
-                                    .getTrekkingById(widget.trekkingId)!
-                                    .challenges[index];
-
-                                final imageUrl = urls[index];
-
-                                final isSelected = selectedIndexChallenge
-                                    .contains(index);
+                              itemBuilder: (_, index) {
+                                final challengeName = trekking.challenges[index];
+                                final isSelected =
+                                    selectedChallengeIndexes.contains(index);
 
                                 return GestureDetector(
                                   onTap: () {
                                     setState(() {
                                       if (isSelected) {
-                                        selectedIndexChallenge.remove(index);
+                                        selectedChallengeIndexes.remove(index);
                                         challenges.remove(challengeName);
                                       } else {
-                                        selectedIndexChallenge.add(index);
+                                        selectedChallengeIndexes.add(index);
                                         challenges.add(challengeName);
                                       }
                                     });
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: isSelected
-                                            ? const Color.fromARGB(
-                                                255,
-                                                155,
-                                                241,
-                                                158,
-                                              )
-                                            : Colors.grey,
+                                        color:
+                                            isSelected ? Colors.green : Colors.grey,
                                         width: isSelected ? 2 : 1,
                                       ),
-                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(10),
                                       child: Image.network(
-                                        imageUrl,
+                                        urls[index],
                                         fit: BoxFit.cover,
                                       ),
                                     ),
@@ -493,291 +383,281 @@ class AddingDiaryPageState extends State<AddingDiaryPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Mood
+            ),
+            const SizedBox(height: 8),
+            // Mood selector
+            _section(
+              context,
+              local.mood_trekking_label,
+              Icons.mood,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${local.mood_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  // Preview mood slected
+                  moods.isEmpty
+                      ? Text(
+                          local.mood_selected_label, // "No mood selected"
+                          style: const TextStyle(fontSize: 14),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          children: moods
+                              .map(
+                                (m) => Chip(
+                                  label: Text(m, style: const TextStyle(fontSize: 20)),
+                                  onDeleted: () {
+                                    setState(() => moods.remove(m));
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        ),
+
                   const SizedBox(height: 8),
 
-                  Text(
-                    mood.isEmpty
-                        ? local.mood_selected_label
-                        : mood.join(
-                            ", ",
-                          ), // mostra solo gli emoji separati da virgola
-                    style: const TextStyle(fontSize: 16),
-                  ),
-
-                  const SizedBox(height: 12),
-
                   ExpansionTile(
-                    title: Text(local.choose_mood_label), 
-                    children: [
-                      SizedBox(
-                        height: 220, // altezza della lista scrollabile
-                        child: ListView.builder(
-                          itemCount: availableMoods.length,
-                          itemBuilder: (context, index) {
-                            final emoji = availableMoods[index];
-                            final label = availableMoodsLabels[index];
-                            final isSelected = selectedIndexMood.contains(
-                              index,
-                            );
-
-                            return InkWell(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    selectedIndexMood.remove(index);
-                                    mood.remove(emoji);
-                                  } else {
-                                    selectedIndexMood.add(index);
-                                    mood.add(emoji);
-                                  }
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
-                                ),
-                                color: isSelected
-                                    ? Colors.blue.withOpacity(0.3)
-                                    : Colors.transparent,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      emoji,
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      label,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                    title: Text(local.choose_mood_label),
+                    children: List.generate(availableMoods.length, (i) {
+                      final emoji = availableMoods[i];
+                      final selected = moods.contains(emoji);
+                      return ListTile(
+                        dense: true,
+                        leading: Text(emoji, style: const TextStyle(fontSize: 20)),
+                        title: Text(moodLabels[i], style: const TextStyle(fontSize: 14)),
+                        trailing:
+                            Icon(selected ? Icons.check_circle : Icons.circle_outlined),
+                        onTap: () => setState(() {
+                          selected ? moods.remove(emoji) : moods.add(emoji);
+                        }),
+                      );
+                    }),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Photos
+            ),
+            const SizedBox(height: 8),
+            // Photos picker
+            _section(
+              context,
+              local.photos_trekking_label,
+              Icons.photo,
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${local.photos_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  if (_images.isNotEmpty)
+                    SizedBox(
+                      height: 90,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _images.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 6),
+                        itemBuilder: (_, i) => ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            _images[i],
+                            width: 90,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+
                   const SizedBox(height: 8),
 
                   ElevatedButton.icon(
-                    onPressed: () async {
-                      final pickedFiles = await picker.pickMultiImage(
-                        maxWidth: 800,
-                        maxHeight: 800,
-                      );
-                      if (pickedFiles.isNotEmpty) {
-                        setState(() {
-                          _images
-                            ..clear()
-                            ..addAll(pickedFiles.map((x) => File(x.path)));
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.photo_library),
+                    icon: const Icon(Icons.add_photo_alternate, size: 18),
                     label: Text(local.add_botton_label),
+                    onPressed: _pickImages,
                   ),
-
-                  const SizedBox(height: 8),
-
-                  if (_images.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _images.length,
-                        itemBuilder: (_, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.file(
-                              _images[index],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
                 ],
               ),
-              const SizedBox(height: 8),
-              // Public/Private botton
+            ),
+            const SizedBox(height: 8),
+            // Public/Private toggle
+            _section(
+              context,
+              local.public_private_label,
+              Icons.lock,
               Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(local.public_private_label),
-
-                  const SizedBox(height: 12),
-
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // PUBLIC
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isPublic
-                              ? const Color.fromARGB(255, 48, 48, 48)
-                              : Colors.grey[300],
-                          foregroundColor: isPublic
-                              ? Colors.white
-                              : Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: isPublic
-                              ? 4
-                              : 0, // ombra SOLO quando selezionato
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isPublic = true;
-                          });
-                        },
-                        child: Text(local.public_botton_label),
+                      _toggle(
+                        local.public_botton_label,
+                        isPublic,
+                        () => setState(() => isPublic = true),
                       ),
-
-                      const SizedBox(width: 16),
-
-                      // PRIVATE
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: !isPublic
-                              ? const Color.fromARGB(255, 48, 48, 48)
-                              : Colors.grey[300],
-                          foregroundColor: !isPublic
-                              ? Colors.white
-                              : Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: !isPublic
-                              ? 4
-                              : 0, // ombra SOLO quando selezionato
-                        ), 
-                        onPressed: () {
-                          setState(() {
-                            isPublic = false;
-                          });
-                        },
-                        child: Text(local.private_botton_label),
+                      const SizedBox(width: 8),
+                      _toggle(
+                        local.private_botton_label,
+                        !isPublic,
+                        () => setState(() => isPublic = false),
                       ),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Add/Cancel botton
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TrekkingPage(
-                              trekkingId: trekkingName.documentId,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Text(local.cancel_button_label),
-                    ),
+            ),
+            const SizedBox(height: 16),
+            // Save/Cancel buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(local.cancel_button_label),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        String castedDate =
-                            "${selectedDay.toString().padLeft(2, '0')} / "
-                            "${selectedMonth.toString().padLeft(2, '0')} / "
-                            "${selectedYear.toString()}";
-                        double summedDuation =
-                            selectedHour!.toDouble() * 60 +
-                            selectedMinute!.toDouble();
-                        photos = await diaryController.uploadDiaryImages(_images);
-                        diaryController.addDiary(
-                          trekkingName.name,
-                          isPublic,
-                          castedDate,
-                          summedDuation,
-                          friends,
-                          photos,
-                          challenges,
-                          refreshmentText,
-                          mood,
-                          notesText,
-                          false,
-                          '',
-                        );
-                        
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserPage(),
-                          ),
-                        );
-                      },
-                      child: Text(local.save_botton_label),
-                    ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    child: Text(local.save_botton_label),
+                    onPressed: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoadingPage()),
+                      );
+
+                      final date =
+                          "${selectedDay.toString().padLeft(2, '0')}/${selectedMonth.toString().padLeft(2, '0')}/$selectedYear";
+                      final duration = selectedHours * 60 + selectedMinutes;
+                      final photos = await diaryController.uploadDiaryImages(
+                        _images,
+                      );
+
+                      await diaryController.addDiary(
+                        trekking.name,
+                        isPublic,
+                        date,
+                        duration.toDouble(),
+                        friends,
+                        photos,
+                        challenges,
+                        _refreshmentController.text,
+                        moods,
+                        _notesController.text,
+                        false,
+                        '',
+                      );
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const UserPage()),
+                      );
+                    },
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Future<void> pickImages(ImagePicker picker, List<File> images) async {
-    final List<XFile>? pickedFiles = await picker.pickMultiImage(
-      maxWidth: 800,
-      maxHeight: 800,
+  // Section card widget
+  Widget _section(BuildContext context, String title, IconData icon, Widget c) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 6),
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            c,
+          ],
+        ),
+      ),
     );
+  }
 
-    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+  // Row of dropdowns
+  Widget _rowDropdown(List<Widget> children) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children
+          .map(
+            (e) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: e,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  // Dropdown widget
+  Widget _dropdown(
+    int value,
+    List<int> items,
+    ValueChanged<int> onChanged, {
+    bool pad = false,
+  }) {
+    return DropdownButton<int>(
+      value: value,
+      onChanged: (v) => onChanged(v!),
+      items: items
+          .map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(pad ? e.toString().padLeft(2, '0') : e.toString()),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  // Input decoration
+  InputDecoration _input(String hint) => InputDecoration(
+    hintText: hint,
+    isDense: true,
+    filled: true,
+    fillColor: Colors.grey[100],
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+  );
+
+  // Toggle button widget
+  Widget _toggle(String label, bool active, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        backgroundColor: active ? const Color(0xFF303030) : Colors.grey[300],
+        foregroundColor: active ? Colors.white : Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: active ? 3 : 0,
+      ),
+      child: Text(label, style: const TextStyle(fontSize: 13)),
+    );
+  }
+
+  // Pick multiple images from gallery
+  Future<void> _pickImages() async {
+    final picked = await _picker.pickMultiImage(maxWidth: 800, maxHeight: 800);
+    if (picked.isNotEmpty) {
       setState(() {
-        images = pickedFiles.map((xfile) => File(xfile.path)).toList();
+        _images
+          ..clear()
+          ..addAll(picked.map((x) => File(x.path)));
       });
     }
   }

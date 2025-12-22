@@ -1,7 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:triplo/pages/diary-page.dart';
-
 // Import delle pagine
 import 'package:triplo/pages/home-page.dart';
 import 'package:triplo/pages/search-page.dart';
@@ -17,13 +14,7 @@ import 'package:triplo/pages/geowatch/geowatch.dart';
 // Import della pagina admin che carica i punti
 import 'package:triplo/update_points.dart';
 
-import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/controller/diary.dart';
-import 'package:triplo/controller/user.dart';
-
-
 import '../../update_user_index.dart';
-import '../user_search_page/user_search_page.dart';
 
 class Landing_Page extends StatefulWidget {
 
@@ -85,17 +76,6 @@ class _Landing_PageState extends State<Landing_Page> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const AdminUploadPage()),
-              );
-            },
-          ),
-          ElevatedButton(
-            child: Text("🔍 Cerca utenti"),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UserSearchPage(),
-                )
               );
             },
           ),

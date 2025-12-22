@@ -714,7 +714,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         maxWidth: 800,
                         maxHeight: 800,
                       );
-                      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+                      if (pickedFiles.isNotEmpty) {
                         setState(() {
                           images.addAll(pickedFiles.map((x) => File(x.path)));
                         });

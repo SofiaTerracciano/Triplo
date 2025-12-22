@@ -42,6 +42,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get share_profile_button_label => 'Partager le profil';
 
   @override
+  String get watch_profile_dialog_level => 'Regarde mon profil sur Triplo!';
+
+  @override
+  String get my_profile_dialog_level => 'Mon profil Triplo';
+
+  @override
   String get level_label => 'Niveau';
 
   @override
@@ -54,6 +60,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get advanced_level => 'Expert';
 
   @override
+  String get no_public_diary_label => 'Aucun journal public';
+
+  @override
+  String get no_private_diary_label => 'Aucun journal privé';
+
+  @override
+  String get no_saved_trekking_label => 'Aucun parcours enregistré';
+
+  @override
   String get follow_label => 'Suivre';
 
   @override
@@ -64,6 +79,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get cancel_button_label => 'Annuler';
+
+  @override
+  String get user_label => 'Utilisateurs';
+
+  @override
+  String get trekking_label => 'Parcours';
+
+  @override
+  String get no_user_found_label => 'Aucun utilisateur trouvé';
+
+  @override
+  String get no_trekking_found_label => 'Aucun parcours trouvé';
+
+  @override
+  String get no_diary_found_label => 'Aucun journal public';
 
   @override
   String get settings_page_title => 'Paramètres';

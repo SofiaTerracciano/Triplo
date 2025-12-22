@@ -1,1 +1,1 @@
-enum SearchMode { all, users, diary, trekking }
+enum SearchMode {users, trekking }

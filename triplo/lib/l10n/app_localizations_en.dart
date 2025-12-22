@@ -42,6 +42,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_profile_button_label => 'Share Profile';
 
   @override
+  String get watch_profile_dialog_level => 'Watch my profile on Triplo!';
+
+  @override
+  String get my_profile_dialog_level => 'My Triplo Profile';
+
+  @override
   String get level_label => 'Level';
 
   @override
@@ -54,6 +60,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get advanced_level => 'Advanced';
 
   @override
+  String get no_public_diary_label => 'No public diary';
+
+  @override
+  String get no_private_diary_label => 'No private diary';
+
+  @override
+  String get no_saved_trekking_label => 'No saved trekking';
+
+  @override
   String get follow_label => 'follow';
 
   @override
@@ -64,6 +79,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel_button_label => 'Cancel';
+
+  @override
+  String get user_label => 'Users';
+
+  @override
+  String get trekking_label => 'Trekking';
+
+  @override
+  String get no_user_found_label => 'No user found';
+
+  @override
+  String get no_trekking_found_label => 'No trekking found';
+
+  @override
+  String get no_diary_found_label => 'No public diary';
 
   @override
   String get settings_page_title => 'Settings';

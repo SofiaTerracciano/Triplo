@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
@@ -23,11 +23,9 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  //Map<String, dynamic>? userData;
-  //final user = Provider.of<UserController>(context).currentUser;
-
   final ImagePicker _picker = ImagePicker();
-  //open image from phone
+
+  // Open image from phone
   Future<XFile?> _pickImage() async {
     return await _picker.pickImage(source: ImageSource.gallery);
   }
@@ -291,32 +289,29 @@ class _UserPageState extends State<UserPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Share profile button (sistemare la foto quando fai share)
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.share),
+                      label: Text(local.share_profile_button_label),
                       onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Share profile'),
-                            content: const Text('Coming soon 👀'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ),
+                        final renderBox = context.findRenderObject() as RenderBox?;
+                        if (renderBox == null) return;
+
+                        Share.share(
+                          '${local.watch_profile_dialog_level}\nhttps://triplo.app/user/${user.username}',
+                          sharePositionOrigin:
+                              renderBox.localToGlobal(Offset.zero) & renderBox.size,
                         );
-                      },
-                      child: Text(local.share_profile_button_label),
+                      }
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
 
             const SizedBox(height: 9),
-            // Tabs for public, private, saved paths
+            // Tabs for public, private diaries and saved trekking
             const TabBar(
               tabs: [
                 Tab(icon: Icon(Icons.label_important)),
@@ -327,9 +322,9 @@ class _UserPageState extends State<UserPage> {
             Expanded(
               child: TabBarView(
                 children: [
-                  // Tab percorsi/diari pubblici
+                  // Tab public diaries
                   user.publicDiaryPages.isEmpty
-                      ? const Center(child: Text("No public diary pages"))
+                      ? Center(child: Text(local.no_public_diary_label))
                       : ListView.separated(
                           itemCount: user.publicDiaryPages.length,
                           separatorBuilder: (_, __) => Divider(),
@@ -351,32 +346,10 @@ class _UserPageState extends State<UserPage> {
                             );
                           },
                         ),
-                  /*user.publicDiaryPages.isEmpty
-                  ? const Center(child: Text("No public diary pages"))
-                  : ListView.builder(
-                      itemCount: user.publicDiaryPages.length,
-                      itemBuilder: (context, index) {
-                        final diary = user.publicDiaryPages[index];
-                        return ListTile(
-                          title: Text(diary.trekkigName), 
-                          subtitle: Text(diary.date),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DiaryPage(
-                                  diaryId: diary.diaryId,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),*/
 
-                  // Tab percorsi/diari privati
+                  // Tab private diaries
                   user.privateDiaryPages.isEmpty
-                      ? const Center(child: Text("No public diary pages"))
+                      ? Center(child: Text(local.no_private_diary_label))
                       : ListView.separated(
                           itemCount: user.privateDiaryPages.length,
                           separatorBuilder: (_, __) => Divider(),
@@ -398,30 +371,9 @@ class _UserPageState extends State<UserPage> {
                           },
                         ),
 
-                  /*user.privateDiaryPages.isEmpty
-                    ? const Center(child: Text("No private diary pages"))
-                    : ListView.builder(
-                        itemCount: user.privateDiaryPages.length,
-                        itemBuilder: (context, index) {
-                          final diary = user.privateDiaryPages[index];
-                          return ListTile(
-                            title: Text(diary.trekkigName), // attenzione al nome della proprietà
-                            subtitle: Text(diary.date),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DiaryPage(
-                                    diaryId: diary.diaryId,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),*/
+                  // Tab saved trekking
                   user.savedTrekkings.isEmpty
-                      ? const Center(child: Text("No saved trekking"))
+                      ? Center(child: Text(local.no_saved_trekking_label))
                       : ListView.builder(
                           itemCount: user.savedTrekkings.length,
                           itemBuilder: (context, index) {
