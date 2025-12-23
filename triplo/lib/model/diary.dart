@@ -1,3 +1,4 @@
+// Diary model
 class Diary {
   final String diaryId;
 
@@ -28,7 +29,7 @@ class Diary {
     required this.isPublic,
   });
 
-  // SERIALIZZAZIONE
+  // Model --> Firestore
   Map<String, dynamic> toMap() {
     return {
       "UserId": userId,
@@ -44,57 +45,28 @@ class Diary {
       "Is_public": isPublic,
     };
   }
-  /*
-  factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
-    return Diary(
-      diaryId: diaryId,
-      routeId: map["RouteId"],               // solo ID del trekking
-      date: DateTime.parse(map["Date"]),
-      duration: (map["Duration"] as num).toDouble(),
-      friends: List<String>.from(map["Friends"] ?? []),
-      photos: List<String>.from(map["Photos"]),
-      challenges: List<String>.from(map["Challenges"]),
-      refreshmentPoint: map["Refreshment_point"],
-      mood: map["Mood"],
-      notes: map["Notes"],
-    );
-  }
- */
 
-  //factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId,}) {
-  //  return Diary(
-  //    diaryId: diaryId,
-  //    userId: map["UserId"],
-  //    trekkigName: map["Trekking_name"],
-  //    date: map["Date"],
-  //    duration: (map["Duration"] as num).toDouble(),
-  //    friends: List<String>.from(map["Friends"] ?? []),
-  //    photos: List<String>.from(map["Photos"] ?? []),
-  //    challenges: List<String>.from(map["Challenges"] ?? []),
-  //    refreshmentPoint: map["Refreshment_point"] ?? "",
-  //    mood: List<String>.from(map["Mood"] ?? []),
-  //    notes: map["Notes"] ?? "",
-  //    isPublic: map["Is_public"],
-  //  );
-  //}
-
- //null safe version
+  // Firestore --> Model
   factory Diary.fromMap(Map<String, dynamic> map, {required String diaryId}) {
+    // Convert List<dynamic> to List<String> for photos
     final List<String>  photos = (map["Photos"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];
     
+    // Convert List<dynamic> to List<String> for challenges
     final List<String>  challenges = (map["Challenges"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];
 
+    // Convert List<dynamic> to List<String> for mood
     final List<String>  mood = (map["Mood"] as List<dynamic>?)
       ?.map((item) => item.toString()) 
       .toList() 
       ?? [];
 
+    // Return the Diary instance
     return Diary(
       diaryId: diaryId,
       userId: map["UserId"] ?? "",
@@ -107,8 +79,7 @@ class Diary {
       refreshmentPoint: map["Refreshment_point"] ?? "",
       mood: mood,
       notes: map["Notes"] ?? "",
-      isPublic: map["Is_public"] ?? false,   // <= prima causa del crash
+      isPublic: map["Is_public"] ?? false, 
     );
   }
-
 }

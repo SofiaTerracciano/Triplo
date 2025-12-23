@@ -1,3 +1,4 @@
+// Challenges model
 class Challenges {
   final String documentId;
 
@@ -48,7 +49,7 @@ class Challenges {
       .toList() 
       ?? []; 
 
-
+    // Return the Challenges instance
     return Challenges(
       documentId: docId,
       title: title,

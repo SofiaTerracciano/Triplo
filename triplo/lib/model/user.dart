@@ -92,24 +92,6 @@ class Users {
   set advanced(int advanced) => _advanced = advanced;
   set intermediate(int intermediate) => _intermediate = intermediate;
 
-  /*
-  Map<String, dynamic> toMap() {
-    return {
-      "Username": _username,
-      "Photo_profile": _photoProfile,
-      "Name": _name,
-      "Surname": _surname,
-      "Birthdate": _birthdate.toIso8601String(),
-      "Email": _email,
-      "Followers": _followers,
-      "Following": _following,
-      "Public_diary": _publicDiaryPages,
-      "Private_diary": _privateDiaryPages,
-      "Saved_trekkings": _savedTrekkings,
-    };
-  }
-   */
-
   /**
    * Converts this Users object into a Map<String, dynamic> that can be stored in Firestore.
    * IMPORTANT: fields  as followers, following, diary pages, saved trekkings cannot be saved as full Dart objects.
@@ -190,6 +172,7 @@ class Users {
   }
    */
 
+  // Firestore --> Model
   factory Users.fromMap(Map<String, dynamic> map, {required String uid}) {
     return Users(
       uid: uid,
@@ -208,7 +191,6 @@ class Users {
       advanced: map["Advanced"] is int
       ? map["Advanced"]
       : int.tryParse(map["Advanced"]?.toString() ?? "0") ?? 0,
-
       intermediate: map["Intermediate"] is int
           ? map["Intermediate"]
           : int.tryParse(map["Intermediate"]?.toString() ?? "0") ?? 0,
@@ -238,8 +220,4 @@ class Users {
 
 
   }
-
-
-
-
 }

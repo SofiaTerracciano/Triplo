@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
+// Controller for managing diary data from and to Firestore
 class DiaryController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -23,6 +24,7 @@ class DiaryController extends ChangeNotifier {
   }
 
   DiaryController();
+
   // Getter for all diaries
   List<Diary> get allDiaries => _diaries;
 
@@ -40,14 +42,11 @@ class DiaryController extends ChangeNotifier {
 
     // Map documents to Diary objects and store in the list --> this function create a
     //list of instance of diary (model)
-    /*_diaries = snap.docs
-        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
-        .toList();*/
-
     final publicDiaries = snap.docs
         .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
 
+    // Add public diaries to the list
     _diaries.addAll(publicDiaries);
 
     notifyListeners();
@@ -64,24 +63,17 @@ class DiaryController extends ChangeNotifier {
 
     // Map documents to Diary objects and store in the list --> this function create a
     //list of instance of diary (model)
-    /*_diaries = snap.docs
-        .map(
-          (doc) => Diary.fromMap(doc.data(), diaryId: doc.id),
-        )
-        .toList();*/
-
     final privateDiaries = snap.docs
         .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
 
+    // Add private diaries to the list
     _diaries.addAll(privateDiaries);
-
-    print(privateDiaries);
-    print(_diaries);
 
     notifyListeners();
   }
 
+  // Update diary page
   Diary updateDiary(
     Diary page,
     bool isPublic,
@@ -116,6 +108,7 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
+  // Add or modify diary page based on 'modify' flag
   Future<void> addDiary(
     String title,
     bool isPublic,
@@ -155,6 +148,8 @@ class DiaryController extends ChangeNotifier {
         isPublic: isPublic,
       );
       _diaries.add(page);
+
+      // Update user's diary lists
       if (page.isPublic) {
         // Update DB
         await _db.collection("users").doc(uid).update({
@@ -170,6 +165,7 @@ class DiaryController extends ChangeNotifier {
         // Update local list
         _currentUser!.privateDiaryPages.add(page);
       }
+      // Create diary document
       await _db.collection("diary").doc(page.diaryId).set(page.toMap());
     } else {
       final uid = _auth.currentUser!.uid;
@@ -195,7 +191,7 @@ class DiaryController extends ChangeNotifier {
       .update(page.toMap());
 
 
-      // Se cambia pubblico / privato
+      // If privacy changed, update user's diary lists
       if (oldIsPublic != isPublic) {
         await _db.collection("users").doc(uid).update({
           oldIsPublic ? "Public_diary" : "Private_diary":
@@ -204,23 +200,13 @@ class DiaryController extends ChangeNotifier {
             page.diaryId,
           ]),
         });
-
-        /*Update local lists
-        if (oldIsPublic) {
-          _currentUser!.publicDiaryPages
-              .removeWhere((p) => p.diaryId == page.diaryId);
-          _currentUser!.privateDiaryPages.add(page);
-        } else {
-          _currentUser!.privateDiaryPages
-              .removeWhere((p) => p.diaryId == page.diaryId);
-          _currentUser!.publicDiaryPages.add(page);
-        }*/
       }
 
       notifyListeners();
     }
   }
 
+  // Remove diary page
   Future<void> removeDiary(String diaryId) async {
     final page = getDiaryById(diaryId)!;
     final uid = _auth.currentUser!.uid;
@@ -228,6 +214,7 @@ class DiaryController extends ChangeNotifier {
     await _db.collection("diary").doc(diaryId).delete();
     _diaries.removeWhere((diary) => diary.diaryId == diaryId);
 
+    // Update user's diary lists based on privacy
     if (page.isPublic) {
       // Remove from DB
       await _db.collection("users").doc(uid).update({
@@ -247,6 +234,7 @@ class DiaryController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Fetch diaries by user ID --> it returns a list of diaries for a specific user
   Future<List<Diary>?> fetchDiaryById(String userId) async {
     final doc = await _db
         .collection('diary')
@@ -265,6 +253,8 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
+  // Upload diary images to Firebase Storage and return their paths --> it returns a path child
+  // not the complete url
   Future<List<String>> uploadDiaryImages(List<File> images) async {
     List<String> paths = [];
 
@@ -318,6 +308,7 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
+  // Delete photo from diary both in Firestore and Firebase Storage
   Future<void> deletePhotoFromDb(String diaryId, String photoPath) async {
     try {
       // Remove from Firestore
@@ -339,6 +330,8 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
+  // Fetch random public diaries from users being followed --> it returns a list of diaries
+  // used for the explore page
   Future<List<Diary>> getRandomPublicDiariesFromFollowing({
     required List<String> followingIds,
     required int limit,
@@ -352,13 +345,13 @@ class DiaryController extends ChangeNotifier {
     final diaries = snap.docs.map((doc) {
       final data = doc.data();
 
-      // Normalizza Friends
+      // Normaliz frineds --> make sure it's a list of strings
       List<String> friends = [];
       if (data["Friends"] is List) {
         friends = List<String>.from(data["Friends"]);
       }
 
-      // Normalizza Photos
+      // Normaliz photos --> make sure it's a list of strings
       List<String> photos = [];
       if (data["Photos"] is List) {
         photos = List<String>.from(data["Photos"]);
@@ -366,7 +359,7 @@ class DiaryController extends ChangeNotifier {
         photos = [data["Photos"]];
       }
 
-      // Normalizza Challenges
+      // Normaliz challenges --> make sure it's a list of strings
       List<String> challenges = [];
       if (data["Challenges"] is List) {
         challenges = List<String>.from(data["Challenges"]);
@@ -374,7 +367,7 @@ class DiaryController extends ChangeNotifier {
         challenges = [data["Challenges"]];
       }
 
-      // Normalizza Mood
+      // Normaliz mood --> make sure it's a list of strings
       List<String> mood = [];
       if (data["Mood"] is List) {
         mood = List<String>.from(data["Mood"]);
@@ -382,6 +375,7 @@ class DiaryController extends ChangeNotifier {
         mood = [data["Mood"]];
       }
 
+      // Create Diary instance --> return the diary instance
       return Diary(
         diaryId: doc.id,
         userId: data["UserId"] ?? "",
@@ -398,7 +392,9 @@ class DiaryController extends ChangeNotifier {
       );
     }).toList();
 
+    // Shuffle and limit results --> to have random diaries
     diaries.shuffle();
+    // Return only up to the specified limit --> to limit the number of diaries shown (only 10)
     return diaries.take(limit).toList();
   }
 }

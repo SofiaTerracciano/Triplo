@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 
+// Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   List<Trekking> _trekkings;
   bool _loaded = false;
-
 
   TrekkingController({required List<Trekking> trekkings})
     : _trekkings = trekkings;
@@ -39,7 +39,7 @@ class TrekkingController extends ChangeNotifier {
   // Callback when a trekking is selected
   void Function(Trekking trekking)? onTrekkingSelected;
 
-  // Getter trekking per documentId
+  // Getter trekking per documentId --> it return the trekking instance given the ID
   Trekking? getTrekkingById(String documentId) {
     try {
       return _trekkings.firstWhere((t) => t.documentId == documentId);
@@ -48,7 +48,7 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-  //Getter trekkingID by name
+  //Getter trekkingID by name --> if you have the name you can get the ID
   String? getTrekkingId(String name) {
     try {
       return _trekkings.firstWhere((t) => t.name == name).documentId;
@@ -58,6 +58,7 @@ class TrekkingController extends ChangeNotifier {
   }
 
   // Fetch image URLs from Firebase Storage given a list of complete firestore url
+  // It returns a list of download URLs that can be used to display images
   Future<List<String>> getDownloadUrls(List<String> paths) async {
     return await Future.wait(paths.map((path) async {
       Reference ref = FirebaseStorage.instance.refFromURL(path);
@@ -66,9 +67,9 @@ class TrekkingController extends ChangeNotifier {
   }
 
   // Fetch image URL from Firebase Storage given complete firestore url
+  // It returns a only one download URL that can be used to display the image
   Future<String> getDownloadUrl(String path) async {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();
   }
-
 }

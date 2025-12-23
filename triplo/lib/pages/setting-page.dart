@@ -60,8 +60,8 @@ class _SettingPageState extends State<SettingPage> {
   );
 
   final TextStyle infoStyle = const TextStyle(
-    fontSize: 14, 
-    color: Color.fromARGB(255, 72, 72, 72)
+    fontSize: 14,
+    color: Color.fromARGB(255, 72, 72, 72),
   );
 
   final ImagePicker _picker = ImagePicker();
@@ -170,23 +170,14 @@ class _SettingPageState extends State<SettingPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    local.username_label,
-                                    style: titleStyle,
-                                  ),
+                                  Text(local.username_label, style: titleStyle),
                                   const SizedBox(height: 2),
-                                  Text(
-                                    user.username,
-                                    style: infoStyle,
-                                  ),
+                                  Text(user.username, style: infoStyle),
                                 ],
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.edit, 
-                                size: 17
-                              ),
+                              icon: const Icon(Icons.edit, size: 17),
                               onPressed: () => _editField(
                                 title: local.username_label,
                                 initialValue: user.username,
@@ -207,20 +198,12 @@ class _SettingPageState extends State<SettingPage> {
           // Personal info
           // Name
           ListTile(
-            title: Text(
-              local.name_field_label,
-              style: titleStyle,
-            ),
+            title: Text(local.name_field_label, style: titleStyle),
             subtitle: Text(
-              user.name.isNotEmpty
-                  ? user.name
-                  : "-",
+              user.name.isNotEmpty ? user.name : "-",
               style: infoStyle,
             ),
-            trailing: const Icon(
-              Icons.edit, 
-              size: 17
-            ),
+            trailing: const Icon(Icons.edit, size: 17),
             dense: true,
             onTap: () => _editField(
               title: local.name_field_label,
@@ -232,20 +215,12 @@ class _SettingPageState extends State<SettingPage> {
           // Surname
           const Divider(height: 1),
           ListTile(
-            title: Text(
-              local.surname_field_label,
-              style: titleStyle,
-            ),
+            title: Text(local.surname_field_label, style: titleStyle),
             subtitle: Text(
-              user.surname.isNotEmpty 
-                  ? user.surname 
-                  : "-",
+              user.surname.isNotEmpty ? user.surname : "-",
               style: infoStyle,
             ),
-            trailing: const Icon(
-              Icons.edit, 
-              size: 17
-            ),
+            trailing: const Icon(Icons.edit, size: 17),
             dense: true,
             onTap: () => _editField(
               title: local.surname_field_label,
@@ -257,20 +232,14 @@ class _SettingPageState extends State<SettingPage> {
           // Birthdate
           const Divider(height: 1),
           ListTile(
-            title: Text(
-              local.birthdate_field_label,
-              style: titleStyle,
-            ),
+            title: Text(local.birthdate_field_label, style: titleStyle),
             subtitle: Text(
               "${user.birthdate.day.toString().padLeft(2, '0')}/"
               "${user.birthdate.month.toString().padLeft(2, '0')}/"
               "${user.birthdate.year}",
               style: infoStyle,
             ),
-            trailing: const Icon(
-              Icons.calendar_today, 
-              size: 17
-            ),
+            trailing: const Icon(Icons.calendar_today, size: 17),
             dense: true,
             onTap: () => _pickBirthdate(user.birthdate),
           ),
@@ -278,39 +247,24 @@ class _SettingPageState extends State<SettingPage> {
           // Email
           const Divider(height: 1),
           ListTile(
-            title: Text(
-              local.email_label, 
-              style: titleStyle
-            ),
-            subtitle: Text(
-              user.email,
-              style: infoStyle,
-            ),
-            trailing: const Icon(
-              Icons.edit, 
-              size: 17
-            ),
+            title: Text(local.email_label, style: titleStyle),
+            subtitle: Text(user.email, style: infoStyle),
+            trailing: const Icon(Icons.edit, size: 17),
             dense: true,
             onTap: () {
               // TODO: modifica email
             },
           ),
-        
+
           const Divider(height: 1),
           // Language selection
           ListTile(
-            title: Text(
-              local.language_field_label,
-              style: titleStyle,
-            ),
+            title: Text(local.language_field_label, style: titleStyle),
             subtitle: Text(
               _getLanguageName(languageController.locale.languageCode),
               style: infoStyle,
             ),
-            trailing: const Icon(
-              Icons.language, 
-              size: 17
-            ),
+            trailing: const Icon(Icons.language, size: 17),
             dense: true,
             onTap: () {
               showDialog(
@@ -433,14 +387,16 @@ class _SettingPageState extends State<SettingPage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.greenAccent),
-              child: Text(
-                local.menu_title,
-                style: TextStyle(color: Colors.white, fontSize: 24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
               ),
+              child: const SizedBox.shrink(),
             ),
             ListTile(
-              leading: const Icon(Icons.home),
+              leading: Icon(
+                Icons.home,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.home_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -450,7 +406,10 @@ class _SettingPageState extends State<SettingPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person),
+              leading: Icon(
+                Icons.person,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.profile_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -460,7 +419,10 @@ class _SettingPageState extends State<SettingPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.search),
+              leading: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.search_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -470,7 +432,10 @@ class _SettingPageState extends State<SettingPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
+              leading: Icon(
+                Icons.settings,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.settings_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -480,7 +445,10 @@ class _SettingPageState extends State<SettingPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.emoji_events),
+              leading: Icon(
+                Icons.emoji_events,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.challeng_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(

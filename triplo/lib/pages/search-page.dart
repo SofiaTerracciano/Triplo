@@ -204,14 +204,16 @@ class _SearchPageState extends State<SearchPage>
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.greenAccent),
-              child: Text(
-                local.menu_title,
-                style: TextStyle(color: Colors.white, fontSize: 24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
               ),
+              child: const SizedBox.shrink(),
             ),
             ListTile(
-              leading: const Icon(Icons.home),
+              leading: Icon(
+                Icons.home,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.home_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -221,7 +223,10 @@ class _SearchPageState extends State<SearchPage>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person),
+              leading: Icon(
+                Icons.person,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.profile_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -231,7 +236,10 @@ class _SearchPageState extends State<SearchPage>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.search),
+              leading: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.search_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -241,7 +249,10 @@ class _SearchPageState extends State<SearchPage>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
+              leading: Icon(
+                Icons.settings,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.settings_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -251,7 +262,10 @@ class _SearchPageState extends State<SearchPage>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.emoji_events),
+              leading: Icon(
+                Icons.emoji_events,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(local.challeng_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
@@ -388,7 +402,7 @@ class _SearchPageState extends State<SearchPage>
                           // Username
                           Flexible(
                             child: Text(
-                              username, 
+                              username,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -458,9 +472,7 @@ class _SearchPageState extends State<SearchPage>
                     backgroundColor: Colors.grey,
                     child: Icon(Icons.person),
                   )
-                : CircleAvatar(
-                    backgroundImage: NetworkImage(u.photoProfile!),
-                  ),
+                : CircleAvatar(backgroundImage: NetworkImage(u.photoProfile!)),
             title: Text(u.username),
             subtitle: Text(u.email),
             onTap: () {
@@ -565,10 +577,7 @@ class _StorageImage extends StatelessWidget {
   final String path;
   final DiaryController diaryController;
 
-  const _StorageImage({
-    required this.path,
-    required this.diaryController,
-  });
+  const _StorageImage({required this.path, required this.diaryController});
 
   @override
   Widget build(BuildContext context) {

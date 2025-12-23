@@ -10,9 +10,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:triplo/model/challenges.dart';
 
+// API controller for external services
 class API {
   late final String openWeatherKey;
 
+  // Constructor to load API keys from .env
   API() {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     if (openWeatherKey.isEmpty) {
@@ -39,9 +41,8 @@ class API {
     return map[id];
   }
 
-
-
-Future<LatLng?> userLocation() async {
+  // Get user's current location
+  Future<LatLng?> userLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) return null;
@@ -67,9 +68,7 @@ Future<LatLng?> userLocation() async {
     }
   }
 
-
-
-
+  // Fetch current weather data for given coordinates
   Future<Map<String, dynamic>?> weather(double lat, double lon) async {
     if (openWeatherKey.isEmpty) return null;
 
@@ -94,6 +93,7 @@ Future<LatLng?> userLocation() async {
     }
   }
 
+  // Fetch 5-day weather forecast for given coordinates
   Future<List<Map<String, dynamic>>?> forecast(
       double lat, double lon) async {
     if (openWeatherKey.isEmpty) return null;
@@ -125,6 +125,7 @@ Future<LatLng?> userLocation() async {
     }
   }
 
+  // Retry a task multiple times with delay
   Future<T?> retry<T>(Future<T?> Function() task,
       {int retries = 2, int delayMs = 400}) async {
     T? result;
@@ -138,6 +139,7 @@ Future<LatLng?> userLocation() async {
     return null;
   }
 
+  // Safe HTTP GET request with error handling
   Future<dynamic> safeRequest(
       Uri url, {
         Duration timeout = const Duration(seconds: 6),
@@ -164,6 +166,7 @@ Future<LatLng?> userLocation() async {
     }
   }
 
+  // Check for internet connectivity
   Future<bool> hasInternet() async {
     try {
       final result = await InternetAddress.lookup('google.com')
@@ -173,7 +176,6 @@ Future<LatLng?> userLocation() async {
       return false;
     }
   }
-
 
   /// Build full URL for weather icon
   String weatherIconUrl(String iconCode, {bool big = true}) {
@@ -216,6 +218,7 @@ Future<LatLng?> userLocation() async {
   }
 }
 
+// Class to represent API errors
 class ApiError {
   final String message;
   final int? statusCode;
@@ -226,6 +229,7 @@ class ApiError {
   String toString() => "ApiError($statusCode): $message";
 }
 
+// Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -276,5 +280,4 @@ class ChallengesController extends ChangeNotifier {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();
   }
-
 }

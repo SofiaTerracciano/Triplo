@@ -1,6 +1,7 @@
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Trekking model
 class Trekking {
   final String documentId;
 
@@ -139,31 +140,24 @@ class Trekking {
 
   // Firestore --> Model
   factory Trekking.fromMap(Map<String, dynamic> map, {required String docId}) {
-    // Convert Firestore GeoPoint to LatLng
-    //List<LatLng> pts = (map["Points"] as List<dynamic>)
-    //  .map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
-    //  .toList();
-
-
+    // Convert List<dynamic> to List<LatLng> for points
     final pts = (map["Points"] as List<dynamic>?)
         ?.map((p) => LatLng((p as GeoPoint).latitude, p.longitude))
         .toList() ?? [];
 
+    // Helper to safely parse double values
     double _safeDouble(dynamic v) {
       if (v is num) return v.toDouble();
       if (v is String) return double.tryParse(v) ?? 0.0;
       return 0.0;
     }
 
-    // Create Trekking instance
+    // Return the Trekking instance
     return Trekking(
       documentId: docId,
       name: map["Name"] ?? "",
       mapPhoto: map["Map_photo"] ?? "",
       difficultyLevel: map["Difficulty_level"] ?? "",
-      //distance: (map["Distance"] ?? 0).toDouble(),
-      //estimatedTime: (map["Estimated_time"] ?? 0).toDouble(),
-      //elevationGain: (map["Elevation_gain"] ?? 0).toDouble(),
       distance: _safeDouble(map["Distance"]),
       estimatedTime: _safeDouble(map["Estimated_time"]),
       elevationGain: _safeDouble(map["Elevation_gain"]),

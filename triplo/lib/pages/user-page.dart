@@ -21,7 +21,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-
+  String level = '';
   /*
   Future<String?> uploadProfilePicture(File image) async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -150,12 +150,12 @@ class _UserPageState extends State<UserPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Colonna Avatar + username + level
+                  // Column for photo + username + level
                   Expanded(
                     flex: 1,
                     child: Column(
                       children: [
-                        // Avatar 
+                        // Photo 
                         CircleAvatar(
                             radius: 36,
                             backgroundImage: user.photoProfile != null &&
@@ -167,8 +167,8 @@ class _UserPageState extends State<UserPage> {
                                 ? const Icon(Icons.person, size: 40)
                                 : null,
                           ),
-                        // Username + level
                         const SizedBox(height: 8),
+                        // Username
                         Row(
                           children: [
                             Expanded(
@@ -184,22 +184,37 @@ class _UserPageState extends State<UserPage> {
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          '${local.level_label}: ${user.level}',
+                        // Level display --> Beginner, Intermediate, Advanced
+                        if (user.level == 'Beginner')
+                          Text(
+                            '${local.level_label}: ${local.beginner_level}',
+                            style:
+                                const TextStyle(fontSize: 13, color: Colors.black54),
+                          )
+                        else if (user.level == 'Intermediate')
+                          Text(
+                            '${local.level_label}: ${local.intermediate_level}',
                           style:
                               const TextStyle(fontSize: 13, color: Colors.black54),
-                        ),
+                        )
+                        else if (user.level == 'Advanced')
+                          Text(
+                            '${local.level_label}: ${local.advanced_level}',
+                            style:
+                                const TextStyle(fontSize: 13, color: Colors.black54),
+                          )
                       ],
                     ),
                   ),
 
                   const SizedBox(width: 16),
-                  // Colonna Nome + stats
+                  // Column for name + stats
                   Expanded(
                     flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Name + surname
                         Row(
                           children: [
                             Expanded(
@@ -215,6 +230,7 @@ class _UserPageState extends State<UserPage> {
                           ],
                         ),
                         const SizedBox(height: 6),
+                        // Stats: total diaries, followers, following
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -261,11 +277,12 @@ class _UserPageState extends State<UserPage> {
             ),
 
             const SizedBox(height: 8),
-            // Botton
+            // Buttons for settings and share profile
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
+                  // Settings button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -278,7 +295,7 @@ class _UserPageState extends State<UserPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Share profile button (sistemare la foto quando fai share)
+                  // Share profile button
                   Expanded(
                     child: ElevatedButton.icon(
                       icon: const Icon(Icons.share),
@@ -287,6 +304,7 @@ class _UserPageState extends State<UserPage> {
                         final renderBox = context.findRenderObject() as RenderBox?;
                         if (renderBox == null) return;
 
+                        // Share profile link --> it return https://triplo.app/user/username
                         Share.share(
                           '${local.watch_profile_dialog_level}\nhttps://triplo.app/user/${user.username}',
                           sharePositionOrigin:
@@ -393,14 +411,13 @@ class _UserPageState extends State<UserPage> {
             padding: EdgeInsets.zero,
             children: <Widget>[
               DrawerHeader(
-                decoration: BoxDecoration(color: Colors.greenAccent),
-                child: Text(
-                  local.menu_title,
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
+                child: const SizedBox.shrink(),
               ),
               ListTile(
-                leading: const Icon(Icons.home),
+                leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
                 title: Text(local.home_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -410,7 +427,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.person),
+                leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary,),
                 title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -420,7 +437,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.search),
+                leading: Icon(Icons.search, color: Theme.of(context).colorScheme.primary,),
                 title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -430,7 +447,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.settings),
+                leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
                 title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -440,7 +457,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.emoji_events),
+                leading: Icon(Icons.emoji_events, color: Theme.of(context).colorScheme.primary,),
                 title: Text(local.challeng_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -457,27 +474,7 @@ class _UserPageState extends State<UserPage> {
   }
 }
 
-/* Widget for individual statistic item
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _StatItem({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        Text(label),
-      ],
-    );
-  }
-}*/
-
+// Widget for displaying a single statistic item
 class _StatItem extends StatelessWidget {
   final String label;
   final String value;

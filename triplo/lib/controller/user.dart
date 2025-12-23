@@ -472,6 +472,7 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Fetches a trekking by ID and returns a Trekking object --> used for savedTrekkings
   Future<Trekking?> _fetchTrekking(String docId) async {
     final snap = await _db.collection("trekking").doc(docId).get();
     if (!snap.exists) return null;
@@ -526,13 +527,14 @@ class UserController extends ChangeNotifier {
     return Users.fromMap(snap.data()!, uid: uid);
   }
 
+  // Adds a trekking to the user's saved list
   Future<void> addTrekkingToSaved(String trekkingId) async {
     final uid = _auth.currentUser!.uid;
-    // Aggiorna Firestore
+    // Update Firestore
     await _db.collection("users").doc(uid).update({
       "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
     });
-    // Aggiorna la lista locale se il trekking esiste
+    // Update local list (Trekking objects) only if the trekking exists
     final trek = await _fetchTrekking(trekkingId);
     if (trek != null) {
       _currentUser?.savedTrekkings.add(trek);
@@ -540,16 +542,15 @@ class UserController extends ChangeNotifier {
     }
   }
 
+  // Removes a trekking from the user's saved list
   Future<void> removeTrekkingFromSaved(String trekkingId) async {
     final uid = _auth.currentUser!.uid;
-    print("Prima di remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
-    // Rimuove dal DB
+    // Remove from Firestore
     await _db.collection("users").doc(uid).update({
       "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
     });
-    // Rimuove dalla lista locale (oggetti Trekking)
+    // Remove from local list (Trekking objects)
     _currentUser?.savedTrekkings.removeWhere((trek) => trek.documentId == trekkingId);
-    print("Dopo remove: ${_currentUser?.savedTrekkings.map((t) => t.documentId).toList()}");
     notifyListeners();
   }
 
@@ -736,7 +737,7 @@ class UserController extends ChangeNotifier {
     );
   }
 
-  // Upadates user level based on trekking difficulty
+  // Upadates user level based on trekking difficulty --> Beginner, Intermediate, Advanced
   Future<void> updateUserLevel(String difficultyLevel) async {
     final uid = _auth.currentUser!.uid;
     final userDoc = _db.collection("users").doc(uid);
@@ -747,14 +748,14 @@ class UserController extends ChangeNotifier {
     int intermediate = _currentUser!.intermediate;
     int advanced = _currentUser!.advanced;
 
-    // Aggiorna i counts in base alla difficoltà del trekking
+    // Update counts based on difficulty level
     if (difficultyLevel == 'Intermediate') {
       intermediate += 1;
     } else if (difficultyLevel == 'Advanced') {
       advanced += 1;
     }
 
-    // Calcola il nuovo livello
+    // Determine new level
     String newLevel;
     if (advanced >= 5) {
       newLevel = 'Advanced';
@@ -764,14 +765,14 @@ class UserController extends ChangeNotifier {
       newLevel = 'Beginner';
     }
 
-    // Aggiorna Firebase
+    // Upadate Firestore
     await userDoc.update({
       "Intermediate": intermediate,
       "Advanced": advanced,
       "Level": newLevel,
     });
 
-    // Aggiorna anche il modello locale
+    // Update local model and notify listeners
     _currentUser?.intermediate = intermediate;
     _currentUser?.advanced = advanced;
     _currentUser?.level = newLevel;
