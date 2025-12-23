@@ -5,7 +5,7 @@ import 'package:triplo/model/trekking.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/diary.dart';
-import 'package:triplo/pages/trekking-page.dart';
+import 'package:triplo/pages/loading-page.dart';
 import 'package:triplo/pages/user-page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -22,9 +22,9 @@ class ModifyDiaryPage extends StatefulWidget {
 }
 
 class ModifyDiaryPageState extends State<ModifyDiaryPage> {
-  final TextEditingController notesController = TextEditingController();
-  final TextEditingController refreshmentController = TextEditingController();
-  final ImagePicker picker = ImagePicker();
+  final _notesController = TextEditingController();
+  final _refreshmentController = TextEditingController();
+  final _picker = ImagePicker();
 
   late Diary diaryPage;
 
@@ -76,9 +76,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
     // Notes and Refreshment controller and text
     notesText = diaryPage.notes;
-    notesController.text = notesText;
+    _notesController.text = notesText;
     refreshmentText = diaryPage.refreshmentPoint;
-    refreshmentController.text = refreshmentText;
+    usedRefreshmentPoint = refreshmentText.isNotEmpty;
+    _refreshmentController.text = refreshmentText;
 
     isPublic = diaryPage.isPublic;
 
@@ -92,7 +93,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
           .map((e) => e.key),
     );
 
-    // Mood available 
+    // Mood available
     final List<String> availableMoods = [
       "😍",
       "😁",
@@ -154,266 +155,319 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     final validPhotos = photos.where((p) => p.isNotEmpty).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text(trekkingName.name)),
+      appBar: AppBar(title: Text(trekkingName.name), centerTitle: true),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Date
-              Text("${local.date_trekking_label}:"),
-              SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Day
-                  DropdownButton<int>(
-                    hint: Text(local.day_trekking_label),
-                    value: selectedDay,
-                    onChanged: (value) {
-                      setState(() => selectedDay = value);
-                    },
-                    items: days
-                        .map(
-                          (day) => DropdownMenuItem(
-                            value: day,
-                            child: Text(day.toString()),
-                          ),
-                        )
-                        .toList(),
+              // Date picker
+              _section(
+                context,
+                local.date_trekking_label,
+                Icons.calendar_today,
+                _rowDropdown([
+                  _dropdown(
+                    selectedDay!,
+                    days,
+                    (v) => setState(() => selectedDay = v),
                   ),
-
-                  SizedBox(width: 16),
-
-                  // Month
-                  DropdownButton<int>(
-                    hint: Text(local.month_trekking_label),
-                    value: selectedMonth,
-                    onChanged: (value) {
-                      setState(() => selectedMonth = value);
-                    },
-                    items: months
-                        .map(
-                          (month) => DropdownMenuItem(
-                            value: month,
-                            child: Text(month.toString()),
-                          ),
-                        )
-                        .toList(),
+                  _dropdown(
+                    selectedMonth!,
+                    months,
+                    (v) => setState(() => selectedMonth = v),
                   ),
-
-                  SizedBox(width: 16),
-
-                  // Year
-                  DropdownButton<int>(
-                    hint: Text(local.year_trekking_label),
-                    value: selectedYear,
-                    onChanged: (value) {
-                      setState(() => selectedYear = value);
-                    },
-                    items: years
-                        .map(
-                          (year) => DropdownMenuItem(
-                            value: year,
-                            child: Text(year.toString()),
-                          ),
-                        )
-                        .toList(),
+                  _dropdown(
+                    selectedYear!,
+                    years,
+                    (v) => setState(() => selectedYear = v),
                   ),
-                ],
+                ]),
               ),
               const SizedBox(height: 8),
-              // Duration
-              Text("${local.duration_trekking_label}:"),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Hours
-                  DropdownButton<int>(
-                    hint: Text(local.hours_trekking_label),
-                    value: selectedHour,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedHour = value;
-                      });
-                    },
-                    items: hours
-                        .map(
-                          (hour) => DropdownMenuItem(
-                            value: hour,
-                            child: Text(hour.toString().padLeft(2, '0')),
-                          ),
-                        )
-                        .toList(),
+              // Duration picker
+              _section(
+                context,
+                local.duration_trekking_label,
+                Icons.timer,
+                _rowDropdown([
+                  _dropdown(
+                    selectedHour!,
+                    hours,
+                    (v) => setState(() => selectedHour = v),
+                    pad: true,
                   ),
-
-                  const SizedBox(width: 16),
-
-                  // Minutes
-                  DropdownButton<int>(
-                    hint: Text(local.minutes_trekking_label),
-                    value: selectedMinute,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMinute = value;
-                      });
-                    },
-                    items: minutes
-                        .map(
-                          (min) => DropdownMenuItem(
-                            value: min,
-                            child: Text(min.toString().padLeft(2, '0')),
-                          ),
-                        )
-                        .toList(),
+                  _dropdown(
+                    selectedMinute!,
+                    minutes,
+                    (v) => setState(() => selectedMinute = v),
+                    pad: true,
                   ),
-                ],
+                ]),
               ),
               const SizedBox(height: 8),
               // Friends
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.friends_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
+              _section(
+                context,
+                local.friends_trekking_label,
+                Icons.group,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Preview friends selected
                     friends.isEmpty
-                        ? local
-                              .friends_trekking_label //da mettere nel dizionario
-                        : userController.currentUser!.following
-                              .where((u) => friends.contains(u.uid))
-                              .map((u) => u.username)
-                              .join(
-                                ", ",
-                              ), // visualizzati del tipo Friends: amico1, amico2, amico3
-                    style: const TextStyle(fontSize: 16),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  ExpansionTile(
-                    title: Text(local.choose_friend_label),
-                    children: [
-                      SizedBox(
-                        height: 220, // lista scrollabile
-                        child: ListView.builder(
-                          itemCount: userController.currentUser!.following.length,
-                          itemBuilder: (context, index) {
-                            final followingUser =
-                                userController.currentUser!.following[index];
-                            final isSelected = friends.contains(
-                              followingUser.uid,
-                            );
-
-                            return ListTile(
-                              leading: CircleAvatar(
-                                child: Text(
-                                  followingUser.username[0].toUpperCase(),
-                                ),
-                              ),
-                              title: Text(followingUser.username),
-                              trailing: Icon(
-                                isSelected
-                                    ? Icons.check_circle
-                                    : Icons.circle_outlined,
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    friends.remove(followingUser.uid);
-                                  } else {
-                                    friends.add(followingUser.uid);
-                                  }
-                                });
-                              },
-                            );
-                          },
-                        ),
+                        ? Text(
+                            local
+                                .friends_selected_label, // "No friends selected"
+                            style: const TextStyle(fontSize: 14),
+                          )
+                        : Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: userController.currentUser!.following
+                                .where((u) => friends.contains(u.uid))
+                                .map(
+                                  (u) => Chip(
+                                    avatar: CircleAvatar(
+                                      backgroundImage:
+                                          (u.photoProfile?.isNotEmpty ?? false)
+                                          ? NetworkImage(u.photoProfile!)
+                                          : null,
+                                      child: (u.photoProfile?.isEmpty ?? true)
+                                          ? const Icon(Icons.person, size: 14)
+                                          : null,
+                                    ),
+                                    label: Text(u.username),
+                                    onDeleted: () {
+                                      setState(() => friends.remove(u.uid));
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                    // Selection of friends
+                    const SizedBox(height: 8),
+                    ExpansionTile(
+                      title: Text(
+                        local.choose_friend_label,
+                        style: const TextStyle(fontSize: 14)
                       ),
-                    ],
-                  ),
-                ],
+                      children: userController.currentUser!.following.map((u) {
+                        final selected = friends.contains(u.uid);
+                        return ListTile(
+                          dense: true,
+                          leading: CircleAvatar(
+                            radius: 16,
+                            backgroundImage:
+                                (u.photoProfile?.isNotEmpty ?? false)
+                                ? NetworkImage(u.photoProfile!)
+                                : null,
+                            child: (u.photoProfile?.isEmpty ?? true)
+                                ? const Icon(Icons.person, size: 18)
+                                : null,
+                          ),
+                          title: Text(
+                            u.username,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          trailing: Icon(
+                            selected
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                          ),
+                          onTap: () => setState(() {
+                            selected
+                                ? friends.remove(u.uid)
+                                : friends.add(u.uid);
+                          }),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-
               const SizedBox(height: 8),
               // Notes
-              Text("${local.notes_trekking_label}: "),
-              TextField(
-                controller: notesController,
-                decoration: InputDecoration(
-                  hintText: local.notes_placeholder_trekking_label,
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.text_fields),
+              _section(
+                context,
+                local.notes_trekking_label,
+                Icons.notes,
+                TextField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  style: const TextStyle(fontSize: 14),
+                  decoration: _input(local.notes_placeholder_trekking_label),
                 ),
-                onChanged: (value) {
-                  notesText = value;
-                },
               ),
               const SizedBox(height: 8),
               // Refreshment
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.refuge_trekking_label}: ",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Row(
-                    children: [
-                      Radio<bool>(
-                        value: true,
-                        groupValue: usedRefreshmentPoint,
-                        onChanged: (val) {
-                          setState(() {
-                            usedRefreshmentPoint = val!;
-                          });
-                        },
-                      ),
-                      Text(local.yes_botton_label),
-                      const SizedBox(width: 20),
-                      Radio<bool>(
-                        value: false,
-                        groupValue: usedRefreshmentPoint,
-                        onChanged: (val) {
-                          setState(() {
-                            usedRefreshmentPoint = val!;
-                          });
-                        },
-                      ),
-                      Text(local.no_botton_label),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  if (usedRefreshmentPoint)
-                    TextField(
-                      controller: refreshmentController,
-                      decoration: InputDecoration(
-                        labelText: local
-                            .refreshment_point_trekking_label, //da mettere nel dizionario
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 1,
-                      onChanged: (value) {
-                        refreshmentText = value;
-                      },
+              _section(
+                context,
+                local.refuge_trekking_label,
+                Icons.restaurant,
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ChoiceChip(
+                          label: Text(local.yes_botton_label),
+                          selected: usedRefreshmentPoint,
+                          onSelected: (_) =>
+                              setState(() => usedRefreshmentPoint = true),
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: Text(local.no_botton_label),
+                          selected: !usedRefreshmentPoint,
+                          onSelected: (_) =>
+                              setState(() => usedRefreshmentPoint = false),
+                        ),
+                      ],
                     ),
-                ],
+                    if (usedRefreshmentPoint) ...[
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _refreshmentController,
+                        style: const TextStyle(fontSize: 14),
+                        decoration: _input(
+                          local.refreshment_point_trekking_label,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               // Challenges
-              Column(
+              _section(
+                context,
+                local.challenges_trekking_label,
+                Icons.flag,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Preview challenge selezionate
+                    challenges.isEmpty
+                        ? Text(
+                            local.challenge_selected_label,
+                            style: const TextStyle(fontSize: 14),
+                          )
+                        : Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: challenges.map((challenge) {
+                              return FutureBuilder<String>(
+                                future: trekkingController.getDownloadUrl(
+                                  challenge,
+                                ),
+                                builder: (_, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const SizedBox(
+                                      width: 60,
+                                      height: 60,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  }
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      snapshot.data!,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                },
+                              );
+                            }).toList(),
+                          ),
+
+                    const SizedBox(height: 8),
+
+                    // Selezione challenge
+                    ExpansionTile(
+                      title: Text(
+                        local.choose_challenge_label,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      children: [
+                        SizedBox(
+                          height: 260,
+                          child: FutureBuilder<List<String>>(
+                            future: Future.wait(
+                              trekkingName.challenges.map(
+                                (c) => trekkingController.getDownloadUrl(c),
+                              ),
+                            ),
+                            builder: (_, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+
+                              final urls = snapshot.data!;
+
+                              return GridView.builder(
+                                padding: const EdgeInsets.all(8),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
+                                itemCount: urls.length,
+                                itemBuilder: (_, index) {
+                                  final challengeName =
+                                      trekkingName.challenges[index];
+                                  final isSelected = selectedIndexChallenge
+                                      .contains(index);
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          selectedIndexChallenge.remove(index);
+                                          challenges.remove(challengeName);
+                                        } else {
+                                          selectedIndexChallenge.add(index);
+                                          challenges.add(challengeName);
+                                        }
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? Colors.green
+                                              : Colors.grey,
+                                          width: isSelected ? 2 : 1,
+                                        ),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          urls[index],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              /*Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -466,8 +520,6 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         ),
 
                   const SizedBox(height: 8),
-
-                  // Challenges
                   ExpansionTile(
                     title: Text(local.choose_challenge_label),
                     children: [
@@ -553,250 +605,152 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                     ],
                   ),
                 ],
-              ),
+              ),*/
               const SizedBox(height: 8),
               // Mood
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.mood_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
+              _section(
+                context,
+                local.mood_trekking_label,
+                Icons.mood,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Preview mood selected
                     mood.isEmpty
-                        ? local.mood_selected_label
-                        : mood.join(
-                            ", ",
-                          ), // mostra solo gli emoji separati da virgola
-                    style: const TextStyle(fontSize: 16),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  ExpansionTile(
-                    title: Text(local.choose_mood_label),
-                    children: [
-                      SizedBox(
-                        height: 220, // altezza della lista scrollabile
-                        child: ListView.builder(
-                          itemCount: availableMoods.length,
-                          itemBuilder: (context, index) {
-                            final emoji = availableMoods[index];
-                            final label = availableMoodsLabels[index];
-                            final isSelected = selectedIndexMood.contains(
-                              index,
-                            );
-
-                            return InkWell(
-                              onTap: () {
-                                setState(() {
-                                  if (isSelected) {
-                                    selectedIndexMood.remove(index);
-                                    mood.remove(emoji);
-                                  } else {
-                                    selectedIndexMood.add(index);
-                                    mood.add(emoji);
-                                  }
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 12,
-                                ),
-                                color: isSelected
-                                    ? Colors.blue.withOpacity(0.3)
-                                    : Colors.transparent,
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      emoji,
-                                      style: const TextStyle(fontSize: 24),
+                        ? Text(
+                            local.mood_selected_label,
+                            style: const TextStyle(fontSize: 14),
+                          )
+                        : Wrap(
+                            spacing: 8,
+                            children: mood
+                                .map(
+                                  (m) => Chip(
+                                    label: Text(
+                                      m,
+                                      style: const TextStyle(fontSize: 20),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      label,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                                    onDeleted: () {
+                                      setState(() => mood.remove(m));
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                    const SizedBox(height: 8),
+                    ExpansionTile(
+                      initiallyExpanded: mood.isEmpty,
+                      title: Text(local.choose_mood_label),
+                      children: List.generate(availableMoods.length, (i) {
+                        final emoji = availableMoods[i];
+                        final selected = mood.contains(emoji);
+
+                        return ListTile(
+                          dense: true,
+                          leading: Text(
+                            emoji,
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          title: Text(
+                            availableMoodsLabels[i],
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          trailing: Icon(
+                            selected
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                          ),
+                          onTap: () {
+                            setState(() {
+                              selected ? mood.remove(emoji) : mood.add(emoji);
+                            });
                           },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               // Photos
-              /*Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.photos_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+              _section(
+                context,
+                local.photos_trekking_label,
+                Icons.photo,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Preview immagini (vecchie + nuove)
+                    if (validPhotos.isNotEmpty || images.isNotEmpty)
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: validPhotos.length + images.length,
+                          itemBuilder: (_, index) {
+                            final isExisting = index < validPhotos.length;
 
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final pickedFiles = await picker.pickMultiImage(
-                        maxWidth: 800,
-                        maxHeight: 800,
-                      );
-                      if (pickedFiles.isNotEmpty) {
-                        setState(() {
-                          images
-                            ..clear()
-                            ..addAll(pickedFiles.map((x) => File(x.path)));
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.photo_library),
-                    label: Text(local.add_botton_label),
-                  ),
+                            return Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Stack(
+                                children: [
+                                  // Immagine
+                                  isExisting
+                                      ? FutureBuilder<String?>(
+                                          future: diaryController
+                                              .getDownloadUrlChild(
+                                                validPhotos[index],
+                                              ),
+                                          builder: (_, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return const SizedBox(
+                                                width: 100,
+                                                height: 100,
+                                                child: Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                ),
+                                              );
+                                            }
 
-                  const SizedBox(height: 8),
+                                            final url = snapshot.data;
 
-                  if (images.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: images.length,
-                        itemBuilder: (_, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.file(
-                              images[index],
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ],
-              ),*/
+                                            if (url == null || url.isEmpty) {
+                                              return _photoPlaceholder();
+                                            }
 
-              // Photos
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.photos_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Bottone per aggiungere nuove immagini
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final pickedFiles = await picker.pickMultiImage(
-                        maxWidth: 800,
-                        maxHeight: 800,
-                      );
-                      if (pickedFiles.isNotEmpty) {
-                        setState(() {
-                          images.addAll(pickedFiles.map((x) => File(x.path)));
-                        });
-                      }
-                    },
-                    icon: const Icon(Icons.photo_library),
-                    label: Text(local.add_botton_label),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Mostrare tutte le immagini (vecchie e nuove) con possibilità di rimuovere
-                  if (photos.isNotEmpty || images.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: validPhotos.length + images.length,
-                        itemBuilder: (_, index) {
-                          final isExisting = index < validPhotos.length;
-
-                          return Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Stack(
-                              children: [
-                                if (isExisting)
-                                  FutureBuilder<String?>(
-                                    future: diaryController
-                                        .getDownloadUrlChild(
-                                          validPhotos[index],
-                                        ),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const SizedBox(
-                                          width: 100,
-                                          height: 100,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            ),
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: Image.network(
+                                                url,
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) =>
+                                                    _photoPlaceholder(),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
-                                        );
-                                      }
-
-                                      final url = snapshot.data;
-
-                                      if (url == null || url.isEmpty) {
-                                        return _photoPlaceholder();
-                                      }
-
-                                      return ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          url,
-                                          width: 100,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
-                                              _photoPlaceholder(),
+                                          child: Image.file(
+                                            images[index - validPhotos.length],
+                                            width: 100,
+                                            height: 100,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                      );
-                                    },
-                                  )
-                                else
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(
-                                      images[index - validPhotos.length],
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
 
-                                // Bottone X in alto a destra
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: Material(
-                                    color: Colors.transparent,
+                                  // Bottone X
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () async {
@@ -818,121 +772,103 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                                         }
                                       },
                                       child: Container(
+                                        padding: const EdgeInsets.all(4),
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.5),
                                           shape: BoxShape.circle,
                                         ),
-                                        padding: const EdgeInsets.all(4),
                                         child: const Icon(
                                           Icons.close,
-                                          size: 18,
+                                          size: 16,
                                           color: Colors.white,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
+                    // Bottone aggiungi foto
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final pickedFiles = await _picker.pickMultiImage(
+                          maxWidth: 800,
+                          maxHeight: 800,
+                        );
+                        if (pickedFiles.isNotEmpty) {
+                          setState(() {
+                            images.addAll(pickedFiles.map((x) => File(x.path)));
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.add_photo_alternate, size: 18),
+                      label: Text(local.add_botton_label),
                     ),
                   ],
-                ],
+                ),
               ),
               const SizedBox(height: 8),
               // Public/Private botton
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("${local.public_private_label}"),
-
-                  const SizedBox(height: 12),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // PUBLIC
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isPublic
-                              ? const Color.fromARGB(255, 48, 48, 48)
-                              : Colors.grey[300],
-                          foregroundColor: isPublic
-                              ? Colors.white
-                              : Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: isPublic
-                              ? 4
-                              : 0, // ombra SOLO quando selezionato
-                        ),
-                        onPressed: () {
+              _section(
+                context,
+                local.public_private_label,
+                Icons.lock,
+                Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // PUBLIC
+                        _toggle(local.public_botton_label, isPublic, () {
                           setState(() {
                             isPublic = true;
 
                             final user = userController.currentUser!;
 
-                            // Aggiungi a pubblico se non c'è già
-                            if (!user.publicDiaryPages.any((d) => d.diaryId == diaryPage.diaryId)) {
+                            // Aggiungi a pubblico se non presente
+                            if (!user.publicDiaryPages.any(
+                              (d) => d.diaryId == diaryPage.diaryId,
+                            )) {
                               user.publicDiaryPages.add(diaryPage);
                             }
 
-                            // Rimuovi dalla lista privata usando diaryId
-                            user.privateDiaryPages.removeWhere((d) => d.diaryId == diaryPage.diaryId);
+                            // Rimuovi da privato
+                            user.privateDiaryPages.removeWhere(
+                              (d) => d.diaryId == diaryPage.diaryId,
+                            );
                           });
-                        },
-                        child: Text(local.public_botton_label),
-                      ),
+                        }),
 
-                      const SizedBox(width: 16),
+                        const SizedBox(width: 8),
 
-                      // PRIVATE
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: !isPublic
-                              ? const Color.fromARGB(255, 48, 48, 48)
-                              : Colors.grey[300],
-                          foregroundColor: !isPublic
-                              ? Colors.white
-                              : Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          elevation: !isPublic
-                              ? 4
-                              : 0, // ombra SOLO quando selezionato
-                        ),
-                        onPressed: () {
+                        // PRIVATE
+                        _toggle(local.private_botton_label, !isPublic, () {
                           setState(() {
                             isPublic = false;
 
                             final user = userController.currentUser!;
 
-                            // Aggiungi a privato se non c'è già
-                            if (!user.privateDiaryPages.any((d) => d.diaryId == diaryPage.diaryId)) {
+                            // Aggiungi a privato se non presente
+                            if (!user.privateDiaryPages.any(
+                              (d) => d.diaryId == diaryPage.diaryId,
+                            )) {
                               user.privateDiaryPages.add(diaryPage);
                             }
 
-                            // Rimuovi dalla lista pubblica usando diaryId
-                            user.publicDiaryPages.removeWhere((d) => d.diaryId == diaryPage.diaryId);
+                            // Rimuovi da pubblico
+                            user.publicDiaryPages.removeWhere(
+                              (d) => d.diaryId == diaryPage.diaryId,
+                            );
                           });
-                        },
-                        child: Text(local.private_botton_label),
-                      ),
-                    ],
-                  ),
-                ],
+                        }),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 8),
               // Save/Cancel botton
@@ -940,35 +876,29 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TrekkingPage(
-                              trekkingId: trekkingName.documentId,
-                            ),
-                          ),
-                        );
-                        /*Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DiaryPage(
-                              onLocaleChanged: widget.onLocaleChanged,
-                              trekkingController: widget.trekkingController,
-                              userController: widget.userController,
-                              diaryId: diary.diaryId,
-                              diaryController: widget.diaryController,
-                            ),
-                          ),
-                        );*/
-                      },
+                      onPressed: () => Navigator.pop(context),
                       child: Text(local.cancel_button_label),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
+                      child: Text(local.save_botton_label),
                       onPressed: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoadingPage(),
+                          ),
+                        );
+                        // Saved new data
+                        notesText = _notesController.text;
+                        if (usedRefreshmentPoint) {
+                          refreshmentText = _refreshmentController.text;
+                        } else {
+                          refreshmentText = "";
+                        }
+
                         String castedDate =
                             "${selectedDay.toString().padLeft(2, '0')} / "
                             "${selectedMonth.toString().padLeft(2, '0')} / "
@@ -976,7 +906,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         double summedDuation =
                             selectedHour!.toDouble() * 60 +
                             selectedMinute!.toDouble();
-                        addedPhotos = await diaryController.uploadDiaryImages(images);
+                        addedPhotos = await diaryController.uploadDiaryImages(
+                          images,
+                        );
                         photos.addAll(addedPhotos);
                         diaryController.addDiary(
                           trekkingName.name,
@@ -994,12 +926,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         );
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => UserPage(),
-                          ),
+                          MaterialPageRoute(builder: (context) => UserPage()),
                         );
                       },
-                      child: Text(local.save_botton_label),
                     ),
                   ),
                 ],
@@ -1008,6 +937,104 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
           ),
         ),
       ),
+    );
+  }
+
+  // Section card widget
+  Widget _section(BuildContext context, String title, IconData icon, Widget c) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            c,
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Row of dropdowns
+  Widget _rowDropdown(List<Widget> children) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children
+          .map(
+            (e) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: e,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  // Dropdown widget
+  Widget _dropdown(
+    int value,
+    List<int> items,
+    ValueChanged<int> onChanged, {
+    bool pad = false,
+  }) {
+    return DropdownButton<int>(
+      value: value,
+      onChanged: (v) => onChanged(v!),
+      items: items
+          .map(
+            (e) => DropdownMenuItem(
+              value: e,
+              child: Text(pad ? e.toString().padLeft(2, '0') : e.toString()),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  // Input decoration
+  InputDecoration _input(String hint) => InputDecoration(
+    hintText: hint,
+    isDense: true,
+    filled: true,
+    fillColor: Colors.grey[100],
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide.none,
+    ),
+  );
+
+  // Toggle button widget
+  Widget _toggle(String label, bool active, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        backgroundColor: active ? const Color(0xFF303030) : Colors.grey[300],
+        foregroundColor: active ? Colors.white : Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: active ? 3 : 0,
+      ),
+      child: Text(label, style: const TextStyle(fontSize: 13)),
     );
   }
 

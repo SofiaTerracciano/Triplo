@@ -63,7 +63,6 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
     final userController = context.watch<UserController>();
-    final user = userController.currentUser!;
     final diaryController = context.watch<DiaryController>();
     final local = AppLocalizations.of(context)!;
 
@@ -89,7 +88,10 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(trekking.name), centerTitle: true),
+      appBar: AppBar(
+        title: Text(trekking.name), 
+        centerTitle: true
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -189,7 +191,10 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                   const SizedBox(height: 8),
                   // Selection of friends
                   ExpansionTile(
-                    title: Text(local.choose_friend_label),
+                    title: Text(
+                      local.choose_friend_label,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     children: userController.currentUser!.following.map((u) {
                       final selected = friends.contains(u.uid);
                       return ListTile(
@@ -315,7 +320,10 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
 
                   // Selection of challenges
                   ExpansionTile(
-                    title: Text(local.choose_challenge_label),
+                    title: Text(
+                      local.choose_challenge_label,
+                      style: const TextStyle(fontSize: 14),
+                    ),
                     children: [
                       SizedBox(
                         height: 260,
