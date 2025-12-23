@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
@@ -10,7 +9,6 @@ import 'diary-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
 import 'search-page.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import '../pages/users-list-page.dart';
@@ -23,12 +21,6 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  final ImagePicker _picker = ImagePicker();
-
-  // Open image from phone
-  Future<XFile?> _pickImage() async {
-    return await _picker.pickImage(source: ImageSource.gallery);
-  }
 
   /*
   Future<String?> uploadProfilePicture(File image) async {
@@ -137,12 +129,9 @@ class _UserPageState extends State<UserPage> {
             IconButton(
               icon: Icon(Icons.logout),
               onPressed: () async {
-                final controller = Provider.of<UserController>(
-                  context,
-                  listen: false,
-                );
+                final userController = context.read<UserController>();
 
-                await controller.logout();
+                await userController.logout();
 
                 Navigator.pushReplacementNamed(
                   context, 
@@ -159,95 +148,87 @@ class _UserPageState extends State<UserPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar + username + level
-                  Column(
-                    children: [
-                      // Profile photo
-                      GestureDetector(
-                        onTap: () async {
-                          final picked = await _pickImage();
-                          if (picked == null) return;
-                          await userController.updateProfilePhoto(
-                            File(picked.path),
-                          );
-                        },
-                        child: CircleAvatar(
-                          radius: 36,
-                          backgroundImage:
-                              user.photoProfile != null &&
-                                  user.photoProfile!.isNotEmpty
-                              ? NetworkImage(user.photoProfile!)
-                              : null,
-                          backgroundColor: Colors.grey[300],
-                          child:
-                              user.photoProfile == null ||
-                                  user.photoProfile!.isEmpty
-                              ? const Icon(Icons.person, size: 40)
-                              : null,
+                  // Colonna Avatar + username + level
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        // Avatar 
+                        CircleAvatar(
+                            radius: 36,
+                            backgroundImage: user.photoProfile != null &&
+                                    user.photoProfile!.isNotEmpty
+                                ? NetworkImage(user.photoProfile!)
+                                : null,
+                            backgroundColor: Colors.grey[300],
+                            child: user.photoProfile == null || user.photoProfile!.isEmpty
+                                ? const Icon(Icons.person, size: 40)
+                                : null,
+                          ),
+                        // Username + level
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                user.username,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      // bisogna sistemare quando lo username è troppo lungo --> crea opverflow
-                      // username
-                      Text(
-                        user.username,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        const SizedBox(height: 2),
+                        Text(
+                          '${local.level_label}: ${user.level}',
+                          style:
+                              const TextStyle(fontSize: 13, color: Colors.black54),
                         ),
-                        maxLines: 1,                 
-                        overflow: TextOverflow.ellipsis, 
-                      ),
-                      const SizedBox(height: 2),
-                      // Level
-                      Text(
-                        '${local.level_label}: ${user.level}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(width: 20),
-
-                  // Nome + stats
+                  const SizedBox(width: 16),
+                  // Colonna Nome + stats
                   Expanded(
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Name and surname
-                        Text(
-                          '${user.name} ${user.surname}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,                 // Una sola riga
-                          overflow: TextOverflow.ellipsis, // Mostra "..." se troppo lungo
-                        ),     
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${user.name} ${user.surname}',
+                                textAlign: TextAlign.center,
+                                style:
+                                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 6),
-                        // Stats: total trekking, followers, following
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Total trekking
                             _StatItem(
                               label: local.totals_trekking_label,
                               value:
                                   '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
                             ),
-                            // Followers
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        UsersList(listName: 'Followers'),
+                                    builder: (_) => UsersList(listName: 'Followers'),
                                   ),
                                 );
                               },
@@ -256,14 +237,12 @@ class _UserPageState extends State<UserPage> {
                                 value: '${user.followers.length}',
                               ),
                             ),
-                            // Following
                             GestureDetector(
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        UsersList(listName: 'Following'),
+                                    builder: (_) => UsersList(listName: 'Following'),
                                   ),
                                 );
                               },
@@ -516,6 +495,7 @@ class _StatItem extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         SizedBox(
+          height: 32,
           width: 70,
           child: Text(
             label,

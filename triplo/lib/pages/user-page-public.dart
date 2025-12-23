@@ -70,115 +70,128 @@ class _UserPagePublicState extends State<UserPagePublic> {
       ),
 
       body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                // Photo profile + username + level
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 36,
-                      backgroundImage:
-                          u.photoProfile != null && u.photoProfile!.isNotEmpty
-                              ? NetworkImage(u.photoProfile!)
-                              : null,
-                      backgroundColor: Colors.grey[300],
-                      child: u.photoProfile == null || u.photoProfile!.isEmpty
-                          ? const Icon(Icons.person, size: 40)
-                          : null,
-                    ),
-                    const SizedBox(height: 8),
-                    // bisogna sistemare quando lo username è troppo lungo --> crea opverflow
-                    Text(
-                      u.username,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,                
-                      overflow: TextOverflow.ellipsis, 
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${local.level_label}: ${u.level}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(width: 20),
-
-                // Name + statistics
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${u.name} ${u.surname}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+          children: [
+            // Top page --> general info
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Colonna Avatar + username + level
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        // Avatar 
+                        CircleAvatar(
+                            radius: 36,
+                            backgroundImage: u.photoProfile != null &&
+                                    u.photoProfile!.isNotEmpty
+                                ? NetworkImage(u.photoProfile!)
+                                : null,
+                            backgroundColor: Colors.grey[300],
+                            child: u.photoProfile == null || u.photoProfile!.isEmpty
+                                ? const Icon(Icons.person, size: 40)
+                                : null,
+                          ),
+                        // Username + level
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                u.username,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        maxLines: 1,                
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start, 
-                        children: [
-                          _StatItem(
-                            label: local.totals_trekking_label,
-                            value: '${u.publicDiaryPages.length}',
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => UsersListPublic(
-                                    listName: 'Followers', 
-                                    userId: u.uid
-                                  ),
-                                ),
-                              );
-                            },
-                            child: _StatItem(
-                              label: 'Followers',
-                              value: '${u.followers.length}', 
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => UsersListPublic(
-                                    listName: 'Following', 
-                                    userId: u.uid,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: _StatItem(
-                              label: 'Following',
-                              value: '${u.following.length}',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          '${local.level_label}: ${u.level}',
+                          style:
+                              const TextStyle(fontSize: 13, color: Colors.black54),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+
+                  const SizedBox(width: 16),
+                  // Colonna Nome + stats
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${u.name} ${u.surname}',
+                                textAlign: TextAlign.center,
+                                style:
+                                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _StatItem(
+                              label: local.totals_trekking_label,
+                              value:
+                                  '${u.publicDiaryPages.length + u.privateDiaryPages.length}',
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => UsersListPublic(
+                                      listName: 'Followers',
+                                      userId: u.uid,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _StatItem(
+                                label: 'Follower',
+                                value: '${u.followers.length}',
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => UsersListPublic(
+                                      listName: 'Following',
+                                      userId: u.uid,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _StatItem(
+                                label: 'Following',
+                                value: '${u.following.length}',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
 
           const Divider(),
 

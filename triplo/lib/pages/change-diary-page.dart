@@ -184,6 +184,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ),
                 ]),
               ),
+
               const SizedBox(height: 8),
               // Duration picker
               _section(
@@ -205,6 +206,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ),
                 ]),
               ),
+
               const SizedBox(height: 8),
               // Friends
               _section(
@@ -286,6 +288,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 8),
               // Notes
               _section(
@@ -299,6 +302,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   decoration: _input(local.notes_placeholder_trekking_label),
                 ),
               ),
+
               const SizedBox(height: 8),
               // Refreshment
               _section(
@@ -338,6 +342,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 8),
               // Challenges
               _section(
@@ -347,47 +352,74 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Preview challenge selezionate
+                    // Preview challenge selected
                     challenges.isEmpty
                         ? Text(
                             local.challenge_selected_label,
                             style: const TextStyle(fontSize: 14),
                           )
                         : Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: challenges.map((challenge) {
-                              return FutureBuilder<String>(
-                                future: trekkingController.getDownloadUrl(
-                                  challenge,
-                                ),
-                                builder: (_, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const SizedBox(
-                                      width: 60,
-                                      height: 60,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    );
-                                  }
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      snapshot.data!,
-                                      width: 60,
-                                      height: 60,
-                                      fit: BoxFit.cover,
-                                    ),
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: challenges.map((challenge) {
+                            return FutureBuilder<String>(
+                              future: trekkingController.getDownloadUrl(challenge),
+                              builder: (_, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const SizedBox(
+                                    width: 60,
+                                    height: 60,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
                                   );
-                                },
-                              );
-                            }).toList(),
-                          ),
+                                }
 
+                                return Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        snapshot.data!,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    // Delete button
+                                    Positioned.fill(
+                                      child: Center(
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              final index =
+                                                  trekkingName.challenges.indexOf(challenge);
+                                              challenges.remove(challenge);
+                                              selectedIndexChallenge.remove(index);
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.6),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
                     const SizedBox(height: 8),
-
-                    // Selezione challenge
+                    // Challenge selection
                     ExpansionTile(
                       title: Text(
                         local.choose_challenge_label,
@@ -467,145 +499,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ],
                 ),
               ),
-              /*Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${local.challenges_trekking_label}: ",
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Mostra immagini selezionate
-                  challenges.isEmpty
-                      ? Text(
-                          local.challenge_selected_label,
-                          style: TextStyle(fontSize: 16),
-                        )
-                      : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: challenges.map((challenge) {
-                            return FutureBuilder<String>(
-                              future: trekkingController.getDownloadUrl(challenge),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.hasData) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      snapshot.data!,
-                                      width: 70,
-                                      height: 70,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  );
-                                }
-                                return const SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                        ),
-
-                  const SizedBox(height: 8),
-                  ExpansionTile(
-                    title: Text(local.choose_challenge_label),
-                    children: [
-                      SizedBox(
-                        height: 260,
-                        child: FutureBuilder(
-                          future: Future.wait(
-                            trekkingController
-                                .getTrekkingById(widget.trekkingId)!
-                                .challenges
-                                .map((c) => trekkingController.getDownloadUrl(c)),
-                          ),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-
-                            final urls = snapshot.data!;
-
-                            return GridView.builder(
-                              padding: const EdgeInsets.all(8),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        4, // 4 per riga --> si crea uan cosa Nx4
-                                    crossAxisSpacing: 8,
-                                    mainAxisSpacing: 8,
-                                  ),
-                              itemCount: urls.length,
-                              itemBuilder: (context, index) {
-                                final challengeName = trekkingController
-                                    .getTrekkingById(widget.trekkingId)!
-                                    .challenges[index];
-
-                                final imageUrl = urls[index];
-
-                                final isSelected = selectedIndexChallenge
-                                    .contains(index);
-
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (isSelected) {
-                                        selectedIndexChallenge.remove(index);
-                                        challenges.remove(challengeName);
-                                      } else {
-                                        selectedIndexChallenge.add(index);
-                                        challenges.add(challengeName);
-                                      }
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? const Color.fromARGB(
-                                                255,
-                                                155,
-                                                241,
-                                                158,
-                                              )
-                                            : Colors.grey,
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),*/
+          
               const SizedBox(height: 8),
               // Mood
               _section(
@@ -671,6 +565,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 8),
               // Photos
               _section(
@@ -680,7 +575,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Preview immagini (vecchie + nuove)
+                    // Preview images selected
                     if (validPhotos.isNotEmpty || images.isNotEmpty)
                       SizedBox(
                         height: 100,
@@ -694,7 +589,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                               padding: const EdgeInsets.all(4),
                               child: Stack(
                                 children: [
-                                  // Immagine
+                                  // Image display
                                   isExisting
                                       ? FutureBuilder<String?>(
                                           future: diaryController
@@ -747,7 +642,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                                           ),
                                         ),
 
-                                  // Bottone X
+                                  // Delete button
                                   Positioned(
                                     top: 4,
                                     right: 4,
@@ -791,25 +686,30 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           },
                         ),
                       ),
-                    // Bottone aggiungi foto
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        final pickedFiles = await _picker.pickMultiImage(
-                          maxWidth: 800,
-                          maxHeight: 800,
-                        );
-                        if (pickedFiles.isNotEmpty) {
-                          setState(() {
-                            images.addAll(pickedFiles.map((x) => File(x.path)));
-                          });
-                        }
-                      },
-                      icon: const Icon(Icons.add_photo_alternate, size: 18),
-                      label: Text(local.add_botton_label),
+                    const SizedBox(height: 8,),
+                    // Add photo button
+                    Center(
+                      child: 
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final pickedFiles = await _picker.pickMultiImage(
+                              maxWidth: 800,
+                              maxHeight: 800,
+                            );
+                            if (pickedFiles.isNotEmpty) {
+                              setState(() {
+                                images.addAll(pickedFiles.map((x) => File(x.path)));
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.add_photo_alternate, size: 18),
+                          label: Text(local.add_botton_label),
+                        ),
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 8),
               // Public/Private botton
               _section(
@@ -822,21 +722,21 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // PUBLIC
+                        // Public
                         _toggle(local.public_botton_label, isPublic, () {
                           setState(() {
                             isPublic = true;
 
                             final user = userController.currentUser!;
 
-                            // Aggiungi a pubblico se non presente
+                            // Add to public if not present
                             if (!user.publicDiaryPages.any(
                               (d) => d.diaryId == diaryPage.diaryId,
                             )) {
                               user.publicDiaryPages.add(diaryPage);
                             }
 
-                            // Rimuovi da privato
+                            // Remove from private
                             user.privateDiaryPages.removeWhere(
                               (d) => d.diaryId == diaryPage.diaryId,
                             );
@@ -845,21 +745,21 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
                         const SizedBox(width: 8),
 
-                        // PRIVATE
+                        // Private
                         _toggle(local.private_botton_label, !isPublic, () {
                           setState(() {
                             isPublic = false;
 
                             final user = userController.currentUser!;
 
-                            // Aggiungi a privato se non presente
+                            // Add to private if not present
                             if (!user.privateDiaryPages.any(
                               (d) => d.diaryId == diaryPage.diaryId,
                             )) {
                               user.privateDiaryPages.add(diaryPage);
                             }
 
-                            // Rimuovi da pubblico
+                            // Remove from public
                             user.publicDiaryPages.removeWhere(
                               (d) => d.diaryId == diaryPage.diaryId,
                             );
@@ -870,6 +770,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 8),
               // Save/Cancel botton
               Row(
@@ -891,7 +792,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                             builder: (context) => const LoadingPage(),
                           ),
                         );
-                        // Saved new data
+                        // Saved new notes and refreshment point
                         notesText = _notesController.text;
                         if (usedRefreshmentPoint) {
                           refreshmentText = _refreshmentController.text;
@@ -1038,6 +939,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     );
   }
 
+  // Image picker for multiple images
   Future<void> pickImages(ImagePicker picker, List<File> images) async {
     final List<XFile>? pickedFiles = await picker.pickMultiImage(
       maxWidth: 800,
@@ -1050,16 +952,17 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
       });
     }
   }
-}
 
-Widget _photoPlaceholder() {
-  return Container(
-    width: 100,
-    height: 100,
-    decoration: BoxDecoration(
-      color: Colors.grey.shade300,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: const Icon(Icons.image_not_supported, size: 40),
-  );
+  // Placeholder widget for failed image loading
+  Widget _photoPlaceholder() {
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(Icons.image_not_supported, size: 40),
+    );
+  }
 }

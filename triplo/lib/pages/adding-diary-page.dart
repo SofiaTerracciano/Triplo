@@ -123,6 +123,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Duration picker
             _section(
@@ -148,6 +149,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Friends selector
             _section(
@@ -187,7 +189,6 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                               )
                               .toList(),
                         ),
-
                   const SizedBox(height: 8),
                   // Selection of friends
                   ExpansionTile(
@@ -221,6 +222,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Notes input
             _section(
@@ -234,6 +236,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 decoration: _input(local.notes_placeholder_trekking_label),
               ),
             ),
+
             const SizedBox(height: 8),
             // Refreshment input
             _section(
@@ -273,6 +276,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Challenges selector
             _section(
@@ -302,22 +306,50 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   );
                                 }
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    snap.data!,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
+                                return Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        snap.data!,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    Positioned.fill(
+                                      child: Center(
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              final index = trekking.challenges.indexOf(c);
+                                              challenges.remove(c);
+                                              selectedChallengeIndexes.remove(index);
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.6),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 );
                               },
                             );
                           }).toList(),
                         ),
-
                   const SizedBox(height: 8),
-
                   // Selection of challenges
                   ExpansionTile(
                     title: Text(
@@ -393,6 +425,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Mood selector
             _section(
@@ -421,9 +454,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                               )
                               .toList(),
                         ),
-
                   const SizedBox(height: 8),
-
                   ExpansionTile(
                     title: Text(local.choose_mood_label),
                     children: List.generate(availableMoods.length, (i) {
@@ -444,6 +475,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Photos picker
             _section(
@@ -459,27 +491,55 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                         scrollDirection: Axis.horizontal,
                         itemCount: _images.length,
                         separatorBuilder: (_, __) => const SizedBox(width: 6),
-                        itemBuilder: (_, i) => ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            _images[i],
-                            width: 90,
-                            fit: BoxFit.cover,
-                          ),
+                        itemBuilder: (_, i) => Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                _images[i],
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+
+                            // Delete button
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() => _images.removeAt(i));
+                                },
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close, size: 16, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-
                   const SizedBox(height: 8),
-
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.add_photo_alternate, size: 18),
-                    label: Text(local.add_botton_label),
-                    onPressed: _pickImages,
-                  ),
+                  // Add photo button
+                  Center(
+                    child:
+                      ElevatedButton.icon(
+                      icon: const Icon(Icons.add_photo_alternate, size: 18),
+                      label: Text(local.add_botton_label),
+                      onPressed: _pickImages,
+                    ),
+                  )
                 ],
               ),
             ),
+
             const SizedBox(height: 8),
             // Public/Private toggle
             _section(
@@ -508,6 +568,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 16),
             // Save/Cancel buttons
             Row(

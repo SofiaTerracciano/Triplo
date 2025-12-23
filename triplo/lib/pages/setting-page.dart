@@ -11,13 +11,8 @@ import 'dart:io';
 
 import 'package:provider/provider.dart';
 
-
-
 class SettingPage extends StatefulWidget {
-
-  SettingPage({
-    super.key,
-  });
+  SettingPage({super.key});
 
   @override
   State<SettingPage> createState() => _SettingPageState();
@@ -41,7 +36,6 @@ class _SettingPageState extends State<SettingPage> {
 
   //late String name;
 
-
   //late String surname;
   //late String username;
   //late DateTime birthdate;
@@ -49,22 +43,28 @@ class _SettingPageState extends State<SettingPage> {
   //late String email;
   //late String password; //da chiedere a Giulio per l'impkementazione
 
-
   //void initState() {
   //  super.initState();
-    //userAccount = widget.userController.currentUser!;
-    //name = userAccount.name;
-    //surname = userAccount.surname;
-    //username = userAccount.username;
-    //birthdate = userAccount.birthdate;
-    //photoProfile = userAccount.photoProfile!;
-    //email = userAccount.email;
+  //userAccount = widget.userController.currentUser!;
+  //name = userAccount.name;
+  //surname = userAccount.surname;
+  //username = userAccount.username;
+  //birthdate = userAccount.birthdate;
+  //photoProfile = userAccount.photoProfile!;
+  //email = userAccount.email;
   //}
 
+  final TextStyle titleStyle = const TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+  );
 
+  final TextStyle infoStyle = const TextStyle(
+    fontSize: 14, 
+    color: Color.fromARGB(255, 72, 72, 72)
+  );
 
   final ImagePicker _picker = ImagePicker();
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,252 +117,211 @@ class _SettingPageState extends State<SettingPage> {
         padding: const EdgeInsets.all(25.0),
         children: [
           // Profile info + avatar
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left column: username + password
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Username + edit
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          local.username_label,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _editField(
-                              title: local.username_label,
-                              initialValue: user.username,
-                              onSave: userController.updateUsername,
-                            );
-                          },
-                          icon: const Icon(Icons.edit, size: 16),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 0, bottom: 8.0),
-                      child: Text(
-                        user.username,
-                        style: TextStyle(fontSize: 14),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage:
+                            user.photoProfile != null &&
+                                user.photoProfile!.isNotEmpty
+                            ? NetworkImage(user.photoProfile!)
+                            : null,
+                        backgroundColor: Colors.grey[300],
+                        child:
+                            user.photoProfile == null ||
+                                user.photoProfile!.isEmpty
+                            ? const Icon(Icons.person, size: 40)
+                            : null,
                       ),
-                    ),
-
-                    // Password + edit
-                    /*
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          local.password_label,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            await widget.userController.requestPasswordReset();
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Password reset email sent"),
-                              ),
-                            );
-
-                          },
-                          icon: const Icon(Icons.edit, size: 16),
-                        ),
-                      ],
-                    ),
-
-                     */
-                    /*
-                    const Padding(
-                      padding: EdgeInsets.only(left: 0, bottom: 8.0),
-                      child: Text(
-                        '***********', // numero di * uguale alla lunghezza della password
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                     */
-                    const SizedBox(height: 8),
-                    /*
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(local.password_label, style: const TextStyle(fontSize: 14)),
-                        TextButton.icon(
-                          onPressed: () async {
-                            await widget.userController.requestPasswordReset();
-
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Password reset email sent")),
-                            );
-                          },
-                          icon: const Icon(Icons.email_outlined, size: 18),
-                          label: const Text("Send reset password link"),
-                        ),
-                      ],
-                    ),
-
-                     */
-
-                    const SizedBox(height: 6),
-
-                  ],
-                ),
-              ),
-
-              // Right column: avatar + edit photo
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      //backgroundImage: AssetImage('images/prova.jpeg'),
-                      backgroundImage: (user.photoProfile != null && user.photoProfile!.isNotEmpty)
-                          ? NetworkImage(user.photoProfile!)
-                          : null,
-                      backgroundColor: Colors.grey[300],
-                      child: (user.photoProfile == null || user.photoProfile!.isEmpty)
-                          ? const Icon(Icons.person, size: 40)
-                          : null,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-
-                            onPressed: _pickProfileImage,
-
-                          child: Text(
-                            local.edit_profile_photo_button_label,
-                            style: TextStyle(fontSize: 12),
+                      // Edit button
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: _pickProfileImage,
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            child: const Icon(
+                              Icons.edit,
+                              size: 17,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    local.username_label,
+                                    style: titleStyle,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    user.username,
+                                    style: infoStyle,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit, 
+                                size: 17
+                              ),
+                              onPressed: () => _editField(
+                                title: local.username_label,
+                                initialValue: user.username,
+                                onSave: userController.updateUsername,
+                              ), // non chiude il dialog ma cambia lo username --> problemi con user_index
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+          // Personal info
+          // Name
+          ListTile(
+            title: Text(
+              local.name_field_label,
+              style: titleStyle,
+            ),
+            subtitle: Text(
+              user.name.isNotEmpty
+                  ? user.name
+                  : "-",
+              style: infoStyle,
+            ),
+            trailing: const Icon(
+              Icons.edit, 
+              size: 17
+            ),
+            dense: true,
+            onTap: () => _editField(
+              title: local.name_field_label,
+              initialValue: user.name,
+              onSave: userController.updateName,
+            ),
+          ),
+
+          // Surname
+          const Divider(height: 1),
+          ListTile(
+            title: Text(
+              local.surname_field_label,
+              style: titleStyle,
+            ),
+            subtitle: Text(
+              user.surname.isNotEmpty 
+                  ? user.surname 
+                  : "-",
+              style: infoStyle,
+            ),
+            trailing: const Icon(
+              Icons.edit, 
+              size: 17
+            ),
+            dense: true,
+            onTap: () => _editField(
+              title: local.surname_field_label,
+              initialValue: user.surname,
+              onSave: userController.updateSurname,
+            ),
+          ),
+
+          // Birthdate
+          const Divider(height: 1),
+          ListTile(
+            title: Text(
+              local.birthdate_field_label,
+              style: titleStyle,
+            ),
+            subtitle: Text(
+              "${user.birthdate.day.toString().padLeft(2, '0')}/"
+              "${user.birthdate.month.toString().padLeft(2, '0')}/"
+              "${user.birthdate.year}",
+              style: infoStyle,
+            ),
+            trailing: const Icon(
+              Icons.calendar_today, 
+              size: 17
+            ),
+            dense: true,
+            onTap: () => _pickBirthdate(user.birthdate),
+          ),
+
+          // Email
+          const Divider(height: 1),
+          ListTile(
+            title: Text(
+              local.email_label, 
+              style: titleStyle
+            ),
+            subtitle: Text(
+              user.email,
+              style: infoStyle,
+            ),
+            trailing: const Icon(
+              Icons.edit, 
+              size: 17
+            ),
+            dense: true,
+            onTap: () {
+              // TODO: modifica email
+            },
+          ),
+        
+          const Divider(height: 1),
+          // Language selection
+          ListTile(
+            title: Text(
+              local.language_field_label,
+              style: titleStyle,
+            ),
+            subtitle: Text(
+              _getLanguageName(languageController.locale.languageCode),
+              style: infoStyle,
+            ),
+            trailing: const Icon(
+              Icons.language, 
+              size: 17
+            ),
+            dense: true,
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (_) => LanguageDialog(
+                  onLocaleSelected: languageController.setLocale,
                 ),
-              ),
-            ],
+              );
+            },
           ),
 
-          const SizedBox(height: 20),
-
-          // Altri campi come nome, cognome, email, nascita, lingua .
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(local.name_field_label, style: TextStyle(fontSize: 14)),
-              IconButton(
-                onPressed: () {
-
-                  _editField(
-                    title: local.name_field_label,
-                    initialValue: user.name,
-                    onSave: userController.updateName,
-                  );
-
-                },
-                icon: const Icon(Icons.edit, size: 16),
-              ),
-              const Spacer(),
-              Text(
-                user.name.isNotEmpty ? user.name : "-",
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(local.surname_field_label, style: TextStyle(fontSize: 14)),
-              IconButton(
-                onPressed: () {
-                  _editField(
-                    title: local.surname_field_label,
-                    initialValue: user.surname,
-                    onSave: userController.updateSurname,
-                  );
-                },
-                icon: const Icon(Icons.edit, size: 16),
-              ),
-              const Spacer(),
-              Text(
-                user.surname.isNotEmpty ? user.surname : "-",
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(local.birthdate_field_label, style: TextStyle(fontSize: 14)),
-              IconButton(
-                onPressed: () => _pickBirthdate(user.birthdate),
-                icon: const Icon(Icons.edit, size: 16),
-              ),
-              const Spacer(),
-              Text(
-                //'birthdate_placeholder',
-                "${user.birthdate.day.toString().padLeft(2, '0')}/"
-                    "${user.birthdate.month.toString().padLeft(2, '0')}/"
-                    "${user.birthdate.year}",
-
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(local.email_label, style: TextStyle(fontSize: 14)),
-              IconButton(
-                onPressed: () {
-                  // to do modifica email
-                },
-                icon: const Icon(Icons.edit, size: 16),
-              ),
-              const Spacer(),
-              Text(
-                user.email,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(local.language_field_label, style: TextStyle(fontSize: 14)),
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => LanguageDialog(
-                      onLocaleSelected: (locale) {
-                        languageController.setLocale(locale); // <-- cambia lingua(locale);
-                      },
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.edit, size: 16),
-              ),
-              const Spacer(),
-              Text(
-                _getLanguageName(languageController.locale.languageCode),
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-            ],
-          ),
           const SizedBox(height: 32),
           /*
           Divider(),
@@ -419,63 +378,52 @@ class _SettingPageState extends State<SettingPage> {
 
 
            */
-        if (context.read<UserController>().isPasswordUser) ...[
-          const SizedBox(height: 32),
-          const Divider(),
-          const SizedBox(height: 16),
+          if (context.read<UserController>().isPasswordUser) ...[
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 16),
 
-          Text(
-            "Password",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            Text(
+              "Password",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ),
 
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-
-
-          Text(
-            "If you want to change your password or if you forgot it, "
-            "we can send you a password reset link to the email associated "
-            "with your account.",
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
+            Text(
+              "If you want to change your password or if you forgot it, "
+              "we can send you a password reset link to the email associated "
+              "with your account.",
+              style: TextStyle(fontSize: 13, color: Colors.black54),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-            onPressed: () async {
-            await userController.requestPasswordReset();
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-              content: Text("Password reset email sent"),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  await userController.requestPasswordReset();
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Password reset email sent")),
+                  );
+                },
+                icon: const Icon(Icons.email_outlined),
+                label: const Text("Send password reset email"),
               ),
-            );
-            },
-            icon: const Icon(Icons.email_outlined),
-            label: const Text("Send password reset email"),
             ),
-          ),
-
-        ],
+          ],
 
           if (context.read<UserController>().isGoogleUser) ...[
-                const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-                TextButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text("Restore Google profile photo"),
-                    onPressed: userController.restoreGoogleProfilePhoto,
-                ),
-          ]
+            TextButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text("Restore Google profile photo"),
+              onPressed: userController.restoreGoogleProfilePhoto,
+            ),
+          ],
         ],
       ),
 
@@ -497,9 +445,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
                 );
               },
             ),
@@ -509,9 +455,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => UserPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => UserPage()),
                 );
               },
             ),
@@ -521,9 +465,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => SearchPage()),
                 );
               },
             ),
@@ -533,9 +475,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => SettingPage()),
                 );
               },
             ),
@@ -545,9 +485,7 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => ChallengesPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => ChallengesPage()),
                 );
               },
             ),
@@ -566,7 +504,6 @@ class _SettingPageState extends State<SettingPage> {
     await userController.updateProfilePhoto(File(picked.path));
   }
 
-
   Future<void> _editField({
     required String title,
     required String initialValue,
@@ -578,10 +515,7 @@ class _SettingPageState extends State<SettingPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(title),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-        ),
+        content: TextField(controller: controller, autofocus: true),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -601,6 +535,7 @@ class _SettingPageState extends State<SettingPage> {
       ),
     );
   }
+
   Future<void> _pickBirthdate(DateTime initial) async {
     final userController = context.read<UserController>();
     final picked = await showDatePicker(
@@ -614,7 +549,6 @@ class _SettingPageState extends State<SettingPage> {
 
     await userController.updateBirthdate(picked);
   }
-
 }
 
 // Popup dialog to select the language
@@ -660,18 +594,18 @@ class LanguageDialog extends StatelessWidget {
 }
 
 String _getLanguageName(String code) {
-    switch (code) {
-      case 'en':
-        return 'English';
-      case 'it':
-        return 'Italiano';
-      case 'es':
-        return 'Español';
-      case 'de':
-        return 'Deutsch';
-      case 'fr':
-        return 'Français';
-      default:
-        return 'Unknown';
-    }
+  switch (code) {
+    case 'en':
+      return 'English';
+    case 'it':
+      return 'Italiano';
+    case 'es':
+      return 'Español';
+    case 'de':
+      return 'Deutsch';
+    case 'fr':
+      return 'Français';
+    default:
+      return 'Unknown';
   }
+}

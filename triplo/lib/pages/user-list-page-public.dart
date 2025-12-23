@@ -48,9 +48,7 @@ class _UsersListPublicState extends State<UsersListPublic> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -62,18 +60,18 @@ class _UsersListPublicState extends State<UsersListPublic> {
               itemBuilder: (context, index) {
                 final user = users[index];
 
-                // Fallback sicuro per avatar
-                ImageProvider? avatar;
-                if (user.photoProfile != null &&
-                    user.photoProfile!.startsWith('http')) {
-                  avatar = NetworkImage(user.photoProfile!);
-                } else {
-                  avatar = const AssetImage('assets/images/default_avatar.png');
-                }
-
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: avatar,
+                    backgroundImage:
+                        user.photoProfile != null &&
+                            user.photoProfile!.isNotEmpty
+                        ? NetworkImage(user.photoProfile!)
+                        : null,
+                    backgroundColor: Colors.grey[300],
+                    child:
+                        user.photoProfile == null || user.photoProfile!.isEmpty
+                        ? const Icon(Icons.person, size: 20)
+                        : null,
                   ),
                   title: Text(user.username),
                   onTap: () {
@@ -90,4 +88,3 @@ class _UsersListPublicState extends State<UsersListPublic> {
     );
   }
 }
-

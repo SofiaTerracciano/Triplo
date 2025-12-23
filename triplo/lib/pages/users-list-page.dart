@@ -44,12 +44,17 @@ class _UsersListState extends State<UsersList> {
           final user = users[index];
           return ListTile(
             leading: CircleAvatar(
-              backgroundImage: user.photoProfile != null
-                  ? NetworkImage( user.photoProfile!) // URL dell'immagine
-                  : AssetImage('assets/images/default_avatar.png')
-                      as ImageProvider, // immagine di default se nulla
+              backgroundImage:user.photoProfile != null && user.photoProfile!.isNotEmpty
+                  ? NetworkImage(user.photoProfile!)
+                  : null,
+              backgroundColor: Colors.grey[300],
+              child:
+                  user.photoProfile == null ||
+                      user.photoProfile!.isEmpty
+                  ? const Icon(Icons.person, size: 20)
+                  : null,
             ),
-            title: Text(user.username), // nome utente
+            title: Text(user.username),
             onTap: () {
               Navigator.pushReplacement(context, MaterialPageRoute(
                   builder: (_) => UserPagePublic(
