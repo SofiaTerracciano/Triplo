@@ -345,161 +345,163 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
               const SizedBox(height: 8),
               // Challenges
-              _section(
-                context,
-                local.challenges_trekking_label,
-                Icons.flag,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Preview challenge selected
-                    challenges.isEmpty
-                        ? Text(
-                            local.challenge_selected_label,
-                            style: const TextStyle(fontSize: 14),
-                          )
-                        : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: challenges.map((challenge) {
-                            return FutureBuilder<String>(
-                              future: trekkingController.getDownloadUrl(challenge),
-                              builder: (_, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return const SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  );
-                                }
-
-                                return Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        snapshot.data!,
+              trekkingName.challenges.isNotEmpty 
+                ?  _section(
+                    context,
+                    local.challenges_trekking_label,
+                    Icons.flag,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Preview challenge selected
+                        challenges.isEmpty
+                            ? Text(
+                                local.challenge_selected_label,
+                                style: const TextStyle(fontSize: 14),
+                              )
+                            : Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: challenges.map((challenge) {
+                                return FutureBuilder<String>(
+                                  future: trekkingController.getDownloadUrl(challenge),
+                                  builder: (_, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const SizedBox(
                                         width: 60,
                                         height: 60,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      );
+                                    }
 
-                                    // Delete button
-                                    Positioned.fill(
-                                      child: Center(
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              final index =
-                                                  trekkingName.challenges.indexOf(challenge);
-                                              challenges.remove(challenge);
-                                              selectedIndexChallenge.remove(index);
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.6),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.close,
-                                              size: 16,
-                                              color: Colors.white,
+                                    return Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
+                                          child: Image.network(
+                                            snapshot.data!,
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+
+                                        // Delete button
+                                        Positioned.fill(
+                                          child: Center(
+                                            child: InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  final index =
+                                                      trekkingName.challenges.indexOf(challenge);
+                                                  challenges.remove(challenge);
+                                                  selectedIndexChallenge.remove(index);
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black.withOpacity(0.6),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 16,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
+                                      ],
+                                    );
+                                  },
                                 );
-                              },
-                            );
-                          }).toList(),
-                        ),
-                    const SizedBox(height: 8),
-                    // Challenge selection
-                    ExpansionTile(
-                      title: Text(
-                        local.choose_challenge_label,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      children: [
-                        SizedBox(
-                          height: 260,
-                          child: FutureBuilder<List<String>>(
-                            future: Future.wait(
-                              trekkingName.challenges.map(
-                                (c) => trekkingController.getDownloadUrl(c),
-                              ),
+                              }).toList(),
                             ),
-                            builder: (_, snapshot) {
-                              if (!snapshot.hasData) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
+                        const SizedBox(height: 8),
+                        // Challenge selection
+                        ExpansionTile(
+                          title: Text(
+                            local.choose_challenge_label,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          children: [
+                            SizedBox(
+                              height: 260,
+                              child: FutureBuilder<List<String>>(
+                                future: Future.wait(
+                                  trekkingName.challenges.map(
+                                    (c) => trekkingController.getDownloadUrl(c),
+                                  ),
+                                ),
+                                builder: (_, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
 
-                              final urls = snapshot.data!;
+                                  final urls = snapshot.data!;
 
-                              return GridView.builder(
-                                padding: const EdgeInsets.all(8),
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 4,
-                                      crossAxisSpacing: 8,
-                                      mainAxisSpacing: 8,
-                                    ),
-                                itemCount: urls.length,
-                                itemBuilder: (_, index) {
-                                  final challengeName =
-                                      trekkingName.challenges[index];
-                                  final isSelected = selectedIndexChallenge
-                                      .contains(index);
+                                  return GridView.builder(
+                                    padding: const EdgeInsets.all(8),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 4,
+                                          crossAxisSpacing: 8,
+                                          mainAxisSpacing: 8,
+                                        ),
+                                    itemCount: urls.length,
+                                    itemBuilder: (_, index) {
+                                      final challengeName =
+                                          trekkingName.challenges[index];
+                                      final isSelected = selectedIndexChallenge
+                                          .contains(index);
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        if (isSelected) {
-                                          selectedIndexChallenge.remove(index);
-                                          challenges.remove(challengeName);
-                                        } else {
-                                          selectedIndexChallenge.add(index);
-                                          challenges.add(challengeName);
-                                        }
-                                      });
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            if (isSelected) {
+                                              selectedIndexChallenge.remove(index);
+                                              challenges.remove(challengeName);
+                                            } else {
+                                              selectedIndexChallenge.add(index);
+                                              challenges.add(challengeName);
+                                            }
+                                          });
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? Colors.green
+                                                  : Colors.grey,
+                                              width: isSelected ? 2 : 1,
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.network(
+                                              urls[index],
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                     },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? Colors.green
-                                              : Colors.grey,
-                                          width: isSelected ? 2 : 1,
-                                        ),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: Image.network(
-                                          urls[index],
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
                                   );
                                 },
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-          
+                  )
+                : SizedBox.shrink(),
+             
               const SizedBox(height: 8),
               // Mood
               _section(

@@ -116,3 +116,80 @@ class AdminUploadPage extends StatelessWidget {
   }
 }
 
+// Serve per prendere tutti i trekking e creare l'indice di ricerca
+/*import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class AdminBuildTrekkingIndexPage extends StatelessWidget {
+  const AdminBuildTrekkingIndexPage({super.key});
+
+  Future<void> buildTrekkingIndex(BuildContext context) async {
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    try {
+      // Prendo tutti i trekking
+      final trekkingSnap = await db.collection('trekking').get();
+
+      if (trekkingSnap.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nessun trekking trovato')),
+        );
+        return;
+      }
+
+      final WriteBatch batch = db.batch();
+
+      for (final doc in trekkingSnap.docs) {
+        final data = doc.data();
+
+        if (!data.containsKey('Name')) continue;
+
+        final String trekkingId = doc.id;
+        final String name = data['Name'];
+
+        final indexRef =
+            db.collection('trekking_index').doc(trekkingId);
+
+        batch.set(indexRef, {
+          'Trekking_id': trekkingId,
+          'Trekking_name': name,
+          'Normalized': name.toLowerCase().trim(),
+        });
+      }
+
+      await batch.commit();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Trekking index creato (${trekkingSnap.docs.length} elementi)',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin – Build Trekking Index'),
+      ),
+      body: Center(
+        child: ElevatedButton.icon(
+          icon: const Icon(Icons.build),
+          label: const Text('Crea / Aggiorna Trekking Index'),
+          onPressed: () => buildTrekkingIndex(context),
+        ),
+      ),
+    );
+  }
+}*/

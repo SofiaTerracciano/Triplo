@@ -279,153 +279,155 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
 
             const SizedBox(height: 8),
             // Challenges selector
-            _section(
-              context,
-              local.challenges_trekking_label,
-              Icons.flag,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Preview challenge selected
-                  challenges.isEmpty
-                      ? Text(
-                          local.challenge_selected_label,
-                          style: const TextStyle(fontSize: 14),
-                        )
-                      : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: challenges.map((c) {
-                            return FutureBuilder<String>(
-                              future: trekkingController.getDownloadUrl(c),
-                              builder: (_, snap) {
-                                if (!snap.hasData) {
-                                  return const SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  );
-                                }
-                                return Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        snap.data!,
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-
-                                    Positioned.fill(
-                                      child: Center(
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              final index = trekking.challenges.indexOf(c);
-                                              challenges.remove(c);
-                                              selectedChallengeIndexes.remove(index);
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.6),
-                                              shape: BoxShape.circle,
+            trekking.challenges.isNotEmpty
+                ? _section(
+                    context,
+                    local.challenges_trekking_label,
+                    Icons.flag,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Preview challenge selected
+                        challenges.isEmpty
+                            ? Text(
+                                local.challenge_selected_label,
+                                style: const TextStyle(fontSize: 14),
+                              )
+                            : Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: challenges.map((c) {
+                                  return FutureBuilder<String>(
+                                    future: trekkingController.getDownloadUrl(c),
+                                    builder: (_, snap) {
+                                      if (!snap.hasData) {
+                                        return const SizedBox(
+                                          width: 60,
+                                          height: 60,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        );
+                                      }
+                                      return Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.network(
+                                              snap.data!,
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.cover,
                                             ),
-                                            child: const Icon(
-                                              Icons.close,
-                                              size: 16,
-                                              color: Colors.white,
+                                          ),
+
+                                          Positioned.fill(
+                                            child: Center(
+                                              child: InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    final index = trekking.challenges.indexOf(c);
+                                                    challenges.remove(c);
+                                                    selectedChallengeIndexes.remove(index);
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.6),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                        const SizedBox(height: 8),
+                        // Selection of challenges
+                        ExpansionTile(
+                          title: Text(
+                            local.choose_challenge_label,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          children: [
+                            SizedBox(
+                              height: 260,
+                              child: FutureBuilder<List<String>>(
+                                future: Future.wait(
+                                  trekking.challenges
+                                      .map((c) => trekkingController.getDownloadUrl(c)),
+                                ),
+                                builder: (_, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+
+                                  final urls = snapshot.data!;
+
+                                  return GridView.builder(
+                                    padding: const EdgeInsets.all(8),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 4,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
+                                    itemCount: urls.length,
+                                    itemBuilder: (_, index) {
+                                      final challengeName = trekking.challenges[index];
+                                      final isSelected =
+                                          selectedChallengeIndexes.contains(index);
+
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            if (isSelected) {
+                                              selectedChallengeIndexes.remove(index);
+                                              challenges.remove(challengeName);
+                                            } else {
+                                              selectedChallengeIndexes.add(index);
+                                              challenges.add(challengeName);
+                                            }
+                                          });
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color:
+                                                  isSelected ? Colors.green : Colors.grey,
+                                              width: isSelected ? 2 : 1,
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Image.network(
+                                              urls[index],
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }).toList(),
-                        ),
-                  const SizedBox(height: 8),
-                  // Selection of challenges
-                  ExpansionTile(
-                    title: Text(
-                      local.choose_challenge_label,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    children: [
-                      SizedBox(
-                        height: 260,
-                        child: FutureBuilder<List<String>>(
-                          future: Future.wait(
-                            trekking.challenges
-                                .map((c) => trekkingController.getDownloadUrl(c)),
-                          ),
-                          builder: (_, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(child: CircularProgressIndicator());
-                            }
-
-                            final urls = snapshot.data!;
-
-                            return GridView.builder(
-                              padding: const EdgeInsets.all(8),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
+                                      );
+                                    },
+                                  );
+                                },
                               ),
-                              itemCount: urls.length,
-                              itemBuilder: (_, index) {
-                                final challengeName = trekking.challenges[index];
-                                final isSelected =
-                                    selectedChallengeIndexes.contains(index);
-
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (isSelected) {
-                                        selectedChallengeIndexes.remove(index);
-                                        challenges.remove(challengeName);
-                                      } else {
-                                        selectedChallengeIndexes.add(index);
-                                        challenges.add(challengeName);
-                                      }
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color:
-                                            isSelected ? Colors.green : Colors.grey,
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: Image.network(
-                                        urls[index],
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
+                      ],
+                    ),
+                  )
+                : const SizedBox.shrink(), // If no challenges, show nothing
+            
             const SizedBox(height: 8),
             // Mood selector
             _section(

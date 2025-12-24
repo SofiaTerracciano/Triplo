@@ -76,6 +76,7 @@ class _Landing_PageState extends State<Landing_Page> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const AdminUploadPage()),
+                //MaterialPageRoute(builder: (_) => const AdminBuildTrekkingIndexPage()),
               );
             },
           ),

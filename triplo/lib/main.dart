@@ -89,6 +89,7 @@ class _MyAppState extends State<MyApp> {
               '/forgotten_password': (context) => ForgottenPasswordPage(),
               '/geowatch': (context) => const GeoWatchPage(),
               '/admin_upload': (context) => const AdminUploadPage(),
+              //'/admin_upload': (context) => const AdminBuildTrekkingIndexPage(),
               "/userProfileRemote": (context) => UserPagePublic(
                     userId: ModalRoute.of(context)!.settings.arguments as String,
                   ),
