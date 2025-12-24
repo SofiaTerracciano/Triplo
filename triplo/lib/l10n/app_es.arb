@@ -98,5 +98,7 @@
   "challenge_selected_label": "Ningún reto seleccionado",
   "choose_challenge_label": "Selecciona los desafíos completados",
 
-  "challeng_title": "Desafíos"
+  "challeng_title": "Desafíos",
+
+  "no_users_found_label": "No se encontraron usuarios"
 }

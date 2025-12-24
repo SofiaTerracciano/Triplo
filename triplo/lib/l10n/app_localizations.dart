@@ -640,6 +640,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Challenges'**
   String get challeng_title;
+
+  /// No description provided for @no_users_found_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get no_users_found_label;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

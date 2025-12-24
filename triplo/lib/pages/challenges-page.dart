@@ -242,7 +242,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
         height: 100,
         child: Image.network(
           url,
-          fit: BoxFit.contain, // mantiene l'immagine intera senza tagli
+          fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
             return Container(
               width: 100,

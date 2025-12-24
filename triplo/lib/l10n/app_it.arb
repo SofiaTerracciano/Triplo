@@ -98,5 +98,7 @@
     "challenge_selected_label": "Nessuna challenge selezionata",
     "choose_challenge_label": "Seleziona le sfide superate",
 
-    "challeng_title": "Sfide"
+    "challeng_title": "Sfide",
+
+    "no_users_found_label": "Nessun utente trovato"
 }

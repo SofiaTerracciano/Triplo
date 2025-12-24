@@ -273,7 +273,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GeoWatchPage(), // i controller?
+                    builder: (context) => GeoWatchPage(), 
                   ),
                 );
               },

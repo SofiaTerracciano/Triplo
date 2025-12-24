@@ -277,4 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get challeng_title => 'Challenges';
+
+  @override
+  String get no_users_found_label => 'No users found';
 }

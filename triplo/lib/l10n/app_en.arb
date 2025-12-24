@@ -98,5 +98,7 @@
     "challenge_selected_label": "No challenge selected",
     "choose_challenge_label": "Select the challenges completed",
 
-    "challeng_title": "Challenges"
+    "challeng_title": "Challenges",
+
+    "no_users_found_label": "No users found"
 }

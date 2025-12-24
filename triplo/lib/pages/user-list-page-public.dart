@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/user.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/user.dart';
 import '../pages/user-page-public.dart';
 import 'package:provider/provider.dart';
@@ -47,6 +48,8 @@ class _UsersListPublicState extends State<UsersListPublic> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -54,7 +57,7 @@ class _UsersListPublicState extends State<UsersListPublic> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.listName)),
       body: users.isEmpty
-          ? const Center(child: Text("No users found"))
+          ? Center(child: Text(local.no_users_found_label))
           : ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) {

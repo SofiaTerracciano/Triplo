@@ -98,5 +98,7 @@
   "challenge_selected_label": "Aucun défi sélectionné",
   "choose_challenge_label": "Sélectionnez les défis accomplis",
 
-  "challeng_title": "Défis"
+  "challeng_title": "Défis",
+
+  "no_users_found_label": "Aucun utilisateur trouvé"
 }
