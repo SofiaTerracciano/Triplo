@@ -241,7 +241,7 @@ class _UserPageState extends State<UserPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersList(listName: 'Followers'),
@@ -255,7 +255,7 @@ class _UserPageState extends State<UserPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersList(listName: 'Following'),

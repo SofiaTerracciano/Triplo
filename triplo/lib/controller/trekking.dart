@@ -72,4 +72,26 @@ class TrekkingController extends ChangeNotifier {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();
   }
+
+  // Search trekkings by name using normalized search in Firestore
+  Future<List<Trekking>> searchTrekking(String query) async {
+    final q = query.trim().toLowerCase();
+    final snap = await _db
+        .collection("trekking_index")
+        .where("Normalized", isGreaterThanOrEqualTo: q)
+        .where("Normalized", isLessThanOrEqualTo: "$q\uf8ff")
+        .get();
+
+    final List<Trekking> results = [];
+
+    for (var d in snap.docs) {
+      final trekkingId = d["Trekking_id"] as String;
+      print(trekkingId);
+      final trekking = getTrekkingById(trekkingId);
+      if (trekking != null) results.add(trekking);
+    }
+    
+    print(results);
+    return results;
+  }
 }

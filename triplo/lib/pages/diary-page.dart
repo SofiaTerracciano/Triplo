@@ -9,6 +9,7 @@ import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/change-diary-page.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import 'package:provider/provider.dart';
+import 'package:triplo/pages/user-page.dart';
 
 class DiaryPage extends StatefulWidget {
   final String diaryId;
@@ -90,22 +91,23 @@ class _DiaryPageState extends State<DiaryPage> {
             title: Text(diary.trekkigName),
             centerTitle: true, // Forced center the title
             actions: [
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ModifyDiaryPage(
-                        trekkingId: trekkingController.getTrekkingId(
-                          diary.trekkigName,
-                        )!,
-                        diaryId: widget.diaryId,
+              if (userController.currentUser!.uid == diary.userId)
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModifyDiaryPage(
+                          trekkingId: trekkingController.getTrekkingId(
+                            diary.trekkigName,
+                          )!,
+                          diaryId: widget.diaryId,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
             ],
           ),
 
@@ -140,14 +142,26 @@ class _DiaryPageState extends State<DiaryPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              user.username,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            TextButton(
+                              child: Text(
+                                user.username,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => userController.currentUser!.uid == diary.userId
+                                        ? UserPage()
+                                        : UserPagePublic(userId: diary.userId),
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 3),
                             infoRow(
                               Icons.calendar_today,
                               '${local.date_trekking_label}: ${diary.date}',
@@ -185,9 +199,8 @@ class _DiaryPageState extends State<DiaryPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => UserPagePublic(
-                                  userId: friend.uid,
-                                ),
+                                builder: (_) =>
+                                    UserPagePublic(userId: friend.uid),
                               ),
                             );
                           },
@@ -203,27 +216,18 @@ class _DiaryPageState extends State<DiaryPage> {
                 text: local.photos_trekking_label,
                 icon: Icons.photo,
               ),
-              imageScroller(
-                diary.photos,
-                diaryController.getDownloadUrlChild,
-              ),
+              imageScroller(diary.photos, diaryController.getDownloadUrlChild),
 
               if (diary.challenges.isNotEmpty) ...[
                 SectionTitle(
                   text: local.challenges_trekking_label,
                   icon: Icons.flag,
                 ),
-                imageScroller(
-                  diary.challenges,
-                  diaryController.getDownloadUrl,
-                ),
+                imageScroller(diary.challenges, diaryController.getDownloadUrl),
               ],
 
               // Mood
-              SectionTitle(
-                text: local.mood_trekking_label,
-                icon: Icons.mood,
-              ),
+              SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
               Wrap(
                 spacing: 8,
                 children: diary.mood.map((m) {

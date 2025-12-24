@@ -152,7 +152,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersListPublic(
@@ -169,7 +169,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersListPublic(

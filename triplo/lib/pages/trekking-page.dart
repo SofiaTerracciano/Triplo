@@ -94,7 +94,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => AddingDiaryPage(
@@ -166,7 +166,11 @@ class _TrekkingPageState extends State<TrekkingPage> {
                     _infoRow(
                       Icons.terrain,
                       local.level_label,
-                      trekking.difficulty_level,
+                      trekking.difficulty_level == "easy"
+                        ? local.beginner_level
+                        : trekking.difficulty_level == "intermediate"
+                            ? local.intermediate_level
+                            : local.advanced_level,
                       valueColor: _difficultyColor(trekking.difficulty_level),
                     ),
                     _infoRow(

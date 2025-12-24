@@ -5,6 +5,7 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/challenges-page.dart';
+import 'package:triplo/pages/trekking-page.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import '../enum/SearchMode.dart';
 import '../widgets_for_pages/filter/filter.dart';
@@ -285,17 +286,21 @@ class _SearchPageState extends State<SearchPage>
     setState(() {
       _searchMode = mode;
       _userResults.clear();
+      _trekkingResults.clear();
+      _isSearching = false;
     });
 
     // Re-run search if there's text
     if (_searchController.text.isNotEmpty &&
         (mode == SearchMode.users || mode == SearchMode.trekking)) {
-      _runSearch(_searchController.text);
+      _runSearch(
+        _searchController.text
+      );
     }
   }
 
   // Run search based on the current search mode
-  Future<void> _runSearch(String query) async {
+  /*Future<void> _runSearch(String query) async {
     if (query.isEmpty) return;
 
     setState(() => _isSearching = true);
@@ -310,12 +315,38 @@ class _SearchPageState extends State<SearchPage>
       _userResults = await userController.searchUsers(query);
     }
 
-    /*if (_searchMode == SearchMode.trekking) {
+    if (_searchMode == SearchMode.trekking) {
       _trekkingResults =
           await trekkingController.searchTrekking(query);
-    }*/
+    }
 
     setState(() => _isSearching = false);
+  }*/
+
+  int _searchToken = 0;
+
+  Future<void> _runSearch(String query) async {
+    if (query.isEmpty) return;
+
+    final int currentToken = ++_searchToken;
+
+    setState(() => _isSearching = true);
+
+    final userController = context.read<UserController>();
+    final trekkingController = context.read<TrekkingController>();
+
+    try {
+      if (_searchMode == SearchMode.users) {
+        _userResults = await userController.searchUsers(query);
+      } else if (_searchMode == SearchMode.trekking) {
+        _trekkingResults =
+            await trekkingController.searchTrekking(query);
+      }
+    } finally {
+      if (currentToken == _searchToken && mounted) {
+        setState(() => _isSearching = false);
+      }
+    }
   }
 
   // Build grid of random diaries
@@ -488,7 +519,7 @@ class _SearchPageState extends State<SearchPage>
       );
     }
 
-    /*if (_searchMode == SearchMode.trekking) {
+    if (_searchMode == SearchMode.trekking) {
       if (_trekkingResults.isEmpty) {
         return Center(child: Text (local.no_trekking_found_label));
       }
@@ -496,16 +527,29 @@ class _SearchPageState extends State<SearchPage>
       return ListView.builder(
         itemCount: _trekkingResults.length,
         itemBuilder: (context, index) {
-          final u = _trekkingResults[index];
+          final trekking = _trekkingResults[index];
           return ListTile(
-            leading: const Icon(Icons.person), // da sistemare cosa si vede 
-            title: Text(u.username),
-            subtitle: Text(u.email),
+            leading: const Icon(Icons.terrain), 
+            title: Text(trekking.name),
+            subtitle: Text(
+              trekking.difficulty_level == "easy"
+                  ? local.beginner_level
+                  : trekking.difficulty_level == "intermediate"
+                      ? local.intermediate_level
+                      : local.advanced_level
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TrekkingPage(trekkingId: trekking.documentId),
+                ),
+              );
+            },
           );
         },
       );
-    }*/
-
+    }
     return const SizedBox.shrink();
   }
 }

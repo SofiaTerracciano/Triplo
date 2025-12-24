@@ -56,7 +56,7 @@ class _UsersListState extends State<UsersList> {
             ),
             title: Text(user.username),
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(
+              Navigator.push(context, MaterialPageRoute(
                   builder: (_) => UserPagePublic(
                     userId: user.uid,
                   ),
