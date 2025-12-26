@@ -12,6 +12,7 @@ import 'trekking-page.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:provider/provider.dart';
 
+// Home page widget with map and navigation drawer --> main landing page after login
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -29,7 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   late MapController mapController;
 
-  // Initial center of the map
+  // Initial center of the map (Madonna di Campiglio)
   final LatLng mapInitialCenter = const LatLng(46.230, 10.831);
 
   @override
@@ -44,7 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(local.home_page_title, style: optionStyle),
+        title: Text(
+          local.home_page_title, 
+          style: optionStyle
+        ),
         centerTitle: true, // Forced center the title
       ),
 
@@ -55,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // Zoom In button
           FloatingActionButton(
             heroTag: "zoomIn",
             mini: true,
@@ -65,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           const SizedBox(height: 10),
+          // Zoom out button
           FloatingActionButton(
             heroTag: "zoomOut",
             mini: true,

@@ -5,8 +5,9 @@ import 'package:triplo/model/user.dart';
 import '../pages/user-page-public.dart';
 import 'package:provider/provider.dart';
 
+// UsersListPublic widget to display followers or following users of a specified user
 class UsersListPublic extends StatefulWidget {
-  final String listName; // 'Followers' o 'Following'
+  final String listName; 
   final String userId;
 
   const UsersListPublic({
@@ -31,11 +32,9 @@ class _UsersListPublicState extends State<UsersListPublic> {
 
   Future<void> _loadUsers() async {
     final userController = context.read<UserController>();
-
-    // Prendi l'utente target
     final targetUser = await userController.getUserById(widget.userId);
     if (!mounted) return;
-
+    // Take followers or following based on listName
     setState(() {
       if (widget.listName == 'Followers') {
         users = targetUser?.followers ?? [];

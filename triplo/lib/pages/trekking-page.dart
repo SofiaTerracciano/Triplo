@@ -8,6 +8,7 @@ import '../controller/trekking.dart';
 import '../controller/user.dart';
 import 'package:provider/provider.dart';
 
+// TrekkingPage widget to display detailed information about a trekking
 class TrekkingPage extends StatefulWidget {
   final String trekkingId;
 
@@ -21,7 +22,7 @@ class TrekkingPage extends StatefulWidget {
 }
 
 class _TrekkingPageState extends State<TrekkingPage> {
-  // Icons for the bookmark button (unsaved and saved) --> 0:not saved, 1:saved
+  // Icons for the bookmark button (unsaved and saved)
   final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
 
   final titleStyle = TextStyle(
@@ -80,11 +81,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
       }
     }
 
+    // Check if the trekking is saved by the user or not
     final bool isSaved = user.savedTrekkings.any(
       (t) => t.documentId == trekking.documentId,
     );
-
-    print(trekking.endingPointPhoto);
 
     return Scaffold(
       appBar: AppBar(
@@ -105,6 +105,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             },
           ),
 
+          // Bookmark button to save/unsave the trekking
           IconButton(
             icon: isSaved ? icons[1] : icons[0],
             onPressed: () async {
@@ -118,7 +119,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 );
               }
 
-              setState(() {}); // ricostruisce l'AppBar
+              setState(() {});
             },
           ),
         ],
@@ -128,14 +129,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // MAP PHOTO
+            // Map photo --> close up view
             _photoSection(
               trekkingController.getDownloadUrl(trekking.mapPhoto),
             ),
 
             const SizedBox(height: 16),
 
-            // TITLE
+            // Title --> Trekking name
             Text(
               trekking.name,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -143,7 +144,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             const SizedBox(height: 16),
 
-            // INFO CARD
+            // Info card --> starting point, ending point, level, distance, time, elevation gain
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -153,16 +154,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
+                    // Starting point
                     _infoRichRow(
                       Icons.place,
                       local.starting_point_trekking_label,
                       trekking.starting_point_name,
                     ),
+                    // Ending point
                     _infoRichRow(
                       Icons.flag,
                       local.ending_point_trekking_label,
                       trekking.ending_point_name,
                     ),
+                    // Difficulty level
                     _infoRow(
                       Icons.terrain,
                       local.level_label,
@@ -173,16 +177,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                             : local.advanced_level,
                       valueColor: _difficultyColor(trekking.difficulty_level),
                     ),
+                    // Distance
                     _infoRow(
                       Icons.straighten,
                       local.distance_trekking_label,
                       "${trekking.distance} km",
                     ),
+                    // Estimated time
                     _infoRow(
                       Icons.schedule,
                       local.estimated_time_trekking_label,
                       formattedTime,
                     ),
+                    // Elevation gain whit up and down arrows
                     _elevationRow(
                       local.elevaition_gain_trekking_label,
                       trekking.elevation_gain,
@@ -196,7 +203,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             const SizedBox(height: 24),
 
-            // ENDING POINT PHOTO
+            // Ending point photo
             _photoSection(
               trekkingController.getDownloadUrl(
                 trekking.endingPointPhoto,
@@ -205,13 +212,13 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             const SizedBox(height: 24),
 
-            // INFO
+            // Info section
             _sectionTitle(local.info_trekking_label),
             Text(trekking.info[langIndex]),
 
             const SizedBox(height: 16),
 
-            // DESCRIPTION
+            // Description section
             _sectionTitle(local.description_trekking_label),
             Text(
               trekking.description[langIndex],
@@ -238,7 +245,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             const SizedBox(height: 16),
 
-            // CHALLENGES
+            // Challenges section
             _sectionTitle(local.challenges_trekking_label),
             trekking.challenges.isNotEmpty
                 ? FutureBuilder<List<String>>(
@@ -266,7 +273,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             const SizedBox(height: 16),
 
-            // WEATHER
+            // Weather
             _sectionTitle(local.weather_trekking_label),
             ElevatedButton(
               onPressed: () {
@@ -287,6 +294,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Get language index based on language code --> it is used to select the correct language from info and description lists
   int getLanguageSelected(String code) {
     switch (code) {
       case 'de':
@@ -304,7 +312,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
     }
   }
 
+  // Widget to display a photo section with a loading indicator until the image is loaded and then show the image
   Widget _photoSection(Future<String> future) {
+    // Use FutureBuilder to handle the asynchronous loading of the image URL
     return FutureBuilder<String>(
       future: future,
       builder: (context, snapshot) {
@@ -315,6 +325,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             child: const CircularProgressIndicator(),
           );
         }
+        // Once the image URL is loaded, display the image with rounded corners
         return ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.network(
@@ -328,6 +339,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Widget to display an information row with an icon, label, and value
   Widget _infoRow(
     IconData icon,
     String label,
@@ -349,6 +361,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Widget to display an information row with an icon, label, and value in rich text format 
   Widget _infoRichRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -379,6 +392,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Widget to display a refreshment point row with an icon, label, and value
   Widget _refreshmentRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -396,6 +410,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Widget to display a family friendly row with an icon, label, and value
   Widget _familyRow(
     IconData icon,
     String label,
@@ -421,6 +436,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Widget to display a section title
   Widget _sectionTitle(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -431,6 +447,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
+  // Function to convert difficulty level to color
   Color _difficultyColor(String difficulty) {
     switch (difficulty.toLowerCase()) {
       case "easy":
@@ -444,6 +461,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     }
   }
 
+  // Widget to display an elevation row with up and down gain indicators
   Widget _elevationRow(
     String label,
     double elevation,

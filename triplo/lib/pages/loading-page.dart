@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// LoadingPage widget to show a loading indicator until content is ready
 class LoadingPage extends StatelessWidget {
   const LoadingPage({super.key});
 

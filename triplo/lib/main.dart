@@ -52,6 +52,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
+      // Provide controllers to the app --> state management
       providers: [
         ChangeNotifierProvider(create: (_) => UserController()),
         ChangeNotifierProvider(create: (_) => DiaryController()),
@@ -67,13 +68,15 @@ class _MyAppState extends State<MyApp> {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
               useMaterial3: true,
             ),
-            locale: lang.locale, // <-- qui la lingua dinamica
+            // This is for localization --> set the app language based on Language controller
+            locale: lang.locale, //
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
+            // Supported locales --> English, Italian, Spanish, German, French
             supportedLocales: const [
               Locale('en'),
               Locale('it'),

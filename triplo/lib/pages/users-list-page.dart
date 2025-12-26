@@ -4,7 +4,7 @@ import 'package:triplo/model/user.dart';
 import '../pages/user-page-public.dart';
 import 'package:provider/provider.dart';
 
-
+// UsersList widget to display followers or following users of the current user
 class UsersList extends StatefulWidget {
   final String listName;
 
@@ -24,6 +24,7 @@ class _UsersListState extends State<UsersList> {
   void initState() {
     super.initState();
     final userController = context.read<UserController>();
+    // Determine whether to show followers or following based on listName
     if(widget.listName == 'Followers') {
       users = userController.currentUser!.followers;
     } else {

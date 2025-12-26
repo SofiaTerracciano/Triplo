@@ -11,6 +11,7 @@ import 'package:triplo/pages/user-page-public.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/pages/user-page.dart';
 
+// DiaryPage widget to display details of a specific diary that you have created
 class DiaryPage extends StatefulWidget {
   final String diaryId;
 
@@ -33,7 +34,7 @@ class _DiaryPageState extends State<DiaryPage> {
     final diaryController = context.read<DiaryController>();
     final currentUserId = diaryController.currentUser!.uid;
 
-    // aspettiamo i due caricamenti
+    // Load both public and private diaries for the current user
     await diaryController.loadPublicDiary(currentUserId);
     await diaryController.loadPrivateDiary(currentUserId);
 
@@ -58,6 +59,7 @@ class _DiaryPageState extends State<DiaryPage> {
       return const Scaffold(body: Center(child: Text('Diary not found')));
     }
 
+    // Format duration into hours and minutes
     String formattedTime;
     if (diary.duration < 60) {
       formattedTime = "${diary.duration} m";
@@ -91,6 +93,8 @@ class _DiaryPageState extends State<DiaryPage> {
             title: Text(diary.trekkigName),
             centerTitle: true, // Forced center the title
             actions: [
+              // Edit button only if the current user is the diary owner so you can watch and edit your 
+              // own diaries but not other users' diaries
               if (userController.currentUser!.uid == diary.userId)
                 IconButton(
                   icon: Icon(Icons.edit),
@@ -114,6 +118,7 @@ class _DiaryPageState extends State<DiaryPage> {
           body: ListView(
             padding: const EdgeInsets.all(25.0),
             children: [
+              // Info card
               Card(
                 elevation: 3,
                 shape: RoundedRectangleBorder(
@@ -123,6 +128,7 @@ class _DiaryPageState extends State<DiaryPage> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
+                      // Profile photo
                       CircleAvatar(
                         radius: 36,
                         backgroundImage:
@@ -138,6 +144,7 @@ class _DiaryPageState extends State<DiaryPage> {
                             : null,
                       ),
                       const SizedBox(width: 16),
+                      // Username
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,10 +169,12 @@ class _DiaryPageState extends State<DiaryPage> {
                               },
                             ),
                             const SizedBox(height: 3),
+                            // Date
                             infoRow(
                               Icons.calendar_today,
                               '${local.date_trekking_label}: ${diary.date}',
                             ),
+                            // Duration
                             infoRow(
                               Icons.timer,
                               '${local.duration_trekking_label}: $formattedTime',
@@ -211,13 +220,16 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ],
 
-              // Photos and challenges
-              SectionTitle(
-                text: local.photos_trekking_label,
-                icon: Icons.photo,
-              ),
-              imageScroller(diary.photos, diaryController.getDownloadUrlChild),
+              // Photos only if you have upload them
+              if (diary.photos.isNotEmpty) ...[
+                SectionTitle(
+                  text: local.photos_trekking_label,
+                  icon: Icons.photo,
+                ),
+                imageScroller(diary.photos, diaryController.getDownloadUrlChild),
+              ],
 
+              // Challenges only if you have done them
               if (diary.challenges.isNotEmpty) ...[
                 SectionTitle(
                   text: local.challenges_trekking_label,
@@ -226,27 +238,29 @@ class _DiaryPageState extends State<DiaryPage> {
                 imageScroller(diary.challenges, diaryController.getDownloadUrl),
               ],
 
-              // Mood
-              SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
-              Wrap(
-                spacing: 8,
-                children: diary.mood.map((m) {
-                  return Chip(
-                    label: Text(m, style: const TextStyle(fontSize: 22)),
-                    backgroundColor: Theme.of(context).cardColor,
-                    elevation: 2,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  );
-                }).toList(),
-              ),
+              // Mood only if you have selected
+              if (diary.mood.isNotEmpty) ...[
+                SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
+                Wrap(
+                  spacing: 8,
+                  children: diary.mood.map((m) {
+                    return Chip(
+                      label: Text(m, style: const TextStyle(fontSize: 22)),
+                      backgroundColor: Theme.of(context).cardColor,
+                      elevation: 2,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
 
-              // Notes and refreshment point
+              // Refreshment point only if you have you eaten there
               if (diary.refreshmentPoint.isNotEmpty) ...[
                 SectionTitle(
                   text: local.refreshment_point_trekking_label,
@@ -260,6 +274,7 @@ class _DiaryPageState extends State<DiaryPage> {
                 ),
               ],
 
+              // Notes only if you have written
               if (diary.notes.isNotEmpty) ...[
                 SectionTitle(
                   text: local.notes_trekking_label,
