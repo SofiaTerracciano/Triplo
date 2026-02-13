@@ -1,575 +1,142 @@
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
+
 import '../model/user.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
 
-/**
- * Controller responsible for:
- * Authentication (email/password + Google)
- * Creating user documents in Firestore
- * Loading complete user profile
- * Converting IDs into full objects (followers, diaries, etc.)
- * Updating profile picture
- */
-
-
-
 class UserController extends ChangeNotifier {
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  UserController();
-
-  Users? _currentUser; // Local copy of logged user
-  bool _loaded = false;
-
-
+  Users? _currentUser;
   Users? get currentUser => _currentUser;
 
-  set currentUser(Users user) {
-    _currentUser = user;
-  }
+  /* --------------------------------------------------
+   * AUTH
+   * -------------------------------------------------- */
 
-  /**
-   * Registers a new user using email and password.
-   * Steps:
-   * 1. Creates a FirebaseAuth account.
-   * 2. Creates a Firestore user document with model fields.
-   * 3. Loads the full user profile into the local model.
-   *
-   * This method is used exclusively for manual email/password sign-up
-   */
   Future<void> register(String email, String password) async {
-    final credential = await _auth.createUserWithEmailAndPassword(
+    final cred = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
-    final uid = credential.user!.uid;
+    final uid = cred.user!.uid;
 
-    // Crea documento Firestore coerente con il MODEL
-    await _createFirestoreUser(uid, email);
-    try {
-      await _createUserIndex(uid, email.split('@')[0]);
-    } catch (e, st) {
-      if (kDebugMode) {
-        print("Failed to create user_index for $uid: $e\n$st");
-      }
-    }
-
-    await loadUser(uid);
-
-  //  Future<List<Users>> searchUsers(String query) async {
-  //    final snap = await _db
-  //        .collection("users_index")
-  //        .where("username", isGreaterThanOrEqualTo: query)
-  //        .where("username", isLessThanOrEqualTo: "$query\uf8ff")
-  //        .get();
-
-      //final List<Users> results = [];
-
-    //  for (var d in snap.docs) {
-    //    final uid = d["uid"];
-    //    final user = await _fetchUserById(uid);  // usa già fromMap corretta
-    //    if (user != null) results.add(user);
-    //  }
-
-    //  return results;
-   // }
-  }
-
-  /**
-   * Logs in a user using email and password.
-   * After authentication, this method:
-   * 1. Ensures the Firestore user document exists
-   * 2. Loads the complete user profile, including
-   *    followers, following, and diaries.
-   */
-  Future<void> login(String email, String password) async {
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    //await loadUser(credential.user!.uid);
-
-    final user = credential.user;
-    if (user == null) {
-      throw StateError("Login riuscito ma FirebaseAuth user è null");
-    }
-
-    final uid = user.uid;
-
-
-
-    //se il documento non esiste, crealo con la struttura del MODEL
-    await _ensureFirestoreUserExists(
-      uid: uid,
-      email: email,
-      username: email.split('@')[0],
-      photoURL: "",
-    );
-    // poi carica il MODEL
-    await loadUser(uid);
-    if (_currentUser == null) {
-      throw StateError("Profilo utente non caricato dopo il login");
-    }
-  }
-
-  /**
-   * Logs in a user using Google Sign-In.
-   * This method:
-   * Receives Google credentials from the LoginPage
-   * Uses them to authenticate with FirebaseAuth
-   * Ensures a Firestore document exists for the Google profile.
-   * Loads the user's full profile into memory.
-   * Supports creating a new Firestore user for the Google profile
-   * if the user has never logged in using Google
-   */
-  Future<void> loginWithGoogle(AuthCredential credential) async {
-    final userCredential = await _auth.signInWithCredential(credential);
-    final user = userCredential.user!;
-    final uid = user.uid;
-    final email = user.email ?? "";
-    final display = user.displayName ?? "";
-
-    // Fallback sicuri
-    final username = display.isNotEmpty
-        ? display
-        : (email.contains("@") ? email.split("@")[0] : uid);
-
-    final photoURL = user.photoURL ?? "";
-
-    await _ensureFirestoreUserExists(
-      uid: uid,
-      email: email,
-      username: username,
-      photoURL: photoURL,
-    );
-    await loadUser(uid);
-  }
-
-
-  /** Creates a new user document in Firestore matching the User model fields */
-  Future<void> _createFirestoreUser(String uid, String email) async {
     await _db.collection("users").doc(uid).set({
-      "Username": email.split('@')[0],
+      "Username": email.split("@")[0],
       "Photo_profile": "",
       "Name": "",
       "Surname": "",
       "Birthdate": DateTime.now().toIso8601String(),
       "Email": email,
-
-      // sempre presenti
-      "Followers": <String>[],
-      "Following": <String>[],
-      "Public_diary": <String>[],
-      "Private_diary": <String>[],
-      "Saved_trekkings": <String>[],
+      "Followers": [],
+      "Following": [],
+      "Public_diary": [],
+      "Private_diary": [],
+      "Saved_trekkings": [],
       "Level": "Beginner",
       "Advanced": 0,
       "Intermediate": 0,
     });
 
+    await loadUserCore(uid);
   }
 
-  /**
-   * Ensures that a Firestore user document exists.
-   * Used mainly for Google login for new users.
-   * If the document does not exist, it is created with default fields.
-   */
-  Future<void> _ensureFirestoreUserExists({
-    required String uid,
-    required String email,
-    required String username,
-    required String photoURL,
-  }) async {
-    final doc = await _db.collection("users").doc(uid).get();
-
-    if (!doc.exists) {
-      await _db.collection("users").doc(uid).set({
-        "Username": username,
-        if (photoURL.isNotEmpty) 
-          "Photo_profile": photoURL,
-        "Name": "",
-        "Surname": "",
-        "Birthdate": DateTime.now().toIso8601String(),
-        "Email": email,
-
-        "Followers": [],
-        "Following": [],
-        "Public_diary": [],
-        "Private_diary": [],
-        "Saved_trekkings": [],
-        "Level": "Beginner",
-        "Advanced": 0,
-        "Intermediate": 0,
-      });
-      try {
-        await _createUserIndex(uid, username);
-      } catch (e, st) {
-        if (kDebugMode) {
-          print("Failed to create user_index (google login) for $uid: $e\n$st");
-        }
-      }
-
-    }
-  }
-
-  /**
-   * Loads the user's complete profile from Firestore.
-   * This method:
-   * Reads basic user fields (email, username, photo, etc.)
-   * Reads lists of IDs (followers, following, diaries...)
-   * Builds from each ID a full Users/Diary object using helper methods
-   */
-  /*
-  Future<void> loadUser(String uid) async {
-
-    //if (_loaded) return;
-    _loaded = true;
-
-    final snap = await _db.collection("users").doc(uid).get();
-    if (!snap.exists) return;
-
-    final data = snap.data()!;
-
-    // campi "semplici" con fallback anche per documenti vecchi
-    final username = (data["Username"] ?? data["username"] ?? "") as String;
-    final name = (data["Name"] ?? "") as String;
-    final surname = (data["Surname"] ?? "") as String;
-    final email = (data["Email"] ?? data["email"] ?? "") as String;
-    final photoProfile = (data["Photo_profile"] ?? data["photoURL"] ?? "") as String;
-
-    // Birthdate robusto (nuovo + vecchia struttura)
-    DateTime birthdate;
-    final rawBirth = data["Birthdate"];
-    if (rawBirth is String && rawBirth.isNotEmpty) {
-      birthdate = DateTime.tryParse(rawBirth) ?? DateTime(2000, 1, 1);
-    } else if (data["registerdate"] is Timestamp) {
-      birthdate = (data["registerdate"] as Timestamp).toDate();
-    } else {
-      birthdate = DateTime(2000, 1, 1);
-    }
-
-    // Conversione di liste di stringhe --> Oggetti Users e Diary
-    List<String> followersIds = List<String>.from(data["Followers"] ?? []);
-    List<String> followingIds = List<String>.from(data["Following"] ?? []);
-    List<String> publicDiaryIds = List<String>.from(data["Public_diary"] ?? []);
-    List<String> privateDiaryIds = List<String>.from(data["Private_diary"] ?? []);
-    List<String> savedTrekkingIds = List<String>.from(data["Saved_trekkings"] ?? []);
-
-
-
-    // Conversione ID --> Oggetti Users (Followers, Following)
-    List<Users> followers = [];
-    for (final id in followersIds) {
-      final u = await fetchUserById(id);
-      if (u != null) followers.add(u);
-    }
-
-    List<Users> following = [];
-    for (final id in followingIds) {
-      final u = await fetchUserById(id);
-      if (u != null) following.add(u);
-    }
-
-    // Conversione ID --> Oggetti Diary
-    List<Diary> publicDiary = [];
-    for (final id in publicDiaryIds) {
-      final d = await _fetchDiary(id);
-      if (d != null) publicDiary.add(d);
-    }
-
-    List<Diary> privateDiary = [];
-    for (final id in privateDiaryIds) {
-      final d = await _fetchDiary(id);
-      if (d != null) privateDiary.add(d);
-    }
-
-    List<Trekking> savedTrek = [];
-    for (final id in savedTrekkingIds) {
-      final d = await _fetchTrekking(id);
-      if (d != null) savedTrek.add(d);
-    }
-
-
-    //_currentUser = Users(
-    //  uid: uid,
-    //  username: data["Username"],
-    //  name: data["Name"],
-    //  surname: data["Surname"],
-    //  birthdate: DateTime.parse(data["Birthdate"]),
-    //  email: data["Email"],
-    //  photoProfile: data["Photo_profile"],
-    //  followers: followers,
-    //  following: following,
-    //  publicDiaryPages: publicDiary,
-    // privateDiaryPages: privateDiary,
-    //  savedTrekkings: savedTrek,
-    //
-    _currentUser = Users(
-      uid: uid,
-      username: username,
-      name: name,
-      surname: surname,
-      birthdate: birthdate,
+  Future<void> login(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(
       email: email,
-      photoProfile: photoProfile,
-      followers: followers,
-      following: following,
-      publicDiaryPages: publicDiary,
-      privateDiaryPages: privateDiary,
-      savedTrekkings: savedTrek,
+      password: password,
     );
 
-    notifyListeners();
-  }
-   */
-  Future<void> loadUser(String uid) async {
-    _loaded = true;
-
-    final snap = await _db.collection("users").doc(uid).get();
-    if (!snap.exists) return;
-
-    final data = snap.data()!;
-
-    // campi semplici, con fallback per documenti vecchi
-    final username = (data["Username"] ?? data["username"] ?? "") as String;
-    final name = (data["Name"] ?? "") as String;
-    final surname = (data["Surname"] ?? "") as String;
-    final email = (data["Email"] ?? data["email"] ?? "") as String;
-    final photoProfile =
-    (data["Photo_profile"] ?? data["photoURL"] ?? "") as String;
-
-    final birthdate = () {
-      final rawBirth = data["Birthdate"];
-      if (rawBirth is String && rawBirth.isNotEmpty) {
-        return DateTime.tryParse(rawBirth) ?? DateTime(2000, 1, 1);
-      }
-      final reg = data["registerdate"];
-      if (reg is Timestamp) return reg.toDate();
-      return DateTime(2000, 1, 1);
-    }();
-
-    // Liste di ID
-    final followersIds =
-    List<String>.from(data["Followers"] ?? const <String>[]);
-    final followingIds =
-    List<String>.from(data["Following"] ?? const <String>[]);
-
-    final publicDiaryIds = List<String>.from(
-      data["Public_diary"] ?? data["Public_Diary"] ?? const <String>[],
-    );
-    final privateDiaryIds = List<String>.from(
-      data["Private_diary"] ?? data["Private_Diary"] ?? const <String>[],
-    );
-
-    final savedTrekkingIds =
-    List<String>.from(data["Saved_trekkings"] ?? const <String>[]);
-
-    // Conversione ID -> Oggetti
-
-    // Followers
-    final followers = (await Future.wait(
-      followersIds.map(fetchUserById),
-    ))
-        .whereType<Users>()
-        .toList();
-
-    // Following
-    final following = (await Future.wait(
-      followingIds.map(fetchUserById),
-    ))
-        .whereType<Users>()
-        .toList();
-
-    // Diary pubblici
-    final publicDiary = (await Future.wait(
-      publicDiaryIds.map(_fetchDiary),
-    ))
-        .whereType<Diary>()
-        .toList();
-
-    // Diary privati
-    final privateDiary = (await Future.wait(
-      privateDiaryIds.map(_fetchDiary),
-    ))
-        .whereType<Diary>()
-        .toList();
-
-    // Trekking salvati
-    final savedTrek = (await Future.wait(
-      savedTrekkingIds.map(_fetchTrekking),
-    ))
-        .whereType<Trekking>()
-        .toList();
-    
-    //Level
-    final level = (data["Level"] ?? "") as String;
-
-    final advanced = (data["Advanced"] ?? 0) as int;
-    final intermediate = (data["Intermediate"] ?? 0) as int;
-
-    _currentUser = Users(
-      uid: uid,
-      username: username,
-      name: name,
-      surname: surname,
-      birthdate: birthdate,
-      email: email,
-      photoProfile: photoProfile,
-      followers: followers,
-      following: following,
-      publicDiaryPages: publicDiary,
-      privateDiaryPages: privateDiary,
-      savedTrekkings: savedTrek,
-      level: level,
-      advanced: advanced,
-      intermediate: intermediate,
-    );
-
-    notifyListeners();
+    await loadUserCore(cred.user!.uid);
   }
 
-
-
-  /**
-   * Fetches a user document by UID and converts it into a Users object.
-   * Used by loadUser() to reconstruct followers and following lists.
-   */
-  Future<Users?> fetchUserById(String uid) async { // da rimettere privato?
-    final snap = await _db.collection("users").doc(uid).get();
-    if (!snap.exists) return null;
-
-    final data = snap.data()!;
-    return Users.fromMap(data, uid: uid);
+  Future<void> loginWithGoogle(AuthCredential credential) async {
+    final cred = await _auth.signInWithCredential(credential);
+    await loadUserCore(cred.user!.uid);
   }
 
-
-  /**
-   * Fetches a diary entry by ID and returns a Diary.
-   * Used by loadUser() to build:
-   * - publicDiaryPages
-   * - privateDiaryPages
-   * - savedTrekkings
-   */
-  Future<Diary?> _fetchDiary(String docId) async {
-    final snap = await _db.collection("diary").doc(docId).get();
-    if (!snap.exists) return null;
-
-    return Diary.fromMap(snap.data()!, diaryId: docId);
-  }
-
-  /** Handles logout of the user */
   Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
-    _loaded = false;
     notifyListeners();
   }
 
-  // Fetches a trekking by ID and returns a Trekking object --> used for savedTrekkings
-  Future<Trekking?> _fetchTrekking(String docId) async {
-    final snap = await _db.collection("trekking").doc(docId).get();
-    if (!snap.exists) return null;
+  /* --------------------------------------------------
+   * LOAD CORE USER (NO PRELOAD)
+   * -------------------------------------------------- */
 
-    return Trekking.fromMap(snap.data()!, docId: docId);
-  }
+  Future<void> loadUserCore(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    if (!snap.exists) return;
 
-  /// Updates the profile picture of the current user.
-  /// This method uploads the selected image file to Firebase Storage
-  /// inside a folder named "profile_photos/<uid>/uid.jpg".
-  /// After the upload, it retrieves the public download URL and
-  /// updates the "Photo_profile" field in the user's Firestore record.
-  /// Updates the in-memory `_currentUser` model
-  /// and notifies listeners so that the UI refreshes.
-  /// Steps:
-  /// 1. Uploads the image file to Firebase Storage.
-  /// 2. Saves the URL of the image inside the "Photo_profile" field in Firestore.
-  /// 3. Updates the local user model and refresh UI.
-  Future<void> updateProfilePhoto(File image) async {
-    final uid = _auth.currentUser!.uid;
+    final data = snap.data()!;
 
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('profile_photos')
-        .child(uid)
-        .child('$uid.jpg');
+    _currentUser = Users(
+      uid: uid,
+      username: data["Username"] ?? "",
+      name: data["Name"] ?? "",
+      surname: data["Surname"] ?? "",
+      email: data["Email"] ?? "",
+      photoProfile: data["Photo_profile"] ?? "",
+      birthdate:
+      DateTime.tryParse(data["Birthdate"] ?? "") ?? DateTime(2000, 1, 1),
 
-    await ref.putFile(image);
-    final url = await ref.getDownloadURL();
+      followers: [],
+      following: [],
+      publicDiaryPages: [],
+      privateDiaryPages: [],
+      savedTrekkings: [],
 
-    await _db.collection("users").doc(uid).update({
-      "Photo_profile": url,
-    });
+      level: data["Level"] ?? "Beginner",
+      advanced: data["Advanced"] ?? 0,
+      intermediate: data["Intermediate"] ?? 0,
+    );
 
-    _currentUser?.photoProfile = url;
     notifyListeners();
   }
 
-  /// Sends a password reset link to the given email.
-  /// This method throws FirebaseAuthException if something goes wrong.
-  Future<void> sendPasswordReset(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
-  }
+  /* --------------------------------------------------
+   * PUBLIC USERS
+   * -------------------------------------------------- */
 
   Future<Users?> getUserById(String uid) async {
-    final snap = await _db.collection('users').doc(uid).get();
-
-    if (!snap.exists) {
-      return null;   // The user doesn't exist
-    }
-
+    final snap = await _db.collection("users").doc(uid).get();
+    if (!snap.exists) return null;
     return Users.fromMap(snap.data()!, uid: uid);
   }
 
-  // Adds a trekking to the user's saved list
-  Future<void> addTrekkingToSaved(String trekkingId) async {
-    final uid = _auth.currentUser!.uid;
-    // Update Firestore
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
-    });
-    // Update local list (Trekking objects) only if the trekking exists
-    final trek = await _fetchTrekking(trekkingId);
-    if (trek != null) {
-      _currentUser?.savedTrekkings.add(trek);
-      notifyListeners();
-    }
+  Future<List<Users>> getFollowers(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Followers"] ?? []);
+
+    final users = await Future.wait(ids.map(getUserById));
+    return users.whereType<Users>().toList();
   }
 
-  // Removes a trekking from the user's saved list
-  Future<void> removeTrekkingFromSaved(String trekkingId) async {
-    final uid = _auth.currentUser!.uid;
-    // Remove from Firestore
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
-    });
-    // Remove from local list (Trekking objects)
-    _currentUser?.savedTrekkings.removeWhere((trek) => trek.documentId == trekkingId);
-    notifyListeners();
+  Future<List<Users>> getFollowing(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Following"] ?? []);
+
+    final users = await Future.wait(ids.map(getUserById));
+    return users.whereType<Users>().toList();
   }
 
-  // Fetch image URL from Firebase Storage given complete firestore url
-  Future<String?> getDownloadUrl(String? path) async {
-    // If you donn't have the profile photo return null
-    if (path == null || path.isEmpty) {
-      return null;
-    }
-
-    try {
-      Reference ref = FirebaseStorage.instance.refFromURL(path);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      debugPrint('Error: $e');
-      return null;
-    }
+  Future<List<String>> getFollowingIds(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    return List<String>.from(snap.data()?["Following"] ?? []);
   }
 
+  /* --------------------------------------------------
+   * SEARCH
+   * -------------------------------------------------- */
 
   Future<List<Users>> searchUsers(String query) async {
     final snap = await _db
@@ -581,202 +148,206 @@ class UserController extends ChangeNotifier {
     final List<Users> results = [];
 
     for (var d in snap.docs) {
-      final uid = d["uid"];
-      final user = await fetchUserById(uid);  // usa già fromMap corretta
+      final user = await getUserById(d["uid"]);
       if (user != null) results.add(user);
     }
 
     return results;
   }
 
+  /* --------------------------------------------------
+   * DIARY
+   * -------------------------------------------------- */
 
-  Future<void> _createUserIndex(String uid, String username) async {
-    await _db.collection("users_index").doc(uid).set({
-      "uid": uid,
-      "username": username,
-      "normalized": username.toLowerCase(),
-    });
+  Future<Diary?> getDiaryById(String id) async {
+    final snap = await _db.collection("diary").doc(id).get();
+    if (!snap.exists) return null;
+    return Diary.fromMap(snap.data()!, diaryId: id);
   }
 
-  Future<List<String>> getFollowingIds(String uid) async {
+
+
+
+
+
+  // =======================
+// DIARY LISTS
+// =======================
+
+  Future<List<Diary>> getPublicDiaries(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
-    if (!snap.exists) return [];
+    final ids = List<String>.from(snap.data()?["Public_diary"] ?? []);
 
-    return List<String>.from(snap.data()?["Following"] ?? []);
+    final diaries = await Future.wait(ids.map(getDiaryById));
+    return diaries.whereType<Diary>().toList();
   }
-  /*
-  Future<void> updateUsername(String newUsername) async {
+
+  Future<List<Diary>> getPrivateDiaries(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Private_diary"] ?? []);
+
+    final diaries = await Future.wait(ids.map(getDiaryById));
+    return diaries.whereType<Diary>().toList();
+  }
+
+// =======================
+// SAVED TREKKINGS
+// =======================
+
+  Future<List<Trekking>> getSavedTrekkings(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
+
+    final trekkings = await Future.wait(ids.map(getTrekkingById));
+    return trekkings.whereType<Trekking>().toList();
+  }
+
+  /* --------------------------------------------------
+   * TREKKING
+   * -------------------------------------------------- */
+
+  Future<Trekking?> getTrekkingById(String id) async {
+    final snap = await _db.collection("trekking").doc(id).get();
+    if (!snap.exists) return null;
+    return Trekking.fromMap(snap.data()!, docId: id);
+  }
+
+  Future<void> addTrekkingToSaved(String trekkingId) async {
     final uid = _auth.currentUser!.uid;
-
     await _db.collection("users").doc(uid).update({
-      "Username": newUsername,
+      "Saved_trekkings": FieldValue.arrayUnion([trekkingId])
     });
+  }
 
-    await _db.collection("users_index").doc(uid).update({
-      "username": newUsername,
-      "normalized": newUsername.toLowerCase(),
+  Future<void> removeTrekkingFromSaved(String trekkingId) async {
+    final uid = _auth.currentUser!.uid;
+    await _db.collection("users").doc(uid).update({
+      "Saved_trekkings": FieldValue.arrayRemove([trekkingId])
     });
+  }
 
-    _currentUser?.username = newUsername;
+  /* --------------------------------------------------
+   * PROFILE UPDATE
+   * -------------------------------------------------- */
 
-
-
+  Future<void> updateUsername(String username) async {
+    final uid = _auth.currentUser!.uid;
+    await _db.collection("users").doc(uid).update({"Username": username});
+    _currentUser?.username = username;
     notifyListeners();
   }
 
-   */
-  Future<void> updateUsername(String newUsername) async {
+  Future<void> updateName(String name) async {
     final uid = _auth.currentUser!.uid;
-
-    await _db.collection("users").doc(uid).update({
-      "Username": newUsername,
-    });
-
-    await _db.collection("users_index").doc(uid).update({
-      "username": newUsername,
-      "normalized": newUsername.toLowerCase(),
-    });
-
-    _currentUser?.username = newUsername;
+    await _db.collection("users").doc(uid).update({"Name": name});
+    _currentUser?.name = name;
     notifyListeners();
   }
 
-  Future<void> updateName(String newName) async {
+  Future<void> updateSurname(String surname) async {
     final uid = _auth.currentUser!.uid;
-
-    await _db.collection("users").doc(uid).update({
-      "Name": newName,
-    });
-
-    _currentUser?.name = newName;
+    await _db.collection("users").doc(uid).update({"Surname": surname});
+    _currentUser?.surname = surname;
     notifyListeners();
   }
 
-
-
-
-
-  Future<void> updateSurname(String newSurname) async {
-    final uid = _auth.currentUser!.uid;
-
-    await _db.collection("users").doc(uid).update({
-      "Surname": newSurname,
-    });
-
-    _currentUser?.surname = newSurname;
-    notifyListeners();
-  }
-
-  /*
   Future<void> updateBirthdate(DateTime date) async {
     final uid = _auth.currentUser!.uid;
-
     await _db.collection("users").doc(uid).update({
-      "Birthdate": date.toIso8601String(),
+      "Birthdate": date.toIso8601String()
     });
-
     _currentUser?.birthdate = date;
     notifyListeners();
   }
-  */
 
+  Future<void> updateProfilePhoto(File image) async {
+    final uid = _auth.currentUser!.uid;
 
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("profile_photos")
+        .child(uid)
+        .child("$uid.jpg");
 
+    await ref.putFile(image);
+    final url = await ref.getDownloadURL();
 
+    await _db.collection("users").doc(uid).update({
+      "Photo_profile": url
+    });
 
+    _currentUser?.photoProfile = url;
+    notifyListeners();
+  }
 
-  Future<void> requestPasswordReset() async {
-    final email = _currentUser?.email;
-    if (email == null || email.isEmpty) return;
+  /* --------------------------------------------------
+   * PASSWORD
+   * -------------------------------------------------- */
 
+  Future<void> sendPasswordReset(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
-  Future<void> updateBirthdate(DateTime birthdate) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    await _db.collection("users").doc(uid).update({
-      "Birthdate": birthdate.toIso8601String(),
-    });
-
-    _currentUser?.birthdate = birthdate;
-    notifyListeners();
+  Future<void> requestPasswordReset() async {
+    if (_currentUser?.email == null) return;
+    await _auth.sendPasswordResetEmail(email: _currentUser!.email);
   }
 
-  Future<void> restoreGoogleProfilePhoto() async {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
-    final googlePhoto = user.photoURL;
-    if (googlePhoto == null || googlePhoto.isEmpty) return;
-
-    await _db.collection("users").doc(user.uid).update({
-      "Photo_profile": googlePhoto,
-    });
-
-    _currentUser?.photoProfile = googlePhoto;
-    notifyListeners();
-  }
+  /* --------------------------------------------------
+   * PROVIDERS
+   * -------------------------------------------------- */
 
   bool get isGoogleUser {
     final user = _auth.currentUser;
     if (user == null) return false;
-
-    return user.providerData.any(
-          (p) => p.providerId == 'google.com',
-    );
+    return user.providerData.any((p) => p.providerId == "google.com");
   }
 
   bool get isPasswordUser {
     final user = _auth.currentUser;
     if (user == null) return false;
-
-    return user.providerData.any(
-          (p) => p.providerId == 'password',
-    );
+    return user.providerData.any((p) => p.providerId == "password");
   }
 
-  // Upadates user level based on trekking difficulty --> Beginner, Intermediate, Advanced
-  Future<void> updateUserLevel(String difficultyLevel) async {
-    final uid = _auth.currentUser!.uid;
-    final userDoc = _db.collection("users").doc(uid);
-    final userSnapshot = await userDoc.get();
-    if (!userSnapshot.exists) 
-      return;
+  Future<void> restoreGoogleProfilePhoto() async {
+    final user = _auth.currentUser;
+    if (user?.photoURL == null) return;
 
-    int intermediate = _currentUser!.intermediate;
-    int advanced = _currentUser!.advanced;
-
-    // Update counts based on difficulty level
-    if (difficultyLevel == 'Intermediate') {
-      intermediate += 1;
-    } else if (difficultyLevel == 'Advanced') {
-      advanced += 1;
-    }
-
-    // Determine new level
-    String newLevel;
-    if (advanced >= 5) {
-      newLevel = 'Advanced';
-    } else if (intermediate >= 5) {
-      newLevel = 'Intermediate';
-    } else {
-      newLevel = 'Beginner';
-    }
-
-    // Upadate Firestore
-    await userDoc.update({
-      "Intermediate": intermediate,
-      "Advanced": advanced,
-      "Level": newLevel,
+    await _db.collection("users").doc(user!.uid).update({
+      "Photo_profile": user.photoURL
     });
 
-    // Update local model and notify listeners
-    _currentUser?.intermediate = intermediate;
-    _currentUser?.advanced = advanced;
-    _currentUser?.level = newLevel;
+    _currentUser?.photoProfile = user.photoURL!;
     notifyListeners();
   }
 
+  /* --------------------------------------------------
+   * USER LEVEL
+   * -------------------------------------------------- */
+
+  Future<void> updateUserLevel(String difficulty) async {
+    int intermediate = _currentUser?.intermediate ?? 0;
+    int advanced = _currentUser?.advanced ?? 0;
+
+    if (difficulty == "Intermediate") intermediate++;
+    if (difficulty == "Advanced") advanced++;
+
+    String level = "Beginner";
+    if (advanced >= 5) level = "Advanced";
+    else if (intermediate >= 5) level = "Intermediate";
+
+    final uid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(uid).update({
+      "Intermediate": intermediate,
+      "Advanced": advanced,
+      "Level": level,
+    });
+
+    _currentUser?.intermediate = intermediate;
+    _currentUser?.advanced = advanced;
+    _currentUser?.level = level;
+
+    notifyListeners();
+  }
 }

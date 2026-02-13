@@ -5,6 +5,8 @@ import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
+import '../model/diary.dart';
+import '../model/trekking.dart';
 import 'diary-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
@@ -326,83 +328,126 @@ class _UserPageState extends State<UserPage> {
                 Tab(icon: Icon(Icons.bookmark)),
               ],
             ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  // Tab public diaries
-                  user.publicDiaryPages.isEmpty
-                      ? Center(child: Text(local.no_public_diary_label))
-                      : ListView.separated(
-                          itemCount: user.publicDiaryPages.length,
-                          separatorBuilder: (_, __) => Divider(),
-                          itemBuilder: (context, index) {
-                            final diary = user.publicDiaryPages[index];
-                            return ListTile(
-                              title: Text(diary.trekkigName),
-                              subtitle: Text(diary.date),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DiaryPage(
-                                      diaryId: diary.diaryId,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+      Expanded(
+        child: TabBarView(
+          children: [
 
-                  // Tab private diaries
-                  user.privateDiaryPages.isEmpty
-                      ? Center(child: Text(local.no_private_diary_label))
-                      : ListView.separated(
-                          itemCount: user.privateDiaryPages.length,
-                          separatorBuilder: (_, __) => Divider(),
-                          itemBuilder: (context, index) {
-                            final diary = user.privateDiaryPages[index];
-                            return ListTile(
-                              title: Text(diary.trekkigName),
-                              subtitle: Text(diary.date),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DiaryPage(diaryId: diary.diaryId),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+            // PUBLIC DIARY
+            FutureBuilder<List<Diary>>(
+            future: context.read<UserController>().getPublicDiaries(user.uid),
+              builder: (context, snapshot) {
 
-                  // Tab saved trekking
-                  user.savedTrekkings.isEmpty
-                      ? Center(child: Text(local.no_saved_trekking_label))
-                      : ListView.builder(
-                          itemCount: user.savedTrekkings.length,
-                          itemBuilder: (context, index) {
-                            final trekking = user.savedTrekkings[index];
-                            return ListTile(
-                              title: Text(trekking.name),
-                              onTap: () {
-                                final routeID = trekking.documentId;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        TrekkingPage(trekkingId: routeID),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                ],
-              ),
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final diaries = snapshot.data ?? [];
+
+                if (diaries.isEmpty) {
+                  return Center(child: Text(local.no_public_diary_label));
+                }
+
+                return ListView.builder(
+                  itemCount: diaries.length,
+                  itemBuilder: (context, index) {
+                    final diary = diaries[index];
+
+                    return ListTile(
+                      title: Text(diary.trekkigName),
+                      subtitle: Text(diary.date),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                DiaryPage(diaryId: diary.diaryId),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
             ),
+
+            // PRIVATE DIARY
+            FutureBuilder<List<Diary>>(
+            future: context.read<UserController>().getPrivateDiaries(user.uid),
+              builder: (context, snapshot) {
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final diaries = snapshot.data ?? [];
+
+                if (diaries.isEmpty) {
+                  return Center(child: Text(local.no_private_diary_label));
+                }
+
+                return ListView.builder(
+                  itemCount: diaries.length,
+                  itemBuilder: (context, index) {
+                    final diary = diaries[index];
+
+                    return ListTile(
+                      title: Text(diary.trekkigName),
+                      subtitle: Text(diary.date),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                DiaryPage(diaryId: diary.diaryId),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+
+            // SAVED TREKKING
+            FutureBuilder<List<Trekking>>(
+            future: context.read<UserController>().getSavedTrekkings(user.uid),
+              builder: (context, snapshot) {
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final trekkings = snapshot.data ?? [];
+
+                if (trekkings.isEmpty) {
+                  return Center(child: Text(local.no_saved_trekking_label));
+                }
+
+                return ListView.builder(
+                  itemCount: trekkings.length,
+                  itemBuilder: (context, index) {
+                    final trekking = trekkings[index];
+
+                    return ListTile(
+                      title: Text(trekking.name),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                TrekkingPage(trekkingId: trekking.documentId),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+
+          ],
+        ),
+      ),
           ],
         ),
         //Drawer to control the navigation among pages
