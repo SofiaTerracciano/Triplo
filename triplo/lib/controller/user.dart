@@ -14,6 +14,7 @@ class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+
   Users? _currentUser;
   Users? get currentUser => _currentUser;
 
@@ -139,10 +140,12 @@ class UserController extends ChangeNotifier {
    * -------------------------------------------------- */
 
   Future<List<Users>> searchUsers(String query) async {
+    final q = query.toLowerCase().trim();
+
     final snap = await _db
         .collection("users_index")
-        .where("username", isGreaterThanOrEqualTo: query)
-        .where("username", isLessThanOrEqualTo: "$query\uf8ff")
+        .where("normalized", isGreaterThanOrEqualTo: q)
+        .where("normalized", isLessThanOrEqualTo: "$q\uf8ff")
         .get();
 
     final List<Users> results = [];
@@ -154,6 +157,7 @@ class UserController extends ChangeNotifier {
 
     return results;
   }
+
 
   /* --------------------------------------------------
    * DIARY
@@ -243,6 +247,7 @@ class UserController extends ChangeNotifier {
     _currentUser?.name = name;
     notifyListeners();
   }
+
 
   Future<void> updateSurname(String surname) async {
     final uid = _auth.currentUser!.uid;
@@ -350,4 +355,39 @@ class UserController extends ChangeNotifier {
 
     notifyListeners();
   }
+  // CHECK IF I FOLLOW USER
+  Future<bool> isFollowing(String targetUid) async {
+    final myUid = _auth.currentUser!.uid;
+
+    final snap = await _db.collection("users").doc(myUid).get();
+    final following = List<String>.from(snap.data()?["Following"] ?? []);
+
+    return following.contains(targetUid);
+  }
+
+  // FOLLOW SYSTEM
+  Future<void> followUser(String targetUid) async {
+    final myUid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(myUid).update({
+      "Following": FieldValue.arrayUnion([targetUid])
+    });
+
+    await _db.collection("users").doc(targetUid).update({
+      "Followers": FieldValue.arrayUnion([myUid])
+    });
+  }
+
+  Future<void> unfollowUser(String targetUid) async {
+    final myUid = _auth.currentUser!.uid;
+
+    await _db.collection("users").doc(myUid).update({
+      "Following": FieldValue.arrayRemove([targetUid])
+    });
+
+    await _db.collection("users").doc(targetUid).update({
+      "Followers": FieldValue.arrayRemove([myUid])
+    });
+  }
+
 }

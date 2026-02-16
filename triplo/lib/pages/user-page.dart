@@ -7,6 +7,7 @@ import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
+import '../model/user.dart';
 import 'diary-page.dart';
 import 'home-page.dart';
 import 'setting-page.dart';
@@ -236,11 +237,27 @@ class _UserPageState extends State<UserPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _StatItem(
-                              label: local.totals_trekking_label,
-                              value:
-                                  '${user.publicDiaryPages.length + user.privateDiaryPages.length}',
+                            // TOTAL DIARIES
+                            FutureBuilder<List<Diary>>(
+                              future: context.read<UserController>().getPublicDiaries(user.uid),
+                              builder: (context, pubSnap) {
+                                return FutureBuilder<List<Diary>>(
+                                  future: context.read<UserController>().getPrivateDiaries(user.uid),
+                                  builder: (context, privSnap) {
+
+                                    final pub = pubSnap.data?.length ?? 0;
+                                    final priv = privSnap.data?.length ?? 0;
+
+                                    return _StatItem(
+                                      label: local.totals_trekking_label,
+                                      value: '${pub + priv}',
+                                    );
+                                  },
+                                );
+                              },
                             ),
+
+                            // FOLLOWERS
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -250,11 +267,17 @@ class _UserPageState extends State<UserPage> {
                                   ),
                                 );
                               },
-                              child: _StatItem(
-                                label: 'Follower',
-                                value: '${user.followers.length}',
+                              child: FutureBuilder<List<Users>>(
+                                future: context.read<UserController>().getFollowers(user.uid),
+                                builder: (context, snap) {
+                                  return _StatItem(
+                                    label: 'Follower',
+                                    value: '${snap.data?.length ?? 0}',
+                                  );
+                                },
                               ),
                             ),
+                            // FOLLOWING
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -264,11 +287,17 @@ class _UserPageState extends State<UserPage> {
                                   ),
                                 );
                               },
-                              child: _StatItem(
-                                label: 'Following',
-                                value: '${user.following.length}',
+                              child: FutureBuilder<List<Users>>(
+                                future: context.read<UserController>().getFollowing(user.uid),
+                                builder: (context, snap) {
+                                  return _StatItem(
+                                    label: 'Following',
+                                    value: '${snap.data?.length ?? 0}',
+                                  );
+                                },
                               ),
                             ),
+
                           ],
                         ),
                       ],

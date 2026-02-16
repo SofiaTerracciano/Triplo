@@ -77,27 +77,45 @@ class _SearchPageState extends State<SearchPage>
   }
 
   Future<void> _loadRandomDiaries() async {
-    final userController = context.read<UserController>();
-    final diaryController = context.read<DiaryController>();
+    try {
+      final userController = context.read<UserController>();
+      final diaryController = context.read<DiaryController>();
 
-    final user = userController.currentUser;
-    if (user == null) return;
+      final user = userController.currentUser;
 
-    //final followingIds = user.following.map((u) => u.uid).toList();
-    final uid = userController.currentUser!.uid;
-    final followingIds = await userController.getFollowingIds(uid);
+      // Se non sei loggato o non ancora caricato: NON bloccare la UI
+      if (user == null) {
+        if (!mounted) return;
+        setState(() {
+          randomDiaries = [];
+          loading = false;
+        });
+        return;
+      }
 
-    final diaries = await diaryController.getRandomPublicDiariesFromFollowing(
-      followingIds: followingIds,
-      limit: 10,
-    );
+      final uid = user.uid;
+      final followingIds = await userController.getFollowingIds(uid);
 
-    SearchCache.randomDiaries = diaries;
+      final diaries = await diaryController.getRandomPublicDiariesFromFollowing(
+        followingIds: followingIds,
+        limit: 10,
+      );
 
-    setState(() {
-      randomDiaries = diaries;
-      loading = false;
-    });
+      SearchCache.randomDiaries = diaries;
+
+      if (!mounted) return;
+      setState(() {
+        randomDiaries = diaries;
+        loading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading random diaries: $e");
+      if (!mounted) return;
+      setState(() {
+        randomDiaries = [];
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -338,14 +356,16 @@ class _SearchPageState extends State<SearchPage>
     try {
       if (_searchMode == SearchMode.users) {
         _userResults = await userController.searchUsers(query);
-      } else if (_searchMode == SearchMode.trekking) {
+      } else {
         _trekkingResults =
-            await trekkingController.searchTrekking(query);
+        await trekkingController.searchTrekking(query);
       }
-    } finally {
-      if (currentToken == _searchToken && mounted) {
-        setState(() => _isSearching = false);
-      }
+    } catch (e) {
+      debugPrint("Search error: $e");
+    }
+
+    if (currentToken == _searchToken && mounted) {
+      setState(() => _isSearching = false);
     }
   }
 

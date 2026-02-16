@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:triplo/pages/diary-page.dart';
 import 'package:triplo/pages/user-list-page-public.dart';
 import '../controller/user.dart';
+import '../model/diary.dart';
 import '../model/user.dart';
 
 class UserPagePublic extends StatefulWidget {
@@ -60,10 +61,28 @@ class _UserPagePublicState extends State<UserPagePublic> {
         title: Text(u.username),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.person_add),
-            onPressed: () {
-              // TODO: follow / unfollow
+          FutureBuilder<bool>(
+            future: context.read<UserController>().isFollowing(u.uid),
+            builder: (context, snapshot) {
+
+              final isFollowing = snapshot.data ?? false;
+
+              return IconButton(
+                icon: Icon(
+                  isFollowing ? Icons.person_remove : Icons.person_add,
+                ),
+                onPressed: () async {
+                  final controller = context.read<UserController>();
+
+                  if (isFollowing) {
+                    await controller.unfollowUser(u.uid);
+                  } else {
+                    await controller.followUser(u.uid);
+                  }
+
+                  setState(() {}); // refresh UI
+                },
+              );
             },
           ),
         ],
@@ -145,10 +164,24 @@ class _UserPagePublicState extends State<UserPagePublic> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _StatItem(
-                              label: local.totals_trekking_label,
-                              value:
-                                  '${u.publicDiaryPages.length + u.privateDiaryPages.length}',
+                            FutureBuilder<List<Diary>>(
+                              future: context.read<UserController>().getPublicDiaries(u.uid),
+                              builder: (context, pubSnap) {
+
+                                return FutureBuilder<List<Diary>>(
+                                  future: context.read<UserController>().getPrivateDiaries(u.uid),
+                                  builder: (context, privSnap) {
+
+                                    final pub = pubSnap.data?.length ?? 0;
+                                    final priv = privSnap.data?.length ?? 0;
+
+                                    return _StatItem(
+                                      label: local.totals_trekking_label,
+                                      value: '${pub + priv}',
+                                    );
+                                  },
+                                );
+                              },
                             ),
                             GestureDetector(
                               onTap: () {
@@ -162,11 +195,17 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                   ),
                                 );
                               },
-                              child: _StatItem(
-                                label: 'Follower',
-                                value: '${u.followers.length}',
+                              child: FutureBuilder<List<Users>>(
+                                future: context.read<UserController>().getFollowers(u.uid),
+                                builder: (context, snap) {
+                                  return _StatItem(
+                                    label: 'Follower',
+                                    value: '${snap.data?.length ?? 0}',
+                                  );
+                                },
                               ),
                             ),
+
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -179,10 +218,16 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                   ),
                                 );
                               },
-                              child: _StatItem(
-                                label: 'Following',
-                                value: '${u.following.length}',
+                              child: FutureBuilder<List<Users>>(
+                                future: context.read<UserController>().getFollowing(u.uid),
+                                builder: (context, snap) {
+                                  return _StatItem(
+                                    label: 'Following',
+                                    value: '${snap.data?.length ?? 0}',
+                                  );
+                                },
                               ),
+
                             ),
                           ],
                         ),
@@ -196,35 +241,49 @@ class _UserPagePublicState extends State<UserPagePublic> {
           const Divider(),
 
           // Public diary
-          Expanded(
-            child: u.publicDiaryPages.isEmpty
-                ?  Center(child: Text(local.no_public_diary_label))
-                : ListView.separated(
-                    itemCount: u.publicDiaryPages.length,
+            Expanded(
+              child: FutureBuilder<List<Diary>>(
+                future: context
+                    .read<UserController>()
+                    .getPublicDiaries(u.uid),
+                builder: (context, snapshot) {
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final diaries = snapshot.data ?? [];
+
+                  if (diaries.isEmpty) {
+                    return Center(child: Text(local.no_public_diary_label));
+                  }
+
+                  return ListView.separated(
+                    itemCount: diaries.length,
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
-                      final diary = u.publicDiaryPages[index];
+                      final diary = diaries[index];
+
                       return ListTile(
                         title: Text(diary.trekkigName),
                         subtitle: Text(diary.date),
-                        trailing:
-                            const Icon(Icons.chevron_right),
+                        trailing: const Icon(Icons.chevron_right),
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  DiaryPage(
-                                    diaryId: diary.diaryId
-                                  ),
+                              builder: (_) => DiaryPage(diaryId: diary.diaryId),
                             ),
                           );
                         },
                       );
                     },
-                  ),
-          ),
-        ],
+                  );
+                },
+              ),
+            ),
+
+          ],
       ),
     );
   }

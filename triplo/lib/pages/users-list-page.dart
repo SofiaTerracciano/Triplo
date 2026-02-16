@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/model/user.dart';
 import '../pages/user-page-public.dart';
-import 'package:provider/provider.dart';
 
-// UsersList widget to display followers or following users of the current user
-class UsersList extends StatefulWidget {
-  final String listName;
+class UsersList extends StatelessWidget {
+  final String listName; // "Followers" or "Following"
 
   const UsersList({
     super.key,
@@ -14,59 +13,74 @@ class UsersList extends StatefulWidget {
   });
 
   @override
-  _UsersListState createState() => _UsersListState();
-}
-
-class _UsersListState extends State<UsersList> {
-  late List<Users> users;
-
-  @override
-  void initState() {
-    super.initState();
-    final userController = context.read<UserController>();
-    // Determine whether to show followers or following based on listName
-    if(widget.listName == 'Followers') {
-      users = userController.currentUser!.followers;
-    } else {
-      users = userController.currentUser!.following;
-    }
-  }
-
-
-  @override
   Widget build(BuildContext context) {
+
+    final controller = context.read<UserController>();
+    final myUid = controller.currentUser!.uid;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.listName),
+        title: Text(listName),
+        centerTitle: true,
       ),
-     body: ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          final user = users[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage:user.photoProfile != null && user.photoProfile!.isNotEmpty
-                  ? NetworkImage(user.photoProfile!)
-                  : null,
-              backgroundColor: Colors.grey[300],
-              child:
-                  user.photoProfile == null ||
+
+      body: FutureBuilder<List<Users>>(
+        future: listName == 'Followers'
+            ? controller.getFollowers(myUid)
+            : controller.getFollowing(myUid),
+
+        builder: (context, snapshot) {
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final users = snapshot.data ?? [];
+
+          if (users.isEmpty) {
+            return const Center(
+              child: Text("No users"),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+
+              final user = users[index];
+
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: user.photoProfile != null &&
+                      user.photoProfile!.isNotEmpty
+                      ? NetworkImage(user.photoProfile!)
+                      : null,
+                  backgroundColor: Colors.grey[300],
+                  child: user.photoProfile == null ||
                       user.photoProfile!.isEmpty
-                  ? const Icon(Icons.person, size: 20)
-                  : null,
-            ),
-            title: Text(user.username),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => UserPagePublic(
-                    userId: user.uid,
-                  ),
+                      ? const Icon(Icons.person)
+                      : null,
                 ),
+
+                title: Text(user.username),
+
+                subtitle: Text(user.email),
+
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UserPagePublic(
+                        userId: user.uid,
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
         },
-      )
+      ),
     );
   }
 }
