@@ -179,9 +179,10 @@ class API {
 
   /// Build full URL for weather icon
   String weatherIconUrl(String iconCode, {bool big = true}) {
-    final size = big ? "2x" : "";
-    return "https://openweathermap.org/img/wn/$iconCode@$size.png";
+    final size = big ? "@2x" : "";
+    return "https://openweathermap.org/img/wn/$iconCode$size.png";
   }
+
 
   /// Extract weather information from a weather response
   Map<String, dynamic> parseWeather(Map<String, dynamic> raw) {

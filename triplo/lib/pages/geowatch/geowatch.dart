@@ -1,203 +1,233 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:triplo/pages/geowatch/weather_page.dart';
+import 'package:triplo/controller/API.dart';
 import 'package:triplo/pages/geowatch/google_satellite_page.dart';
-import '../../controller/API.dart';
-import '../../widgets_for_pages/mini_map/mini_map.dart';
-import '../../widgets_for_pages/weather/weather.dart';
+import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
+import 'package:triplo/controller/API.dart';
 
-
+// Nota: qui facciamo "WeatherPage" inline: dettagli + forecast subito.
 class GeoWatchPage extends StatefulWidget {
-  const GeoWatchPage({Key? key}) : super(key: key);
+
+  final LatLng? trailCenter;
+
+
+  const GeoWatchPage({Key? key, this.trailCenter}) : super(key: key);
 
   @override
   State<GeoWatchPage> createState() => _GeoWatchPageState();
-
 }
 
-
-
-
-
-
-
-
 class _GeoWatchPageState extends State<GeoWatchPage> {
-  LatLng _center = const LatLng(46.0667, 11.1218);
-  bool _loadingWeather = false;
-  String? _weatherError;
-  Map<String, dynamic>? _weather;
-  List<Map<String, dynamic>> _forecast = [];
-  //late String _openWeatherApiKey;
-
-
   final API api = API();
 
+  LatLng? _userPos; // GPS dell’utente (optional)
+  bool _loading = true;
+  String? _error;
+  Map<String, dynamic>? _weather;
+  List<Map<String, dynamic>> _forecast = [];
 
+
+
+  bool _useTrailWeather = true;
   @override
   void initState() {
     super.initState();
-    //_openWeatherApiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
     _loadAll();
   }
 
-  /*
-  // --- GEOLOCALIZZAZIONE ---
-  Future<void> _getUserLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() => _weatherError = "Servizi di localizzazione disattivati");
-      return;
-    }
+  Future<void> _loadAll() async {
+    try {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+
+      // 1) meteo del PERCORSO
+      LatLng? target;
+
+      // se arriva dal trekking → usa percorso
+      if (_useTrailWeather && widget.trailCenter != null) {
+        target = widget.trailCenter;
+      } else {
+        target = await api.userLocation() ?? const LatLng(46.0, 11.0);
+      }
 
 
-
-
-
-
-
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() => _weatherError = "location_disabled");
+      if (target == null) {
+        setState(() {
+          _error = "Location unavailable";
+          _loading = false;
+        });
         return;
       }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      setState(() => _weatherError = "Permesso posizione negato permanentemente");
-      return;
-    }
 
-    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() => _center = LatLng(position.latitude, position.longitude));
-
-    await _fetchWeather();
-    await _fetchForecast();
-  }
-
-  // --- METEO ---
-  Future<void> _fetchWeather() async {
-    if (_openWeatherApiKey.isEmpty) return;
-    setState(() => _loadingWeather = true);
-
-    final url =
-        "https://api.openweathermap.org/data/2.5/weather?lat=${_center.latitude}&lon=${_center.longitude}&appid=$_openWeatherApiKey&units=metric&lang=en";
-
-    try {
-      final res = await http.get(Uri.parse(url));
-      if (res.statusCode == 200) {
-        setState(() => _weather = json.decode(res.body));
-      } else {
-        setState(() => _weatherError = "Errore meteo (${res.statusCode})");
-      }
-    } catch (e) {
-      setState(() => _weatherError = "Connessione meteo non riuscita");
-    } finally {
-      setState(() => _loadingWeather = false);
-    }
-  }
-
-  Future<void> _fetchForecast() async {
-    if (_openWeatherApiKey.isEmpty) return;
-
-    final url =
-        "https://api.openweathermap.org/data/2.5/forecast?lat=${_center.latitude}&lon=${_center.longitude}&appid=$_openWeatherApiKey&units=metric&lang=en";
-    try {
-      final res = await http.get(Uri.parse(url));
-      if (res.statusCode == 200) {
-        final data = json.decode(res.body);
-        final List list = data['list'];
+      final w = await api.weather(target.latitude, target.longitude);
+      if (w == null) {
         setState(() {
-          _forecast = List<Map<String, dynamic>>.from(
-              [for (int i = 0; i < list.length; i += 8) list[i]]);
+          _error = "Weather unavailable";
+          _loading = false;
         });
+        return;
       }
+
+      final rawForecast = await api.forecast(target.latitude, target.longitude);
+      final List<Map<String, dynamic>> parsedForecast =
+      rawForecast == null
+          ? <Map<String, dynamic>>[]
+          : api.parseForecast(rawForecast);
+
+
+
+
+      // 2) gps utente (solo per pin/contesto)
+      final pos = await api.userLocation(); // può tornare null
+
+      if (!mounted) return;
+      setState(() {
+        _weather = w;
+        _forecast = parsedForecast;
+        _userPos = pos;
+        _loading = false;
+      });
     } catch (e) {
-      debugPrint("Errore previsioni: $e");
+      if (!mounted) return;
+      setState(() {
+        _error = "Weather unavailable";
+        _loading = false;
+      });
     }
   }
-   */
 
-
-
-
-
-
-  Future<void> _loadAll() async {
-    final pos = await api.userLocation();
-    if (pos == null) {
-      setState(() => _weatherError = "Location unavailable");
-      return;
-    }
-
-    setState(() => _center = pos);
-
-    final weather = await api.weather(pos.latitude, pos.longitude);
-    final forecast = await api.forecast(pos.latitude, pos.longitude);
-
-    setState(() {
-      _weather = weather;
-      _forecast = forecast ?? [];
-    });
-  }
-
-  // --- UI ---
   @override
   Widget build(BuildContext context) {
+    final place = _weather?['name'] ?? "Trail area";
+    final temp = _weather?['main']?['temp']?.round()?.toString() ?? "-";
+    final List weatherList =
+    (_weather?['weather'] is List && _weather!['weather'].isNotEmpty)
+        ? _weather!['weather']
+        : [];
+
+    final icon = weatherList.isNotEmpty && weatherList[0]['icon'] != null
+        ? weatherList[0]['icon'].toString()
+        : "01d";
+
+    final rawDesc = weatherList.isNotEmpty && weatherList[0]['description'] != null
+        ? weatherList[0]['description'].toString().toLowerCase()
+        : "-";
+
+    final desc = rawDesc;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("GeoWatch"),
-        backgroundColor: Colors.green[700],
-        actions: [
-          IconButton(
-            tooltip: "Aggiorna dati",
-            onPressed: _loadAll,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
+
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          // Card Meteo
-          GestureDetector(
-            onTap: () {
-              if (_weather != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => WeatherPage(
-                      weather: _weather!,
-                      forecast: _forecast,
-                    ),
+          // ========= HEADER METEO (DETTAGLIO SUBITO) =========
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: _loading
+                  ? _buildSkeletonWeather()
+                  : (_error != null)
+                  ? Text("Errore: $_error", style: const TextStyle(color: Colors.red))
+                  : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.network(api.weatherIconUrl(icon), width: 60),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              place,
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "$temp°C • ${desc.capitalize()}",
+                              style: const TextStyle(fontSize: 16, color: Colors.black87),
+                            ),
+                            const SizedBox(height: 10),
+
+                            _buildLocationToggle(),
+
+
+
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              }
-            },
-            child: Weather(
-              weather: _weather,
-              loading: _loadingWeather,
-              error: _weatherError,
+                  const SizedBox(height: 14),
+                  const Text(
+                    "Forecast",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  if (_forecast.isEmpty)
+                    Text(
+                      _loading ? "" : "No forecast available",
+                      style: const TextStyle(color: Colors.black54),
+                    )
+                  else
+                    Column(
+                      children: _forecast.take(6).map((f) {
+                        final DateTime? d = f["date"];
+                        final t = f["temp"];
+                        final ic = f["icon"]?.toString() ?? "01d";
+                        final ds = (f["description"] ?? "-").toString();
+
+                        final String dateLabel =
+                        d != null ? "${d.day}/${d.month}" : "--/--";
+
+                        return ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Image.network(api.weatherIconUrl(ic, big: false)),
+                          title: Text("$dateLabel – ${ds.capitalize()}"),
+                          trailing: Text("$t°C", style: const TextStyle(fontSize: 16)),
+                        );
+                      }).toList(),
+                    ),
+                ],
+              ),
             ),
           ),
+
           const SizedBox(height: 12),
-          // Mappa
-          Mini_Map(center: _center),
+
+          // ========= MINI MAP (CENTER = PERCORSO) =========
+          Mini_Map(center: widget.trailCenter ?? _userPos ?? const LatLng(0,0)),
+
           const SizedBox(height: 10),
-          // Bottone per aprire la mappa completa
+
+          // ========= BUTTON → SATELLITE MAP =========
           ElevatedButton.icon(
             onPressed: () {
+
+              final LatLng center =
+                  widget.trailCenter ??
+                      _userPos ??
+                      const LatLng(46.0, 11.0);
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => GoogleSatellitePage(center: _center),
+                  builder: (_) => GoogleSatellitePage(
+                    trailCenter: center,
+                    userCenter: _userPos,
+                  ),
                 ),
               );
             },
             icon: const Icon(Icons.map_outlined),
-            label: const Text("Open satellite view by Google"),
+            label: const Text("Open satellite view & weather layers"),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black12,
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -206,129 +236,160 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 14),
+
+          // ========= ALERTS SECTION (placeholder) =========
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Weather Alerts",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Provider not configured yet.\nHere you can show alerts for this trail area (wind, thunderstorms, flood risk, etc.).",
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: const [
+                      Icon(Icons.info_outline, size: 18, color: Colors.black54),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          "Tip: later you can plug in a provider and show severity badges + expiry time.",
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // ========= GPS NOTE =========
           Text(
-            _weatherError == null
-                ? "Posizione rilevata automaticamente dal GPS"
-                : "${_weatherError!}",
+            _userPos == null
+                ? "GPS user position unavailable (no permission or off)."
+                : "GPS user position available: used only as secondary pin.",
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _weatherError == null ? Colors.green[700] : Colors.red,
+              color: _userPos == null ? Colors.red : Colors.green[700],
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 20),
-          /*
-          // Bottone Copernicus
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SatelliteGallery(images: [])),
-              );
-            },
-            icon: const Icon(Icons.satellite_alt),
-            label: const Text("Apri Copernicus Gallery"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black12,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-           */
         ],
       ),
     );
   }
-
-
-
-
-
-
-/*
-  // Anteprima Meteo
-  Widget _buildWeatherPreview() {
-    if (_loadingWeather) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_weatherError != null) {
-      return Text("Errore: $_weatherError", style: const TextStyle(color: Colors.red));
-    }
-    if (_weather == null) {
-      return const Text("Nessun dato meteo disponibile");
-    }
-
-    final place = _weather!['name'] ?? "Posizione corrente";
-    final temp = _weather!['main']?['temp']?.round() ?? "-";
-    final desc = _weather!['weather']?[0]?['description'] ?? "-";
-    final icon = _weather!['weather']?[0]?['icon'] ?? "01d";
-
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Image.network("https://openweathermap.org/img/wn/$icon@2x.png", width: 70),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(place,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("$temp°C", style: const TextStyle(fontSize: 22)),
-                Text(desc, style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-            const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey)
-          ],
-        ),
-
-      ),
-    );
-  }
-
-  // Mini mappa
-  Widget _buildMiniMap() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        height: 180,
-        child: FlutterMap(
-          key: ValueKey(_center),
-          options: MapOptions(
-            initialCenter: _center,
-            initialZoom: 10,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.none,
+  Widget _buildLocationToggle() {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              if (!_useTrailWeather) {
+                setState(() {
+                  _useTrailWeather = true;
+                });
+                _loadAll();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: _useTrailWeather ? Colors.green[700] : Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  "Trail weather",
+                  style: TextStyle(
+                    color: _useTrailWeather ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
-          children: [
-            TileLayer(
-              urlTemplate: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-              userAgentPackageName: 'com.example.triplo2',
-            ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: _center,
-                  width: 50,
-                  height: 50,
-                  child: const Icon(Icons.location_pin, color: Colors.blue, size: 40),
-                ),
-              ],
-            ),
-          ],
         ),
-      ),
+
+        const SizedBox(width: 10),
+
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              if (_useTrailWeather) {
+                setState(() {
+                  _useTrailWeather = false;
+                });
+                _loadAll();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: !_useTrailWeather ? Colors.green[700] : Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  "My GPS",
+                  style: TextStyle(
+                    color: !_useTrailWeather ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
- */
 }
+
+extension StringCasing on String {
+  String capitalize() => isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
+}
+Widget _buildSkeletonWeather() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(height: 20, width: 140, color: Colors.grey[300]),
+      const SizedBox(height: 10),
+      Container(height: 26, width: 90, color: Colors.grey[300]),
+      const SizedBox(height: 20),
+      Row(
+        children: List.generate(
+          5,
+              (_) => Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+
+}
+
+
+

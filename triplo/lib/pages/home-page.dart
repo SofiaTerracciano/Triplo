@@ -32,12 +32,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Initial center of the map (Madonna di Campiglio)
   final LatLng mapInitialCenter = const LatLng(46.230, 10.831);
-
   @override
   void initState() {
     super.initState();
     mapController = MapController();
+
+    Future.microtask(() {
+      context.read<TrekkingController>().loadTrekking();
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {

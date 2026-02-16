@@ -8,6 +8,11 @@ import '../controller/trekking.dart';
 import '../controller/user.dart';
 import 'package:provider/provider.dart';
 
+import 'package:latlong2/latlong.dart';
+import 'package:triplo/controller/API.dart';
+import 'package:triplo/widgets_for_pages/weather/weather.dart';
+
+
 // TrekkingPage widget to display detailed information about a trekking
 class TrekkingPage extends StatefulWidget {
   final String trekkingId;
@@ -43,6 +48,60 @@ class _TrekkingPageState extends State<TrekkingPage> {
     color: const Color.fromARGB(255, 0, 0, 0),
   );
 
+
+  final API api = API();
+  Map<String, dynamic>? weather;
+  List<Map<String, dynamic>> forecast = [];
+  bool loadingWeather = true;
+  String? weatherError;
+
+  @override
+  void initState() {
+    super.initState();
+    // Carichiamo il meteo del percorso (non GPS utente)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTrailWeather();
+    });
+  }
+
+  Future<void> _loadTrailWeather() async {
+    try {
+      setState(() {
+        loadingWeather = true;
+        weatherError = null;
+      });
+
+      final trekkingController = context.read<TrekkingController>();
+      final trekking = trekkingController.getTrekkingById(widget.trekkingId);
+      if (trekking == null) {
+        setState(() {
+          weatherError = "Trekking not found";
+          loadingWeather = false;
+        });
+        return;
+      }
+
+      final LatLng trail = trekking.starting_point ?? const LatLng(0,0);
+
+
+      final w = await api.weather(trail.latitude, trail.longitude);
+      final f = await api.forecast(trail.latitude, trail.longitude);
+
+      if (!mounted) return;
+      setState(() {
+        weather = w;
+        forecast = f ?? [];
+        loadingWeather = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        weatherError = "Weather unavailable";
+        loadingWeather = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
@@ -51,10 +110,21 @@ class _TrekkingPageState extends State<TrekkingPage> {
     final langIndex = getLanguageSelected(langCode);
 
     final trekkingController =context.watch<TrekkingController>();
-    final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
+    final trekking = trekkingController.getTrekkingById(widget.trekkingId);
+
+    if (trekking == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
 
     final userController = context.watch<UserController>();
-    final user = userController.currentUser!;
+    final user = userController.currentUser;
+
+
 
     // To calculate the trekking durantion time
     String formattedTime;
@@ -82,9 +152,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
     }
 
     // Check if the trekking is saved by the user or not
-    final bool isSaved = user.savedTrekkings.any(
-      (t) => t.documentId == trekking.documentId,
-    );
+    final bool isSaved = user?.savedTrekkings.any(
+          (t) => t.documentId == trekking.documentId,
+    ) ?? false;
+
 
     return Scaffold(
       appBar: AppBar(
@@ -274,18 +345,25 @@ class _TrekkingPageState extends State<TrekkingPage> {
             const SizedBox(height: 16),
 
             // Weather
-            _sectionTitle(local.weather_trekking_label),
-            ElevatedButton(
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GeoWatchPage(), 
+                    builder: (_) => GeoWatchPage(
+                      trailCenter: trekking.starting_point,
+                    ),
                   ),
                 );
               },
-              child: Text(local.weather_trekking_botton),
+              child: Weather(
+                weather: weather,
+                loading: loadingWeather,
+                error: weatherError,
+              ),
             ),
+
+
 
             const SizedBox(width: 10,)
           ],
