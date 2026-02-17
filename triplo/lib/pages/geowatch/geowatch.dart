@@ -43,62 +43,37 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       _error = null;
     });
 
-    LatLng? target;
+    // 1) Determina target velocemente
+    LatLng target =
+    (_useTrailWeather && widget.trailCenter != null)
+        ? widget.trailCenter!
+        : (await api.userLocation() ?? const LatLng(46.0, 11.0));
 
-    if (_useTrailWeather && widget.trailCenter != null) {
-      target = widget.trailCenter;
-    } else {
-      target = await api.userLocation() ?? const LatLng(46.0, 11.0);
-    }
-
-    if (target == null) {
-      setState(() {
-        _error = "Location unavailable";
-        _loading = false;
-      });
-      return;
-    }
-
-    // -------- METEO --------
+    // 2) METEO SUBITO
     final w = await api.weather(target.latitude, target.longitude);
     final rawForecast = await api.forecast(target.latitude, target.longitude);
-
-    if (w == null) {
-      setState(() {
-        _error = "Weather unavailable";
-        _loading = false;
-      });
-      return;
-    }
-
-    final List<Map<String, dynamic>> parsedForecast =
-    rawForecast == null ? [] : api.parseForecast(rawForecast);
-
-    // -------- ALERTS (protetti) --------
-    List<Map<String, dynamic>> alerts = [];
-
-    try {
-      final realAlerts =
-      await api.meteoAlarmAlerts(target.latitude, target.longitude);
-      alerts.addAll(realAlerts);
-    } catch (_) {}
-
-    try {
-      final mockAlerts = await api.mockAlerts();
-      alerts.addAll(mockAlerts);
-    } catch (_) {}
-
-    // -------- GPS --------
-    final pos = await api.userLocation();
 
     if (!mounted) return;
 
     setState(() {
       _weather = w;
-      _forecast = parsedForecast;
-      _alerts = alerts;
-      _userPos = pos;
-      _loading = false;
+      _forecast =
+      rawForecast == null ? [] : api.parseForecast(rawForecast);
+      _loading = false; // 👈 UI sblocca SUBITO
+    });
+
+    // 3) TUTTO IL RESTO IN BACKGROUND
+
+    api.userLocation().then((pos) {
+      if (mounted) setState(() => _userPos = pos);
+    });
+
+    api.meteoAlarmAlerts(target.latitude, target.longitude).then((real) {
+      if (mounted) setState(() => _alerts.addAll(real));
+    });
+
+    api.mockAlerts().then((mock) {
+      if (mounted) setState(() => _alerts.addAll(mock));
     });
   }
 
@@ -124,7 +99,14 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
     return Scaffold(
 
-      body: ListView(
+
+
+
+        extendBodyBehindAppBar: false,
+
+        body: Stack(
+          children: [
+        ListView(
         padding: const EdgeInsets.all(12),
         children: [
           // ========= HEADER METEO (DETTAGLIO SUBITO) =========
@@ -305,7 +287,17 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
 
         ],
-      ),
+      ),  // BACK BUTTON FLOATING
+            Positioned(
+              top: 12,
+              left: 12,
+              child: SafeArea(
+                child: _buildBackButton(context),
+              ),
+            ),], ),
+
+
+
     );
   }
   Widget _buildLocationToggle() {
@@ -422,6 +414,24 @@ Widget _buildSkeletonWeather() {
     ],
   );
 
+}
+Widget _buildBackButton(BuildContext context) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.95),
+      shape: BoxShape.circle,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.15),
+          blurRadius: 8,
+        ),
+      ],
+    ),
+    child: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.pop(context),
+    ),
+  );
 }
 
 
