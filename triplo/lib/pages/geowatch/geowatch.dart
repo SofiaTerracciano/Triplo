@@ -29,74 +29,79 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
 
   bool _useTrailWeather = true;
+
+  List<Map<String, dynamic>> _alerts = [];
+
   @override
   void initState() {
     super.initState();
     _loadAll();
   }
-
   Future<void> _loadAll() async {
-    try {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    LatLng? target;
+
+    if (_useTrailWeather && widget.trailCenter != null) {
+      target = widget.trailCenter;
+    } else {
+      target = await api.userLocation() ?? const LatLng(46.0, 11.0);
+    }
+
+    if (target == null) {
       setState(() {
-        _loading = true;
-        _error = null;
-      });
-
-      // 1) meteo del PERCORSO
-      LatLng? target;
-
-      // se arriva dal trekking → usa percorso
-      if (_useTrailWeather && widget.trailCenter != null) {
-        target = widget.trailCenter;
-      } else {
-        target = await api.userLocation() ?? const LatLng(46.0, 11.0);
-      }
-
-
-      if (target == null) {
-        setState(() {
-          _error = "Location unavailable";
-          _loading = false;
-        });
-        return;
-      }
-
-      final w = await api.weather(target.latitude, target.longitude);
-      if (w == null) {
-        setState(() {
-          _error = "Weather unavailable";
-          _loading = false;
-        });
-        return;
-      }
-
-      final rawForecast = await api.forecast(target.latitude, target.longitude);
-      final List<Map<String, dynamic>> parsedForecast =
-      rawForecast == null
-          ? <Map<String, dynamic>>[]
-          : api.parseForecast(rawForecast);
-
-
-
-
-      // 2) gps utente (solo per pin/contesto)
-      final pos = await api.userLocation(); // può tornare null
-
-      if (!mounted) return;
-      setState(() {
-        _weather = w;
-        _forecast = parsedForecast;
-        _userPos = pos;
+        _error = "Location unavailable";
         _loading = false;
       });
-    } catch (e) {
-      if (!mounted) return;
+      return;
+    }
+
+    // -------- METEO --------
+    final w = await api.weather(target.latitude, target.longitude);
+    final rawForecast = await api.forecast(target.latitude, target.longitude);
+
+    if (w == null) {
       setState(() {
         _error = "Weather unavailable";
         _loading = false;
       });
+      return;
     }
+
+    final List<Map<String, dynamic>> parsedForecast =
+    rawForecast == null ? [] : api.parseForecast(rawForecast);
+
+    // -------- ALERTS (protetti) --------
+    List<Map<String, dynamic>> alerts = [];
+
+    try {
+      final realAlerts =
+      await api.meteoAlarmAlerts(target.latitude, target.longitude);
+      alerts.addAll(realAlerts);
+    } catch (_) {}
+
+    try {
+      final mockAlerts = await api.mockAlerts();
+      alerts.addAll(mockAlerts);
+    } catch (_) {}
+
+    // -------- GPS --------
+    final pos = await api.userLocation();
+
+    if (!mounted) return;
+
+    setState(() {
+      _weather = w;
+      _forecast = parsedForecast;
+      _alerts = alerts;
+      _userPos = pos;
+      _loading = false;
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -245,49 +250,60 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(14),
-              child: Column(
+              child: _alerts.isEmpty
+                  ? const Text(
+                "No active weather alerts for this area",
+                style: TextStyle(color: Colors.black54),
+              )
+                  : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     "Weather Alerts",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Provider not configured yet.\nHere you can show alerts for this trail area (wind, thunderstorms, flood risk, etc.).",
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: const [
-                      Icon(Icons.info_outline, size: 18, color: Colors.black54),
-                      SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          "Tip: later you can plug in a provider and show severity badges + expiry time.",
-                          style: TextStyle(color: Colors.black54),
-                        ),
+                  const SizedBox(height: 8),
+
+                  ..._alerts.map((a) {
+                    final color = _severityColor(a["severity"]);
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: color),
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${a["event"]} • ${a["severity"]}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: color,
+                            ),
+                          ),
+                          if ((a["headline"] ?? "").toString().isNotEmpty)
+                            Text(a["headline"]),
+                          if ((a["description"] ?? "").toString().isNotEmpty)
+                            Text(a["description"]),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ],
               ),
             ),
           ),
 
+
+
+
           const SizedBox(height: 16),
 
-          // ========= GPS NOTE =========
-          Text(
-            _userPos == null
-                ? "GPS user position unavailable (no permission or off)."
-                : "GPS user position available: used only as secondary pin.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _userPos == null ? Colors.red : Colors.green[700],
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+
         ],
       ),
     );
@@ -357,6 +373,23 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       ],
     );
   }
+
+  Color _severityColor(String sev) {
+    switch (sev.toLowerCase()) {
+      case "minor":
+        return Colors.yellow.shade700;
+      case "moderate":
+        return Colors.orange;
+      case "severe":
+        return Colors.red;
+      case "extreme":
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
+
+
 }
 
 extension StringCasing on String {

@@ -217,6 +217,74 @@ class API {
   List<String> openTopoMapSubdomains() {
     return ['a', 'b', 'c'];
   }
+
+
+  Future<List<Map<String, dynamic>>> meteoAlarmAlerts(
+      double lat,
+      double lon,
+      ) async {
+
+    final url =
+        "https://api.meteoalarm.org/edr/v1/collections/warnings/items"
+        "?coords=POINT($lon $lat)";
+
+    try {
+      final res = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 8));
+
+      if (res.statusCode != 200) {
+        debugPrint("MeteoAlarm error ${res.statusCode}");
+        return [];
+      }
+
+      final data = jsonDecode(res.body);
+
+      final List features = data["features"] ?? [];
+
+      return features.map<Map<String, dynamic>>((f) {
+        final p = f["properties"] ?? {};
+        return {
+          "event": p["event"] ?? "Unknown",
+          "severity": p["severity"] ?? "Unknown",
+          "headline": p["headline"] ?? "",
+          "description": p["description"] ?? "",
+          "start": p["effective"],
+          "end": p["expires"],
+        };
+      }).toList();
+    } catch (e) {
+      debugPrint("MeteoAlarm exception $e");
+      return [];
+    }
+  }
+
+
+  Future<List<Map<String, dynamic>>> mockAlerts() async {
+    try {
+      final res = await http.get(
+        Uri.parse("http://10.0.2.2:3000/alerts"),
+      );
+
+      if (res.statusCode != 200) return [];
+
+      final data = jsonDecode(res.body);
+
+      if (data is List) {
+        return List<Map<String, dynamic>>.from(data);
+      }
+
+      if (data is Map) {
+        return [Map<String, dynamic>.from(data)];
+      }
+
+      return [];
+    } catch (e) {
+      debugPrint("Mock alerts error $e");
+      return [];
+    }
+  }
+
 }
 
 // Class to represent API errors
@@ -281,4 +349,7 @@ class ChallengesController extends ChangeNotifier {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();
   }
+
+
+
 }
