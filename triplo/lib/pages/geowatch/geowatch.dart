@@ -59,7 +59,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       _weather = w;
       _forecast =
       rawForecast == null ? [] : api.parseForecast(rawForecast);
-      _loading = false; // 👈 UI sblocca SUBITO
+      _loading = false;
     });
 
     // 3) TUTTO IL RESTO IN BACKGROUND
