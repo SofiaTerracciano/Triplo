@@ -1,0 +1,70 @@
+\documentclass[12 pt, openany]{book}
+\usepackage{preamble}
+
+% --- GLOSSARY --- %
+\usepackage{datatool}[=v2.32] % pervent error with babel package
+\usepackage[
+    %nonumberlist,      % remove numbers reference in glossaries
+    counter=page,       % set the counter where glossary entry are defined to point at where the term was referenced
+    nogroupskip,        % define the same space for each glossarie entry
+    section=subsection, % Define glossary outline level
+]{glossaries}
+\usepackage[
+    toc,                % include glossary in the table of content
+    acronym,            % to use the acronym
+    abbreviations,      % to use abbreviations
+    postdot,            % adds a dot after the explanation of the glossary entry,
+    noredefwarn,        %suppress the warning that occurs when the environment and \printglossary are redefined while glossaries is loading
+    section=subsection, % Define glossary outline level
+    numberedsection,     % Set the numbering as an usual subsection of the
+]{glossaries-extra} % improves glossaries package feature
+
+\usepackage{glossaries}
+
+% Redefine how the entry name is printed for the 'unsrt' style
+\renewcommand*{\glossentryname}[1]{%
+  \Glsentrytext{#1}%
+}
+
+\makenoidxglossaries
+\loadglsentries{glossary.tex}
+
+% --- MAIN DOCUMENT --- %
+\begin{document}
+    \frontmatter
+    \import{./}{title}
+
+    \setcounter{tocdepth}{2}
+    \tableofcontents
+
+    \mainmatter
+    
+    \setcounter{fnm}{\value{footnote}}
+
+    % Section
+
+    \subfile{section/introduction}
+
+    \subfile{section/architectural_design}
+
+    \subfile{section/user_interface_design}
+
+    \subfile{section/requirements_traceability}
+
+    \subfile{section/implementation_integration_testplan}
+
+    \subfile{section/effort_spent}
+
+    \backmatter
+
+    %\printunsrtglossary[type=main, title=Glossary, toctitle=Glossary] % Print the glossary entries
+    %\printunsrtglossary[type=\acronymtype] % Print acronym entries
+
+    \nocite{*}
+    
+    \printbibliography[heading=bibintoc] % Print all the bibliography and adds it to the list of contents
+    %\printbibliography[type=article, title={Articles Reference}] % Prints the bibliography references related to Articles
+    %\printbibliography[type=book, title={Books Reference}] % Prints the bibliography references related to Books
+    %\printbibliography[type=manual, title={Manual Reference}] % Prints the bibliography references related to Manual
+    %\printbibliography[type=online, title={Online Reference}] % Prints the bibliography references related to online soruces
+\end{document}

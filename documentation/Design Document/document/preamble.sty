@@ -1,0 +1,687 @@
+\ProvidesPackage{preamble}
+
+% --- ASPECTS BASIC --- %
+\usepackage{layout} % To see layout bounds (test purpose)
+\usepackage{import} % Input a file from another directory
+\usepackage[a4paper, left =0.5in, right=0.5in, top=0.5in, bottom=0.5in]{geometry} % To set layout aspect
+\usepackage{pdflscape} % Change pages to landscape
+\usepackage{pdfpages} % Include external pdf pages in the document
+\usepackage{scalerel} % Provides four commands for vertically scaling and stretching objects
+\usepackage{subfiles} % Handle multi-file, making it possible to both process the subsidiary files by themselves and to process the main file that includes them
+\usepackage[pdfencoding=auto, psdextra, hyperfootnotes=false, hidelinks]{hyperref}
+\usepackage{bookmark}
+\hypersetup{
+    colorlinks = true,
+    linkcolor = Blue,
+    filecolor = Aquamarine,
+    urlcolor = Cerulean,
+    citecolor = SkyBlue,
+    runcolor = Mulberry,
+    breaklinks = true,
+    pdftitle={Design Document},
+    pdfauthor = {Giulio Angaroni, Mirko Gentile, Emanuele Valsecchi}
+    pdfpagemode=FullScreen,
+    pdfview = FitH
+}
+\usepackage{textcomp}   % Add the copyright functions
+\usepackage{lipsum}     % Test package for random text generation
+
+% --- TEXT BASICS --- %
+\usepackage[english]{babel} % Typing recognition
+\usepackage{relsize} % Changing text size
+\usepackage[inline]{enumitem} % Add personalization to itemize
+\usepackage{textcase} % For special characters in caps
+\usepackage[dvipsnames, table, x11names]{xcolor} % Provides easy driver-independent access to several kinds of color tints, shades, tones, and mixes of arbitrary colors
+\usepackage[symbol]{footmisc} % To personalize footnotes
+\usepackage{slantsc, bold-extra} % Combine small caps with other style
+\usepackage[T1]{fontenc} % Prevent OT1 small caps and bold warning
+\usepackage[compact]{titlesec} % Various title styles, headings and one-step page styles
+\usepackage[most]{tcolorbox} % To add colored box
+\usepackage{fontawesome5} % Import icons (https://mirrors.ibiblio.org/CTAN/fonts/fontawesome5/doc/fontawesome5.pdf)
+
+% --- IMAGES --- %
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{ {./images/} }
+
+ % --- COMMAND CONTROL --- %
+\usepackage{ifthen}     % To create command with if option
+\usepackage{xifthen}    % Provides \isempty test
+\usepackage{xparse}     % Commands with multiple arguments
+\usepackage{etoolbox}   % Addition to xparse
+\usepackage{xstring}    % To include commands for string
+\usepackage{xspace}     % To handle spaces after commands
+
+% --- NEW FOOTNOTE --- %
+\renewcommand{\thefootnote}{\roman{footnote}}
+\newcounter{fnm} % default footnote mark counter
+
+\NewDocumentCommand{\deccounter}{
+    O{-1}   % #1 - value to subtract at the counter
+    m       % #2 - the counter name
+}{\addtocounter{#2}{#1}}
+
+\NewDocumentCommand{\footnoteMark}{
+    s       % #1 - if present doesn't add value to the counter
+    O{1}    % #2 - value to add at the counter
+    m       % #3 - the counter
+}{\IfBooleanTF{#1}{}{\addtocounter{#3}{#2}}\footnotemark[\value{#3}]}
+
+\NewDocumentCommand{\footnoteText}{
+    s       % if present add to the counter a value 
+    O{-1}   % the value to add at the counter
+    m       % the counter
+    m       % the footnote text
+}{\IfBooleanTF{#1}{\addtocounter{#3}{#2}}{}\footnotetext[\value{#3}]{#4}}
+
+\NewDocumentCommand{\fnMark}{ % refers to the default counter fnm
+    s % if present doesn't add value to the counter
+    O{1} % value to add at the counter
+}{\IfBooleanTF{#1}{\footnoteMark*[#2]{fnm}}{\footnoteMark[#2]{fnm}}}
+
+\NewDocumentCommand{\fnText}{
+    s % if present add to the counter a value 
+    O{-1} % the value to add at the counter
+    m % the footnote text
+}{\IfBooleanTF{#1}{\footnoteText*[#2]{fnm}{#3}}{\footnoteText{fnm}{#3}}}
+
+% --- BIBLIOGRAPHY --- %
+\usepackage[
+    backend = biber, % back end engine to handle bib reference
+    style = numeric, % set the bibliography style (https://www.overleaf.com/learn/latex/Biblatex_bibliography_styles)
+    sorting = nty,   % bibliography sorting order (https://www.overleaf.com/learn/latex/Bibliography_management_in_LaTeX#Reference_guide)
+    backref = true,  % back references via page numbers
+    block = par
+]{biblatex}
+\usepackage{csquotes} % ensure that quoted texts are typeset according to the rules of the main language
+\addbibresource{bibliography.bib}
+\BiblatexSplitbibDefernumbersWarningOff % suppress warning about splitting bibliography
+
+% --- TABLES --- %
+\usepackage{array, ragged2e, ctable, colortbl, hhline, tabularx, multirow}
+\usepackage{longtable}
+\usepackage{makecell}
+\newcolumntype{C}[1]{ >{\centering\arraybackslash} m{#1} }
+\newcolumntype{L}[1]{ >{\arraybackslash} m{#1}}
+\newcolumntype{R}[1]{ >{\RaggedLeft\arraybackslash} m{#1}}
+\newcolumntype{E}[2]{ >{\centering\arraybackslash\columncolor{#1}} m{#2}}
+\newcolumntype{F}[1]{ >{\arraybackslash} m{#1}}
+\newcolumntype{T}[1]{ >{\RaggedLeft\arraybackslash} m{#1}}
+
+\newcommand{\bhline}{\specialrule{.13em}{.05em}{.05em}} % Horizzontal thick line
+\newcolumntype{\bvline}{!{\vrule width .13em}} % Vertical thick line
+\NewDocumentCommand{\cellbox}{
+    s    % if present the text is centered
+    O{1} % the percentage of the row to be occupied 1 = 100%
+    m    % the cell's argument
+}{\parbox[H]{#2\linewidth}{\IfBooleanTF{#1}{\centering}{}\medskip #3 \medskip}}
+
+\NewDocumentCommand{\tline}{ % end of table line
+    s   % #1 If present the line is in bold
+    o   % #2 If present \cline is used instead of \hline and the specified values are used as intervals for \cline arugment
+}{\\ \IfNoValueTF{#2}{\IfBooleanTF{#1}{\bhline}{\hline}}{\cline{#2}}}
+
+% --- MATH --- %
+\usepackage{amsmath, amssymb, systeme, cases, mathrsfs, mathtools, accents, amsbsy, arydshln, stackengine, gensymb}
+\usepackage{fdsymbol} % More mathemathical symbols (loaded after amsmath to remove underbrace problem)
+\usepackage[scr=boondoxupr, cal=esstix]{mathalpha}
+\usepackage{pifont} % checkmarks and cross marks
+
+\NewDocumentCommand{\displayskip}{ % Redifine math space
+    O{0em}
+}{\setlength{\abovedisplayskip}{#1}
+\setlength{\belowdisplayskip}{#1}
+\setlength{\abovedisplayshortskip}{#1}
+\setlength{\belowdisplayshortskip}{#1}}
+
+\NewDocumentCommand{\perc}{ % Percentage symbol
+    s
+}{\ensuremath{\,\%\;}}
+
+\NewDocumentCommand{\ord}{% Order function that will print st, nd, rd, th depending on the number passed
+    m   % #1 - the number at which append the symbol
+}{\IfEqCase{#1}{%
+    {1}{{\text{$1^{\text{st}}$}}\xspace}%
+    {2}{{\text{$2^{\text{nd}}$}}\xspace}%
+    {3}{{\text{$3^{\text{rd}}$}}\xspace}%
+}[{\text{$#1^{\text{th}}$}}\xspace]}
+
+% Process Arguments: Separe arguments separated by "," and separe them with ",\,"
+\ExplSyntaxOn
+\NewDocumentCommand{\pargs}{m}
+{
+  \tl_if_empty:nTF {#1}
+    {}
+    {
+      \seq_set_split:Nnn \l_tmpa_seq {,} {#1}
+      \seq_use:Nn \l_tmpa_seq { ,\, }
+    }
+}
+\ExplSyntaxOff
+
+\NewDocumentCommand{\xmark}{ % x | cross mark
+    s
+}{\text{\ding{55}}}
+\NewDocumentCommand{\cmark}{ % tick | checkmark
+    s
+}{\text{\ding{51}}}
+
+\NewDocumentCommand{\R}{ % Real number set
+    s
+}{\ensuremath{\mathbb{R}}}
+
+% Bracket
+\DeclarePairedDelimiterX{\rndb}[1]{(}{)}{\pargs{#1}}
+\DeclarePairedDelimiterX{\sqrb}[1]{[}{]}{\pargs{#1}}
+\DeclarePairedDelimiterX{\crlb}[1]{\{}{\}}{\pargs{#1}}
+\DeclarePairedDelimiterX{\modb}[1]{|}{|}{\pargs{#1}}
+\DeclarePairedDelimiterX{\normb}[1]{\lVert}{\rVert}{\pargs{#1}}
+\DeclarePairedDelimiterX{\angleb}[1]{\langle}{\rangle}{\pargs{#1}}
+
+\NewDocumentCommand{\rb}{ % Parentesi Tonde
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \rndb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl(\pargs{#2}\bigr)}
+            {Big}{\Bigl(\pargs{#2}\Bigr)}
+            {bigg}{\biggl(\pargs{#2}\biggr)}
+            {Bigg}{\Biggl(\pargs{#2}\Biggr)}
+        }[\rndb*{#2}]
+    }
+}
+
+\NewDocumentCommand{\sq}{ % Parentesi Quadre
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \sqrb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl[\pargs{#2}\bigr]}
+            {bigg}{\biggl[\pargs{#2}\biggr]}
+            {Big}{\Bigl[\pargs{#2}\Bigr]}
+            {Bigg}{\Biggl[\pargs{#2}\Biggr]}
+        }[\sqrb*{#2}]
+    }
+}
+
+\NewDocumentCommand{\cb}{ % Parentesi Graffe
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \crlb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl\{\pargs{#2}\bigr\}}
+            {bigg}{\biggl\{\pargs{#2}\biggr\}}
+            {Big}{\Bigl\{\pargs{#2}\Bigr\}}
+            {Bigg}{\Biggl\{\pargs{#2}\Biggr\}}
+        }[\crlb*{#2}]
+    }
+}
+
+\NewDocumentCommand{\mb}{ % Modulo
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \modb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl|\pargs{#2}\bigr|}
+            {bigg}{\biggl|\pargs{#2}\biggr|}
+            {Big}{\Bigl|\pargs{#2}\Bigr|}
+            {Bigg}{\Biggl|\pargs{#2}\Biggr|}
+        }[\modb*{#2}]
+    }
+}
+
+\NewDocumentCommand{\norm}{ % Norma
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \normb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl\|\pargs{#2}\bigr\|}
+            {bigg}{\biggl\|\pargs{#2}\biggr\|}
+            {Big}{\Bigl\|\pargs{#2}\Bigr\|}
+            {Bigg}{\Biggl\|\pargs{#2}\Biggr\|}
+        }[\normb*{#2}]
+    }
+}
+
+\NewDocumentCommand{\angb}{ % Angle brackets
+    o 
+    m
+}{ 
+    \IfNoValueTF{#1}{
+        \angleb*{#2}
+    }{
+        \IfEqCase{#1}{
+            {big}{\bigl\langle\pargs{#2}\bigr\rangle}
+            {bigg}{\biggl\langle\pargs{#2}\biggr\rangle}
+            {Big}{\Bigl\langle\pargs{#2}\Bigr\rangle}
+            {Bigg}{\Biggl\langle\pargs{#2}\Biggr\rangle}
+        }[\angleb*{#2}]
+    }
+}
+
+\newcommand{\grad}{\rotatebox[origin=c]{180}{$\Delta$}} % Gradient Symbol
+
+% --- PSEUDO CODE ENVIROMENT --- % https://ctan.mirror.garr.it/mirrors/ctan/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
+\usepackage[boxruled, vlined, linesnumbered, resetcount, titlenotnumbered]{algorithm2e}
+\SetStartEndCondition{ ( }{ ) }{ ) }
+\DontPrintSemicolon
+\SetAlgoCaptionLayout{textbf}
+
+\NewDocumentCommand{\comm}{ % Comment style equals to \tcp*[l]
+    s % if present default new line is not entered
+    m % comment text
+}{%
+    \IfBooleanTF{#1}{\tcp*[h]{#2}}{\tcp*[l]{#2}}
+}
+\NewDocumentCommand{\mcomm}{ % Multiline comment style to \tcc*[l]
+    s % if present default new line is not entered
+    m % comment text
+}{%
+    \IfBooleanTF{#1}{\tcc*[h]{#2}}{\tcc*[l]{#2}}
+}
+
+\NewDocumentCommand{\pcsep}{ % pseudo code separator
+    s
+}{\BlankLine\BlankLine}
+
+
+% --- CODING ENVIROMENT --- %
+\usepackage{listings}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{ % defines the code style
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle} % To set the mystyle as the code style
+
+% --- PERSONALIZED DOCUMENT COMMAND --- %
+
+\NewDocumentCommand{\bbp}{ % Automatically ref to bbp glossary entry
+    o   % #1 - can be l -> to use \glsxtrlong
+        %             s -> to use \glsxtrshort (also used by defualt)
+        %             f -> to use \glsxtrfull
+}{\IfNoValueTF{#1}{\glsxtrshort{bbp}}{%
+\IfEqCase{#1}{%
+        {s}{\glsxtrshort{bbp}}%
+        {l}{\glsxtrlong{bbp}}%
+        {f}{\glsxtrfull{bbp}}%
+    }[\PackageError{Preamble}{Undefined output option: #1}{}]%
+}\xspace}
+
+% Enviroment to prevent text from going in new page
+\newenvironment{stpar}[1][t]
+{\noindent\begin{minipage}[#1]{\linewidth}}
+{\end{minipage}\bigskip}
+
+% Enviroment to prevent text from going in new page and split the page in 2 columns
+\NewDocumentEnvironment{mcstpar}{
+    O{h!} % #1 alignment of the first minipage
+    m     % #2 first column width
+    s     % #3 if present a vertical line is added between the two columns
+    O{h!} % #4 alignment of the second minipage
+    m     % #5 second column width
+    +m    % #6 multiline argument corresponding to the first column content
+    +m    % #7 multiline argument corresponding to the second column content
+}{%
+  \begin{minipage}[#1]{#2\linewidth}%
+    #6%
+  \end{minipage}\hfill\IfBooleanTF{#3}{\vline\hfill}{}%
+  \begin{minipage}[#4]{#5\linewidth}%
+    #7%
+  \end{minipage}%
+}{}
+
+% Enviroment to prevent text from going in new page and split the page in 2 columns no hfill is added between the two columns
+\NewDocumentEnvironment{mcstpar*}{
+    O{h!} % #1 alignment of the first minipage
+    m     % #2 first column width
+    s     % #3 if present a vertical line is added between the two columns
+    O{h!} % #4 alignment of the second minipage
+    m     % #5 second column width
+    +m    % #6 multiline argument corresponding to the first column content
+    +m    % #7 multiline argument corresponding to the second column content
+}{%
+  \begin{minipage}[#1]{#2\linewidth}%
+    #6%
+  \end{minipage}\IfBooleanTF{#3}{\vline}{}%
+  \begin{minipage}[#4]{#5\linewidth}%
+    #7%
+  \end{minipage}%
+}{}
+
+% Remove "Chapter x" before the actual name of the chapter
+\titleformat{\chapter}[display]
+  {\Huge\bfseries}
+  {}
+  {0pt}
+  {\thechapter.\ }
+
+\titleformat{name=\chapter,numberless}[display]
+  {\Huge\bfseries}
+  {}
+  {0pt}
+  {}
+
+\NewDocumentCommand{\impt}{
+    s
+    o   % The text color (default is BrickRed)
+    m   % The text to display
+}{\textbf{\textcolor{\IfNoValueTF{#2}{BrickRed}{#2}}{#3}}}
+
+% --- AD HOC DOCUMENT COMMAND --- %
+
+\definecolor{darkblue}{RGB}{16, 44, 83}
+
+\NewDocumentCommand{\linkToGitHub}{
+    o   % #1 - It can be    i -> to show only the icon; 
+        %                   t -> to show only the text
+        %                   is-> to show the icon without ``'' 
+}{\href{https://github.com/emanuele1valsecchi/AngaroniGentileValsecchi}{\IfNoValueTF{#1}{link to GitHub ``\,\faGithub\,''}{%
+\IfEqCase{#1}{%
+        {i}{``\,\faGithub\,''}%
+        {t}{link to GitHub}%
+        {is}{\faGithub}
+    }[\PackageError{Preamble}{Undefined output option: #1}{}]%
+}}\xspace}
+
+\NewDocumentCommand{\km}{ % Kilometers measurments unit
+    s % If present the space after is not printed
+}{\ensuremath{\,\text{km}\IfBooleanTF{#1}{}{\;}}}
+
+\NewDocumentCommand{\kmh}{ % Kilometers per Hours measurments unit
+    s % If present the space after is not printed
+}{\ensuremath{\,\text{km$\setminus$h}\IfBooleanTF{#1}{}{\;}}}
+
+\NewDocumentCommand{\useCase}{ % Command to define useCase with a defined look and feel
+    m % #1 - Name
+    m % #2 - Actors
+    m % #3 - Entry condition
+    m % #4 - Event Flow
+    m % #5 - Exit condition
+    m % #6 - Exceptions
+    m % #7 - Special Requirements
+}{\begin{table}[H]
+    \centering\def\arraystretch{1.5}%
+    \begin{tabular}{|L{.25\textwidth}|L{.7\textwidth}|}%
+         \hline%
+         \textbf{Name} & #1 \tline%
+         \textbf{Actors} & #2 \tline%
+         \textbf{Entry condition} & #3 \tline%
+         \textbf{Event Flow} & #4 \tline%
+         \textbf{Exit condition} & #5 \tline%
+         \textbf{Exceptions} & #6 \tline%
+         \textbf{Special Requirements} & #7 \tline%
+     \end{tabular}
+\end{table}}
+
+% -- APPLICATION ICONS -- %
+
+\NewDocumentCommand{\comboBox}{
+    O{it}   %   #1  it  -> icon + text (default);
+            %       i   -> only the icon;
+            %       t   -> only the text;
+            %       ick -> only the icon with check inside the square;
+            %       itck-> text + icon with check inside the square
+}{%
+\IfEqCase{#1}{%
+        {it}{\texttt{combo box} ``\,\faSquare\,''}
+        {i}{``\,\faSquare\,''}%
+        {t}{\texttt{combo box}}%
+        {ick}{``\,\faCheckSquare\,''}%
+        {itck}{\texttt{combo box} ``\,\faCheckSquare\,''}
+    }[\PackageError{Preamble}{Undefined output option: #1}{}]%
+\xspace}
+
+\NewDocumentCommand{\button}{% Defines the beheviour of the different button icon showed in the document
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+    m   % #2 -  The text of the button
+    m   % #3 -  The fontawesom icon
+}{\IfNoValueTF{#1}{\texttt{#2 button} ``\,{#3}\,''}{%
+\IfEqCase{#1}{%
+        {i}{``\,#3\,''}%
+        {t}{\texttt{#2 button}}%
+    }[\PackageError{Preamble}{Undefined output option: #1}{}]%
+}\xspace}
+
+\NewDocumentCommand{\startButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{start}{\faLocationArrow}}
+
+\NewDocumentCommand{\infoButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{info}{\faInfoCircle}}
+
+\NewDocumentCommand{\userButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{user}{\faUserCircle}}
+
+\NewDocumentCommand{\meteorologicalButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{meteorological}{\faCloudSun}}
+
+\NewDocumentCommand{\closingButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{closing}{\faWindowClose}}
+
+\NewDocumentCommand{\backButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{back}{\faAngleLeft}}
+
+\NewDocumentCommand{\searchButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{search}{\faSearch}}
+
+\NewDocumentCommand{\addRouteButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{add route}{\faPlusCircle}}
+
+\NewDocumentCommand{\myLocationButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{my location}{\faCompass}}
+
+\NewDocumentCommand{\homeButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{home}{\faHome}}
+
+\NewDocumentCommand{\swapButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{swap}{{\tiny\kern.01em\raisebox{.25em}{\faArrowUp}\kern-.27em\lower.25em\hbox{\faArrowDown}\kern.01em}}}
+
+\NewDocumentCommand{\orderStopsButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{order}{\faGripLines}}
+
+\NewDocumentCommand{\removeStopButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{remove stop}{\faMinusCircle}}
+
+\NewDocumentCommand{\evaluatePathButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{evaluate}{\faPenSquare}}
+
+\NewDocumentCommand{\editButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{edit}{\faPen}}
+
+\NewDocumentCommand{\replyButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{reply}{\faComments}}
+
+\NewDocumentCommand{\sendMessageButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{send message}{\faPaperPlane}}
+
+\NewDocumentCommand{\attachImageButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{attach image}{\faPaperclip}}
+
+\NewDocumentCommand{\explorePageButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{explore page}{\faMap[regular]}}
+
+\NewDocumentCommand{\createNewPathButton}{
+    o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{create new route}{\faPlus}}
+
+\NewDocumentCommand{\likeButton}{
+     o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{like}{\faThumbsUp}}
+
+\NewDocumentCommand{\dislikeButton}{
+     o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{dislike}{\faThumbsDown}}
+
+\NewDocumentCommand{\cameraButton}{
+     o % #1 - It can be i -> to show only the icon; t -> to show only the text
+}{\button[#1]{camera}{\faCamera}}
+
+% -- SCENARIO DEFINITION -- %
+\newlist{scenarios}{enumerate}{2}
+\setlist[scenarios]{%
+    label=$($\textbf{\textsc{sc}\arabic*}$)$,%
+    ref=\textbf{\textsc{sc}\arabic*},%
+    resume,%
+    align=left%
+}
+
+\NewDocumentCommand{\scn}{
+    s   % #1 - 
+    m   % #2 - The scenario title
+    m   % #3 - The scenario label
+}{\begin{scenarios}\item\label{#3} \textbf{#2}\end{scenarios}}
+
+\NewDocumentCommand{\subscn}{
+    s   % #1 - 
+    m   % #2 - The sub-scenario title
+    m   % #3 - The scenario top level label
+    m   % #4 - The sub-scenario label
+}{\begin{scenarios}\item[]\begin{scenarios}[%
+label=$($\textbf{\ref*{#3}.\arabic*}$)$,%
+ref=\textbf{\ref{#3}.\arabic*},%
+resume=#3,
+leftmargin=0pt,%
+listparindent=0pt,%
+]%
+\item\label{#4} \textbf{\emph{#2}}\end{scenarios}\end{scenarios}}
+
+% -- GOAL DEFINITION -- %
+\newlist{goals}{enumerate}{1}
+\setlist[goals]{label=$[$\textbf{\textsc{g}\arabic*}$]$\;\;, ref=\textbf{\textsc{g}\arabic*}, leftmargin=*, resume, topsep=.3em, partopsep=.3em, parsep=.3em, itemsep=.3em}
+
+\NewDocumentCommand{\gl}{
+    s   % #1 - 
+    m   % #2 - The goal title
+    o   % #3 - The goal long text
+    m   % #4 - The goal label
+}{\begin{goals}\item\label{#4} \textbf{#2}\IfNoValueTF{#3}{}{\hfill\\ #3}\end{goals}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+% -- WPH DEFINITION -- %
+\newlist{wps}{enumerate}{1}
+\setlist[wps]{label=$[$\textbf{\textsc{wp}\arabic*}$]$\;\;, ref=\textbf{\textsc{wp}\arabic*}, leftmargin=*, resume, topsep=.3em, partopsep=.3em, parsep=.3em, itemsep=.3em}
+
+\NewDocumentCommand{\wph}{
+    s   % #1 - 
+    m   % #2 - The goal title
+    m   % #3 - The goal label
+}{\begin{wps}\item\label{#3} #2\end{wps}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+% -- SPH DEFINITION -- %
+\newlist{sps}{enumerate}{1}
+\setlist[sps]{label=$[$\textbf{\textsc{sp}\arabic*}$]$\;\;, ref=\textbf{\textsc{sp}\arabic*}, leftmargin=*, align=parleft, listparindent=0pt, labelsep=0pt, resume=spsenum, topsep=.3em, partopsep=.3em, parsep=.3em, itemsep=.3em}
+
+\NewDocumentCommand{\sph}{
+    s   % #1 - 
+    m   % #2 - The SP title
+    m   % #3 - The SP label
+}{\begin{sps}\item\label{#3} #2\end{sps}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+% Enviroment to create the shared phenomena table
+\newenvironment{sphenv}{%
+\begin{table}[H]%
+    \centering\def\arraystretch{1.5}%
+    \begin{tabular}{|L{.1\linewidth}|L{.55\linewidth}|L{.13\linewidth}|L{.13\linewidth}|}%
+    \hline%
+         \textbf{Number} & \textbf{Title} & \textbf{Controller} & \textbf{Observer} \tline*}{
+    \end{tabular}
+\end{table}}
+
+\NewDocumentCommand{\sphe}{ % Shared phenomena element for the sphenvironment
+    m % #1 - The Shared Phenomena title
+    m % #2 - Controlled by column
+    m % #3 - Observed by solumn
+    m % #4 - The Shared Phenomena label
+}{\sph{}{#4} & #1 & #2 & #3 \tline}
+
+% -- MACHINE PHENOMENA DEFINITION -- %
+\newlist{mps}{enumerate}{1}
+\setlist[mps]{label=$[$\textbf{\textsc{mp}\arabic*}$]$\;\;, ref=\textbf{\textsc{mp}\arabic*}, leftmargin=*, resume, topsep=.3em, partopsep=.3em, parsep=.3em, itemsep=.3em}
+
+\NewDocumentCommand{\mph}{
+    s   % #1 - 
+    m   % #2 - The MP title
+    m   % #3 - The MP label
+}{\begin{mps}\item\label{#3} #2\end{mps}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+% -- USE CASE DEFINITION -- %
+\newlist{usecases}{enumerate}{1}
+\setlist[usecases]{label=\textbf{\textsc{uc}\arabic*}\,:\;, ref=\textsc{uc}\arabic*, leftmargin=*, resume, nosep}
+
+\NewDocumentCommand{\uc}{
+    s   % #1 - 
+    m   % #2 - The use case title
+    m   % #3 - The use case label
+}{\begin{usecases}\item\label{#3} \textbf{#2}\end{usecases}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+% -- FUNCTIONAL REQUIREMENTS DEFINITION -- %
+\newlist{funcreq}{enumerate}{1}
+\setlist[funcreq]{label=\textbf{\textsc{FR}\arabic*}\,:\;, ref=\textsc{fr}\arabic*, leftmargin=*, labelindent=\parindent, align=left, itemindent=-.6em, resume=myfuncreq, itemsep=.1em, topsep=.1em, parsep=0em, partopsep=.1em}
+
+\NewDocumentCommand{\fr}{
+    s   % #1 - 
+    m   % #2 - The functional requirement
+    m   % #3 - The functional requirement label
+}{\begin{funcreq}\item\label{#3} #2\end{funcreq}\vspace{-\baselineskip}\nopagebreak\nobreak\nobreakspace}
+
+\NewDocumentCommand{\timeSpent}{
+    m   % #1 -  Hours
+    o   % #2 -  Minutes
+}{$\displaystyle #1\text{h\;}$\IfNoValueTF{#2}{}{$#2\text{m}$}}
+
+% Development Order counter
+\newcounter{devOrder}
+\setcounter{devOrder}{0}
+\NewDocumentCommand{\devOrder}{}{\stepcounter{devOrder}\arabic{devOrder}}

@@ -32,18 +32,25 @@ class _UsersListPublicState extends State<UsersListPublic> {
 
   Future<void> _loadUsers() async {
     final userController = context.read<UserController>();
-    final targetUser = await userController.getUserById(widget.userId);
+
+    List<Users> result;
+
+    if (widget.listName == 'Followers') {
+      result = await userController.getFollowers(widget.userId);
+    } else {
+      result = await userController.getFollowing(widget.userId);
+    }
+
     if (!mounted) return;
-    // Take followers or following based on listName
+
+
+
     setState(() {
-      if (widget.listName == 'Followers') {
-        users = targetUser?.followers ?? [];
-      } else {
-        users = targetUser?.following ?? [];
-      }
+      users = result;
       loading = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
