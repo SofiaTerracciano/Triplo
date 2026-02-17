@@ -30,6 +30,8 @@ class _UsersListPublicState extends State<UsersListPublic> {
     _loadUsers();
   }
 
+
+
   Future<void> _loadUsers() async {
     final userController = context.read<UserController>();
 
@@ -43,13 +45,12 @@ class _UsersListPublicState extends State<UsersListPublic> {
 
     if (!mounted) return;
 
-
-
     setState(() {
       users = result;
       loading = false;
     });
   }
+
 
 
   @override
