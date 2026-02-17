@@ -14,6 +14,7 @@ import 'package:triplo/pages/geowatch/geowatch.dart';
 // Import della pagina admin che carica i punti
 import 'package:triplo/update_points.dart';
 
+import '../../admin_add_trekking.dart';
 import '../../update_user_index.dart';
 
 class Landing_Page extends StatefulWidget {
@@ -83,7 +84,19 @@ class _Landing_PageState extends State<Landing_Page> {
           ElevatedButton(
             onPressed: () => updateUsersIndex(),
             child: Text("Update Users Index"),
+          ),
+          ElevatedButton(
+            child: const Text("Admin – Create Trekking"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminCreateTrekkingPage(),
+                ),
+              );
+            },
           )
+
         ],
       ),
     );
