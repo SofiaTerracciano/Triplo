@@ -29,9 +29,13 @@ class UserController extends ChangeNotifier {
     );
 
     final uid = cred.user!.uid;
+    final username = email.split("@")[0];
 
+    // -----------------------
+    // USERS COLLECTION
+    // -----------------------
     await _db.collection("users").doc(uid).set({
-      "Username": email.split("@")[0],
+      "Username": username,
       "Photo_profile": "",
       "Name": "",
       "Surname": "",
@@ -43,12 +47,20 @@ class UserController extends ChangeNotifier {
       "Private_diary": [],
       "Saved_trekkings": [],
       "Level": "Beginner",
-      "Advanced": 0,
-      "Intermediate": 0,
+    });
+
+    // -----------------------
+    // USERS_INDEX COLLECTION
+    // -----------------------
+    await _db.collection("users_index").doc(uid).set({
+      "uid": uid,
+      "username": username,
+      "normalized": username.toLowerCase(),
     });
 
     await loadUserCore(uid);
   }
+
 
   Future<void> login(String email, String password) async {
     final cred = await _auth.signInWithEmailAndPassword(
