@@ -68,7 +68,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       if (mounted) setState(() => _userPos = pos);
     });
 
-    api.meteoAlarmAlerts(target.latitude, target.longitude).then((real) {
+    api.weatherbitAlerts(target.latitude, target.longitude).then((real) {
       if (mounted) setState(() => _alerts.addAll(real));
     });
 
@@ -247,7 +247,28 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                   const SizedBox(height: 8),
 
                   ..._alerts.map((a) {
-                    final color = _severityColor(a["severity"]);
+
+                    final String event =
+                    (a["event"] ??
+                        a["title"] ??
+                        "Weather alert").toString();
+
+                    final String severity =
+                    (a["severity"] ??
+                        a["severity_level"] ??
+                        "unknown").toString();
+
+                    final String headline =
+                    (a["headline"] ??
+                        a["title"] ??
+                        "").toString();
+
+                    final String description =
+                    (a["description"] ??
+                        a["desc"] ??
+                        "").toString();
+
+                    final color = _severityColor(severity);
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -261,20 +282,23 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${a["event"]} • ${a["severity"]}",
+                            "$event • $severity",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: color,
                             ),
                           ),
-                          if ((a["headline"] ?? "").toString().isNotEmpty)
-                            Text(a["headline"]),
-                          if ((a["description"] ?? "").toString().isNotEmpty)
-                            Text(a["description"]),
+
+                          if (headline.isNotEmpty)
+                            Text(headline),
+
+                          if (description.isNotEmpty)
+                            Text(description),
                         ],
                       ),
                     );
                   }).toList(),
+
                 ],
               ),
             ),

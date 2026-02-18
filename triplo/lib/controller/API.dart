@@ -13,14 +13,21 @@ import 'package:triplo/model/challenges.dart';
 // API controller for external services
 class API {
   late final String openWeatherKey;
+  late final String weatherbitKey;
 
   // Constructor to load API keys from .env
   API() {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
+    weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
+
     if (openWeatherKey.isEmpty) {
-      debugPrint("WARNING: OPENWEATHER_API_KEY is missing in .env");
+      debugPrint("WARNING: OPENWEATHER_API_KEY missing");
+    }
+    if (weatherbitKey.isEmpty) {
+      debugPrint("WARNING: WEATHERBIT_API_KEY missing");
     }
   }
+
 
   /// Build OpenWeather tile URL for FlutterMap
   String weatherTile(String layer) {
@@ -218,7 +225,7 @@ class API {
     return ['a', 'b', 'c'];
   }
 
-
+/*
   Future<List<Map<String, dynamic>>> meteoAlarmAlerts(
       double lat,
       double lon,
@@ -258,12 +265,12 @@ class API {
       return [];
     }
   }
-
+*/
 
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
       final res = await http.get(
-        Uri.parse("http://10.0.2.2:3000/alerts"),
+        Uri.parse("https://meteodemoserver.onrender.com/alerts"),
       );
 
       if (res.statusCode != 200) return [];
@@ -281,6 +288,46 @@ class API {
       return [];
     } catch (e) {
       debugPrint("Mock alerts error $e");
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> weatherbitAlerts(
+      double lat,
+      double lon,
+      ) async {
+
+    if (weatherbitKey.isEmpty) return [];
+
+    final url =
+        "https://api.weatherbit.io/v2.0/alerts"
+        "?lat=$lat&lon=$lon&key=$weatherbitKey";
+
+    try {
+      final res = await http.get(Uri.parse(url));
+
+      if (res.statusCode != 200) {
+        debugPrint("Weatherbit alerts error ${res.statusCode}");
+        return [];
+      }
+
+      final data = jsonDecode(res.body);
+      final List alerts = data["alerts"] ?? [];
+
+      return alerts.map<Map<String, dynamic>>((a) {
+        return {
+          "event": a["title"] ?? "Weather Alert",
+          "severity": (a["severity"] ?? "Unknown").toString(),
+          "headline": a["title"] ?? "",
+          "description": a["description"] ?? "",
+          "start": a["effective_local"],
+          "end": a["expires_local"],
+          "source": "weatherbit",
+        };
+      }).toList();
+
+    } catch (e) {
+      debugPrint("Weatherbit alerts exception $e");
       return [];
     }
   }
