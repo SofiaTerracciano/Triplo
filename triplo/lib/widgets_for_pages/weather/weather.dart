@@ -4,12 +4,14 @@ class Weather extends StatelessWidget {
   final Map<String, dynamic>? weather;
   final bool loading;
   final String? error;
-
+  final bool hideLocationName;
   const Weather({
     Key? key,
     required this.weather,
     required this.loading,
     required this.error,
+
+    this.hideLocationName = false,
   }) : super(key: key);
 
   @override
@@ -26,7 +28,9 @@ class Weather extends StatelessWidget {
       return const Text("Nessun dato meteo disponibile");
     }
 
-    final place = weather!['name'] ?? "Posizione corrente";
+    final place = hideLocationName
+        ? "Trail area"
+        : (weather!['name'] ?? "Posizione corrente");
     final temp = weather!['main']?['temp']?.round() ?? "-";
     final desc = weather!['weather']?[0]?['description'] ?? "-";
     final icon = weather!['weather']?[0]?['icon'] ?? "01d";

@@ -332,6 +332,22 @@ class API {
     }
   }
 
+
+  LatLng computeCentroid(List<LatLng> points) {
+    double lat = 0;
+    double lon = 0;
+
+    for (final p in points) {
+      lat += p.latitude;
+      lon += p.longitude;
+    }
+
+    return LatLng(
+      lat / points.length,
+      lon / points.length,
+    );
+  }
+
 }
 
 // Class to represent API errors

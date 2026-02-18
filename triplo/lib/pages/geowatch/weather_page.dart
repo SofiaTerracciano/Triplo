@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/API.dart';
-
+/*
 class WeatherPage extends StatelessWidget {
   final Map<String, dynamic> weather;
   final List<Map<String, dynamic>> forecast;
@@ -92,3 +92,4 @@ extension StringCasing on String {
   String capitalize() =>
       isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
 }
+ */

@@ -11,11 +11,14 @@ class GoogleSatellitePage extends StatefulWidget {
   final LatLng trailCenter;
   final LatLng? userCenter;
 
+  final LatLng initialCenter;
   const GoogleSatellitePage({
     Key? key,
     required this.trailCenter,
     required this.userCenter,
+    required this.initialCenter,
   }) : super(key: key);
+
 
   @override
   State<GoogleSatellitePage> createState() => _GoogleSatellitePageState();
@@ -37,6 +40,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
   Widget build(BuildContext context) {
     final legendWidget = _buildLegendWidget();
 
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Satellite map with weather layers"),
@@ -47,7 +51,8 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: widget.trailCenter, // ✅ trail is the main target
+
+              initialCenter: widget.initialCenter,
               initialZoom: 9,
               maxZoom: 18,
               minZoom: 3,
@@ -59,7 +64,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
                 userAgentPackageName: 'com.example.triplo',
               ),
 
-              // ✅ Markers: trail + user
+
               MarkerLayer(
                 markers: [
                   Marker(

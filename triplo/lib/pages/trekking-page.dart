@@ -29,7 +29,7 @@ class TrekkingPage extends StatefulWidget {
 class _TrekkingPageState extends State<TrekkingPage> {
   // Icons for the bookmark button (unsaved and saved)
   final List<Icon> icons = [Icon(Icons.bookmark_border), Icon(Icons.bookmark)];
-
+  LatLng? center;
   final titleStyle = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
@@ -80,6 +80,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
         });
         return;
       }
+      if (trekking.starting_point != null &&
+          trekking.ending_point != null) {
+        center = LatLng(
+          (trekking.starting_point!.latitude +
+              trekking.ending_point!.latitude) /
+              2,
+          (trekking.starting_point!.longitude +
+              trekking.ending_point!.longitude) /
+              2,
+        );
+      } else {
+        center = trekking.starting_point ?? const LatLng(46.0, 11.0);
+      }
 
       final LatLng trail = trekking.starting_point ?? const LatLng(0,0);
 
@@ -111,6 +124,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
     final trekkingController =context.watch<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(widget.trekkingId);
+
 
     if (trekking == null) {
       return const Scaffold(
@@ -343,6 +357,16 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 : Text(local.challenges_available_trekking_label),
 
             const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                "Weather near trail",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
 
             // Weather
             GestureDetector(
@@ -350,16 +374,16 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => GeoWatchPage(
-                      trailCenter: trekking.starting_point,
-                    ),
+                    builder: (_) => GeoWatchPage(trailCenter: center),
                   ),
                 );
+
               },
               child: Weather(
                 weather: weather,
                 loading: loadingWeather,
                 error: weatherError,
+                hideLocationName: true,
               ),
             ),
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:triplo/controller/API.dart';
@@ -31,16 +33,24 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   bool _useTrailWeather = true;
 
   List<Map<String, dynamic>> _alerts = [];
-
+  late Timer _timer;
   @override
   void initState() {
     super.initState();
     _loadAll();
+    _timer = Timer.periodic(
+      const Duration(minutes: 5),
+          (_) => _loadAll(),
+    );
+
+
+
   }
   Future<void> _loadAll() async {
     setState(() {
       _loading = true;
       _error = null;
+      _alerts = [];
     });
 
     // 1) Determina target velocemente
@@ -80,7 +90,9 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final place = _weather?['name'] ?? "Trail area";
+    final place = _useTrailWeather
+        ? "Trail area"
+        : "Your position";
     final temp = _weather?['main']?['temp']?.round()?.toString() ?? "-";
     final List weatherList =
     (_weather?['weather'] is List && _weather!['weather'].isNotEmpty)
@@ -136,6 +148,15 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
+                            const Text(
+                              "Based on nearest weather station",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+
+                            const SizedBox(height: 2),
                             Text(
                               "$temp°C • ${desc.capitalize()}",
                               style: const TextStyle(fontSize: 16, color: Colors.black87),
@@ -190,7 +211,11 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
           const SizedBox(height: 12),
 
           // ========= MINI MAP (CENTER = PERCORSO) =========
-          Mini_Map(center: widget.trailCenter ?? _userPos ?? const LatLng(0,0)),
+          Mini_Map(
+            center: _useTrailWeather
+                ? widget.trailCenter ?? const LatLng(46.0, 11.0)
+                : _userPos ?? widget.trailCenter ?? const LatLng(46.0, 11.0),
+          ),
 
           const SizedBox(height: 10),
 
@@ -198,17 +223,18 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
           ElevatedButton.icon(
             onPressed: () {
 
-              final LatLng center =
-                  widget.trailCenter ??
-                      _userPos ??
-                      const LatLng(46.0, 11.0);
+              final LatLng center = _useTrailWeather
+                  ? widget.trailCenter ?? const LatLng(46.0, 11.0)
+                  : _userPos ?? widget.trailCenter ?? const LatLng(46.0, 11.0);
+
 
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => GoogleSatellitePage(
-                    trailCenter: center,
+                    trailCenter: widget.trailCenter!,
                     userCenter: _userPos,
+                    initialCenter: center,
                   ),
                 ),
               );
@@ -270,33 +296,77 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
                     final color = _severityColor(severity);
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: color),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "$event • $severity",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: color,
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AlertDetailPage(
+                              event: event,
+                              severity: severity,
+                              headline: headline,
+                              description: description,
                             ),
                           ),
+                        );
+                      },
 
-                          if (headline.isNotEmpty)
-                            Text(headline),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: color),
+                        ),
 
-                          if (description.isNotEmpty)
-                            Text(description),
-                        ],
+                        child: Row(
+                          children: [
+
+                            // BARRA COLORE
+                            Container(
+                              width: 6,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+
+                            const SizedBox(width: 10),
+
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    event,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 2),
+
+                                  Text(
+                                    severity.toUpperCase(),
+                                    style: TextStyle(
+                                      color: color,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
                       ),
                     );
+
                   }).toList(),
 
                 ],
@@ -389,12 +459,13 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       ],
     );
   }
-
   Color _severityColor(String sev) {
     switch (sev.toLowerCase()) {
+      case "advisory":
       case "minor":
         return Colors.yellow.shade700;
       case "moderate":
+      case "watch" :
         return Colors.orange;
       case "severe":
         return Colors.red;
@@ -405,6 +476,13 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
     }
   }
 
+
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
 }
 
@@ -460,3 +538,69 @@ Widget _buildBackButton(BuildContext context) {
 
 
 
+class AlertDetailPage extends StatelessWidget {
+  final String event;
+  final String severity;
+  final String headline;
+  final String description;
+
+  const AlertDetailPage({
+    super.key,
+    required this.event,
+    required this.severity,
+    required this.headline,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Weather Alert"),
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            Text(
+              event,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              severity,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            if (headline.isNotEmpty)
+              Text(
+                headline,
+                style: const TextStyle(fontSize: 16),
+              ),
+
+            const SizedBox(height: 12),
+
+            if (description.isNotEmpty)
+              Text(
+                description,
+                style: const TextStyle(fontSize: 15),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
