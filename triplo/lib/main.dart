@@ -70,7 +70,7 @@ class _MyAppState extends State<MyApp> {
 
         Provider<API>(create: (_) => API()),
 
-
+        /*
         Provider<NotificationService>(
           create: (_) {
             final service = NotificationService();
@@ -86,6 +86,7 @@ class _MyAppState extends State<MyApp> {
             notificationService: context.read<NotificationService>(),
           ),
         ),
+         */
 
       ],
       child: Consumer<Language>(

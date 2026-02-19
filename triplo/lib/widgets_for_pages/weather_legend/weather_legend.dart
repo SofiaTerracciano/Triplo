@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+/*
 /**
  * Classe statica che costruisce le legende grafiche dei layer meteo.
  */
@@ -30,69 +30,87 @@ class WeatherLegend {
   // --- Singole legende per ciascun layer ---
 
   static Widget _rainLegend() => _buildGradientLegend(
-    "Precipitazioni (mm)",
+    "Precipitation (mm)",
     [
-      Color.fromRGBO(225, 200, 100, 1),
-      Color.fromRGBO(200, 150, 150, 1),
-      Color.fromRGBO(120, 120, 190, 1),
-      Color.fromRGBO(80, 80, 225, 1),
-      Color.fromRGBO(20, 20, 255, 1),
+      Color(0xFF0D47A1), // blu scuro
+      Color(0xFF1976D2), // blu
+      Color(0xFF00BCD4), // ciano
+      Color(0xFF4CAF50), // verde
+      Color(0xFFFFEB3B), // giallo
+      Color(0xFFFF9800), // arancio
+      Color(0xFFF44336), // rosso
     ],
-    ["0", "1", "10", "140 mm"],
+    ["0", "1", "5", "10", "25", "50", "100"],
   );
+
+
 
   static Widget _snowLegend() => _buildGradientLegend(
-    "Neve (mm)",
+    "Snow (mm)",
     [
-      Color.fromRGBO(0, 216, 255, 1),
-      Color.fromRGBO(0, 182, 255, 1),
-      Color.fromRGBO(149, 73, 255, 1),
+      Color(0xFFE0F7FA), // quasi bianco
+      Color(0xFF81D4FA), // azzurro
+      Color(0xFF29B6F6), // blu
+      Color(0xFF4CAF50), // verde
+      Color(0xFFFFF176), // giallo chiaro
+      Color(0xFFFF9800), // arancio
+      Color(0xFFF44336), // rosso
     ],
-    ["0", "5", "10+", "25 mm"],
+    ["0", "1", "5", "7", "10", "12", "25"],
   );
+
 
   static Widget _windLegend() => _buildGradientLegend(
-    "Vento (m/s)",
+    "Wind (m/s)",
     [
-      Color.fromRGBO(255, 255, 255, 0),
-      Color.fromRGBO(238, 206, 206, 0.4),
-      Color.fromRGBO(179, 100, 188, 0.7),
-      Color.fromRGBO(70, 0, 175, 1),
+      Color(0xFF0D47A1), // blu scuro
+      Color(0xFF1976D2), // blu
+      Color(0xFF00BCD4), // ciano
+      Color(0xFF4CAF50), // verde
+      Color(0xFFFFEB3B), // giallo
+      Color(0xFFFF9800), // arancio
     ],
-    ["0", "5", "15", "100 m/s"],
+    ["0", "5", "10", "20", "40", "80"],
   );
+
 
   static Widget _tempLegend() => _buildGradientLegend(
-    "Temperatura (°C)",
+    "Temperature (°C)",
     [
-      Color.fromRGBO(130, 22, 146, 1),
-      Color.fromRGBO(32, 140, 236, 1),
-      Color.fromRGBO(194, 255, 40, 1),
-      Color.fromRGBO(252, 128, 20, 1),
+      Color(0xFF0D47A1), // molto freddo
+      Color(0xFF1976D2), // freddo
+      Color(0xFF00BCD4), // fresco
+      Color(0xFF4CAF50), // mite
+      Color(0xFFFFEB3B), // caldo
+      Color(0xFFFF9800), // molto caldo
     ],
-    ["-40", "-10", "0", "30 °C"],
-  );
-
-  static Widget _pressureLegend() => _buildGradientLegend(
-    "Pressione (Pa)",
-    [
-      Color.fromRGBO(0, 115, 255, 1),
-      Color.fromRGBO(75, 208, 214, 1),
-      Color.fromRGBO(251, 85, 21, 1),
-      Color.fromRGBO(198, 0, 0, 1),
-    ],
-    ["94000", "98000", "101000", "108000 Pa"],
+    ["-30", "-10", "0", "10", "20", "35"],
   );
 
   static Widget _cloudsLegend() => _buildGradientLegend(
-    "Copertura nuvolosa (%)",
+    "Cloud coverage (%)",
     [
-      Color.fromRGBO(255, 255, 255, 0.1),
-      Color.fromRGBO(243, 242, 255, 1),
-      Color.fromRGBO(240, 240, 255, 1),
+      Color.fromARGB(0, 255, 255, 255),
+      Color.fromARGB(80, 255, 255, 255),
+      Color.fromARGB(160, 230, 230, 230),
+      Color.fromARGB(255, 200, 200, 200),
     ],
-    ["0", "50", "100%"],
+    ["0", "30", "60", "100%"],
   );
+
+
+  static Widget _pressureLegend() => _buildGradientLegend(
+    "Pressure (Pa)",
+    [
+      Color(0xFF2C7BB6),
+      Color(0xFFABD9E9),
+      Color(0xFFFFFFBF),
+      Color(0xFFFDAE61),
+      Color(0xFFD7191C),
+    ],
+    ["94000", "98000", "101000", "108000"],
+  );
+
 
   /**
    * Costruisce una barra colorata con etichette per la legenda.
@@ -136,3 +154,4 @@ class WeatherLegend {
     );
   }
 }
+ */

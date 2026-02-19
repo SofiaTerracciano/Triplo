@@ -3,6 +3,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/service/notification.dart';
 
+/*
 class ObserverService {
   final API api;
   final NotificationService notificationService;
@@ -39,3 +40,5 @@ class ObserverService {
     _timer?.cancel();
   }
 }
+
+ */
