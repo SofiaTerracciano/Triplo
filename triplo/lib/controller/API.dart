@@ -332,7 +332,7 @@ class API {
     }
   }
 
-
+/*
   LatLng computeCentroid(List<LatLng> points) {
     double lat = 0;
     double lon = 0;
@@ -348,6 +348,8 @@ class API {
     );
   }
 
+
+ */
 }
 
 // Class to represent API errors
