@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/pages/geowatch/google_satellite_page.dart';
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
@@ -20,10 +21,29 @@ class GeoWatchPage extends StatefulWidget {
 }
 
 class _GeoWatchPageState extends State<GeoWatchPage> {
-  final API api = API();
+  late API api;
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      api = context.read<API>();
+      _loadAll();
+
+      _timer = Timer.periodic(
+        const Duration(minutes: 5),
+            (_) => _loadAll(),
+      );
+
+      _initialized = true;
+    }
+  }
+
 
   LatLng? _userPos; // GPS dell’utente (optional)
-  bool _loading = true;
+  bool _loading = false;
   String? _error;
   Map<String, dynamic>? _weather;
   List<Map<String, dynamic>> _forecast = [];
@@ -34,58 +54,70 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
   List<Map<String, dynamic>> _alerts = [];
   late Timer _timer;
+
+
+
+
   @override
   void initState() {
     super.initState();
-    _loadAll();
-    _timer = Timer.periodic(
-      const Duration(minutes: 5),
-          (_) => _loadAll(),
-    );
+
+
 
 
 
   }
   Future<void> _loadAll() async {
+    if (_loading) return;
+
     setState(() {
       _loading = true;
       _error = null;
       _alerts = [];
     });
 
-    // 1) Determina target velocemente
-    LatLng target =
-    (_useTrailWeather && widget.trailCenter != null)
-        ? widget.trailCenter!
-        : (await api.userLocation() ?? const LatLng(46.0, 11.0));
+    try {
+      final LatLng target =
+      (_useTrailWeather && widget.trailCenter != null)
+          ? widget.trailCenter!
+          : (await api.userLocation() ?? const LatLng(46.0, 11.0));
 
-    // 2) METEO SUBITO
-    final w = await api.weather(target.latitude, target.longitude);
-    final rawForecast = await api.forecast(target.latitude, target.longitude);
+      final w = await api.weather(target.latitude, target.longitude);
+      final rawForecast =
+      await api.forecast(target.latitude, target.longitude);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _weather = w;
-      _forecast =
-      rawForecast == null ? [] : api.parseForecast(rawForecast);
-      _loading = false;
-    });
+      setState(() {
+        _weather = w;
+        _forecast =
+        rawForecast == null ? [] : api.parseForecast(rawForecast);
+        _loading = false;
+      });
 
-    // 3) TUTTO IL RESTO IN BACKGROUND
+      final real =
+      await api.weatherbitAlerts(target.latitude, target.longitude);
+      final mock = await api.mockAlerts();
 
-    api.userLocation().then((pos) {
-      if (mounted) setState(() => _userPos = pos);
-    });
+      if (!mounted) return;
 
-    api.weatherbitAlerts(target.latitude, target.longitude).then((real) {
-      if (mounted) setState(() => _alerts.addAll(real));
-    });
+      setState(() {
+        _alerts = [...real, ...mock];
+      });
 
-    api.mockAlerts().then((mock) {
-      if (mounted) setState(() => _alerts.addAll(mock));
-    });
+      api.userLocation().then((pos) {
+        if (mounted) setState(() => _userPos = pos);
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _error = "Error loading weather";
+        _loading = false;
+      });
+    }
   }
+
 
 
   @override
@@ -232,7 +264,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => GoogleSatellitePage(
-                    trailCenter: widget.trailCenter!,
+                    trailCenter: widget.trailCenter ?? _userPos ?? const LatLng(46.0, 11.0),
                     userCenter: _userPos,
                     initialCenter: center,
                   ),

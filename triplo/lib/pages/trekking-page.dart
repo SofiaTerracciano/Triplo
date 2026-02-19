@@ -49,7 +49,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
   );
 
 
-  final API api = API();
+  late API api;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    api = context.read<API>();
+  }
+
   Map<String, dynamic>? weather;
   List<Map<String, dynamic>> forecast = [];
   bool loadingWeather = true;

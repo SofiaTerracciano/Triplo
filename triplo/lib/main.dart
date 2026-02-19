@@ -23,6 +23,15 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
 
+
+
+
+
+import 'package:triplo/controller/API.dart';
+import 'package:triplo/service/notification.dart';
+import 'package:triplo/service/observer.dart';
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -58,7 +67,27 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
         ChangeNotifierProvider(create: (_) => Language()),
-        ],
+
+        Provider<API>(create: (_) => API()),
+
+
+        Provider<NotificationService>(
+          create: (_) {
+            final service = NotificationService();
+            service.init();
+            return service;
+          },
+        ),
+
+
+        Provider<ObserverService>(
+          create: (context) => ObserverService(
+            api: context.read<API>(),
+            notificationService: context.read<NotificationService>(),
+          ),
+        ),
+
+      ],
       child: Consumer<Language>(
         builder: (context, lang, child) {
           return MaterialApp(
