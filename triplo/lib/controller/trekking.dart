@@ -17,7 +17,7 @@ class TrekkingController extends ChangeNotifier {
   // Getter for all trekkings
   List<Trekking> get allTrekkings => _trekkings;
 
-  // Load trekkings from Firestore
+  /* Load trekkings from Firestore
   Future<void> loadTrekking() async {
     if (_loaded) return; // To avoid reloading
     _loaded = true;
@@ -29,6 +29,23 @@ class TrekkingController extends ChangeNotifier {
 
     // Map documents to Trekking objects and store in the list --> this function create a 
     //list of istance of trekkning (model)
+    _trekkings = snap.docs
+        .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
+        .toList();
+
+    notifyListeners();
+  }*/
+
+  // Load trekkings from Firestore --> serve per il watch che scarica a prescindere le info (da capire che fare)
+  Future<void> loadTrekking({bool force = false}) async {
+    // Se è già caricato e non stiamo forzando, esce.
+    // Ma aggiungiamo un controllo: se la lista è vuota, carica comunque!
+    if (_loaded && !force && _trekkings.isNotEmpty) return; 
+    
+    _loaded = true;
+
+    final snap = await _db.collection('trekking').get();
+
     _trekkings = snap.docs
         .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
         .toList();

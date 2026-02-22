@@ -17,10 +17,7 @@ import 'package:triplo/widgets_for_pages/weather/weather.dart';
 class TrekkingPage extends StatefulWidget {
   final String trekkingId;
 
-  TrekkingPage({
-    super.key,
-    required this.trekkingId,
-  });
+  TrekkingPage({super.key, required this.trekkingId});
 
   @override
   _TrekkingPageState createState() => _TrekkingPageState();
@@ -130,22 +127,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
     final langIndex = getLanguageSelected(langCode);
 
     final trekkingController =context.watch<TrekkingController>();
-    final trekking = trekkingController.getTrekkingById(widget.trekkingId);
-
-
-    if (trekking == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
+    final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
 
     final userController = context.watch<UserController>();
-    final user = userController.currentUser;
-
-
+    final user = userController.currentUser!;
 
     // To calculate the trekking durantion time
     String formattedTime;
@@ -189,9 +174,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddingDiaryPage(
-                    trekkingId: trekking.documentId,
-                  ),
+                  builder: (context) =>
+                      AddingDiaryPage(trekkingId: trekking.documentId),
                 ),
               );
             },
@@ -206,9 +190,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   trekking.documentId,
                 );
               } else {
-                await userController.addTrekkingToSaved(
-                  trekking.documentId,
-                );
+                await userController.addTrekkingToSaved(trekking.documentId);
               }
 
               setState(() {});
@@ -222,9 +204,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Map photo --> close up view
-            _photoSection(
-              trekkingController.getDownloadUrl(trekking.mapPhoto),
-            ),
+            _photoSection(trekkingController.getDownloadUrl(trekking.mapPhoto)),
 
             const SizedBox(height: 16),
 
@@ -263,10 +243,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
                       Icons.terrain,
                       local.level_label,
                       trekking.difficulty_level == "easy"
-                        ? local.beginner_level
-                        : trekking.difficulty_level == "intermediate"
-                            ? local.intermediate_level
-                            : local.advanced_level,
+                          ? local.beginner_level
+                          : trekking.difficulty_level == "intermediate"
+                          ? local.intermediate_level
+                          : local.advanced_level,
                       valueColor: _difficultyColor(trekking.difficulty_level),
                     ),
                     // Distance
@@ -288,18 +268,37 @@ class _TrekkingPageState extends State<TrekkingPage> {
                       trekking.upGain,
                       trekking.downGain,
                     ),
+                    
+                    if (trekking.pic_nic_area == true || trekking.family_firendly == true ) 
+                      const Divider(),
+                    
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        children: [
+                          // Picnic area
+                          if (trekking.refreshment_point.isNotEmpty)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 12),
+                              child: Icon(Icons.table_restaurant,  size: 25),
+                            ),
+                          
+                          // Family Friendly
+                          if (trekking.family_firendly)
+                            const Icon(Icons.family_restroom, size: 25),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
+              )
             ),
 
             const SizedBox(height: 24),
 
             // Ending point photo
             _photoSection(
-              trekkingController.getDownloadUrl(
-                trekking.endingPointPhoto,
-              ),
+              trekkingController.getDownloadUrl(trekking.endingPointPhoto),
             ),
 
             const SizedBox(height: 24),
@@ -312,9 +311,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             // Description section
             _sectionTitle(local.description_trekking_label),
-            Text(
-              trekking.description[langIndex],
-            ),
+            Text(trekking.description[langIndex]),
 
             const SizedBox(height: 16),
 
@@ -326,14 +323,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   : local.refreshment_point_available_trekking_label,
             ),
 
-            // Family friendly
+            /* Family friendly
             _familyRow(
               Icons.family_restroom,
               local.family_friendly_trekking_label,
               trekking.family_firendly
                   ? local.yes_botton_label
                   : local.no_botton_label,
-            ),
+            ),*/
 
             const SizedBox(height: 16),
 
@@ -381,7 +378,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => GeoWatchPage(trailCenter: center),
+                    builder: (context) => GeoWatchPage(), 
                   ),
                 );
 
@@ -396,7 +393,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
 
 
-            const SizedBox(width: 10,)
+            const SizedBox(width: 10),
           ],
         ),
       ),
@@ -470,7 +467,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
-  // Widget to display an information row with an icon, label, and value in rich text format 
+  // Widget to display an information row with an icon, label, and value in rich text format
   Widget _infoRichRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -519,7 +516,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     );
   }
 
-  // Widget to display a family friendly row with an icon, label, and value
+  /* Widget to display a family friendly row with an icon, label, and value
   Widget _familyRow(
     IconData icon,
     String label,
@@ -543,7 +540,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
         ],
       ),
     );
-  }
+  }*/
 
   // Widget to display a section title
   Widget _sectionTitle(String text) {

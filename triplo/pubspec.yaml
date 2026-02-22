@@ -50,7 +50,9 @@ dependencies:
   image_picker: ^1.1.1
   provider: ^6.0.5
   #flutter_map_tile_caching: ^10.1.1
-
+  flutter_native_splash: ^2.4.1
+  # For generating app icons
+  flutter_launcher_icons: ^0.13.1 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -127,3 +129,23 @@ l10n:
 
 dependency_overrides:
   flutter_map: ^6.1.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/Triplo_def.png" # Path to your app icon image for IOS
+
+  # Config for Android adaptive icons
+  adaptive_icon_background: "#006788" 
+  adaptive_icon_foreground: "images/Triplo.png"
+
+flutter_native_splash:
+  color: "#006788"     
+  image: images/Triplo.png 
+  
+  android_12:
+    color: "#006788"
+    icon_background_color: "#006788"
+    image: images/Triplo.png
+    
+  fullscreen: true

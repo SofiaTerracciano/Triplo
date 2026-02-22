@@ -74,7 +74,7 @@ class AdminUploadPage extends StatelessWidget {
 
   Future<void> uploadPoints() async {
     final db = FirebaseFirestore.instance;
-    final docRef = db.collection('trekking').doc('QXbf9XjSlOvRdUQ4ZhxV');
+    final docRef = db.collection('trekking').doc('HXJLiwWo2IdNf6l6tSqw');
 
     try {
       final pointsGeo = await loadPointsFromJson();
