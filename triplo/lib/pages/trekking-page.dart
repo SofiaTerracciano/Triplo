@@ -435,18 +435,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 ),
               ),
             ),
-
-            // Weather
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GeoWatchPage(), 
+        GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GeoWatchPage(
+                    trailCenter: center,
                   ),
-                );
+                ),
+              );
+            },
 
-              },
+
               child: Weather(
                 weather: weather,
                 loading: loadingWeather,
