@@ -130,8 +130,37 @@ class _TrekkingPageState extends State<TrekkingPage> {
     final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
 
     final userController = context.watch<UserController>();
-    final user = userController.currentUser!;
 
+    final user = userController.currentUser;
+    if (user == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.person_off, size: 70, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text(
+                "You are not logged in",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                "Please login to access your profile",
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: const Text("Go to Login"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     // To calculate the trekking durantion time
     String formattedTime;
     if (trekking.estimated_time < 60) {
