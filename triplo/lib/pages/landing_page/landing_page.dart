@@ -10,7 +10,6 @@ import 'package:triplo/pages/login_page/LoginPage.dart';
 
 // Import da sottocartella geowatch
 import 'package:triplo/pages/geowatch/geowatch.dart';
-import 'package:triplo/pages/Watch/watch-home-page.dart';
 
 // Import della pagina admin che carica i punti
 import 'package:triplo/update_points.dart';
@@ -30,27 +29,9 @@ class Landing_Page extends StatefulWidget {
 
 class _Landing_PageState extends State<Landing_Page> {
 
-  // Detect wich dispotive is used
-  bool isWatch(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return size.shortestSide < 300;
-  }
-
   @override
   void initState() {
     super.initState();
-
-    // Se è uno smartwatch, vai alla WatchHomePage
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isWatch(context)) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => WatchHomePage(), 
-          ),
-        );
-      }
-    });
   }
 
   // Se non è uno smartwatch, mostra la landing page normale

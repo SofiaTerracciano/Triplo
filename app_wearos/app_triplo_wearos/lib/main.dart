@@ -1,20 +1,105 @@
-import 'package:app_triplo_wearos/pages/login.dart';
+import 'package:app_triplo_wearos/controller/API.dart';
+import 'package:app_triplo_wearos/controller/language.dart';
+import 'package:app_triplo_wearos/controller/trekking.dart';
+import 'package:app_triplo_wearos/l10n/app_localizations.dart';
+import 'package:app_triplo_wearos/pages/home-page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint(".env file not found — continuing without it.");
+  }
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const TriploWatchApp());
 }
 
-class TriploWatchApp extends StatelessWidget {
+class TriploWatchApp extends StatefulWidget {
   const TriploWatchApp({super.key});
 
   @override
+  State<TriploWatchApp> createState() => _TriploWatchAppState();
+}
+
+class _TriploWatchAppState extends State<TriploWatchApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: const WatchLoginPage(),
+    return MultiProvider(
+      // Provide controllers to the app --> state management
+      providers: [
+        //ChangeNotifierProvider(create: (_) => UserController()),
+        //ChangeNotifierProvider(create: (_) => DiaryController()),
+        ChangeNotifierProvider(
+          create: (_) => TrekkingController(trekkings: []),
+        ),
+        ChangeNotifierProvider(create: (_) => Language()),
+
+        Provider<API>(create: (_) => API()),
+
+        /*
+        Provider<NotificationService>(
+          create: (_) {
+            final service = NotificationService();
+            service.init();
+            return service;
+          },
+        ),
+
+
+        Provider<ObserverService>(
+          create: (context) => ObserverService(
+            api: context.read<API>(),
+            notificationService: context.read<NotificationService>(),
+          ),
+        ),
+         */
+      ],
+      child: Consumer<Language>(
+        builder: (context, lang, child) {
+          return MaterialApp(
+            title: 'Triplo',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.lightBlueAccent,
+              ),
+              useMaterial3: true,
+            ),
+            // This is for localization --> set the app language based on Language controller
+            locale: lang.locale, //
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            // Supported locales --> English, Italian, Spanish, German, French
+            supportedLocales: const [
+              Locale('en'),
+              Locale('it'),
+              Locale('es'),
+              Locale('de'),
+              Locale('fr'),
+            ],
+            home: HomePage(),
+          );
+        },
+      ),
     );
   }
 }

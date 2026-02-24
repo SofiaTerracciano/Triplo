@@ -1,25 +1,31 @@
 import 'dart:ui';
+import 'package:app_triplo_wearos/controller/language.dart';
+import 'package:app_triplo_wearos/controller/trekking.dart';
+import 'package:app_triplo_wearos/l10n/app_localizations.dart';
+import 'package:app_triplo_wearos/pages/home-page.dart';
 import 'package:flutter/material.dart';
-import 'package:triplo/controller/trekking.dart';
 import 'package:provider/provider.dart';
-import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/home-page.dart';
 
-class WatchTrekkingPage extends StatelessWidget {
+class TrekkingPage extends StatelessWidget {
   final String trekkingId;
 
-  const WatchTrekkingPage({super.key, required this.trekkingId});
+  const TrekkingPage({super.key, required this.trekkingId});
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    final languageController = context.watch<Language>();
+    final langCode = languageController.locale.languageCode;
+    final langIndex = getLanguageSelected(langCode);
+
     final trekkingController = context.watch<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(trekkingId);
-    final local = AppLocalizations.of(context)!;
 
     if (trekking == null) {
       return const Scaffold(
         backgroundColor: Colors.black,
         body: Center(
+        
           child: Text("Error", style: TextStyle(color: Colors.white)),
         ),
       );
@@ -55,7 +61,7 @@ class WatchTrekkingPage extends StatelessWidget {
               // List of sections
               _buildHeroSection(trekking, mainColor),
               _buildTechnicalSection(trekking, formattedTime, mainColor),
-              _buildInfoSection(trekking, mainColor),
+              _buildInfoSection(trekking, mainColor, langIndex),
               _buildActionsSection(context, trekking, mainColor),
             ],
           ),
@@ -250,10 +256,14 @@ class WatchTrekkingPage extends StatelessWidget {
   }*/
 
   // Info
-  Widget _buildInfoSection(var trekking, Color color) {
-    String infoText = trekking.info.length > 4
-        ? trekking.info[4]
-        : trekking.info[1]; //--> da mettere dinamico il cambio lingua
+  Widget _buildInfoSection(var trekking, Color color, int langIndex) {
+    String infoText = "";
+    if (trekking.info != null && trekking.info.length > langIndex) {
+      infoText = trekking.info[langIndex];
+    } else {
+      // Fallback sulla lingua inglese (indice 1) se la traduzione manca
+      infoText = trekking.info.length > 1 ? trekking.info[1] : trekking.info[0];
+    }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
       child: Column(
@@ -451,5 +461,23 @@ class WatchTrekkingPage extends StatelessWidget {
           Icon(Icons.family_restroom, color: color, size: 16),
       ],
     );
+  }
+
+  // Get language index based on language code --> it is used to select the correct language from info and description lists
+  int getLanguageSelected(String code) {
+    switch (code) {
+      case 'de':
+        return 0;
+      case 'en':
+        return 1;
+      case 'es':
+        return 2;
+      case 'fr':
+        return 3;
+      case 'it':
+        return 4;
+      default:
+        return 1;
+    }
   }
 }
