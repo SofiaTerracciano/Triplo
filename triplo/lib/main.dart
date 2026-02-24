@@ -63,7 +63,13 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       // Provide controllers to the app --> state management
       providers: [
-        ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final controller = UserController();
+            controller.tryAutoLogin();
+            return controller;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
         ChangeNotifierProvider(create: (_) => Language()),

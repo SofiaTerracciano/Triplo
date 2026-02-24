@@ -402,4 +402,11 @@ class UserController extends ChangeNotifier {
     });
   }
 
+  Future<void> tryAutoLogin() async {
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      await loadUserCore(user.uid);
+    }
+  }
 }

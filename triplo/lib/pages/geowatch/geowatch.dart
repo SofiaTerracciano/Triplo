@@ -8,7 +8,7 @@ import 'package:triplo/pages/geowatch/google_satellite_page.dart';
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
 import 'package:triplo/controller/API.dart';
 
-// Nota: qui facciamo "WeatherPage" inline: dettagli + forecast subito.
+
 class GeoWatchPage extends StatefulWidget {
 
   final LatLng? trailCenter;

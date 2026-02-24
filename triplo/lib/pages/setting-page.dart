@@ -249,7 +249,7 @@ class _SettingPageState extends State<SettingPage> {
           ListTile(
             title: Text(local.email_label, style: titleStyle),
             subtitle: Text(user.email, style: infoStyle),
-            trailing: const Icon(Icons.edit, size: 17),
+            //trailing: const Icon(Icons.edit, size: 17),
             dense: true,
             onTap: () {
               // TODO: modifica email
