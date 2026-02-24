@@ -48,6 +48,12 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
   late API api;
 
+
+
+
+
+  bool? _isSavedLocal;
+  bool _loadingSavedState = true;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -65,6 +71,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     // Carichiamo il meteo del percorso (non GPS utente)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadTrailWeather();
+      _initSavedState();
     });
   }
 
@@ -118,6 +125,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
       });
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -186,10 +196,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
       }
     }
 
+
     // Check if the trekking is saved by the user or not
-    final bool isSaved = user?.savedTrekkings.any(
-          (t) => t.documentId == trekking.documentId,
-    ) ?? false;
+    final bool isSaved = _isSavedLocal ?? false;
 
 
     return Scaffold(
@@ -212,17 +221,43 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
           // Bookmark button to save/unsave the trekking
           IconButton(
-            icon: isSaved ? icons[1] : icons[0],
-            onPressed: () async {
-              if (isSaved) {
-                await userController.removeTrekkingFromSaved(
-                  trekking.documentId,
-                );
-              } else {
-                await userController.addTrekkingToSaved(trekking.documentId);
-              }
+            icon: _loadingSavedState
+                ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+                : (isSaved ? icons[1] : icons[0]),
+            onPressed: _loadingSavedState
+                ? null
+                : () async {
+              final previous = isSaved;
 
-              setState(() {});
+              // UI immediata
+              setState(() {
+                _isSavedLocal = !previous;
+              });
+
+              try {
+                if (previous) {
+                  await userController.removeTrekkingFromSaved(trekking.documentId);
+                } else {
+                  await userController.addTrekkingToSaved(trekking.documentId);
+                }
+              } catch (e) {
+                if (!mounted) return;
+
+                // rollback
+                setState(() {
+                  _isSavedLocal = previous;
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Errore: impossibile aggiornare il bookmark"),
+                  ),
+                );
+              }
             },
           ),
         ],
@@ -624,5 +659,23 @@ class _TrekkingPageState extends State<TrekkingPage> {
         ],
       ),
     );
+  }
+  Future<void> _initSavedState() async {
+    try {
+      final userController = context.read<UserController>();
+      final saved = await userController.isTrekkingSaved(widget.trekkingId);
+
+      if (!mounted) return;
+      setState(() {
+        _isSavedLocal = saved;
+        _loadingSavedState = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSavedLocal = false;
+        _loadingSavedState = false;
+      });
+    }
   }
 }

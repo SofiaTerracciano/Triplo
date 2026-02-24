@@ -341,7 +341,6 @@ class UserController extends ChangeNotifier {
   /* --------------------------------------------------
    * USER LEVEL
    * -------------------------------------------------- */
-
   Future<void> updateUserLevel(String difficulty) async {
     int intermediate = _currentUser?.intermediate ?? 0;
     int advanced = _currentUser?.advanced ?? 0;
@@ -369,8 +368,10 @@ class UserController extends ChangeNotifier {
   }
   // CHECK IF I FOLLOW USER
   Future<bool> isFollowing(String targetUid) async {
-    final myUid = _auth.currentUser!.uid;
+    final user = _auth.currentUser;
+    if (user == null) return false;
 
+    final myUid = user.uid;
     final snap = await _db.collection("users").doc(myUid).get();
     final following = List<String>.from(snap.data()?["Following"] ?? []);
 
@@ -378,8 +379,12 @@ class UserController extends ChangeNotifier {
   }
 
   // FOLLOW SYSTEM
-  Future<void> followUser(String targetUid) async {
-    final myUid = _auth.currentUser!.uid;
+  Future<bool> followUser(String targetUid) async {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+    final myUid = user.uid;
+
+    if (myUid == targetUid) return false;
 
     await _db.collection("users").doc(myUid).update({
       "Following": FieldValue.arrayUnion([targetUid])
@@ -388,10 +393,16 @@ class UserController extends ChangeNotifier {
     await _db.collection("users").doc(targetUid).update({
       "Followers": FieldValue.arrayUnion([myUid])
     });
+    return true;
   }
 
   Future<void> unfollowUser(String targetUid) async {
-    final myUid = _auth.currentUser!.uid;
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final myUid = user.uid;
+
+    if (myUid == targetUid) return;
 
     await _db.collection("users").doc(myUid).update({
       "Following": FieldValue.arrayRemove([targetUid])
@@ -402,11 +413,27 @@ class UserController extends ChangeNotifier {
     });
   }
 
+
+
   Future<void> tryAutoLogin() async {
     final user = _auth.currentUser;
 
     if (user != null) {
       await loadUserCore(user.uid);
     }
+  }
+
+
+
+
+
+
+  Future<bool> isTrekkingSaved(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return false;
+
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
+    return ids.contains(trekkingId);
   }
 }
