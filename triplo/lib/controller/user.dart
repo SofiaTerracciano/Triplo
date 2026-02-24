@@ -233,6 +233,7 @@ class UserController extends ChangeNotifier {
     await _db.collection("users").doc(uid).update({
       "Saved_trekkings": FieldValue.arrayUnion([trekkingId])
     });
+    notifyListeners();
   }
 
   Future<void> removeTrekkingFromSaved(String trekkingId) async {
@@ -240,7 +241,9 @@ class UserController extends ChangeNotifier {
     await _db.collection("users").doc(uid).update({
       "Saved_trekkings": FieldValue.arrayRemove([trekkingId])
     });
+    notifyListeners();
   }
+
 
   /* --------------------------------------------------
    * PROFILE UPDATE
