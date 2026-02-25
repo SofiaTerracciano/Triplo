@@ -100,5 +100,35 @@
 
   "challeng_title": "Défis",
 
-  "no_users_found_label": "Aucun utilisateur trouvé"
+  "no_users_found_label": "Aucun utilisateur trouvé",
+  "weather_near_trail_label": "Météo près du sentier",
+  "weather_error_label": "Erreur",
+  "no_weather_available_label": "Aucune donnée météo disponible",
+  "trail_area_label": "Zone du parcours",
+  "current_position_label": "Position actuelle",
+
+
+
+
+
+
+
+  "your_position_label": "Votre position",
+  "based_on_nearest_station_label": "Basé sur la station météo la plus proche",
+  "forecast_label": "Prévisions",
+  "no_forecast_available_label": "Aucune prévision disponible",
+  "open_satellite_weather_layers_label": "Ouvrir la vue satellite et les couches météo",
+  "no_active_weather_alerts_label": "Aucune alerte météo active pour cette zone",
+  "weather_alerts_label": "Alertes météo",
+  "trail_weather_label": "Météo du parcours",
+  "my_gps_label": "Mon GPS",
+  "error_loading_weather_label": "Erreur lors du chargement de la météo",
+  "weather_alert_title": "Alerte météo"
+
+
+
+
+
+
+
 }

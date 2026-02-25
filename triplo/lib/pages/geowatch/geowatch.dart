@@ -8,6 +8,8 @@ import 'package:triplo/pages/geowatch/google_satellite_page.dart';
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
 import 'package:triplo/controller/API.dart';
 
+import '../../l10n/app_localizations.dart';
+
 
 class GeoWatchPage extends StatefulWidget {
 
@@ -22,7 +24,10 @@ class GeoWatchPage extends StatefulWidget {
 
 class _GeoWatchPageState extends State<GeoWatchPage> {
   late API api;
+  AppLocalizations get local => AppLocalizations.of(context)!;
   bool _initialized = false;
+
+
 
   @override
   void didChangeDependencies() {
@@ -82,9 +87,19 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
           ? widget.trailCenter!
           : (await api.userLocation() ?? const LatLng(46.0, 11.0));
 
-      final w = await api.weather(target.latitude, target.longitude);
-      final rawForecast =
-      await api.forecast(target.latitude, target.longitude);
+      final langCode = Localizations.localeOf(context).languageCode;
+
+      final w = await api.weather(
+        target.latitude,
+        target.longitude,
+        langCode,
+      );
+
+      final rawForecast = await api.forecast(
+        target.latitude,
+        target.longitude,
+        langCode,
+      );
 
       if (!mounted) return;
 
@@ -112,7 +127,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       if (!mounted) return;
 
       setState(() {
-        _error = "Error loading weather";
+        _error = local.error_loading_weather_label;;
         _loading = false;
       });
     }
@@ -122,9 +137,10 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     final place = _useTrailWeather
-        ? "Trail area"
-        : "Your position";
+        ? local.trail_area_label
+        : local.your_position_label;
     final temp = _weather?['main']?['temp']?.round()?.toString() ?? "-";
     final List weatherList =
     (_weather?['weather'] is List && _weather!['weather'].isNotEmpty)
@@ -180,8 +196,10 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
-                            const Text(
-                              "Based on nearest weather station",
+
+
+                             Text(
+                              local.based_on_nearest_station_label,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.black54,
@@ -205,14 +223,19 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    "Forecast",
+
+
+
+
+
+                  Text(
+                    local.forecast_label,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
                   if (_forecast.isEmpty)
                     Text(
-                      _loading ? "" : "No forecast available",
+                  _loading ? "" : local.no_forecast_available_label,
                       style: const TextStyle(color: Colors.black54),
                     )
                   else
@@ -272,7 +295,14 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               );
             },
             icon: const Icon(Icons.map_outlined),
-            label: const Text("Open satellite view & weather layers"),
+
+
+
+
+
+
+
+            label: Text(local.open_satellite_weather_layers_label),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black12,
               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -291,15 +321,15 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: _alerts.isEmpty
-                  ? const Text(
-                "No active weather alerts for this area",
+                  ?  Text(
+                local.no_active_weather_alerts_label,
                 style: TextStyle(color: Colors.black54),
               )
                   : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Weather Alerts",
+                  Text(
+                    local.weather_alerts_label,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
@@ -447,7 +477,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               ),
               child: Center(
                 child: Text(
-                  "Trail weather",
+                  local.trail_weather_label,
                   style: TextStyle(
                     color: _useTrailWeather ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
@@ -478,7 +508,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               ),
               child: Center(
                 child: Text(
-                  "My GPS",
+                  local.my_gps_label,
                   style: TextStyle(
                     color: !_useTrailWeather ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
@@ -586,9 +616,10 @@ class AlertDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Weather Alert"),
+        title:  Text(local.weather_alert_title),
       ),
 
       body: Padding(

@@ -100,5 +100,24 @@
 
     "challeng_title": "Challenges",
 
-    "no_users_found_label": "No users found"
+    "no_users_found_label": "No users found",
+    "weather_near_trail_label": "Weather near trail",
+    "weather_error_label": "Error",
+    "no_weather_available_label": "No weather data available",
+    "trail_area_label": "Trail area",
+    "current_position_label": "Current location",
+
+
+
+    "your_position_label": "Your position",
+    "based_on_nearest_station_label": "Based on nearest weather station",
+    "forecast_label": "Forecast",
+    "no_forecast_available_label": "No forecast available",
+    "open_satellite_weather_layers_label": "Open satellite view & weather layers",
+    "no_active_weather_alerts_label": "No active weather alerts for this area",
+    "weather_alerts_label": "Weather Alerts",
+    "trail_weather_label": "Trail weather",
+    "my_gps_label": "My GPS",
+    "error_loading_weather_label": "Error loading weather",
+    "weather_alert_title": "Weather Alert"
 }

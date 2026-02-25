@@ -100,5 +100,31 @@
 
   "challeng_title": "Herausforderungen",
 
-  "no_users_found_label": "Keine Benutzer gefunden"
+  "no_users_found_label": "Keine Benutzer gefunden",
+  "weather_near_trail_label": "Wetter in der Nähe der Route",
+  "weather_error_label": "Fehler",
+  "no_weather_available_label": "Keine Wetterdaten verfügbar",
+  "trail_area_label": "Routenbereich",
+  "current_position_label": "Aktuelle Position",
+
+
+
+
+
+  "your_position_label": "Deine Position",
+  "based_on_nearest_station_label": "Basierend auf der nächstgelegenen Wetterstation",
+  "forecast_label": "Vorhersage",
+  "no_forecast_available_label": "Keine Vorhersage verfügbar",
+  "open_satellite_weather_layers_label": "Satellitenansicht & Wetterebenen öffnen",
+  "no_active_weather_alerts_label": "Keine aktiven Wetterwarnungen für dieses Gebiet",
+  "weather_alerts_label": "Wetterwarnungen",
+  "trail_weather_label": "Wetter entlang der Strecke",
+  "my_gps_label": "Mein GPS",
+  "error_loading_weather_label": "Fehler beim Laden des Wetters",
+  "weather_alert_title": "Wetterwarnung"
+
 }
+
+
+
+

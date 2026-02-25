@@ -100,5 +100,36 @@
 
   "challeng_title": "Desafíos",
 
-  "no_users_found_label": "No se encontraron usuarios"
+  "no_users_found_label": "No se encontraron usuarios",
+  "weather_near_trail_label": "Clima cerca del sendero",
+  "weather_error_label": "Error",
+  "no_weather_available_label": "No hay datos meteorológicos disponibles",
+  "trail_area_label": "Área del recorrido",
+  "current_position_label": "Ubicación actual",
+
+
+
+
+
+  "trail_area_label": "Área del recorrido",
+  "your_position_label": "Tu ubicación",
+  "based_on_nearest_station_label": "Basado en la estación meteorológica más cercana",
+  "forecast_label": "Pronóstico",
+  "no_forecast_available_label": "No hay pronóstico disponible",
+  "open_satellite_weather_layers_label": "Abrir vista satélite y capas meteorológicas",
+  "no_active_weather_alerts_label": "No hay alertas meteorológicas activas en esta zona",
+  "weather_alerts_label": "Alertas meteorológicas",
+  "trail_weather_label": "Meteo del recorrido",
+  "my_gps_label": "Mi GPS",
+  "error_loading_weather_label": "Error al cargar el clima",
+  "weather_alert_title": "Alerta meteorológica"
+
+
+
+
+
+
+
+
+
 }

@@ -76,12 +76,12 @@ class API {
   }
 
   // Fetch current weather data for given coordinates
-  Future<Map<String, dynamic>?> weather(double lat, double lon) async {
+  Future<Map<String, dynamic>?> weather(double lat, double lon, String lang) async {
     if (openWeatherKey.isEmpty) return null;
 
     final url =
         "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon"
-        "&appid=$openWeatherKey&units=metric&lang=en";
+        "&appid=$openWeatherKey&units=metric&lang=$lang";
 
 
     try {
@@ -102,12 +102,12 @@ class API {
 
   // Fetch 5-day weather forecast for given coordinates
   Future<List<Map<String, dynamic>>?> forecast(
-      double lat, double lon) async {
+      double lat, double lon, String lang) async {
     if (openWeatherKey.isEmpty) return null;
 
     final url =
         "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon"
-        "&appid=$openWeatherKey&units=metric&lang=en";
+        "&appid=$openWeatherKey&units=metric&lang=$lang";
 
     try {
       final res = await http

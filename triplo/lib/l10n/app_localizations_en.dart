@@ -280,4 +280,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_users_found_label => 'No users found';
+
+  @override
+  String get weather_near_trail_label => 'Weather near trail';
+
+  @override
+  String get weather_error_label => 'Error';
+
+  @override
+  String get no_weather_available_label => 'No weather data available';
+
+  @override
+  String get trail_area_label => 'Trail area';
+
+  @override
+  String get current_position_label => 'Current location';
+
+  @override
+  String get your_position_label => 'Your position';
+
+  @override
+  String get based_on_nearest_station_label => 'Based on nearest weather station';
+
+  @override
+  String get forecast_label => 'Forecast';
+
+  @override
+  String get no_forecast_available_label => 'No forecast available';
+
+  @override
+  String get open_satellite_weather_layers_label => 'Open satellite view & weather layers';
+
+  @override
+  String get no_active_weather_alerts_label => 'No active weather alerts for this area';
+
+  @override
+  String get weather_alerts_label => 'Weather Alerts';
+
+  @override
+  String get trail_weather_label => 'Trail weather';
+
+  @override
+  String get my_gps_label => 'My GPS';
+
+  @override
+  String get error_loading_weather_label => 'Error loading weather';
+
+  @override
+  String get weather_alert_title => 'Weather Alert';
 }

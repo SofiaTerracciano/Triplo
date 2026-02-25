@@ -646,6 +646,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No users found'**
   String get no_users_found_label;
+
+  /// No description provided for @weather_near_trail_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather near trail'**
+  String get weather_near_trail_label;
+
+  /// No description provided for @weather_error_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get weather_error_label;
+
+  /// No description provided for @no_weather_available_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No weather data available'**
+  String get no_weather_available_label;
+
+  /// No description provided for @trail_area_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail area'**
+  String get trail_area_label;
+
+  /// No description provided for @current_position_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location'**
+  String get current_position_label;
+
+  /// No description provided for @your_position_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Your position'**
+  String get your_position_label;
+
+  /// No description provided for @based_on_nearest_station_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on nearest weather station'**
+  String get based_on_nearest_station_label;
+
+  /// No description provided for @forecast_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get forecast_label;
+
+  /// No description provided for @no_forecast_available_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast available'**
+  String get no_forecast_available_label;
+
+  /// No description provided for @open_satellite_weather_layers_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Open satellite view & weather layers'**
+  String get open_satellite_weather_layers_label;
+
+  /// No description provided for @no_active_weather_alerts_label.
+  ///
+  /// In en, this message translates to:
+  /// **'No active weather alerts for this area'**
+  String get no_active_weather_alerts_label;
+
+  /// No description provided for @weather_alerts_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Alerts'**
+  String get weather_alerts_label;
+
+  /// No description provided for @trail_weather_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail weather'**
+  String get trail_weather_label;
+
+  /// No description provided for @my_gps_label.
+  ///
+  /// In en, this message translates to:
+  /// **'My GPS'**
+  String get my_gps_label;
+
+  /// No description provided for @error_loading_weather_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading weather'**
+  String get error_loading_weather_label;
+
+  /// No description provided for @weather_alert_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Alert'**
+  String get weather_alert_title;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

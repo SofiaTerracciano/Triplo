@@ -280,4 +280,52 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get no_users_found_label => 'Nessun utente trovato';
+
+  @override
+  String get weather_near_trail_label => 'Meteo vicino al percorso';
+
+  @override
+  String get weather_error_label => 'Errore';
+
+  @override
+  String get no_weather_available_label => 'Nessun dato meteo disponibile';
+
+  @override
+  String get trail_area_label => 'Area del percorso';
+
+  @override
+  String get current_position_label => 'Posizione corrente';
+
+  @override
+  String get your_position_label => 'La tua posizione';
+
+  @override
+  String get based_on_nearest_station_label => 'Basato sulla stazione meteo più vicina';
+
+  @override
+  String get forecast_label => 'Previsioni';
+
+  @override
+  String get no_forecast_available_label => 'Nessuna previsione disponibile';
+
+  @override
+  String get open_satellite_weather_layers_label => 'Apri vista satellitare e livelli meteo';
+
+  @override
+  String get no_active_weather_alerts_label => 'Nessuna allerta meteo attiva per questa zona';
+
+  @override
+  String get weather_alerts_label => 'Allerte meteo';
+
+  @override
+  String get trail_weather_label => 'Meteo del percorso';
+
+  @override
+  String get my_gps_label => 'Il mio GPS';
+
+  @override
+  String get error_loading_weather_label => 'Errore nel caricamento del meteo';
+
+  @override
+  String get weather_alert_title => 'Allerta meteo';
 }

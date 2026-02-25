@@ -108,8 +108,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
       final LatLng trail = trekking.starting_point ?? const LatLng(0,0);
 
 
-      final w = await api.weather(trail.latitude, trail.longitude);
-      final f = await api.forecast(trail.latitude, trail.longitude);
+      final langCode = Localizations.localeOf(context).languageCode;
+
+      final w = await api.weather(
+        trail.latitude,
+        trail.longitude,
+        langCode,
+      );
+
+      final f = await api.forecast(
+        trail.latitude,
+        trail.longitude,
+        langCode,
+      );
 
       if (!mounted) return;
       setState(() {
@@ -428,7 +439,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Text(
-                "Weather near trail",
+                local.weather_near_trail_label,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
