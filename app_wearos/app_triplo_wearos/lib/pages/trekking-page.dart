@@ -34,21 +34,6 @@ class TrekkingPage extends StatelessWidget {
     // Color based on difficulty
     final Color mainColor = difficultyToColor(trekking.difficulty_level);
 
-    // Format estimated time
-    String formattedTime;
-    if (trekking.estimated_time < 60) {
-      formattedTime =
-          "${(trekking.estimated_time).toInt()} ${local.minutes_trekking_label}";
-    } else {
-      if (trekking.estimated_time % 60 == 0) {
-        formattedTime =
-            "${trekking.estimated_time ~/ 60} ${trekking.estimated_time / 60 == 1 ? local.hour_trekking_label : local.hours_trekking_label}";
-      } else {
-        formattedTime =
-            "${trekking.estimated_time ~/ 60} ${trekking.estimated_time / 60 == 1 ? local.hour_trekking_label : local.hours_trekking_label} ${(trekking.estimated_time % 60).toInt()} ${local.minutes_trekking_label}";
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -60,8 +45,8 @@ class TrekkingPage extends StatelessWidget {
             children: [
               // List of sections
               _buildHeroSection(trekking, mainColor),
-              _buildTechnicalSection(trekking, formattedTime, mainColor),
-              _buildInfoSection(trekking, mainColor, langIndex),
+              _buildTechnicalSection(trekking, trekking.estimated_time.toInt(), mainColor),
+              _buildInfoSection(context,trekking, mainColor, langIndex),
               _buildActionsSection(context, trekking, mainColor),
             ],
           ),
@@ -107,7 +92,7 @@ class TrekkingPage extends StatelessWidget {
   }
 
   // Icons
-  Widget _buildTechnicalSection(var trekking, String formattedTime, Color color) {
+  Widget _buildTechnicalSection(var trekking, int estimatedTime, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Center(
@@ -170,9 +155,10 @@ class TrekkingPage extends StatelessWidget {
 
                     // Estimated time
                     _buildCompactStat(
-                        Icons.schedule,
-                        _formatShortTime(formattedTime),
-                        color),
+                      Icons.schedule,
+                      formatShortTimeFromMinutes(trekking.estimated_time.toInt()),
+                      color,
+                    ),
                   ],
                 ),
               ),
@@ -256,20 +242,23 @@ class TrekkingPage extends StatelessWidget {
   }*/
 
   // Info
-  Widget _buildInfoSection(var trekking, Color color, int langIndex) {
+  Widget _buildInfoSection(BuildContext context, var trekking, Color color, int langIndex) {
     String infoText = "";
     if (trekking.info != null && trekking.info.length > langIndex) {
       infoText = trekking.info[langIndex];
     } else {
-      // Fallback sulla lingua inglese (indice 1) se la traduzione manca
+      // Fallback to english if selected language is not available, otherwise to the first element of the list
       infoText = trekking.info.length > 1 ? trekking.info[1] : trekking.info[0];
     }
+    final local = AppLocalizations.of(context)!;
+
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
       child: Column(
         children: [
           Text(
-            "Dettagli", // da mettere nel dizionario
+            local.details_trekking_label, // da mettere nel dizionario
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,
@@ -293,17 +282,28 @@ class TrekkingPage extends StatelessWidget {
 
   // Back and Meteo
   Widget _buildActionsSection(BuildContext context, var trekking, Color color) {
+    final local = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Meteo Button da mandare nella pagina giusta
-          _actionButton(Icons.wb_sunny, "METEO", Colors.blueGrey[800]!, () {}), // da mettere nel dizionario
+          // Weather Button
+          _actionButton(
+            Icons.wb_sunny, 
+            local.weather_trekking_label, 
+            Colors.blueGrey[800]!, 
+            () => Navigator.push(context, 
+              MaterialPageRoute(
+                builder: (_) => HomePage() // da mettere pagina weather
+              )
+            )
+          ), 
           const SizedBox(height: 10),
           // Back Button
           _actionButton(
             Icons.arrow_back,
-            "Indietro", // da mettere nel dizionario
+            local.home_page_title, 
             color,
             () => Navigator.pop(context),
           ),
@@ -437,14 +437,17 @@ class TrekkingPage extends StatelessWidget {
   }
 
   // Hours/hour -> h, Minutes/minute --> m
-  String _formatShortTime(String time) {
-    return time
-        .toLowerCase()
-        .replaceAll("hours", "h")
-        .replaceAll("hour", "h")
-        .replaceAll("minutes", "m")
-        .replaceAll("minute", "m")
-        .replaceAll(" ", "");
+  String formatShortTimeFromMinutes(int totalMinutes) {
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+      return "${hours}h${minutes}m";
+    } else if (hours > 0) {
+      return "${hours}h";
+    } else {
+      return "${minutes}m";
+    }
   }
 
   // Helper for service icons (PicNic, Refreshment, Family) with compact layout for watch

@@ -183,6 +183,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get weather_trekking_botton => 'Cliquez ici pour découvrir la météo';
 
   @override
+  String get details_trekking_label => 'Détails';
+
+  @override
   String get date_trekking_label => 'Date';
 
   @override

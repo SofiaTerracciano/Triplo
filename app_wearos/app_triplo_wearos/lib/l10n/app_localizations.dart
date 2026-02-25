@@ -449,6 +449,12 @@ abstract class AppLocalizations {
   /// **'Click here to check the weather'**
   String get weather_trekking_botton;
 
+  /// No description provided for @details_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details_trekking_label;
+
   /// No description provided for @date_trekking_label.
   ///
   /// In en, this message translates to:
