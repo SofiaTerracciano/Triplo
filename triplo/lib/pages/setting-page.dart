@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
+import 'package:triplo/pages/watch_pair_page.dart';
 import 'home-page.dart';
 import 'user-page.dart';
 import 'search-page.dart';
@@ -378,6 +379,23 @@ class _SettingPageState extends State<SettingPage> {
               onPressed: userController.restoreGoogleProfilePhoto,
             ),
           ],
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: () async {
+              final ok = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(builder: (_) => const WatchPairScannerPage()),
+              );
+
+              if (ok == true && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Orologio collegato!")),
+                );
+              }
+            },
+            icon: const Icon(Icons.qr_code_scanner),
+            label: const Text("Pair watch"),
+          ),
         ],
       ),
 
