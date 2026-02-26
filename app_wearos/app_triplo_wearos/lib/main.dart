@@ -3,7 +3,9 @@ import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/home-page.dart';
+import 'package:app_triplo_wearos/pages/landing_page.dart';
 import 'package:app_triplo_wearos/pages/login.dart';
+import 'package:app_triplo_wearos/pages/user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +99,7 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
               Locale('de'),
               Locale('fr'),
             ],
-            home: LoginPage(),
+            home: DebugLandingPage(),
           );
         },
       ),

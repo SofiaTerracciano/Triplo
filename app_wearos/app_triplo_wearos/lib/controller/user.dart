@@ -41,6 +41,7 @@ class UserController extends ChangeNotifier {
 
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _pairSub;
   Timer? _expiryTimer;
+  DateTime? _pairCreatedAtLocal;
 
   static const Duration _qrTtl = Duration(minutes: 2);
 
@@ -336,8 +337,13 @@ class UserController extends ChangeNotifier {
     await loadUserCore(cred.user!.uid);
   }
 
-  Future<void> startWatchPairing() async {
+  Future<void> startWatchPairing({bool forceNew = false}) async {
     if (_pairing) return;
+
+    // Se ho già un QR valido e non forzo rigenerazione, riuso quello
+    if (!forceNew && hasValidPairId) {
+      return;
+    }
 
     _pairing = true;
     _pairingError = null;
@@ -347,19 +353,28 @@ class UserController extends ChangeNotifier {
     _pairSub = null;
 
     _expiryTimer?.cancel();
+    _expiryTimer = null;
 
     // IMPORTANT: le tue regole permettono create SOLO se request.auth == null
-    await logout(); // usa il tuo metodo, non FirebaseAuth diretto qui fuori
+    if (isLoggedIn) {
+      await logout();
+    }
 
     final newPairId = _uuid.v4();
     _pairId = newPairId;
+    _pairCreatedAtLocal = DateTime.now();
     notifyListeners();
 
     try {
-      await _db.collection('watch_pairs').doc(newPairId).set({
+      await _db.collection('watch_pair').doc(newPairId).set({
         'status': 'waiting',
-        'createdAt': FieldValue.serverTimestamp(),
         'platform': 'wearos',
+        'createdAt': FieldValue.serverTimestamp(),
+
+
+        'expiresAt': Timestamp.fromDate(
+          DateTime.now().add(const Duration(minutes: 2)),
+        ),
       });
 
       // timer scadenza locale (watch non può fare delete/update con rules attuali)
@@ -368,31 +383,35 @@ class UserController extends ChangeNotifier {
         notifyListeners();
       });
 
-      _pairSub =
-          _db.collection('watch_pairs').doc(newPairId).snapshots().listen(
-                (doc) async {
-              final data = doc.data();
-              if (data == null) return;
+      _pairSub = _db.collection('watch_pair').doc(newPairId).snapshots().listen(
+            (doc) async {
+          final data = doc.data();
+          if (data == null) return;
 
-              final status = data['status'] as String?;
-              final token = data['customToken'] as String?;
+          final status = data['status'] as String?;
+          final token = data['customToken'] as String?;
 
-              if (status == 'approved' && token != null && token.isNotEmpty) {
-                _expiryTimer?.cancel();
-                await loginWithCustomToken(token);
-                // authStateChanges() ti popola currentUser e notifica già
-              }
+          if (status == 'approved' && token != null && token.isNotEmpty) {
+            _expiryTimer?.cancel();
+            _expiryTimer = null;
 
-              if (status == 'expired') {
-                _pairingError = "QR scaduto, rigenera.";
-                notifyListeners();
-              }
-            },
-            onError: (e) {
-              _pairingError = "Errore listener pairing: $e";
-              notifyListeners();
-            },
-          );
+            await _pairSub?.cancel();
+            _pairSub = null;
+
+            await loginWithCustomToken(token);
+            return;
+          }
+
+          if (status == 'expired') {
+            _pairingError = "QR scaduto, rigenera.";
+            notifyListeners();
+          }
+        },
+        onError: (e) {
+          _pairingError = "Errore listener pairing: $e";
+          notifyListeners();
+        },
+      );
     } catch (e) {
       _pairingError = "Errore pairing: $e";
     } finally {
@@ -407,5 +426,9 @@ class UserController extends ChangeNotifier {
 
     await _pairSub?.cancel();
     _pairSub = null;
+  }
+  bool get hasValidPairId {
+    if (_pairId == null || _pairCreatedAtLocal == null) return false;
+    return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
   }
 }

@@ -155,9 +155,9 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 12),
 
                   ElevatedButton(
-                    onPressed: creating
-                        ? null
-                        : () => context.read<UserController>().startWatchPairing(),
+                    onPressed: _creating ? null : () {
+                      context.read<UserController>().startWatchPairing(forceNew: true);
+                    },
                     child: const Text("Rigenera QR"),
                   ),
                 ],

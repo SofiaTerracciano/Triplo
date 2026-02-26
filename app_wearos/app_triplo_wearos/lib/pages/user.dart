@@ -9,7 +9,7 @@ class UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userCtrl = context.watch<UserController>();
     final user = userCtrl.currentUser;
-
+    
     if (user == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
