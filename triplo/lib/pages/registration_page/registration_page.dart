@@ -14,6 +14,7 @@ class RegistrationPage extends StatefulWidget {
     super.key,
   });
 
+
   @override
   State<StatefulWidget> createState() => _RegistrationPageState();
 }

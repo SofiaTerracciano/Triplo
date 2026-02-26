@@ -3,6 +3,7 @@ import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/home-page.dart';
+import 'package:app_triplo_wearos/pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-
+import 'package:app_triplo_wearos/controller/user.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -48,7 +49,7 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
           create: (_) => TrekkingController(trekkings: []),
         ),
         ChangeNotifierProvider(create: (_) => Language()),
-
+        ChangeNotifierProvider(create: (_) => UserController()),
         Provider<API>(create: (_) => API()),
 
         /*
@@ -96,7 +97,7 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
               Locale('de'),
               Locale('fr'),
             ],
-            home: HomePage(),
+            home: LoginPage(),
           );
         },
       ),

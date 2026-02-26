@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "851089216049",
+    "project_id": "fir-triplo",
+    "storage_bucket": "fir-triplo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851089216049:android:2c7a88d4c2da5fc55d7b10",
+        "android_client_info": {
+          "package_name": "com.example.app_triplo_wearos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "851089216049-q404fmoa9j82v5sosms5f78g1gflat0b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQKrn4tUhpE70y6dEZ2aYNXIehXKoE4AU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "851089216049-q404fmoa9j82v5sosms5f78g1gflat0b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "851089216049-la7gcbt66cn74ta2pbo0gf4ndh7v58q1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.triplo"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851089216049:android:330fe0810cef71115d7b10",
+        "android_client_info": {
+          "package_name": "com.example.triplo2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "851089216049-obv8l1b6qvlijeluubb7rnmea6i0tvd5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triplo2",
+            "certificate_hash": "d62183f29644df47e8e8bf8955ad5ae148ed0f64"
+          }
+        },
+        {
+          "client_id": "851089216049-q404fmoa9j82v5sosms5f78g1gflat0b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQKrn4tUhpE70y6dEZ2aYNXIehXKoE4AU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "851089216049-q404fmoa9j82v5sosms5f78g1gflat0b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "851089216049-la7gcbt66cn74ta2pbo0gf4ndh7v58q1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.triplo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
