@@ -8,9 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:uuid/uuid.dart';
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -45,6 +43,15 @@ class UserController extends ChangeNotifier {
 
   static const Duration _qrTtl = Duration(minutes: 2);
 
+
+
+
+
+
+
+
+  String? _pairedUid;
+  String? get pairedUid => _pairedUid;
 
   UserController() {
     // Auto-sync login/logout
@@ -340,7 +347,7 @@ class UserController extends ChangeNotifier {
   Future<void> startWatchPairing({bool forceNew = false}) async {
     if (_pairing) return;
 
-    // Se ho già un QR valido e non forzo rigenerazione, riuso quello
+
     if (!forceNew && hasValidPairId) {
       return;
     }
@@ -355,12 +362,14 @@ class UserController extends ChangeNotifier {
     _expiryTimer?.cancel();
     _expiryTimer = null;
 
-    // IMPORTANT: le tue regole permettono create SOLO se request.auth == null
+
     if (isLoggedIn) {
+      await Future.delayed(const Duration(milliseconds: 50));
       await logout();
     }
 
     final newPairId = _uuid.v4();
+    _pairedUid = null;
     _pairId = newPairId;
     _pairCreatedAtLocal = DateTime.now();
     notifyListeners();
@@ -389,17 +398,15 @@ class UserController extends ChangeNotifier {
           if (data == null) return;
 
           final status = data['status'] as String?;
-          final token = data['customToken'] as String?;
+          final uid = data['uid'] as String?;
 
-          if (status == 'approved' && token != null && token.isNotEmpty) {
+          if (status == 'approved' && uid != null && uid.isNotEmpty) {
             _expiryTimer?.cancel();
-            _expiryTimer = null;
 
-            await _pairSub?.cancel();
-            _pairSub = null;
-
-            await loginWithCustomToken(token);
-            return;
+            // NON fai login Firebase Auth
+            // Salvi solo uid per leggere profilo pubblico
+            _pairedUid = uid;
+            notifyListeners();
           }
 
           if (status == 'expired') {

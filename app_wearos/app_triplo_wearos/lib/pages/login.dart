@@ -1,10 +1,6 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 import '../controller/user.dart';
 import 'user.dart';
@@ -17,16 +13,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _db = FirebaseFirestore.instance;
-  final _uuid = const Uuid();
-
-  String? _pairId;
-  bool _creating = false;
-  String? _error;
-
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _sub;
-
-
   @override
   void initState() {
     super.initState();
@@ -35,71 +21,18 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-
   @override
   void dispose() {
+    // chiude listener/timer nel controller
     context.read<UserController>().stopWatchPairing();
     super.dispose();
-  }
-
-  Future<void> _startPairing() async {
-    if (_creating) return;
-
-    setState(() {
-      _creating = true;
-      _error = null;
-    });
-
-    // pulisci listener vecchio
-    await _sub?.cancel();
-    _sub = null;
-
-    final pairId = _uuid.v4();
-    setState(() => _pairId = pairId);
-
-    try {
-      await _db.collection('watch_pair').doc(pairId).set({
-        'status': 'waiting',
-        'createdAt': FieldValue.serverTimestamp(),
-        'platform': 'wearos',
-      });
-
-      // ascolta approvazione da telefono
-      _sub = _db.collection('watch_pair').doc(pairId).snapshots().listen(
-            (doc) async {
-          final data = doc.data();
-          if (data == null) return;
-
-          final status = data['status'] as String?;
-          final token = data['customToken'] as String?;
-
-          if (status == 'approved' && token != null && token.isNotEmpty) {
-            // fai login nel tuo UserController (aggiungeremo sotto la funzione)
-            final userController = context.read<UserController>();
-            await userController.loginWithCustomToken(token);
-            // quando currentUser diventa != null, build() ti porterà su UserPage
-          }
-
-          if (status == 'expired') {
-            if (!mounted) return;
-            setState(() => _error = "QR scaduto, rigenera.");
-          }
-        },
-      );
-    } catch (e) {
-      setState(() => _error = "Errore pairing: $e");
-    } finally {
-      if (mounted) {
-        setState(() => _creating = false);
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final userController = context.watch<UserController>();
 
-    if (userController.currentUser != null) {
+    if (userController.currentUser != null || userController.pairedUid != null) {
       return UserPage();
     }
 
@@ -117,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text("Login"),
-
+                  const SizedBox(height: 10),
 
                   if (creating) const CircularProgressIndicator(),
 
@@ -133,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                   if (pairId != null) ...[
                     const SizedBox(height: 10),
                     QrImageView(
-                      data: pairId,
+                      data: pairId, // oppure "triplo://watch-pair/$pairId"
                       version: QrVersions.auto,
                       size: 120,
                     ),
@@ -155,9 +88,11 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 12),
 
                   ElevatedButton(
-                    onPressed: _creating ? null : () {
-                      context.read<UserController>().startWatchPairing(forceNew: true);
-                    },
+                    onPressed: creating
+                        ? null
+                        : () => context
+                        .read<UserController>()
+                        .startWatchPairing(forceNew: true),
                     child: const Text("Rigenera QR"),
                   ),
                 ],
