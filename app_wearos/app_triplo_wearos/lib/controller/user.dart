@@ -438,4 +438,7 @@ class UserController extends ChangeNotifier {
     if (_pairId == null || _pairCreatedAtLocal == null) return false;
     return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
   }
+  String? get effectiveUid {
+    return _auth.currentUser?.uid ?? _pairedUid;
+  }
 }

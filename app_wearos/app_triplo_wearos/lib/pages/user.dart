@@ -8,25 +8,41 @@ class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userCtrl = context.watch<UserController>();
-    final user = userCtrl.currentUser;
-    
-    if (user == null) {
+
+    // Usa effectiveUid invece di currentUser
+    final uid = userCtrl.effectiveUid;
+
+    if (uid == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(user.username),
-            const SizedBox(height: 6),
-            Text(user.level),
-          ],
-        ),
-      ),
+    return FutureBuilder(
+      future: userCtrl.getUserById(uid),
+      builder: (context, snapshot) {
+
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final user = snapshot.data!;
+
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(user.username),
+                const SizedBox(height: 6),
+                Text(user.level),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
