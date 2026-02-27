@@ -8,8 +8,6 @@ class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userCtrl = context.watch<UserController>();
-
-    // Usa effectiveUid invece di currentUser
     final uid = userCtrl.effectiveUid;
 
     if (uid == null) {
@@ -31,14 +29,53 @@ class UserPage extends StatelessWidget {
         final user = snapshot.data!;
 
         return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(user.username),
-                const SizedBox(height: 6),
-                Text(user.level),
-              ],
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+
+                        const Icon(Icons.account_circle, size: 60),
+                        const SizedBox(height: 12),
+
+                        Text(
+                          user.username,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        Text(
+                          "Level: ${user.level}",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.logout),
+                          label: const Text("Logout"),
+                          onPressed: () async {
+                            await userCtrl.logoutWatch();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         );

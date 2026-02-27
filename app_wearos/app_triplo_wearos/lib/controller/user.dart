@@ -52,7 +52,21 @@ class UserController extends ChangeNotifier {
 
   String? _pairedUid;
   String? get pairedUid => _pairedUid;
+  String? get effectiveUid {
 
+
+
+
+    return _pairedUid;
+  }
+
+  bool get hasValidPairId {
+    if (_pairId == null || _pairCreatedAtLocal == null) {
+      return false;
+    }
+
+    return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
+  }
   UserController() {
     // Auto-sync login/logout
     _authSub = _auth.authStateChanges().listen((firebaseUser) async {
@@ -120,8 +134,7 @@ class UserController extends ChangeNotifier {
     await loadUserCore(cred.user!.uid);
   }
 
-  /// Se sul watch NON fai Google Sign-In UI, puoi comunque usare
-  /// un credential già ottenuto altrove (telefono) e passarla qui.
+
   Future<void> loginWithCredential(AuthCredential credential) async {
     final cred = await _auth.signInWithCredential(credential);
     await loadUserCore(cred.user!.uid);
@@ -150,9 +163,7 @@ class UserController extends ChangeNotifier {
 
     _currentUser = Users.fromMap(data, uid: uid);
 
-    // NB: qui lasciamo followers/following/diaries/savedTrekkings vuoti
-    // perché in questo approccio sono "on demand".
-    // Se invece vuoi solo SAVED state, vedi isTrekkingSaved() sotto.
+
 
     notifyListeners();
   }
@@ -386,7 +397,7 @@ class UserController extends ChangeNotifier {
         ),
       });
 
-      // timer scadenza locale (watch non può fare delete/update con rules attuali)
+
       _expiryTimer = Timer(_qrTtl, () {
         _pairingError = "QR scaduto, rigenera.";
         notifyListeners();
@@ -427,18 +438,43 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  Future<void> stopWatchPairing() async {
+  Future<void> stopWatchPairing({bool clearId = false}) async {
     _expiryTimer?.cancel();
     _expiryTimer = null;
 
     await _pairSub?.cancel();
     _pairSub = null;
+
+    if (clearId) {
+      _pairId = null;
+      _pairCreatedAtLocal = null;
+    }
+
+    notifyListeners();
   }
-  bool get hasValidPairId {
-    if (_pairId == null || _pairCreatedAtLocal == null) return false;
-    return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
-  }
-  String? get effectiveUid {
-    return _auth.currentUser?.uid ?? _pairedUid;
+
+
+
+
+
+
+
+
+
+
+
+  Future<void> logoutWatch() async {
+
+    await logout();
+
+
+    _pairedUid = null;
+    _pairId = null;
+    _pairCreatedAtLocal = null;
+    _pairingError = null;
+
+    await stopWatchPairing(clearId: true);
+
+    notifyListeners();
   }
 }
