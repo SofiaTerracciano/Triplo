@@ -73,10 +73,18 @@ class UserController extends ChangeNotifier {
 
   Future<void> loginWithGoogle(AuthCredential credential) async {
     final cred = await _auth.signInWithCredential(credential);
-    await loadUserCore(cred.user!.uid);
+    final user = cred.user;
+    if (user == null) {
+      throw StateError("Firebase user è null dopo signInWithCredential");
+    }
+
+    // Se è nuovo (o se il doc non esiste), crea Firestore docs
+    await _ensureUserFirestoreDocs(user);
+
+    await loadUserCore(user.uid);
   }
 
-  Future<void> logout() async {
+    Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
     notifyListeners();
@@ -439,4 +447,57 @@ class UserController extends ChangeNotifier {
     final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
     return ids.contains(trekkingId);
   }
+
+    Future<void> _ensureUserFirestoreDocs(User user) async {
+      final uid = user.uid;
+
+      final userRef = _db.collection("users").doc(uid);
+      final indexRef = _db.collection("users_index").doc(uid);
+
+      final snap = await userRef.get();
+      if (snap.exists) return;
+
+      // Dati base presi da Google
+      final email = user.email ?? "";
+      final displayName = user.displayName ?? "";
+      final photoUrl = user.photoURL ?? "";
+
+      // Username: prova displayName, altrimenti parte dell'email, altrimenti uid corto
+      String username;
+      if (displayName.trim().isNotEmpty) {
+        username = displayName.trim().split(RegExp(r"\s+")).first;
+      } else if (email.contains("@")) {
+        username = email.split("@")[0];
+      } else {
+        username = uid.substring(0, 8);
+      }
+
+
+      final batch = _db.batch();
+
+      batch.set(userRef, {
+        "Username": username,
+        "Photo_profile": photoUrl,
+        "Name": displayName,
+        "Surname": "",
+        "Birthdate": DateTime.now().toIso8601String(),
+        "Email": email,
+        "Followers": [],
+        "Following": [],
+        "Public_diary": [],
+        "Private_diary": [],
+        "Saved_trekkings": [],
+        "Level": "Beginner",
+        "Advanced": 0,
+        "Intermediate": 0,
+      });
+
+      batch.set(indexRef, {
+        "uid": uid,
+        "username": username,
+        "normalized": username.toLowerCase(),
+      });
+
+      await batch.commit();
+    }
 }

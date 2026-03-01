@@ -13,7 +13,7 @@ class NavigationPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final ctrl = context.watch<UserController>();
-    final isPaired = ctrl.effectiveUid != null;
+
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -24,7 +24,7 @@ class NavigationPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Titolo piccolo (puoi rimuoverlo se vuoi super minimal)
+
                 Text(
                   "Triplo",
                   style: const TextStyle(

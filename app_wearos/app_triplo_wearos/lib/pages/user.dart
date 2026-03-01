@@ -4,7 +4,7 @@ import '../controller/user.dart';
 import 'user_list_page.dart';
 
 class UserPage extends StatelessWidget {
-  final String? uidOverride; // se vuoi mostrare profilo di un altro utente
+  final String? uidOverride;
   const UserPage({super.key, this.uidOverride});
 
   String _fmtBirthdate(dynamic birthdateRaw) {

@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
       final controller = Provider.of<UserController>(context, listen: false);
       await controller.loginWithGoogle(credential);
 
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
