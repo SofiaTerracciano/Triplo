@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Language controller for localization --> manage app language
 class Language extends ChangeNotifier {
-  // Current locale, default to English
-  Locale _locale = const Locale('en');
+  static const _kLocaleCodeKey = "locale_code";
 
-  // Getter for current locale
+  Locale _locale = const Locale('en');
   Locale get locale => _locale;
 
-  // Set a new locale and notify listeners
-  void setLocale(Locale locale) {
-    if (_locale == locale) 
-      return;
-    
-    _locale = locale;
+  // Carica la lingua salvata (da chiamare all'avvio)
+  Future<void> loadSavedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    final code = prefs.getString(_kLocaleCodeKey);
 
+    if (code == null || code.isEmpty) return;
+
+    final loaded = Locale(code);
+    if (_locale == loaded) return;
+
+    _locale = loaded;
     notifyListeners();
+  }
+
+  // Imposta e salva
+  Future<void> setLocale(Locale locale) async {
+    if (_locale == locale) return;
+
+    _locale = locale;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kLocaleCodeKey, locale.languageCode);
   }
 }

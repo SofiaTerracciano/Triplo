@@ -31,7 +31,6 @@ import 'package:triplo/controller/API.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/observer.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -39,29 +38,24 @@ Future<void> main() async {
   } catch (e) {
     debugPrint(".env file not found — continuing without it.");
   }
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final language = Language();
+  await language.loadSavedLocale();
 
-  runApp(const MyApp());
+  runApp(MyApp(language: language));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
 
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
+
+class MyApp extends StatelessWidget {
+  final Language language;
+  const MyApp({super.key, required this.language});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      // Provide controllers to the app --> state management
       providers: [
         ChangeNotifierProvider(
           create: (_) {
@@ -72,28 +66,11 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
-        ChangeNotifierProvider(create: (_) => Language()),
+
+
+        ChangeNotifierProvider.value(value: language),
 
         Provider<API>(create: (_) => API()),
-
-        /*
-        Provider<NotificationService>(
-          create: (_) {
-            final service = NotificationService();
-            service.init();
-            return service;
-          },
-        ),
-
-
-        Provider<ObserverService>(
-          create: (context) => ObserverService(
-            api: context.read<API>(),
-            notificationService: context.read<NotificationService>(),
-          ),
-        ),
-         */
-
       ],
       child: Consumer<Language>(
         builder: (context, lang, child) {
@@ -104,15 +81,13 @@ class _MyAppState extends State<MyApp> {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
               useMaterial3: true,
             ),
-            // This is for localization --> set the app language based on Language controller
-            locale: lang.locale, //
+            locale: lang.locale,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            // Supported locales --> English, Italian, Spanish, German, French
             supportedLocales: const [
               Locale('en'),
               Locale('it'),
@@ -128,10 +103,9 @@ class _MyAppState extends State<MyApp> {
               '/forgotten_password': (context) => ForgottenPasswordPage(),
               '/geowatch': (context) => const GeoWatchPage(),
               '/admin_upload': (context) => const AdminUploadPage(),
-              //'/admin_upload': (context) => const AdminBuildTrekkingIndexPage(),
               "/userProfileRemote": (context) => UserPagePublic(
-                    userId: ModalRoute.of(context)!.settings.arguments as String,
-                  ),
+                userId: ModalRoute.of(context)!.settings.arguments as String,
+              ),
             },
           );
         },
@@ -139,3 +113,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+

@@ -277,7 +277,7 @@ class _SettingPageState extends State<SettingPage> {
             },
           ),
 
-          const SizedBox(height: 32),
+          //const SizedBox(height: 32),
           /*
           Divider(),
 
@@ -396,6 +396,9 @@ class _SettingPageState extends State<SettingPage> {
             icon: const Icon(Icons.qr_code_scanner),
             label: const Text("Pair watch"),
           ),
+
+
+          const SizedBox(height: 30)
         ],
       ),
 
@@ -539,7 +542,7 @@ class _SettingPageState extends State<SettingPage> {
 
 // Popup dialog to select the language
 class LanguageDialog extends StatelessWidget {
-  final void Function(Locale) onLocaleSelected;
+  final Future<void> Function(Locale) onLocaleSelected;
 
   const LanguageDialog({super.key, required this.onLocaleSelected});
 
