@@ -14,46 +14,64 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
   bool _handled = false;
   String? _error;
 
-  String _extractPairId(String raw) {
-    // supporta sia "pairId" puro sia "triplo://watch-pair/<id>"
-    final uri = Uri.tryParse(raw);
-    if (uri != null && uri.scheme == "triplo") {
-      // triplo://watch-pair/<pairId>
-      if (uri.host == "watch-pair") {
-        final seg = uri.pathSegments;
-        if (seg.isNotEmpty) return seg.first;
-      }
+  ({String watchId, String token}) _extractPair(String raw) {
+    final uri = Uri.tryParse(raw.trim());
+    if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {
+      throw const FormatException("QR non valido");
     }
-    return raw.trim();
+
+    final seg = uri.pathSegments;
+    if (seg.isEmpty) throw const FormatException("watchId mancante");
+
+    final watchId = seg.first.trim();
+    if (watchId.isEmpty) throw const FormatException("watchId mancante");
+
+    final token = uri.queryParameters['t']?.trim();
+    if (token == null || token.isEmpty) {
+      throw const FormatException("token mancante");
+    }
+
+    return (watchId: watchId, token: token);
   }
 
-  Future<void> _approvePair(String pairId) async {
+  Future<void> _approvePair({
+    required String watchId,
+    required String token,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       setState(() => _error = "Devi essere loggato sul telefono.");
       return;
     }
 
-    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(pairId);
+    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(watchId);
 
-    final snap = await ref.get();
-    if (!snap.exists) {
-      setState(() => _error = "PairId non trovato: $pairId");
-      return;
-    }
+    await FirebaseFirestore.instance.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (!snap.exists) {
+        throw Exception("watch_pair non trovato (watchId=$watchId)");
+      }
 
-    final data = snap.data() as Map<String, dynamic>;
-    final status = data['status'] as String?;
+      final data = snap.data() as Map<String, dynamic>;
+      final status = data['status'] as String?;
+      final qrToken = data['qrToken'] as String?;
+      final expiresAt = data['expiresAt'] as Timestamp?;
 
-    if (status != 'waiting') {
-      setState(() => _error = "Questo QR non è in stato waiting (status=$status).");
-      return;
-    }
+      if (status != 'waiting') {
+        throw Exception("QR non in waiting (status=$status)");
+      }
+      if (qrToken != token) {
+        throw Exception("Token non valido / QR rigenerato");
+      }
+      if (expiresAt == null || expiresAt.toDate().isBefore(DateTime.now())) {
+        throw Exception("QR scaduto");
+      }
 
-    await ref.update({
-      'status': 'approved',
-      'uid': user.uid,
-      'approvedAt': FieldValue.serverTimestamp(),
+      // Coerente con le rules: aggiorna SOLO status e uid
+      tx.update(ref, {
+        'status': 'approved',
+        'uid': user.uid,
+      });
     });
 
     if (!mounted) return;
@@ -77,13 +95,26 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
               if (raw == null || raw.trim().isEmpty) return;
 
               _handled = true;
-              final pairId = _extractPairId(raw);
+
+              late final String watchId;
+              late final String token;
+
+              try {
+                final pair = _extractPair(raw);
+                watchId = pair.watchId;
+                token = pair.token;
+              } catch (e) {
+                if (!mounted) return;
+                setState(() => _error = "QR non valido: $e");
+                _handled = false;
+                return;
+              }
 
               final ok = await showDialog<bool>(
                 context: context,
                 builder: (_) => AlertDialog(
                   title: const Text("Connettere l'orologio?"),
-                  content: Text("PairId:\n$pairId"),
+                  content: Text("WatchId:\n$watchId"),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -99,7 +130,7 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
 
               if (ok == true) {
                 try {
-                  await _approvePair(pairId);
+                  await _approvePair(watchId: watchId, token: token);
                 } catch (e) {
                   if (!mounted) return;
                   setState(() => _error = "Errore approvazione: $e");

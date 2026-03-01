@@ -1,3 +1,4 @@
+import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:flutter/material.dart';
 import 'home-page.dart';
 import 'login.dart';
@@ -52,7 +53,7 @@ class DebugLandingPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => UserPage()),
+                  MaterialPageRoute(builder: (_) => PairingService(child: UserPage())),
                 );
               },
               child: const Text("User Page"),

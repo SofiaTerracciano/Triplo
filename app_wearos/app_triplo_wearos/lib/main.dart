@@ -5,7 +5,9 @@ import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/home-page.dart';
 import 'package:app_triplo_wearos/pages/landing_page.dart';
 import 'package:app_triplo_wearos/pages/login.dart';
+import 'package:app_triplo_wearos/pages/navigation.dart';
 import 'package:app_triplo_wearos/pages/user.dart';
+import 'package:app_triplo_wearos/service/watch_id_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -24,15 +26,25 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const TriploWatchApp());
+
+
+
+  final watchId = await WatchIdService.getOrCreateWatchId();
+
+  runApp(TriploWatchApp(watchId: watchId));
 }
 
 class TriploWatchApp extends StatefulWidget {
-  const TriploWatchApp({super.key});
+  final String watchId;
+  const TriploWatchApp({super.key, required this.watchId});
+
 
   @override
   State<TriploWatchApp> createState() => _TriploWatchAppState();
 }
+
+
+
 
 class _TriploWatchAppState extends State<TriploWatchApp> {
   @override
@@ -51,7 +63,7 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
           create: (_) => TrekkingController(trekkings: []),
         ),
         ChangeNotifierProvider(create: (_) => Language()),
-        ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => UserController(watchId: widget.watchId)),
         Provider<API>(create: (_) => API()),
 
         /*
@@ -62,7 +74,6 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
             return service;
           },
         ),
-
 
         Provider<ObserverService>(
           create: (context) => ObserverService(
@@ -99,10 +110,11 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
               Locale('de'),
               Locale('fr'),
             ],
-            home: DebugLandingPage(),
+            home: NavigationPage(),
           );
         },
       ),
     );
   }
+
 }
