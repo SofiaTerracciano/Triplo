@@ -607,4 +607,16 @@ class UserController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<List<String>> getFollowerUids(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final raw = snap.data()?["Followers"] ?? [];
+    return List<String>.from(raw);
+  }
+
+  Future<List<String>> getFollowingUids(String uid) async {
+    final snap = await _db.collection("users").doc(uid).get();
+    final raw = snap.data()?["Following"] ?? [];
+    return List<String>.from(raw);
+  }
 }
