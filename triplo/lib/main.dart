@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
+import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/pages/user-page-public.dart';
+import 'package:triplo/service/internetservice.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,7 +32,7 @@ import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/observer.dart';
-
+final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -71,12 +73,29 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: language),
 
         Provider<API>(create: (_) => API()),
+        ChangeNotifierProxyProvider<API, InternetService>(
+          create: (context) => InternetService(api: context.read<API>())..start(),
+          update: (context, api, old) => old ?? InternetService(api: api)..start(),
+        ),
       ],
-      child: Consumer<Language>(
-        builder: (context, lang, child) {
+      child: Consumer2<Language, InternetService>(
+        builder: (context, lang, internet, child) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final nav = navKey.currentState;
+            if (nav == null) return;
+
+            if (!internet.isOnline) {
+              nav.pushNamedAndRemoveUntil('/offline', (r) => false);
+            } else {
+              // quando torna online: vai alla home
+              nav.pushNamedAndRemoveUntil('/landing_page', (r) => false);
+            }
+          });
+
           return MaterialApp(
             title: 'Triplo',
             debugShowCheckedModeBanner: false,
+            navigatorKey: navKey,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
               useMaterial3: true,
@@ -106,6 +125,10 @@ class MyApp extends StatelessWidget {
               "/userProfileRemote": (context) => UserPagePublic(
                 userId: ModalRoute.of(context)!.settings.arguments as String,
               ),
+
+
+
+              '/offline': (context) => const OfflinePage(),
             },
           );
         },
