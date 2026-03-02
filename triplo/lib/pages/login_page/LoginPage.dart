@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:triplo/controller/user.dart';
+import 'package:triplo/widgets_for_pages/language_button/language_button.dart';
+import '../../controller/language.dart';
 import '../user-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/trekking.dart';
@@ -131,7 +133,35 @@ class _LoginPageState extends State<LoginPage> {
   /** UI of the Login Page */
   @override
   Widget build(BuildContext context) {
+    final language = context.watch<Language>();
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Text(
+                language.locale.languageCode.toUpperCase(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => LanguageButton(
+                  onLocaleSelected: context.read<Language>().setLocale,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+
       body: Center(
         // horizontally
         child: SingleChildScrollView(
@@ -141,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Image.asset('images/logo.png', height: 120),
+                Image.asset('images/Triplo_def.png', height: 120),
                 const SizedBox(height: 24),
 
                 const Text(
