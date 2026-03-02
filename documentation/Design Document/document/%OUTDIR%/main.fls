@@ -1,7 +1,7 @@
 PWD c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document
 INPUT C:\Users\giuli\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
 INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\main.tex
-OUTPUT main.log
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.log
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\base\book.cls
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\base\book.cls
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\base\bk12.clo
@@ -343,7 +343,7 @@ INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibraryfadings.code.tex
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryfadings.code.tex
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryfadings.code.tex
-OUTPUT main.pdf
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.pdf
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\tcolorbox\tcbposter.code.tex
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\fontawesome5\fontawesome5.sty
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\fontawesome5\fontawesome5.sty
@@ -572,10 +572,10 @@ INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\glossaries-extra\gl
 INPUT .\glossary.tex
 INPUT .\glossary.tex
 INPUT glossary.tex
-INPUT .\main.aux
-INPUT .\main.aux
-INPUT main.aux
-OUTPUT main.aux
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.aux
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.aux
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.aux
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.aux
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
@@ -589,24 +589,32 @@ INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\base\inputenc.sty
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\biblatex\lbx\english.lbx
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\biblatex\lbx\english.lbx
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\tex\latex\biblatex\lbx\english.lbx
-OUTPUT main.bcf
-INPUT main.bbl
-INPUT .\main.bbl
-INPUT .\main.bbl
-INPUT .\main.bbl
-INPUT main.bbl
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bcf
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bbl
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bbl
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bbl
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bbl
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.bbl
 INPUT .\title.tex
 INPUT .\title.tex
 INPUT .\title.tex
 INPUT .\title.tex
 INPUT .\title.tex
 INPUT .\title.tex
-INPUT .\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
-INPUT .\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
-INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
-INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
-INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
-INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoMilanoLogo.png
+INPUT .\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\.\images\PolitecnicoDiMilanoLogo\PolitecnicoDiMilanoLogo.png
+INPUT .\images\Triplo_def.png
+INPUT .\images\Triplo_def.png
+INPUT .\images\Triplo_def.png
+INPUT .\.\images\Triplo_def.png
+INPUT .\.\images\Triplo_def.png
+INPUT .\.\images\Triplo_def.png
+INPUT .\.\images\Triplo_def.png
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm2488.tfm
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx2488.tfm
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\public\fdsymbol\FdSymbolA-Book.tfm
@@ -641,11 +649,11 @@ INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecti120
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbi1200.tfm
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecrm1440.tfm
 INPUT C:\Users\giuli\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
-INPUT .\main.toc
-INPUT .\main.toc
-INPUT main.toc
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.toc
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.toc
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.toc
 INPUT C:\Users\giuli\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\ecbx1200.tfm
-OUTPUT main.toc
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.toc
 INPUT .\section\introduction.tex
 INPUT .\section\introduction.tex
 INPUT section\introduction.tex
@@ -684,9 +692,9 @@ INPUT section\effort_spent.tex
 INPUT .\section\effort_spent.tex
 INPUT .\section\effort_spent.tex
 INPUT section\effort_spent.tex
-INPUT main.aux
-INPUT main.run.xml
-OUTPUT main.run.xml
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.aux
+INPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.run.xml
+OUTPUT c:\Users\giuli\Desktop\DIMA\App\mainrepo\documentation\Design Document\document\%OUTDIR%\main.run.xml
 INPUT C:\Users\giuli\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1728.pk
 INPUT C:\Users\giuli\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1728.pk
 INPUT C:\Users\giuli\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\ecbx1200.pk
