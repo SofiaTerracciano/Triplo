@@ -54,7 +54,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
     return Scaffold(
       appBar: AppBar(title: Text(local.challeng_title)),
       body: challenges.isEmpty
-          ? Center(child: Text("No challenges available"))
+          ? Center(child: Text(local.no_challenge))
           : ListView.builder(
               itemCount: challenges.length,
               itemBuilder: (context, index) {

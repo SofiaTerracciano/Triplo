@@ -99,6 +99,10 @@
   "choose_challenge_label": "Selecciona los desafíos completados",
 
   "challeng_title": "Desafíos",
+  "no_challenge": "No hay desafíos disponibles",
+  "start_trekking_label": "Comenzar",
+  "before_start": "Antes de comenzar",
+  "back_label": "Volver",
 
   "no_users_found_label": "No se encontraron usuarios",
   "weather_near_trail_label": "Clima cerca del sendero",
@@ -107,11 +111,6 @@
   "trail_area_label": "Área del recorrido",
   "current_position_label": "Ubicación actual",
 
-
-
-
-
-  "trail_area_label": "Área del recorrido",
   "your_position_label": "Tu ubicación",
   "based_on_nearest_station_label": "Basado en la estación meteorológica más cercana",
   "forecast_label": "Pronóstico",

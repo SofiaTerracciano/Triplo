@@ -56,6 +56,10 @@ class _HomePageState extends State<HomePage> {
             options: MapOptions(
               initialCenter: campiglioCenter,
               initialZoom: 13,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.pinchZoom |
+                InteractiveFlag.drag,
+              ), 
             ),
             children: [
               TileLayer(

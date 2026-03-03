@@ -279,6 +279,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get challeng_title => 'Défis';
 
   @override
+  String get no_challenge => 'Aucun défi disponible';
+
+  @override
+  String get start_trekking_label => 'Commencer';
+
+  @override
+  String get before_start => 'Avant de commencer';
+
+  @override
+  String get back_label => 'Retour';
+
+  @override
   String get no_users_found_label => 'Aucun utilisateur trouvé';
 
   @override

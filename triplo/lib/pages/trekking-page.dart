@@ -3,6 +3,7 @@ import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/adding-diary-page.dart';
+import 'package:triplo/pages/details_trekking.dart';
 import 'package:triplo/pages/geowatch/geowatch.dart';
 import '../controller/trekking.dart';
 import '../controller/user.dart';
@@ -217,6 +218,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
         title: Text(trekking.name),
         centerTitle: true,
         actions: [
+          //add button
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -225,6 +227,19 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 MaterialPageRoute(
                   builder: (context) =>
                       AddingDiaryPage(trekkingId: trekking.documentId),
+                ),
+              );
+            },
+          ),
+
+          IconButton(
+            icon: Icon(Icons.play_arrow),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DetailsTrekking(trekkingid: trekking.documentId),
                 ),
               );
             },
@@ -398,38 +413,54 @@ class _TrekkingPageState extends State<TrekkingPage> {
                   : local.refreshment_point_available_trekking_label,
             ),
 
-            /* Family friendly
-            _familyRow(
-              Icons.family_restroom,
-              local.family_friendly_trekking_label,
-              trekking.family_firendly
-                  ? local.yes_botton_label
-                  : local.no_botton_label,
-            ),*/
-
             const SizedBox(height: 16),
 
             // Challenges section
             _sectionTitle(local.challenges_trekking_label),
             trekking.challenges.isNotEmpty
                 ? FutureBuilder<List<String>>(
-                    future: trekkingController.getDownloadUrls(
-                      trekking.challenges,
-                    ),
+                    future: trekkingController.getDownloadUrls(trekking.challenges),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const CircularProgressIndicator();
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
                       }
+                      
+                      if (snapshot.hasError || !snapshot.hasData) {
+                        return Text(local.challenges_available_trekking_label);
+                      }
+
                       return Wrap(
-                        spacing: 8,
-                        children: snapshot.data!
-                            .map(
-                              (url) => Chip(
-                                avatar: const Icon(Icons.warning, size: 16),
-                                label: Image.network(url, height: 24),
-                              ),
-                            )
-                            .toList(),
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: snapshot.data!.map((url) {
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Image.network(
+                              url,
+                              height: 45, // Dimensione simile agli screenshot
+                              width: 45,
+                              fit: BoxFit.contain,
+                              // Se l'immagine specifica ha un errore di caricamento
+                              errorBuilder: (context, error, stackTrace) => 
+                                  const Icon(Icons.broken_image, color: Colors.grey),
+                            ),
+                          );
+                        }).toList(),
                       );
                     },
                   )
@@ -591,32 +622,6 @@ class _TrekkingPageState extends State<TrekkingPage> {
       ),
     );
   }
-
-  /* Widget to display a family friendly row with an icon, label, and value
-  Widget _familyRow(
-    IconData icon,
-    String label,
-    String value, {
-    bool highlight = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon),
-          const SizedBox(width: 8),
-          Text("$label: ", style: const TextStyle(fontWeight: FontWeight.w600)),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: highlight ? Colors.green : null,
-            ),
-          ),
-        ],
-      ),
-    );
-  }*/
 
   // Widget to display a section title
   Widget _sectionTitle(String text) {

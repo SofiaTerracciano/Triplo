@@ -63,6 +63,7 @@ dependencies:
   mobile_scanner: ^5.2.3
   shared_preferences: ^2.2.3
   connectivity_plus: ^4.0.0
+  flutter_local_notifications: ^18.0.0
 flutter_gen:
   output: lib/gen/
 

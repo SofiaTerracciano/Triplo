@@ -66,6 +66,8 @@
   "weather_trekking_label": "Wetter",
   "weather_trekking_botton": "Klicken Sie hier, um das Wetter zu entdecken",
   "details_trekking_label": "Details",
+  "start_question_label": "Möchten Sie diese Route starten?",
+  "start_trekking_label": "Starten",
 
   "date_trekking_label": "Datum",
   "day_trekking_label": "Tag",
@@ -100,6 +102,9 @@
   "choose_challenge_label": "Wählen Sie die abgeschlossenen Challenges aus",
 
   "challeng_title": "Herausforderungen",
+  "no_challenge": "Keine Herausforderung verfügbar",
+  "before_start": "Vor dem Start",
+  "back_label": "Zurück",
 
   "no_users_found_label": "Keine Benutzer gefunden"
 }

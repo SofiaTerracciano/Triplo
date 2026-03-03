@@ -186,6 +186,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get details_trekking_label => 'Dettagli';
 
   @override
+  String get start_question_label => 'Vuoi iniziare questo percorso?';
+
+  @override
+  String get start_trekking_label => 'Inizia';
+
+  @override
   String get date_trekking_label => 'Data';
 
   @override
@@ -280,6 +286,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get challeng_title => 'Sfide';
+
+  @override
+  String get no_challenge => 'Nessuna sfida disponibile';
+
+  @override
+  String get before_start => 'Prima di iniziare';
+
+  @override
+  String get back_label => 'Indietro';
 
   @override
   String get no_users_found_label => 'Nessun utente trovato';

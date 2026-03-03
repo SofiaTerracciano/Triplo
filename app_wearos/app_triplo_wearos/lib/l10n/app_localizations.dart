@@ -455,6 +455,18 @@ abstract class AppLocalizations {
   /// **'Details'**
   String get details_trekking_label;
 
+  /// No description provided for @start_question_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to start this trekking?'**
+  String get start_question_label;
+
+  /// No description provided for @start_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start_trekking_label;
+
   /// No description provided for @date_trekking_label.
   ///
   /// In en, this message translates to:
@@ -646,6 +658,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Challenges'**
   String get challeng_title;
+
+  /// No description provided for @no_challenge.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenge available'**
+  String get no_challenge;
+
+  /// No description provided for @before_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Before starting'**
+  String get before_start;
+
+  /// No description provided for @back_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back_label;
 
   /// No description provided for @no_users_found_label.
   ///

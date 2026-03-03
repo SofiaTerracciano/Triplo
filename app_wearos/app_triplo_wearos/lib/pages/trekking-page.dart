@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
+import 'package:app_triplo_wearos/pages/details_trekking.dart';
 import 'package:app_triplo_wearos/pages/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,6 @@ class TrekkingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final local = AppLocalizations.of(context)!;
     final languageController = context.watch<Language>();
     final langCode = languageController.locale.languageCode;
     final langIndex = getLanguageSelected(langCode);
@@ -25,7 +25,6 @@ class TrekkingPage extends StatelessWidget {
       return const Scaffold(
         backgroundColor: Colors.black,
         body: Center(
-        
           child: Text("Error", style: TextStyle(color: Colors.white)),
         ),
       );
@@ -45,8 +44,16 @@ class TrekkingPage extends StatelessWidget {
             children: [
               // List of sections
               _buildHeroSection(trekking, mainColor),
-              _buildTechnicalSection(trekking, trekking.estimated_time.toInt(), mainColor),
-              _buildInfoSection(context,trekking, mainColor, langIndex),
+              _buildTechnicalSection(
+                trekking,
+                trekking.estimated_time.toInt(),
+                mainColor,
+              ),
+              // Details and description
+              _buildInfoSection(context, trekking, mainColor, langIndex),
+              // Start trekking
+              _buildStartSection(context, trekking, mainColor),
+              // Back and Meteo
               _buildActionsSection(context, trekking, mainColor),
             ],
           ),
@@ -59,7 +66,7 @@ class TrekkingPage extends StatelessWidget {
   Widget _buildHeroSection(var trekking, Color color) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20), 
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -68,12 +75,12 @@ class TrekkingPage extends StatelessWidget {
             Text(
               trekking.name.toUpperCase(),
               textAlign: TextAlign.center,
-              maxLines: 3, 
-              softWrap: true, 
+              maxLines: 3,
+              softWrap: true,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 15, 
+                fontSize: 15,
               ),
             ),
             const SizedBox(height: 4),
@@ -96,17 +103,23 @@ class TrekkingPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Center(
-        child: SingleChildScrollView( 
+        child: SingleChildScrollView(
           child: Column(
-            mainAxisSize: MainAxisSize.min, 
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Starting point
               _watchLocationRowCompact(
-                  Icons.place, trekking.starting_point_name!, color),
+                Icons.place,
+                trekking.starting_point_name!,
+                color,
+              ),
               const SizedBox(height: 4),
               // Ending point
               _watchLocationRowCompact(
-                  Icons.flag, trekking.ending_point_name!, color),
+                Icons.flag,
+                trekking.ending_point_name!,
+                color,
+              ),
 
               const SizedBox(height: 10),
               //Distance, elevation gain, estimated time
@@ -115,17 +128,17 @@ class TrekkingPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: color.withOpacity(0.2), width: 0.5),
+                  border: Border.all(color: color.withOpacity(0.2), width: 0.5),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     // Distance
                     _buildCompactStat(
-                        Icons.straighten,
-                        "${trekking.distance}km",
-                        color),
+                      Icons.straighten,
+                      "${trekking.distance}km",
+                      color,
+                    ),
 
                     // Elevation gain with conditional arrows
                     Column(
@@ -138,7 +151,11 @@ class TrekkingPage extends StatelessWidget {
                               Icon(Icons.arrow_upward, color: color, size: 14),
 
                             if (trekking.downGain == true)
-                              Icon(Icons.arrow_downward, color: color, size: 14),
+                              Icon(
+                                Icons.arrow_downward,
+                                color: color,
+                                size: 14,
+                              ),
                           ],
                         ),
                         const SizedBox(height: 2),
@@ -156,7 +173,9 @@ class TrekkingPage extends StatelessWidget {
                     // Estimated time
                     _buildCompactStat(
                       Icons.schedule,
-                      formatShortTimeFromMinutes(trekking.estimated_time.toInt()),
+                      formatShortTimeFromMinutes(
+                        trekking.estimated_time.toInt(),
+                      ),
                       color,
                     ),
                   ],
@@ -174,75 +193,13 @@ class TrekkingPage extends StatelessWidget {
     );
   }
 
-  /* Icons and details
-  Widget _buildTechnicalSection(var trekking, String formattedTime, Color color) {
-    String start = trekking.starting_point_name!;
-    String end = trekking.ending_point_name!;
-
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, 
-          children: [
-            // Starting point 
-            _watchInfoRow(Icons.place, start, color: color),
-            const SizedBox(height: 5),
-            // Ending point
-            _watchInfoRow(Icons.flag, end, color: color),
-            const SizedBox(height: 5),
-            // Distance
-            _watchInfoRow(Icons.straighten, "${trekking.distance} km", color: color),
-            const SizedBox(height: 5),
-            
-            // Elevation gain with conditional arrows
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (trekking.upGain == true) 
-                  Icon(Icons.arrow_upward, color: color, size: 13),
-                if (trekking.downGain == true) 
-                  Icon(Icons.arrow_downward, color: color, size: 13),
-                const SizedBox(width: 4),
-                Text("${trekking.elevation_gain} m", style: const TextStyle(color: Colors.white, fontSize: 12)),
-              ],
-            ),
-            
-            const SizedBox(height: 5),
-            // Estimated time
-            _watchInfoRow(Icons.schedule, formattedTime, color: color),
-            
-            const SizedBox(height: 10),
-
-            // Service (PicNic, Refreshment, Family)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (trekking.pic_nic_area == true) 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4), 
-                    child: Icon(Icons.table_restaurant, color: color, size: 18)
-                  ),
-                if (trekking.refreshment_point != null && trekking.refreshment_point.isNotEmpty) 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4), 
-                    child: Icon(Icons.restaurant, color: color, size: 18)
-                  ),
-                if (trekking.family_firendly == true)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4), 
-                    child: Icon(Icons.family_restroom, color: color, size: 18)
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }*/
-
   // Info
-  Widget _buildInfoSection(BuildContext context, var trekking, Color color, int langIndex) {
+  Widget _buildInfoSection(
+    BuildContext context,
+    var trekking,
+    Color color,
+    int langIndex,
+  ) {
     String infoText = "";
     if (trekking.info != null && trekking.info.length > langIndex) {
       infoText = trekking.info[langIndex];
@@ -252,13 +209,12 @@ class TrekkingPage extends StatelessWidget {
     }
     final local = AppLocalizations.of(context)!;
 
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
       child: Column(
         children: [
           Text(
-            local.details_trekking_label, // da mettere nel dizionario
+            local.details_trekking_label, 
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,
@@ -290,20 +246,21 @@ class TrekkingPage extends StatelessWidget {
         children: [
           // Weather Button
           _actionButton(
-            Icons.wb_sunny, 
-            local.weather_trekking_label, 
-            Colors.blueGrey[800]!, 
-            () => Navigator.push(context, 
+            Icons.wb_sunny,
+            local.weather_trekking_label,
+            Colors.blueGrey[800]!,
+            () => Navigator.push(
+              context,
               MaterialPageRoute(
-                builder: (_) => HomePage() // da mettere pagina weather
-              )
-            )
-          ), 
+                builder: (_) => HomePage(), // da mettere pagina weather
+              ),
+            ),
+          ),
           const SizedBox(height: 10),
           // Back Button
           _actionButton(
             Icons.arrow_back,
-            local.home_page_title, 
+            local.home_page_title,
             color,
             () => Navigator.pop(context),
           ),
@@ -312,33 +269,60 @@ class TrekkingPage extends StatelessWidget {
     );
   }
 
-  /* Helpers
-  Widget _watchInfoRow(IconData icon, String text, {required Color color}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start, 
-        children: [
-          Icon(icon, color: color, size: 12),
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white, 
-                fontSize: 10, 
-                height: 1.1,  
+  // Start trekking if you want
+  Widget _buildStartSection(BuildContext context, var trekking, Color color,) {
+    final local = AppLocalizations.of(context)!;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              local.start_question_label, 
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
-              textAlign: TextAlign.center, 
-              softWrap: true,
-              maxLines: 2,
             ),
-          ),
-        ],
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: 130,
+              height: 38,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DetailsTrekking(
+                        trekkingid: trekking.documentId,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.play_arrow, size: 16),
+                label: Text(
+                  local.start_trekking_label,
+                  style: const TextStyle(fontSize: 11, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }*/
+  }
 
   // Button for meteo and back
   Widget _actionButton(
@@ -399,11 +383,11 @@ class TrekkingPage extends StatelessWidget {
         const SizedBox(height: 2),
 
         SizedBox(
-          width: 140, 
+          width: 140,
           child: Text(
             text,
             textAlign: TextAlign.center,
-            maxLines:  2,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Colors.white,
@@ -456,11 +440,12 @@ class TrekkingPage extends StatelessWidget {
       alignment: WrapAlignment.center,
       spacing: 10,
       children: [
-        if (trekking.pic_nic_area == true) 
+        if (trekking.pic_nic_area == true)
           Icon(Icons.table_restaurant, color: color, size: 16),
-        if (trekking.refreshment_point != null && trekking.refreshment_point.isNotEmpty) 
+        if (trekking.refreshment_point != null &&
+            trekking.refreshment_point.isNotEmpty)
           Icon(Icons.restaurant, color: color, size: 16),
-        if (trekking.family_firendly == true) 
+        if (trekking.family_firendly == true)
           Icon(Icons.family_restroom, color: color, size: 16),
       ],
     );

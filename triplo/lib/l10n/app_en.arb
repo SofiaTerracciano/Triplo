@@ -99,6 +99,10 @@
     "choose_challenge_label": "Select the challenges completed",
 
     "challeng_title": "Challenges",
+    "no_challenge": "No challenges available",
+    "start_trekking_label": "Start",
+    "before_start": "Before starting",
+    "back_label": "Back",   
 
     "no_users_found_label": "No users found",
     "weather_near_trail_label": "Weather near trail",
@@ -106,8 +110,6 @@
     "no_weather_available_label": "No weather data available",
     "trail_area_label": "Trail area",
     "current_position_label": "Current location",
-
-
 
     "your_position_label": "Your position",
     "based_on_nearest_station_label": "Based on nearest weather station",

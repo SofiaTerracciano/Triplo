@@ -641,6 +641,30 @@ abstract class AppLocalizations {
   /// **'Challenges'**
   String get challeng_title;
 
+  /// No description provided for @no_challenge.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenges available'**
+  String get no_challenge;
+
+  /// No description provided for @start_trekking_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start_trekking_label;
+
+  /// No description provided for @before_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Before starting'**
+  String get before_start;
+
+  /// No description provided for @back_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back_label;
+
   /// No description provided for @no_users_found_label.
   ///
   /// In en, this message translates to:

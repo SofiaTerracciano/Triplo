@@ -279,6 +279,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get challeng_title => 'Desafíos';
 
   @override
+  String get no_challenge => 'No hay desafíos disponibles';
+
+  @override
+  String get start_trekking_label => 'Comenzar';
+
+  @override
+  String get before_start => 'Antes de comenzar';
+
+  @override
+  String get back_label => 'Volver';
+
+  @override
   String get no_users_found_label => 'No se encontraron usuarios';
 
   @override
