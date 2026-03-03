@@ -406,7 +406,7 @@ class UserController extends ChangeNotifier {
 
     _pairedUid = null;
     _qrToken = token;
-    _pairId = token; // se ti serve per UI legacy; altrimenti rimuovilo
+    _pairId = token;
     _pairCreatedAtLocal = DateTime.now();
     notifyListeners();
 
@@ -438,7 +438,7 @@ class UserController extends ChangeNotifier {
         final uid = data['uid'] as String?;
         final tokenOnDb = data['qrToken'] as String?;
 
-        // evita approvazioni di token vecchi
+
         if (tokenOnDb != _qrToken) return;
 
         if (status == 'approved' && uid != null && uid.isNotEmpty) {
@@ -488,7 +488,7 @@ class UserController extends ChangeNotifier {
 
 
   Future<void> logoutWatch() async {
-    // stop timer/listener QR live (ma NON toccare watchId)
+
     _expiryTimer?.cancel();
     _expiryTimer = null;
 
@@ -555,7 +555,7 @@ class UserController extends ChangeNotifier {
       debugPrint("restoreWatchPairing get failed: $e");
     }
 
-    // se non paired, puoi comunque ascoltare (opzionale)
+
     _pairSub = docRef.snapshots().listen((doc) {
       final d = doc.data();
       if (d == null) return;
