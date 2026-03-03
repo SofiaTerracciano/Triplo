@@ -63,7 +63,7 @@ dependencies:
   uuid: ^4.4.0
   mobile_scanner: ^5.2.3
   flutter_secure_storage: ^9.2.2
-  workmanager: ^0.5.0
+
   flutter_local_notifications: ^18.0.0
 flutter_gen:
   output: lib/gen/
@@ -131,7 +131,7 @@ l10n:
 
 dependency_overrides:
   flutter_map: ^6.1.0
-
+  workmanager: ^0.6.0
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
