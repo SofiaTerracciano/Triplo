@@ -103,6 +103,12 @@
   "start_trekking_label": "Commencer",
   "before_start": "Avant de commencer",
   "back_label": "Retour",
+  "trekking_in_progress_label": "En cours",
+  "trekking_completed_label": "Parcours complété!",
+  "stop_trekking": "Arrêter le trekking",
+  "add_to_diary_question_label": "Veux-tu ajouter un souvenir à ton journal?",
+  "add_to_diary_label": "Ajouter au journal",
+  "not_now": "Pas maintenant, retour à l'accueil",
 
   "no_users_found_label": "Aucun utilisateur trouvé",
   "weather_near_trail_label": "Météo près du sentier",

@@ -297,5 +297,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get back_label => 'Zurück';
 
   @override
+  String get trekking_completed_label => 'Route abgeschlossen!';
+
+  @override
   String get no_users_found_label => 'Keine Benutzer gefunden';
 }

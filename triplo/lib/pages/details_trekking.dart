@@ -19,218 +19,191 @@ class DetailsTrekking extends StatelessWidget {
     final local = AppLocalizations.of(context)!;
     final trekkingController = context.watch<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(trekkingid)!;
-
     final Color mainColor = difficultyToColor(trekking.difficulty_level);
 
     final hours = trekking.estimated_time ~/ 60;
     final minutes = (trekking.estimated_time % 60).toInt();
-    final formattedTime = hours > 0
-        ? "${hours}h ${minutes}m"
-        : "${minutes}m";
-
-    // Dimensioni responsive basate sullo schermo
-    final size = MediaQuery.of(context).size;
-    final isSmallPhone = size.height < 700;
+    final String formattedTime = hours > 0 ? "${hours}h ${minutes}m" : "${minutes}m";
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
           _buildFixedBackground(trekkingController, trekking),
-
-          PageView(
-            scrollDirection: Axis.vertical,
-            children: [
-              // Estimated time + Title
-              _buildSectionWrapper(
-                children: [
-                  Text(
-                    local.before_start.toUpperCase(),
-                    style: TextStyle(
-                      color: mainColor,
-                      fontSize: isSmallPhone ? 13 : 15,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  SizedBox(height: isSmallPhone ? 24 : 32),
-                  Icon(Icons.access_time, size: isSmallPhone ? 52 : 64, color: mainColor),
-                  SizedBox(height: isSmallPhone ? 14 : 18),
-                  Text(
-                    local.estimated_time_trekking_label,
-                    style: TextStyle(
-                      fontSize: isSmallPhone ? 14 : 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    formattedTime,
-                    style: TextStyle(
-                      fontSize: isSmallPhone ? 40 : 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Elevation gain
-              _buildSectionWrapper(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (trekking.upGain)
-                        Icon(Icons.arrow_upward, size: isSmallPhone ? 44 : 52, color: mainColor),
-                      if (trekking.upGain && trekking.downGain)
-                        const SizedBox(width: 8),
-                      if (trekking.downGain)
-                        Icon(Icons.arrow_downward, size: isSmallPhone ? 44 : 52, color: mainColor),
-                    ],
-                  ),
-                  SizedBox(height: isSmallPhone ? 14 : 18),
-                  Text(
-                    local.elevaition_gain_trekking_label,
-                    style: TextStyle(
-                      fontSize: isSmallPhone ? 14 : 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "${trekking.elevation_gain.round()} m",
-                    style: TextStyle(
-                      fontSize: isSmallPhone ? 40 : 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Challenges (present or not)
-              if (trekking.challenges.isNotEmpty)
-                _buildSectionWrapper(
-                  children: [
-                    Text(
-                      local.challeng_title.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: isSmallPhone ? 13 : 15,
-                        fontWeight: FontWeight.bold,
-                        color: mainColor,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    SizedBox(height: isSmallPhone ? 24 : 32),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: trekking.challenges.map<Widget>(
-                          (challengeUrl) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: _buildChallengeImage(
-                              trekkingController,
-                              challengeUrl,
-                              mainColor,
-                              size: isSmallPhone ? 72.0 : 84.0,
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                        child: Column(
+                          // Centra tutto verticalmente
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          // Centra tutto orizzontalmente
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Header
+                            Text(
+                              local.before_start.toUpperCase(),
+                              style: TextStyle(
+                                color: mainColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
                             ),
-                          ),
-                        ).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              if (trekking.challenges.isEmpty)
-                _buildSectionWrapper(
-                  children: [
-                    Icon(
-                      Icons.emoji_events_outlined,
-                      size: isSmallPhone ? 52 : 64,
-                      color: mainColor.withOpacity(0.5),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      local.no_challenge.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: isSmallPhone ? 13 : 15,
-                        fontWeight: FontWeight.bold,
-                        color: mainColor,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-
-              // Start and Back buttons
-              _buildSectionWrapper(
-                children: [
-                  Icon(
-                    Icons.directions_walk,
-                    color: Colors.white54,
-                    size: isSmallPhone ? 44 : 52,
-                  ),
-                  SizedBox(height: isSmallPhone ? 28 : 36),
-                  SizedBox(
-                    width: double.infinity,
-                    height: isSmallPhone ? 52 : 58,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mainColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => StartTrekkingPage(
-                              trekkingid: trekkingid,
+                            const SizedBox(height: 8),
+                            Text(
+                              trekking.name ?? "Trekking", 
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        local.start_trekking_label,
-                        style: TextStyle(
-                          fontSize: isSmallPhone ? 16 : 18,
-                          fontWeight: FontWeight.bold,
+                            
+                            const SizedBox(height: 48),
+
+                            // Info Cards
+                            Row(
+                              children: [
+                                _buildInfoCard(
+                                  icon: Icons.access_time_rounded,
+                                  label: local.estimated_time_trekking_label,
+                                  value: formattedTime,
+                                  color: mainColor,
+                                ),
+                                const SizedBox(width: 16),
+                                _buildInfoCard(
+                                  icon: trekking.upGain ? Icons.arrow_upward : Icons.arrow_downward,
+                                  label: local.elevaition_gain_trekking_label,
+                                  value: "${trekking.elevation_gain.round()} m",
+                                  color: mainColor,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 32),
+
+                            // Challenge Section 
+                            _buildChallengeSection(local, trekking, trekkingController, mainColor),
+
+                            const SizedBox(height: 48),
+
+                            // Pulsanti Finali
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 60,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: mainColor,
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => StartTrekkingPage(trekkingid: trekkingid),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      local.start_trekking_label.toUpperCase(),
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    local.back_label,
+                                    style: const TextStyle(color: Colors.white54, fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(
-                      local.back_label,
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: isSmallPhone ? 14 : 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionWrapper({required List<Widget> children}) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
+  Widget _buildInfoCard({required IconData icon, required String label, required String value, required Color color}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.07),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: children,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 32),
+            const SizedBox(height: 12),
+            Text(
+              label, 
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white60, fontSize: 11)
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value, 
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildChallengeSection(var local, var trekking, var controller, Color mainColor) {
+    return Column(
+      children: [
+        Text(
+          local.challeng_title.toUpperCase(),
+          style: TextStyle(
+            color: mainColor, 
+            fontWeight: FontWeight.bold, 
+            letterSpacing: 1.5,
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (trekking.challenges.isEmpty)
+          Text(local.no_challenge, style: const TextStyle(color: Colors.white38))
+        else
+          // Allineamento centrale delle icone sfide
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: trekking.challenges.map<Widget>((url) {
+              return _buildChallengeImage(controller, url, mainColor, size: 64);
+            }).toList(),
+          ),
+      ],
     );
   }
 
@@ -248,77 +221,47 @@ class DetailsTrekking extends StatelessWidget {
         ),
         Positioned.fill(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-            child: Container(color: Colors.black.withOpacity(0.6)),
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.7),
+                    Colors.black,
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChallengeImage(
-    TrekkingController controller,
-    String url,
-    Color color, {
-    double size = 80,
-  }) {
+  Widget _buildChallengeImage(TrekkingController controller, String url, Color color, {double size = 64}) {
     return FutureBuilder<String>(
       future: controller.getDownloadUrl(url),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _challengePlaceholder(color, size: size);
-        }
-
-        if (snapshot.hasError || !snapshot.hasData) {
-          return Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: Colors.white10,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(Icons.broken_image, size: size * 0.4, color: color.withOpacity(0.5)),
-          );
-        }
-
         return Container(
           width: size,
           height: size,
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            border: Border.all(color: color.withOpacity(0.5), width: 1.5),
-            borderRadius: BorderRadius.circular(14),
+            color: Colors.white.withOpacity(0.05),
+            border: Border.all(color: color.withOpacity(0.4), width: 1.5),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: Image.network(
-              snapshot.data!,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  Icon(Icons.error, color: color, size: size * 0.35),
-            ),
-          ),
+          child: snapshot.hasData 
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(snapshot.data!, fit: BoxFit.contain),
+              )
+            : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         );
       },
-    );
-  }
-
-  Widget _challengePlaceholder(Color color, {double size = 80}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Center(
-        child: SizedBox(
-          width: size * 0.25,
-          height: size * 0.25,
-          child: CircularProgressIndicator(strokeWidth: 2, color: color),
-        ),
-      ),
     );
   }
 }

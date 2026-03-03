@@ -291,6 +291,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get back_label => 'Volver';
 
   @override
+  String get trekking_in_progress_label => 'En curso';
+
+  @override
+  String get trekking_completed_label => '¡Ruta completada!';
+
+  @override
+  String get stop_trekking => 'Detener trekking';
+
+  @override
+  String get add_to_diary_question_label => '¿Quieres agregar un pensamiento a tu diario?';
+
+  @override
+  String get add_to_diary_label => 'Agregar al diario';
+
+  @override
+  String get not_now => 'No ahora, volver a la home';
+
+  @override
   String get no_users_found_label => 'No se encontraron usuarios';
 
   @override

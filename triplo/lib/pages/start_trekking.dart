@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:triplo/controller/trekking.dart';
-import 'package:triplo/pages/adding-diary-page.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/pages/end_trekking_page.dart';
 import 'package:triplo/pages/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 
 final FlutterLocalNotificationsPlugin notifications = FlutterLocalNotificationsPlugin();
 
+//TODO: sfondo non sta funzionando (i percorsi hard hanno il nero), nome del trekkign in alto se troppo lungo deve forzare a capo
 class StartTrekkingPage extends StatefulWidget {
   final String trekkingid;
 
@@ -76,11 +78,13 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     _timer?.cancel();
     _challengeTimer?.cancel();
 
+    // Navighiamo alla pagina di fine trekking passando il tempo finale
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => AddingDiaryPage(
-          trekkingId: widget.trekkingid
+        builder: (_) => EndTrekkingPage(
+          trekkingid: widget.trekkingid,
+          elapsedTime: _stopwatch.elapsed,
         ),
       ),
     );
@@ -118,140 +122,183 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     final size = MediaQuery.of(context).size;
     final isSmallPhone = size.height < 700;
 
-    // Dimensione del cerchio: usa la larghezza dello schermo con margini
     final double circleSize = size.width * 0.78;
 
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header con nome trekking
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Row(
-                children: [
-                  Icon(Icons.terrain, color: mainColor, size: 22),
-                  const SizedBox(width: 8),
-                  Text(
-                    trekking?.name ?? "TREKKING",
-                    style: TextStyle(
-                      color: mainColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Background posizionato dietro tutto
+          _buildFixedBackground(trekkingController, trekking),
 
-            const Spacer(),
-
-            // Cerchio con timer
-            Center(
-              child: SizedBox(
-                width: circleSize,
-                height: circleSize,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Anello di progresso
-                    SizedBox(
-                      width: circleSize,
-                      height: circleSize,
-                      child: CircularProgressIndicator(
-                        value: (_stopwatch.elapsed.inMilliseconds % 60000) / 60000,
-                        strokeWidth: 6,
-                        backgroundColor: Colors.white10,
-                        valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+          // Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Header with trekking name and icon
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.terrain, color: mainColor, size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        trekking?.name ?? "TREKKING",
+                        style: TextStyle(
+                          color: mainColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
+                    ],
+                  ),
+                ),
 
-                    // Contenuto centrale
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
+                const Spacer(),
+
+                // Timer with progress ring
+                Center(
+                  child: SizedBox(
+                    width: circleSize,
+                    height: circleSize,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Icon(
-                          Icons.timer_outlined,
-                          color: mainColor.withOpacity(0.6),
-                          size: isSmallPhone ? 28 : 32,
-                        ),
-                        SizedBox(height: isSmallPhone ? 8 : 12),
-                        Text(
-                          _formattedTime,
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: isSmallPhone ? 42 : 52,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 2,
+                        // Prossesing ring
+                        SizedBox(
+                          width: circleSize,
+                          height: circleSize,
+                          child: CircularProgressIndicator(
+                            value: (_stopwatch.elapsed.inMilliseconds % 60000) / 60000,
+                            strokeWidth: 6,
+                            backgroundColor: Colors.white10,
+                            valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                           ),
                         ),
-                        SizedBox(height: isSmallPhone ? 4 : 6),
-                        Text(
-                          "IN CORSO",
-                          style: TextStyle(
-                            color: Colors.white38,
-                            fontSize: isSmallPhone ? 11 : 13,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.w500,
-                          ),
+
+                        // Timer text
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              color: mainColor.withOpacity(0.6),
+                              size: isSmallPhone ? 28 : 32,
+                            ),
+                            SizedBox(height: isSmallPhone ? 8 : 12),
+                            Text(
+                              _formattedTime,
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: isSmallPhone ? 42 : 52,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            SizedBox(height: isSmallPhone ? 4 : 6),
+                            Text(
+                              local.trekking_in_progress_label,
+                              style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: isSmallPhone ? 11 : 13,
+                                letterSpacing: 2,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                ),
+
+                const Spacer(),
+
+                // Stop button
+                Padding(
+                  padding: EdgeInsets.only(bottom: isSmallPhone ? 32 : 48),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _stop,
+                        child: Container(
+                          width: isSmallPhone ? 80 : 96,
+                          height: isSmallPhone ? 80 : 96,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: mainColor.withOpacity(0.1),
+                            border: Border.all(
+                              color: mainColor.withOpacity(0.5),
+                              width: 2.5,
+                            ),
+                          ),
+                          child: Center(
+                            child: Container(
+                              width: isSmallPhone ? 30 : 36,
+                              height: isSmallPhone ? 30 : 36,
+                              decoration: BoxDecoration(
+                                color: mainColor,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        local.stop_trekking,
+                        style: TextStyle(
+                          color: Colors.white38,
+                          fontSize: isSmallPhone ? 12 : 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFixedBackground(TrekkingController controller, var trekking) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: FutureBuilder<String>(
+            future: controller.getDownloadUrl(trekking.endingPointPhoto),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return Container(color: Colors.black);
+              return Image.network(snapshot.data!, fit: BoxFit.cover);
+            },
+          ),
+        ),
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.8),
+                    Colors.black,
                   ],
                 ),
               ),
             ),
-
-            const Spacer(),
-
-            // Bottone STOP
-            Padding(
-              padding: EdgeInsets.only(bottom: isSmallPhone ? 32 : 48),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: _stop,
-                    child: Container(
-                      width: isSmallPhone ? 80 : 96,
-                      height: isSmallPhone ? 80 : 96,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: mainColor.withOpacity(0.1),
-                        border: Border.all(
-                          color: mainColor.withOpacity(0.5),
-                          width: 2.5,
-                        ),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: isSmallPhone ? 30 : 36,
-                          height: isSmallPhone ? 30 : 36,
-                          decoration: BoxDecoration(
-                            color: mainColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Ferma trekking",
-                    style: TextStyle(
-                      color: Colors.white38,
-                      fontSize: isSmallPhone ? 12 : 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

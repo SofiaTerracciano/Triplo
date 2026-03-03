@@ -677,6 +677,12 @@ abstract class AppLocalizations {
   /// **'Back'**
   String get back_label;
 
+  /// No description provided for @trekking_completed_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trekking completed!'**
+  String get trekking_completed_label;
+
   /// No description provided for @no_users_found_label.
   ///
   /// In en, this message translates to:

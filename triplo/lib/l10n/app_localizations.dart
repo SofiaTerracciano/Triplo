@@ -665,6 +665,42 @@ abstract class AppLocalizations {
   /// **'Back'**
   String get back_label;
 
+  /// No description provided for @trekking_in_progress_label.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get trekking_in_progress_label;
+
+  /// No description provided for @trekking_completed_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Trekking Completed'**
+  String get trekking_completed_label;
+
+  /// No description provided for @stop_trekking.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop trekking'**
+  String get stop_trekking;
+
+  /// No description provided for @add_to_diary_question_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to add a thought to your diary?'**
+  String get add_to_diary_question_label;
+
+  /// No description provided for @add_to_diary_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to diary'**
+  String get add_to_diary_label;
+
+  /// No description provided for @not_now.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now, return to home'**
+  String get not_now;
+
   /// No description provided for @no_users_found_label.
   ///
   /// In en, this message translates to:

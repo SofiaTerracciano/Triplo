@@ -105,6 +105,7 @@
   "no_challenge": "Keine Herausforderung verfügbar",
   "before_start": "Vor dem Start",
   "back_label": "Zurück",
+  "trekking_completed_label": "Route abgeschlossen!",
 
   "no_users_found_label": "Keine Benutzer gefunden"
 }

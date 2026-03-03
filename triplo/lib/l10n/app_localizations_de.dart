@@ -291,6 +291,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get back_label => 'Zurück';
 
   @override
+  String get trekking_in_progress_label => 'In Bearbeitung';
+
+  @override
+  String get trekking_completed_label => 'Pfad abgeschlossen';
+
+  @override
+  String get stop_trekking => 'Trekking stoppen';
+
+  @override
+  String get add_to_diary_question_label => 'Möchten Sie einen Gedanken zu Ihrem Tagebuch hinzufügen?';
+
+  @override
+  String get add_to_diary_label => 'Zum Tagebuch hinzufügen';
+
+  @override
+  String get not_now => 'Nicht jetzt, zurück zur Startseite';
+
+  @override
   String get no_users_found_label => 'Keine Benutzer gefunden';
 
   @override

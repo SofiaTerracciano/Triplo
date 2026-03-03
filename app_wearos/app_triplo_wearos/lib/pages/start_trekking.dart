@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/pages/end_trekking.dart';
 import 'package:app_triplo_wearos/pages/home-page.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
+//TODO: sfondo non sta funzioanndo (i percorsi hard hanno il nero)
 final FlutterLocalNotificationsPlugin notifications =
     FlutterLocalNotificationsPlugin();
 
@@ -136,69 +138,118 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: SizedBox(
-          width: screenSize,
-          height: screenSize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: screenSize * 0.90,
-                height: screenSize * 0.90,
-                child: CircularProgressIndicator(
-                  value: (_stopwatch.elapsed.inSeconds % 60) / 60,
-                  strokeWidth: 3,
-                  backgroundColor: const Color.fromARGB(255, 100, 100, 100),
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
+      body: Stack(
+        children: [
+          _buildFixedBackground(trekkingController, trekking),
+
+          Center(
+            child: SizedBox(
+              width: screenSize,
+              height: screenSize,
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  Text(
-                    _formattedTime,
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: screenSize * 0.10,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: 1,
-                      height: 1,
+                  SizedBox(
+                    width: screenSize * 0.90,
+                    height: screenSize * 0.90,
+                    child: CircularProgressIndicator(
+                      value:
+                          (_stopwatch.elapsed.inSeconds % 60) / 60,
+                      strokeWidth: 3,
+                      backgroundColor:
+                          const Color.fromARGB(
+                              255, 100, 100, 100),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(
+                              color),
                     ),
                   ),
-                  SizedBox(height: screenSize * 0.06),
-                  GestureDetector(
-                    onTap: _stop,
-                    child: Container(
-                      width: screenSize * 0.18,
-                      height: screenSize * 0.18,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: color,
-                          width: 1,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _formattedTime,
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: screenSize * 0.10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: 1,
+                          height: 1,
                         ),
-                        color: Colors.black,
                       ),
-                      child: Center(
+                      SizedBox(
+                          height: screenSize * 0.06),
+                      GestureDetector(
+                        onTap: _stop,
                         child: Container(
-                          width: screenSize * 0.07,
-                          height: screenSize * 0.07,
+                          width: screenSize * 0.18,
+                          height: screenSize * 0.18,
                           decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(2),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: color,
+                              width: 1,
+                            ),
+                            color: Colors.black
+                                .withOpacity(0.4),
+                          ),
+                          child: Center(
+                            child: Container(
+                              width:
+                                  screenSize * 0.07,
+                              height:
+                                  screenSize * 0.07,
+                              decoration:
+                                  BoxDecoration(
+                                color: color,
+                                borderRadius:
+                                    BorderRadius
+                                        .circular(2),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFixedBackground(TrekkingController controller, var trekking) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: FutureBuilder<String>(
+            future: controller
+                .getDownloadUrl(trekking.endingPointPhoto),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Container(color: Colors.black);
+              }
+              return Image.network(
+                snapshot.data!,
+                fit: BoxFit.cover,
+              );
+            },
           ),
         ),
-      ),
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+                sigmaX: 3.0, sigmaY: 3.0),
+            child: Container(
+              color: Colors.black.withOpacity(0.6),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

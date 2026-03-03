@@ -139,8 +139,6 @@ class _TrekkingPageState extends State<TrekkingPage> {
   }
 
 
-
-
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
@@ -232,6 +230,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
             },
           ),
 
+          // Play button to start the trekking
           IconButton(
             icon: Icon(Icons.play_arrow),
             onPressed: () {
