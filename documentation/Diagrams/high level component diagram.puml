@@ -1,0 +1,100 @@
+@startuml
+title Triplo System - High-Level Component Diagram
+
+
+'skinparam packageStyle rectangle
+
+
+'========================
+' Mobile applications
+'========================
+component "Triplo Smartphone App" as SmartphoneApp
+component "Triplo Smartwatch App" as WatchApp
+
+
+'--- GUIs (Smartphone)
+interface "HomeGUI" as HomeGUI
+interface "SearchGUI" as SearchGUI
+interface "TrekkingGUI" as TrekkingGUI
+interface "UserProfileGUI" as UserProfileGUI
+interface "LoginRegistrationGUI" as LoginGUI
+
+HomeGUI -down- SmartphoneApp
+SearchGUI -down- SmartphoneApp
+TrekkingGUI -down- SmartphoneApp
+UserProfileGUI -down- SmartphoneApp
+LoginGUI -down- SmartphoneApp
+
+
+
+
+interface "GeoWatchGUI" as GeoWatchGUI
+GeoWatchGUI -down- SmartphoneApp
+interface "HomeSmartwatchGUI" as HomeGUI
+interface "TrekkingSmartwatchGUI" as TrekkingGUI
+interface "UserProfileSmartwatchGUI" as UserProfileGUI
+interface "LoginSmartwatchGUI" as LoginGUI
+
+
+'========================
+' Firebase as backend
+'========================
+package "Firebase" as FirebasePkg {
+  component "Firebase Authentication" as FirebaseAuth
+  component "Firestore" as Firestore
+  component "Firebase Storage" as FirebaseStorage
+}
+
+interface FirebaseAuth as FAuth
+interface FirebaseFirestore as FFirestore
+interface FirebaseStorage as FStorage
+
+SmartphoneApp --( FFAuth : Auth API
+FFAuth -- FirebaseAuth
+SmartphoneApp --( FFirestore : Database API
+FFirestore -- Firestore
+SmartphoneApp --( FStorage: Storage API
+FStorage -- FirebaseStorage
+
+
+'SmartphoneApp -- Firestore : Database API
+'SmartphoneApp -- FirebaseStorage : Storage API
+
+'WatchApp -- FirebaseAuth : Auth API
+'WatchApp -- Firestore : Database API
+'WatchApp -- FirebaseStorage : Storage API
+
+'========================
+' External services
+'========================
+package "External Services" as ExtSvc {
+  component "OpenTopoMap" as OpenTopoMap
+  component "Google Satellite View" as GoogleSat
+  component "OpenWeather" as OpenWeather
+  component "Weatherbit" as Weatherbit
+  component "External Auth Provider (Google)" as GoogleAuth
+}
+
+' Mapping + weather consumed by the apps
+'SmartphoneApp -- OpenTopoMap : Maps API
+'SmartphoneApp -- GoogleSat : Tiles/Maps API
+'SmartphoneApp -- OpenWeather : Weather API
+'SmartphoneApp -- Weatherbit : Weather API
+
+'WatchApp -- OpenTopoMap : Maps API
+'WatchApp -- GoogleSat : Tiles/Maps API
+'WatchApp -- OpenWeather : Weather API
+'WatchApp -- Weatherbit : Weather API
+
+' External auth (federated sign-in)
+'SmartphoneApp -- GoogleAuth : OAuth / Sign-In
+'WatchApp -- GoogleAuth : OAuth / Sign-In
+
+'========================
+' Demo server for meteo alerts
+'========================
+component "Demo Meteo Server" as DemoMeteoServer
+'SmartphoneApp -- DemoMeteoServer : Alert subscription / fetch
+'WatchApp -- DemoMeteoServer : Alert fetch
+
+@enduml
