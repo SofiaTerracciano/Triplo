@@ -1,7 +1,7 @@
+import 'package:app_triplo_wearos/pages/user-page-public.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/user.dart';
-import 'user.dart';
 
 class UserListPage extends StatelessWidget {
   final String title;
@@ -54,7 +54,7 @@ class UserListPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => UserPage(uidOverride: uid),
+                        builder: (_) => UserPagePublic(uidOverride: uid),
                       ),
                     );
                   },
