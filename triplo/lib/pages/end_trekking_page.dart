@@ -6,7 +6,6 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/adding-diary-page.dart';
 import 'package:triplo/pages/home-page.dart';
 
-//TODO:  sfondo non sta funzionando (i percorsi hard hanno il nero)
 class EndTrekkingPage extends StatelessWidget {
   final String trekkingid;
   final Duration elapsedTime;

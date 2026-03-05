@@ -1,6 +1,10 @@
+import 'package:app_triplo_wearos/l10n/app_localizations.dart';
+import 'package:app_triplo_wearos/model/diary.dart';
+import 'package:app_triplo_wearos/pages/diary_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/user.dart';
+import '../controller/diary.dart';
 import 'user_list_page.dart';
 
 class UserPage extends StatelessWidget {
@@ -115,6 +119,9 @@ class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userCtrl = context.watch<UserController>();
+    final diaryController = context.watch<DiaryController>();
+
+    final local = AppLocalizations.of(context)!;
 
     // se uidOverride è null => profilo "paired" (watch)
     final uid = uidOverride ?? userCtrl.effectiveUid;
@@ -141,10 +148,6 @@ class UserPage extends StatelessWidget {
         final email = (user.email ?? "").toString();
         final level = (user.level ?? "-").toString();
         final birthdate = _fmtBirthdate(user.birthdate);
-
-
-
-
 
 
         final photoUrl = (user.photoProfile ?? "").toString();
@@ -191,16 +194,24 @@ class UserPage extends StatelessWidget {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         const SizedBox(height: 2),
-                                        Text(
-                                          "Level: $level",
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        if (user.level == 'Beginner')
+                                          Text(
+                                            '${local.level_label}: ${local.beginner_level}',
+                                            style:
+                                                const TextStyle(fontSize: 10, color: Colors.lightBlue),
+                                          )
+                                        else if (user.level == 'Intermediate')
+                                          Text(
+                                            '${local.level_label}: ${local.intermediate_level}',
+                                          style:
+                                              const TextStyle(fontSize: 10, color: Colors.red),
+                                        )
+                                        else if (user.level == 'Advanced')
+                                          Text(
+                                            '${local.level_label}: ${local.advanced_level}',
+                                            style:
+                                                const TextStyle(fontSize: 10, color: const Color.fromARGB(255, 135, 1, 162)),
+                                          )
                                       ],
                                     ),
                                   ),
@@ -270,22 +281,69 @@ class UserPage extends StatelessWidget {
 
                             const SizedBox(height: 10),
 
-                            // Info card
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(color: Colors.white.withOpacity(0.10)),
-                              ),
-                              child: Column(
-                                children: [
-                                  _infoRow(label: "Email", value: email.isEmpty ? "-" : email),
-                                  const SizedBox(height: 8),
-                                  _infoRow(label: "Birth", value: birthdate),
-                                ],
-                              ),
+                            // Diary button 
+                            FutureBuilder<List<Diary>?>(
+                              future: diaryController.fetchDiaryById(uid),
+                              builder: (context, snapshot) {
+
+                                if (!snapshot.hasData) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+
+                                final diaries = snapshot.data ?? [];
+
+                                final publicDiaries =
+                                    diaries.where((d) => d.isPublic == true).toList();
+
+                                final privateDiaries =
+                                    diaries.where((d) => d.isPublic == false).toList();
+
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+
+                                    _statButton(
+                                      context: context,
+                                      label: local.public_botton_label,
+                                      value: publicDiaries.length,
+                                      onTap: publicDiaries.isEmpty
+                                          ? () {}
+                                          : () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => DiaryListPage(
+                                                    title: "Public diaries",
+                                                    diaries: publicDiaries,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                    ),
+
+                                    const SizedBox(width: 10),
+
+                                    _statButton(
+                                      context: context,
+                                      label: local.private_botton_label,
+                                      value: privateDiaries.length,
+                                      onTap: privateDiaries.isEmpty
+                                          ? () {}
+                                          : () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => DiaryListPage(
+                                                    title: "Private diaries",
+                                                    diaries: privateDiaries,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
 
                             const SizedBox(height: 12),

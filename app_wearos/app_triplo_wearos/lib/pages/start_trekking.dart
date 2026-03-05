@@ -7,7 +7,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
-//TODO: sfondo non sta funzioanndo (i percorsi hard hanno il nero)
 final FlutterLocalNotificationsPlugin notifications =
     FlutterLocalNotificationsPlugin();
 
@@ -114,12 +113,13 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
   String get _formattedTime {
     final elapsed = _stopwatch.elapsed;
+    final hours = elapsed.inHours;
     final minutes = elapsed.inMinutes.remainder(60).toString().padLeft(2, '0');
     final seconds = elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
-    final centiseconds = (elapsed.inMilliseconds.remainder(1000) ~/ 10)
-        .toString()
-        .padLeft(2, '0');
-    return '$minutes:$seconds.$centiseconds';
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:$minutes:$seconds';
+    }
+    return '$hours:$minutes:$seconds';
   }
 
   @override
@@ -140,8 +140,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          _buildFixedBackground(trekkingController, trekking),
-
           Center(
             child: SizedBox(
               width: screenSize,
@@ -219,37 +217,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFixedBackground(TrekkingController controller, var trekking) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: FutureBuilder<String>(
-            future: controller
-                .getDownloadUrl(trekking.endingPointPhoto),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Container(color: Colors.black);
-              }
-              return Image.network(
-                snapshot.data!,
-                fit: BoxFit.cover,
-              );
-            },
-          ),
-        ),
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 3.0, sigmaY: 3.0),
-            child: Container(
-              color: Colors.black.withOpacity(0.6),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

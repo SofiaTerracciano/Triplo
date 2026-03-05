@@ -2,7 +2,6 @@ import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:flutter/material.dart';
 import 'home-page.dart';
 import 'login.dart';
-import 'trekking-page.dart';
 import 'user.dart';
 
 class DebugLandingPage extends StatelessWidget {

@@ -25,10 +25,6 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
 
-
-
-
-
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/observer.dart';
@@ -46,10 +42,6 @@ Future<void> main() async {
 
   runApp(MyApp(language: language));
 }
-
-
-
-
 
 class MyApp extends StatelessWidget {
   final Language language;

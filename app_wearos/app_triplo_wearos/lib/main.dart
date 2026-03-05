@@ -1,4 +1,5 @@
 import 'package:app_triplo_wearos/controller/API.dart';
+import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
@@ -58,7 +59,7 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
       // Provide controllers to the app --> state management
       providers: [
         //ChangeNotifierProvider(create: (_) => UserController()),
-        //ChangeNotifierProvider(create: (_) => DiaryController()),
+        ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider(
           create: (_) => TrekkingController(trekkings: []),
         ),
