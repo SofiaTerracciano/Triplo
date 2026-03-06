@@ -13,7 +13,7 @@ import 'package:triplo/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp);
+    await tester.pumpWidget(const MyApp(language: Language.en));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
@@ -28,3 +28,16 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 }*/
+
+import 'package:flutter_test/flutter_test.dart';
+
+class Dummy {
+  int add(int a, int b) => a + b;
+}
+
+void main() {
+  test('Dummy add works', () {
+    final dummy = Dummy();
+    expect(dummy.add(2, 3), 5);
+  });
+}

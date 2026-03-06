@@ -106,6 +106,8 @@
   "before_start": "Vor dem Start",
   "back_label": "Zurück",
   "trekking_completed_label": "Route abgeschlossen!",
+  "public_diaries_label": "Öffentliche Tagebücher",
+  "private_diaries_label": "Private Tagebücher",
 
   "no_users_found_label": "Keine Benutzer gefunden"
 }

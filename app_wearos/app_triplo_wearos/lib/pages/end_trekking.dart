@@ -16,26 +16,22 @@ class EndTrekkingPage extends StatelessWidget {
   }) : super(key: key);
 
   String get _formattedTime {
-    final minutes =
-        elapsedTime.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds =
-        elapsedTime.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+    final hours = elapsedTime.inHours;
+    final minutes = elapsedTime.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = elapsedTime.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return hours > 0 ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
-    final trekking =
-        trekkingController.getTrekkingById(trekkingid)!;
+    final trekking = trekkingController.getTrekkingById(trekkingid)!;
 
-    final color =
-        difficultyToColor(trekking.difficulty_level);
+    final color = difficultyToColor(trekking.difficulty_level);
 
     final local = AppLocalizations.of(context)!;
 
-    final double screenSize =
-        MediaQuery.of(context).size.shortestSide;
+    final double screenSize = MediaQuery.of(context).size.shortestSide;
 
     return Scaffold(
       backgroundColor: Colors.black,

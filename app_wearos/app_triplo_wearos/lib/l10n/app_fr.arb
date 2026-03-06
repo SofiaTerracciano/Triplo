@@ -106,6 +106,8 @@
   "before_start": "Avant de commencer",
   "back_label": "Retour",
   "trekking_completed_label": "Parcours terminé!",
+  "public_diaries_label": "Journaux publics",
+  "private_diaries_label": "Journaux privés",
 
   "no_users_found_label": "Aucun utilisateur trouvé"
 }

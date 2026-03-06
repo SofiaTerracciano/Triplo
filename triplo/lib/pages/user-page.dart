@@ -192,19 +192,19 @@ class _UserPageState extends State<UserPage> {
                           Text(
                             '${local.level_label}: ${local.beginner_level}',
                             style:
-                                const TextStyle(fontSize: 13, color: Colors.black54),
+                                const TextStyle(fontSize: 13, color: Colors.lightBlue),
                           )
                         else if (user.level == 'Intermediate')
                           Text(
                             '${local.level_label}: ${local.intermediate_level}',
                           style:
-                              const TextStyle(fontSize: 13, color: Colors.black54),
+                              const TextStyle(fontSize: 13, color: Colors.red),
                         )
                         else if (user.level == 'Advanced')
                           Text(
                             '${local.level_label}: ${local.advanced_level}',
                             style:
-                                const TextStyle(fontSize: 13, color: Colors.black54),
+                                const TextStyle(fontSize: 13, color: const Color.fromARGB(255, 135, 1, 162)),
                           )
                       ],
                     ),

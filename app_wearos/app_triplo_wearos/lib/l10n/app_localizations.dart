@@ -683,6 +683,18 @@ abstract class AppLocalizations {
   /// **'Trekking completed!'**
   String get trekking_completed_label;
 
+  /// No description provided for @public_diaries_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Public diaries'**
+  String get public_diaries_label;
+
+  /// No description provided for @private_diaries_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Private diaries'**
+  String get private_diaries_label;
+
   /// No description provided for @no_users_found_label.
   ///
   /// In en, this message translates to:

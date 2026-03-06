@@ -300,5 +300,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trekking_completed_label => 'Parcours terminé!';
 
   @override
+  String get public_diaries_label => 'Journaux publics';
+
+  @override
+  String get private_diaries_label => 'Journaux privés';
+
+  @override
   String get no_users_found_label => 'Aucun utilisateur trouvé';
 }

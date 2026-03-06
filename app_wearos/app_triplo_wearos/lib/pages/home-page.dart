@@ -38,9 +38,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Load trekking
   Future<void> _loadDataDirectly() async {
-    // Chiamiamo direttamente il load del controller
-    await context.read<TrekkingController>().loadTrekking(force: true);
+    await context.read<TrekkingController>().loadTrekking();
   }
 
   @override
@@ -197,7 +197,7 @@ Color difficultyToColor(String difficulty) {
     case "intermediate":
       return Colors.red;
     case "hard":
-      return Colors.black;
+      return const Color.fromARGB(255, 135, 1, 162);
     default:
       return Colors.blueGrey; // fallback
   }
