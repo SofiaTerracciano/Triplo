@@ -1,5 +1,5 @@
 @startuml
-title Triplo System - High-Level Component Diagram
+title Triplo Application - High-Level Component Diagram
 
 
 'skinparam packageStyle rectangle
