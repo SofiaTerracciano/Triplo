@@ -300,5 +300,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trekking_completed_label => 'Trekking completed!';
 
   @override
+  String get public_diaries_label => 'Public diaries';
+
+  @override
+  String get private_diaries_label => 'Private diaries';
+
+  @override
   String get no_users_found_label => 'No users found';
 }

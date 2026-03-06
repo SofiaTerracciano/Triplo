@@ -1,146 +1,108 @@
-import 'package:app_triplo_wearos/pages/user-page-public.dart';
+import 'package:app_triplo_wearos/pages/user.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:app_triplo_wearos/l10n/app_localizations.dart'; 
 import '../controller/user.dart';
+import '../model/user.dart';
 
 class UserListPage extends StatelessWidget {
   final String title;
   final List<String> uids;
 
-  const UserListPage({
-    super.key,
-    required this.title,
-    required this.uids,
-  });
+  const UserListPage({super.key, required this.title, required this.uids});
 
   @override
   Widget build(BuildContext context) {
     final userCtrl = context.read<UserController>();
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        title: Text(title),
-      ),
       body: SafeArea(
-        child: uids.isEmpty
-            ? const Center(
-          child: Text(
-            "Nessun utente",
-            style: TextStyle(color: Colors.white70),
-          ),
-        )
-            : ListView.separated(
-          padding: const EdgeInsets.all(10),
-          itemCount: uids.length,
-          separatorBuilder: (_, __) => Divider(color: Colors.white.withOpacity(0.08)),
-          itemBuilder: (context, index) {
-            final uid = uids[index];
-
-            return FutureBuilder(
-              future: userCtrl.getUserById(uid),
-              builder: (context, snap) {
-                if (!snap.hasData) {
-                  return _UserListTile.loading();
-                }
-                final u = snap.data!;
-                return _UserListTile(
-                  username: u.username,
-                  subtitle: (u.level ?? "").toString(),
-                  photoUrl: (u.photoProfile ?? "").toString(),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => UserPagePublic(uidOverride: uid),
-                      ),
-                    );
-                  },
-                );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _UserListTile extends StatelessWidget {
-  final String username;
-  final String subtitle;
-  final String photoUrl;
-  final VoidCallback onTap;
-  final bool isLoading;
-
-  const _UserListTile({
-    required this.username,
-    required this.subtitle,
-    required this.photoUrl,
-    required this.onTap,
-    this.isLoading = false,
-  });
-
-  factory _UserListTile.loading() => _UserListTile(
-    username: "Caricamento…",
-    subtitle: "",
-    photoUrl: "",
-    onTap: () {},
-    isLoading: true,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    final hasPhoto = photoUrl.trim().isNotEmpty;
-
-    return InkWell(
-      onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
-        ),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.10),
-                image: hasPhoto ? DecorationImage(image: NetworkImage(photoUrl), fit: BoxFit.cover) : null,
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13, 
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
               ),
-              child: hasPhoto ? null : const Icon(Icons.person, color: Colors.white),
             ),
-            const SizedBox(width: 10),
+            
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 children: [
-                  Text(
-                    username,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (subtitle.isNotEmpty)
-                    Text(
-                      subtitle,
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  ...uids.map((uid) => FutureBuilder<Users?>(
+                    future: userCtrl.getUserById(uid),
+                    builder: (context, snap) {
+                      if (!snap.hasData) return const SizedBox(height: 50);
+                      final user = snap.data!;
+
+                      return Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          dense: true,
+                          visualDensity: VisualDensity.compact,
+                          leading: CircleAvatar(
+                            radius: 12,
+                            backgroundImage: (user.photoProfile?.isNotEmpty ?? false)
+                                ? NetworkImage(user.photoProfile!)
+                                : null,
+                            child: (user.photoProfile?.isEmpty ?? true)
+                                ? Icon(Icons.person, size: 14, color: primaryColor)
+                                : null,
+                          ),
+                          title: Text(
+                            user.username,
+                            style: const TextStyle(
+                              fontSize: 11, 
+                              fontWeight: FontWeight.bold
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => UserPage(uidOverride: user.uid),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  )).toList(),
+
+                  const SizedBox(height: 12),
+
+                  // Back button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        minimumSize: const Size(0, 30), 
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        local.back_label, 
+                        style: const TextStyle(fontSize: 11)
+                      ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-            if (!isLoading) const Icon(Icons.chevron_right, color: Colors.white54),
           ],
-
         ),
       ),
     );

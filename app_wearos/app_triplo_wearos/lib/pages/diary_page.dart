@@ -1,13 +1,11 @@
 import 'package:app_triplo_wearos/model/diary.dart';
+import 'package:app_triplo_wearos/pages/user.dart';
 import 'package:flutter/material.dart';
-import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/controller/user.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/model/user.dart';
 import 'package:provider/provider.dart';
 
-/// WearOS-optimized DiaryPage — same visual identity as the mobile app.
-/// Read-only: trekkingName, username, date, duration, friends, challenges.
 class DiaryPage extends StatefulWidget {
   final Diary diary;
 
@@ -19,51 +17,35 @@ class DiaryPage extends StatefulWidget {
 
 class _DiaryPageState extends State<DiaryPage> {
   bool _isLoading = true;
-
-  // Cache futures so they are NOT recreated on every rebuild
   Future<Users?>? _ownerFuture;
   final Map<String, Future<Users?>> _friendFutures = {};
 
   @override
   void initState() {
     super.initState();
-    _loadDiaries();
+    _loadData();
   }
 
-  Future<void> _loadDiaries() async {
-  try {
-    final diaryController = context.read<DiaryController>();
-    final userController = context.read<UserController>();
+  Future<void> _loadData() async {
+    try {
+      final userController = context.read<UserController>();
+      final diary = widget.diary;
 
-    final currentUser = diaryController.currentUser;
-    if (currentUser == null) {
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    final currentUserId = currentUser.uid;
-
-    await diaryController.loadPublicDiary(currentUserId);
-    await diaryController.loadPrivateDiary(currentUserId);
-
-    final diary = widget.diary;
-    if (diary != null) {
       _ownerFuture = userController.getUserById(diary.userId);
       for (final id in diary.friends) {
         _friendFutures[id] = userController.getUserById(id);
       }
+    } catch (e) {
+      debugPrint('Errore in _loadData: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-  } catch (e) {
-    debugPrint('Errore in _loadDiaries: $e');
-  } finally {
-    // ✅ Garantisce che il loading venga sempre rimosso
-    if (mounted) setState(() => _isLoading = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final diary = widget.diary;
 
     if (_isLoading) {
@@ -72,68 +54,55 @@ class _DiaryPageState extends State<DiaryPage> {
       );
     }
 
-    // Format duration
-    String formattedTime;
-    if (diary.duration < 60) {
-      formattedTime = "${diary.duration} m";
-    } else if (diary.duration % 60 == 0) {
-      formattedTime = "${diary.duration ~/ 60} h";
-    } else {
-      formattedTime = "${diary.duration ~/ 60} h ${diary.duration % 60} m";
-    }
+    String formattedTime = diary.duration < 60
+        ? "${diary.duration} m"
+        : "${diary.duration ~/ 60} h ${diary.duration % 60} m";
 
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 32, bottom: 20),
           children: [
-
-            // TITLE
-            Text(
-              diary.trekkigName,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
+            // Trekking name
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                diary.trekkigName,
+                textAlign: TextAlign.center,
+                maxLines: 3, 
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14, 
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
-            // INFO CARD
+            // Info card
             Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: [
-
-                    /// USER
                     FutureBuilder<Users?>(
                       future: _ownerFuture,
                       builder: (_, snap) {
-                        if (!snap.hasData) {
-                          return const SizedBox(height: 20);
-                        }
-
+                        if (!snap.hasData) return const SizedBox(height: 20);
                         final user = snap.data!;
-
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircleAvatar(
                               radius: 12,
-                              backgroundImage: user.photoProfile != null &&
-                                      user.photoProfile!.isNotEmpty
+                              backgroundImage: (user.photoProfile?.isNotEmpty ?? false)
                                   ? NetworkImage(user.photoProfile!)
                                   : null,
-                              child: user.photoProfile == null ||
-                                      user.photoProfile!.isEmpty
+                              child: (user.photoProfile?.isEmpty ?? true)
                                   ? const Icon(Icons.person, size: 14)
                                   : null,
                             ),
@@ -142,59 +111,53 @@ class _DiaryPageState extends State<DiaryPage> {
                               child: Text(
                                 user.username,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
                         );
                       },
                     ),
-
-                    const SizedBox(height: 6),
-
+                    const Divider(height: 12),
                     _infoRow(Icons.calendar_today, diary.date),
-
                     const SizedBox(height: 4),
-
                     _infoRow(Icons.timer, formattedTime),
                   ],
                 ),
               ),
             ),
 
-            /// FRIENDS
+            // Friends section only if there are friends
             if (diary.friends.isNotEmpty) ...[
-              const SizedBox(height: 6),
-
-              _SectionTitle(
-                text: local.friends_trekking_label,
-                icon: Icons.group,
-              ),
-
+              const SizedBox(height: 8),
+              _SectionTitle(text: local.friends_trekking_label, icon: Icons.group),
               Card(
                 elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(
                     children: diary.friends.map((id) {
                       return FutureBuilder<Users?>(
                         future: _friendFutures[id],
                         builder: (_, snap) {
-                          if (!snap.hasData) {
-                            return const SizedBox(height: 14);
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: _infoRow(
-                              Icons.person_outline,
-                              snap.data!.username,
+                          if (!snap.hasData) return const SizedBox(height: 24);
+                          final friend = snap.data!;
+                          return InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => UserPage(uidOverride: friend.uid)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.person_outline, size: 12, color: primaryColor),
+                                  const SizedBox(width: 4),
+                                  Text(friend.username, style: const TextStyle(fontSize: 11)),
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -205,31 +168,52 @@ class _DiaryPageState extends State<DiaryPage> {
               ),
             ],
 
-            /// CHALLENGES
+            // Challenge section only if there are challenges
             if (diary.challenges.isNotEmpty) ...[
-              const SizedBox(height: 6),
-
-              _SectionTitle(
-                text: local.challenges_trekking_label,
-                icon: Icons.flag,
-              ),
-
+              const SizedBox(height: 8),
+              _SectionTitle(text: local.challenges_trekking_label, icon: Icons.emoji_events),
               Card(
                 elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: _infoRow(
-                    Icons.emoji_events,
-                    "${diary.challenges.length}",
+                  padding: const EdgeInsets.all(8),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: diary.challenges.map((challengePath) {
+                      // Challenge icons
+                      return Image.asset(
+                        challengePath,
+                        width: 24,
+                        height: 24,
+                        errorBuilder: (context, error, stackTrace) => 
+                          Icon(Icons.flag, size: 20, color: primaryColor),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
             ],
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
+
+            // Back button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: const StadiumBorder(),
+                  minimumSize: const Size(0, 30),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: Text(local.back_label, style: TextStyle(fontSize: 11)),
+              ),
+            ),
+
+            const SizedBox(height: 14),
           ],
         ),
       ),
@@ -245,22 +229,16 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 14),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 12, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 }
@@ -281,3 +259,4 @@ Widget _infoRow(IconData icon, String text) {
     ],
   );
 }
+
