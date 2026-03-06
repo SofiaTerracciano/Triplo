@@ -8,8 +8,8 @@ title Triplo System - High-Level Component Diagram
 '========================
 ' Mobile applications
 '========================
-component "Triplo Smartphone App" as SmartphoneApp
-component "Triplo Smartwatch App" as WatchApp
+component "Triplo Smartphone App" as SmartphoneApp 
+component "Triplo Smartwatch App" as WatchApp 
 
 
 '--- GUIs (Smartphone)
@@ -18,7 +18,6 @@ interface "SearchGUI" as SearchGUI
 interface "TrekkingGUI" as TrekkingGUI
 interface "UserProfileGUI" as UserProfileGUI
 interface "LoginRegistrationGUI" as LoginGUI
-
 HomeGUI -down- SmartphoneApp
 SearchGUI -down- SmartphoneApp
 TrekkingGUI -down- SmartphoneApp
@@ -30,16 +29,26 @@ LoginGUI -down- SmartphoneApp
 
 interface "GeoWatchGUI" as GeoWatchGUI
 GeoWatchGUI -down- SmartphoneApp
-interface "HomeSmartwatchGUI" as HomeGUI
-interface "TrekkingSmartwatchGUI" as TrekkingGUI
-interface "UserProfileSmartwatchGUI" as UserProfileGUI
-interface "LoginSmartwatchGUI" as LoginGUI
+interface "HomeSmartwatchGUI" 
+interface "TrekkingSmartwatchGUI" 
+interface "UserProfileSmartwatchGUI" 
+interface "LoginSmartwatchGUI" 
+HomeSmartwatchGUI -down- WatchApp
+
+TrekkingSmartwatchGUI -down- WatchApp
+UserProfileSmartwatchGUI -down- WatchApp
+LoginSmartwatchGUI -down- WatchApp
+
+
+
+
+
 
 
 '========================
 ' Firebase as backend
 '========================
-package "Firebase" as FirebasePkg {
+database "Firebase" as FirebasePkg {
   component "Firebase Authentication" as FirebaseAuth
   component "Firestore" as Firestore
   component "Firebase Storage" as FirebaseStorage
@@ -49,13 +58,14 @@ interface FirebaseAuth as FAuth
 interface FirebaseFirestore as FFirestore
 interface FirebaseStorage as FStorage
 
-SmartphoneApp --( FFAuth : Auth API
-FFAuth -- FirebaseAuth
-SmartphoneApp --( FFirestore : Database API
+SmartphoneApp --( FAuth 
+FAuth -- FirebaseAuth
+SmartphoneApp --( FFirestore 
 FFirestore -- Firestore
-SmartphoneApp --( FStorage: Storage API
+SmartphoneApp --( FStorage
 FStorage -- FirebaseStorage
-
+WatchApp --( FFirestore 
+WatchApp --( FStorage 
 
 'SmartphoneApp -- Firestore : Database API
 'SmartphoneApp -- FirebaseStorage : Storage API
@@ -67,12 +77,13 @@ FStorage -- FirebaseStorage
 '========================
 ' External services
 '========================
-package "External Services" as ExtSvc {
+package "External Services" {
   component "OpenTopoMap" as OpenTopoMap
-  component "Google Satellite View" as GoogleSat
+  component "Google Satellite View" as GSW
   component "OpenWeather" as OpenWeather
   component "Weatherbit" as Weatherbit
   component "External Auth Provider (Google)" as GoogleAuth
+    component "Demo Meteo Server" as DemoMeteoServer
 }
 
 ' Mapping + weather consumed by the apps
@@ -90,11 +101,96 @@ package "External Services" as ExtSvc {
 'SmartphoneApp -- GoogleAuth : OAuth / Sign-In
 'WatchApp -- GoogleAuth : OAuth / Sign-In
 
-'========================
-' Demo server for meteo alerts
-'========================
-component "Demo Meteo Server" as DemoMeteoServer
+
 'SmartphoneApp -- DemoMeteoServer : Alert subscription / fetch
 'WatchApp -- DemoMeteoServer : Alert fetch
 
+interface MapAPI 
+interface ExternalAuthAPI
+
+interface WeatherAPI 
+interface WeatherAlertAPI
+
+
+
+
+
+interface SatelliteAPI
+
+
+
+
+
+
+
+
+
+
+
+SmartphoneApp --( MapAPI 
+MapAPI -- OpenTopoMap
+SmartphoneApp --(  ExternalAuthAPI 
+ExternalAuthAPI -- GoogleAuth
+
+
+SmartphoneApp --( WeatherAPI 
+WeatherAPI -- OpenWeather
+
+SmartphoneApp --( WeatherAlertAPI 
+WeatherAlertAPI -- Weatherbit
+
+SmartphoneApp --( SatelliteAPI
+SatelliteAPI -- GSW
+
+
+
+
+WeatherAlertAPI -- DemoMeteoServer
+
+
+
+
+
+
+interface token_verification_API
+FirebaseAuth --( token_verification_API
+token_verification_API -- GoogleAuth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WatchApp --( MapAPI
+
+
+
+
+
+
+
+component SmartphoneOS
+component WatchOS
+
+interface SmartphoneOSAPI
+interface WatchOSAPI
+
+
+
+
+
+
+
+SmartphoneApp -left-( SmartphoneOSAPI
+SmartphoneOSAPI -left- SmartphoneOS
+WatchApp -right-( WatchOSAPI
+WatchOSAPI -right- WatchOS
 @enduml
