@@ -265,9 +265,9 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
               try {
                 if (previous) {
-                  await userController.removeTrekkingFromSaved(trekking.documentId);
+                  await trekkingController.removeTrekkingFromSaved(trekking.documentId);
                 } else {
-                  await userController.addTrekkingToSaved(trekking.documentId);
+                  await trekkingController.addTrekkingToSaved(trekking.documentId);
                 }
               } catch (e) {
                 if (!mounted) return;
@@ -678,8 +678,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
   }
   Future<void> _initSavedState() async {
     try {
-      final userController = context.read<UserController>();
-      final saved = await userController.isTrekkingSaved(widget.trekkingId);
+      final trekkingController = context.read<TrekkingController>();
+      final saved = await trekkingController.isTrekkingSaved(widget.trekkingId);
 
       if (!mounted) return;
       setState(() {

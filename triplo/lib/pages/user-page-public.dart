@@ -3,6 +3,7 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/pages/diary-page.dart';
 import 'package:triplo/pages/user-list-page-public.dart';
+import '../controller/diary.dart';
 import '../controller/user.dart';
 import '../model/diary.dart';
 import '../model/user.dart';
@@ -165,11 +166,11 @@ class _UserPagePublicState extends State<UserPagePublic> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             FutureBuilder<List<Diary>>(
-                              future: context.read<UserController>().getPublicDiaries(u.uid),
+                              future: context.read<DiaryController>().getPublicDiaries(u.uid),
                               builder: (context, pubSnap) {
 
                                 return FutureBuilder<List<Diary>>(
-                                  future: context.read<UserController>().getPrivateDiaries(u.uid),
+                                  future: context.read<DiaryController>().getPrivateDiaries(u.uid),
                                   builder: (context, privSnap) {
 
                                     final pub = pubSnap.data?.length ?? 0;
@@ -244,7 +245,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
             Expanded(
               child: FutureBuilder<List<Diary>>(
                 future: context
-                    .read<UserController>()
+                    .read<DiaryController>()
                     .getPublicDiaries(u.uid),
                 builder: (context, snapshot) {
 

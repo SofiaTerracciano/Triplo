@@ -397,4 +397,28 @@ class DiaryController extends ChangeNotifier {
     // Return only up to the specified limit --> to limit the number of diaries shown (only 10)
     return diaries.take(limit).toList();
   }
+
+  Future<List<Diary>> getPublicDiaries(String userId) async {
+    final snap = await _db
+        .collection('diary')
+        .where('UserId', isEqualTo: userId)
+        .where('Is_public', isEqualTo: true)
+        .get();
+
+    return snap.docs
+        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
+        .toList();
+  }
+
+  Future<List<Diary>> getPrivateDiaries(String userId) async {
+    final snap = await _db
+        .collection('diary')
+        .where('UserId', isEqualTo: userId)
+        .where('Is_public', isEqualTo: false)
+        .get();
+
+    return snap.docs
+        .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
+        .toList();
+  }
 }

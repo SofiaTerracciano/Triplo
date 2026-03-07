@@ -227,6 +227,7 @@ class UserController extends ChangeNotifier {
 // DIARY LISTS
 // =======================
 
+  /*
   Future<List<Diary>> getPublicDiaries(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     final ids = List<String>.from(snap.data()?["Public_diary"] ?? []);
@@ -239,14 +240,16 @@ class UserController extends ChangeNotifier {
     final snap = await _db.collection("users").doc(uid).get();
     final ids = List<String>.from(snap.data()?["Private_diary"] ?? []);
 
+
     final diaries = await Future.wait(ids.map(getDiaryById));
     return diaries.whereType<Diary>().toList();
   }
 
+*/
 // =======================
 // SAVED TREKKINGS
 // =======================
-
+/*
   Future<List<Trekking>> getSavedTrekkings(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
@@ -255,10 +258,12 @@ class UserController extends ChangeNotifier {
     return trekkings.whereType<Trekking>().toList();
   }
 
+ */
+
   /* --------------------------------------------------
    * TREKKING
    * -------------------------------------------------- */
-
+/*
   Future<Trekking?> getTrekkingById(String id) async {
     final snap = await _db.collection("trekking").doc(id).get();
     if (!snap.exists) return null;
@@ -280,6 +285,8 @@ class UserController extends ChangeNotifier {
     });
     notifyListeners();
   }
+
+ */
 
 
   /* --------------------------------------------------
@@ -471,7 +478,7 @@ class UserController extends ChangeNotifier {
 
 
 
-
+/*
   Future<bool> isTrekkingSaved(String trekkingId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return false;
@@ -480,6 +487,8 @@ class UserController extends ChangeNotifier {
     final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
     return ids.contains(trekkingId);
   }
+
+ */
 
     Future<void> _ensureUserFirestoreDocs(User user) async {
       final uid = user.uid;

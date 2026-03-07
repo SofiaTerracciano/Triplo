@@ -3,11 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Trekking> _trekkings;
   bool _loaded = false;
 
@@ -27,7 +27,8 @@ class TrekkingController extends ChangeNotifier {
         .collection('trekking') 
         .get();
 
-    // Map documents to Trekking objects and store in the list --> this function create a 
+
+    // Map documents to Trekking objects and store in the list --> this function create a
     //list of istance of trekkning (model)
     _trekkings = snap.docs
         .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
@@ -93,5 +94,52 @@ class TrekkingController extends ChangeNotifier {
     
     print(results);
     return results;
+  }
+  Future<Trekking?> fetchTrekkingById(String id) async {
+    final snap = await _db.collection("trekking").doc(id).get();
+    if (!snap.exists) return null;
+    return Trekking.fromMap(snap.data()!, docId: id);
+  }
+
+  Future<List<Trekking>> getSavedTrekkings(String uid) async {
+    final userSnap = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .get();
+
+    final ids = List<String>.from(userSnap.data()?["Saved_trekkings"] ?? []);
+    final trekkings = await Future.wait(ids.map(fetchTrekkingById));
+    return trekkings.whereType<Trekking>().toList();
+  }
+
+  Future<void> addTrekkingToSaved(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _db.collection("users").doc(uid).update({
+      "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
+    });
+
+    notifyListeners();
+  }
+
+  Future<void> removeTrekkingFromSaved(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _db.collection("users").doc(uid).update({
+      "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
+    });
+
+    notifyListeners();
+  }
+
+  Future<bool> isTrekkingSaved(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return false;
+
+    final snap = await _db.collection("users").doc(uid).get();
+    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
+    return ids.contains(trekkingId);
   }
 }

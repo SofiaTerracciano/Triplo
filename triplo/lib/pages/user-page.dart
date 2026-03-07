@@ -5,6 +5,8 @@ import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekking-page.dart';
+import '../controller/diary.dart';
+import '../controller/trekking.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
 import '../model/user.dart';
@@ -239,10 +241,10 @@ class _UserPageState extends State<UserPage> {
                           children: [
                             // TOTAL DIARIES
                             FutureBuilder<List<Diary>>(
-                              future: context.read<UserController>().getPublicDiaries(user.uid),
+                              future: context.read<DiaryController>().getPublicDiaries(user.uid),
                               builder: (context, pubSnap) {
                                 return FutureBuilder<List<Diary>>(
-                                  future: context.read<UserController>().getPrivateDiaries(user.uid),
+                                  future: context.read<DiaryController>().getPrivateDiaries(user.uid),
                                   builder: (context, privSnap) {
 
                                     final pub = pubSnap.data?.length ?? 0;
@@ -363,7 +365,7 @@ class _UserPageState extends State<UserPage> {
 
             // PUBLIC DIARY
             FutureBuilder<List<Diary>>(
-            future: context.read<UserController>().getPublicDiaries(user.uid),
+            future: context.read<DiaryController>().getPublicDiaries(user.uid),
               builder: (context, snapshot) {
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -401,7 +403,7 @@ class _UserPageState extends State<UserPage> {
 
             // PRIVATE DIARY
             FutureBuilder<List<Diary>>(
-            future: context.read<UserController>().getPrivateDiaries(user.uid),
+            future: context.read<DiaryController>().getPrivateDiaries(user.uid),
               builder: (context, snapshot) {
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -439,7 +441,7 @@ class _UserPageState extends State<UserPage> {
 
             // SAVED TREKKING
             FutureBuilder<List<Trekking>>(
-            future: context.read<UserController>().getSavedTrekkings(user.uid),
+              future: context.read<TrekkingController>().getSavedTrekkings(user.uid),
               builder: (context, snapshot) {
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
