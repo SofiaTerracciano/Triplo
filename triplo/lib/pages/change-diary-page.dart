@@ -118,6 +118,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     );
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
