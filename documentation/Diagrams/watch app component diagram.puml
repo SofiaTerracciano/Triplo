@@ -1,0 +1,645 @@
+@startuml
+title Triplo Application Smartphone App - Component Diagram
+top to bottom direction
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor transparent
+  FontColor transparent
+}
+
+
+rectangle  {
+
+
+  () HomeGUI
+  () SearchGUI
+
+  
+  '() RideSummaryReviewGUI
+  () LoginRegistrationGUI
+  () UserProfileGUI
+  
+  () trekkingGUI
+  () GeowatchGUI
+  () SettingsGUI
+  () DiaryGUI
+}
+
+
+component "Mobile Triplo Application" {
+
+  
+  portout p1
+  portout p2
+  portout p3
+  
+  
+
+
+
+
+'portout p36
+'portout p37
+'portout p38
+
+
+
+
+
+
+
+
+
+
+
+ 'portout pe1
+  'portout pe2
+  'portout pOS
+  
+  
+
+
+
+
+'portout pe6
+'portout pe7
+'portout pe8
+
+  portin p5
+  portin p6
+
+
+  portin p7
+  portin p8
+  portin p9
+  portin p10
+  portin p11
+  portin p12
+
+
+  package "View" #476bb5ff{
+    [HomePage]
+    [SearchPage]
+    [UserProfilePage]
+    [LoginRegistrationPage]
+    [trekkingPage]
+    [GeowatchPage]
+    [SettingsPage]
+    [DiaryPage]
+  }
+
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
+  rectangle "provaaa" {
+  package "controller" #aaaaaa {
+    package "domain controller" as domaincontroller{
+    [DiaryController]
+    
+    [UserController]
+    [trekkingController]
+    
+    [challengecontroller]
+
+    }
+    [APIController]
+
+
+
+
+
+    [languagecontroller]
+
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+  
+
+  'package "Services" {
+    '[BackendAPIHandler]
+    '[OSAPIHandler]
+    '[SensorLocalService]
+    '[GPSLocalService]
+    
+    '[WeatherLocalService]
+    
+  '}
+
+
+
+
+
+
+
+rectangle "Prova" {
+  package "Service" {
+    [internetservice]
+  }  
+  package "Model" #a62b22ff{
+    [DiaryModel]
+    [UserModel]
+    [trekkingModel]
+    [challengeModel]
+  }
+  package "lib" {
+    [geolocator]
+    [compass]
+  }
+}
+
+
+interface dmi
+interface umi
+interface trekkingmi 
+interface challengeminterface
+  DiaryController -down-( dmi
+  dmi -down- DiaryModel
+  UserController -down-( umi
+  umi -down- UserModel
+  trekkingController -down( trekkingmi
+  trekkingmi -down- trekkingModel
+  challengecontroller -down-( challengeminterface
+  challengeminterface -down- challengeModel
+
+
+
+
+
+interface diary_i
+interface user_i
+interface trekking_i 
+interface challenge_i
+interface language_i
+interface api_i
+
+
+HomePage -down[#green]-( api_i
+api_i -[#green]- APIController
+
+
+HomePage -down[#482408]-( trekking_i 
+trekking_i -down[#482408]- trekkingController
+
+LoginRegistrationPage -down[#blue]-( user_i
+user_i -down[#blue]- UserController
+LoginRegistrationPage -down[#red]-( diary_i
+
+
+
+
+
+diary_i -down[#red]- DiaryController
+
+
+LoginRegistrationPage -down-( language_i
+language_i -- languagecontroller
+
+UserProfilePage -down[#blue]-( user_i
+
+trekkingPage -[#482408]-( trekking_i 
+trekkingPage -[#blue]-( user_i
+trekkingPage -[#green]-( api_i
+trekkingPage --( challenge_i
+challenge_i -- challengecontroller
+DiaryPage -[#red]-( diary_i
+DiaryPage -[#blue]-( user_i
+DiaryPage -[#482408]-( trekking_i 
+
+GeowatchPage -[#green]-( api_i
+
+SettingsPage -[#blue]-( user_i
+SettingsPage --( language_i
+
+
+
+
+
+SearchPage -[#red]-( diary_i
+SearchPage -[#blue]-( user_i
+SearchPage -[#482408]-( trekking_i 
+
+
+
+
+
+
+
+
+
+
+
+
+
+geolocator -- p1
+compass -- p1
+
+
+
+
+
+
+
+
+
+
+
+'challengecontroller -- p3
+'trekkingController --p3
+'UserController -- p3
+'DiaryController -- p3
+domaincontroller -- p3
+
+
+
+'interface lib_i
+'controller -down-( lib_i
+'lib_i -down- lib
+
+interface " " as prova #transparent
+
+
+}
+
+'package "Mobile OS" {
+'  [OS_API]
+'}
+
+'package "Triplo Application Backend" {
+'  [Triplo Application_API]
+'}
+' UI → Controllers
+'[HomePage] --> [PathController]
+'[SearchPage] --> [PathController]
+'[RideSummaryReviewUI] --> [ReviewController]
+'[UserProfilePage] --> [UserController]
+'[LoginRegistrationPage] --> [UserController]
+
+' Controllers → Services
+'[PathController] --> [BackendAPIClient]
+'[ReviewController] --> [BackendAPIClient]
+'[UserController] --> [BackendAPIClient]
+
+'[PathController] --> [GPSService]
+'[ReviewController] --> [LocalStorageService]
+
+' Services → OS
+'[GPSService] --> [OS_API]
+'[SensorService] --> [OS_API]
+'[LocalStorageService] --> [OS_API]
+
+' Backend communication
+'[BackendAPIClient] --> [Triplo Application_API]
+
+' Domain usage
+'[PathController] ..> [Path]
+'[ReviewController] ..> [Review]
+'[UserController] ..> [User]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+database "Firebase Backend" as Backend
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+component "                  <<platform>> \n                   MobileOS\n GPS, sensors, file system, storage" as OS
+
+
+
+
+
+
+
+
+
+
+
+
+'() "HomeGUI"
+'() "SearchGUI"
+'() "RideSummaryReviewGUI"
+'() "UserProfileGUI"
+'() "LoginRegistrationGUI"
+
+
+HomePage -- p5
+p5 -up- HomeGUI
+
+SearchPage -- p6
+p6 -up- SearchGUI
+
+'RideSummaryReviewUI -- p7
+'p7 -up- RideSummaryReviewGUI
+
+
+
+UserProfilePage -- p8
+p8 -up- UserProfileGUI
+
+
+
+LoginRegistrationPage -- p12
+p12 -up- LoginRegistrationGUI
+
+
+
+
+
+
+GeowatchPage -- p11
+p11 -up- GeowatchGUI
+
+
+
+SettingsPage -- p9
+p9 -up- SettingsGUI
+
+trekkingPage -- p10
+p10 -up- trekkingGUI
+
+DiaryPage -- p7
+p7 -up- DiaryGUI
+
+
+
+
+UserController -down- p2
+' View → Controller
+'[HomePage] -down-> [BikePathController]
+'[SearchPage] -down-> [BikePathController]
+'[RideSummaryReviewUI] -down-> [ReviewController]
+'[UserProfilePage] -down-> [UserController]
+'[LoginRegistrationPage] -down-> [UserController]
+
+' Controller → Model
+'[BikePathController] -down-> [BikePathModel]
+'[tripController] -down-> [tripModel]
+'[ReviewController] -down-> [ReviewModel]
+'[UserController] -down-> [UserModel]
+
+
+
+
+
+' Controller → Backend
+'[BikePathController] -right-> [BackendAPIHandler]
+'[tripController] -right-> [BackendAPIHandler]
+'[ReviewController] -right-> [BackendAPIHandler]
+'[UserController] -right-> [BackendAPIHandler]
+' Controller → OS
+'[tripController] -right-> [OSAPIHandler]
+'[ReviewController] -right-> [OSAPIHandler]
+
+
+
+
+' Controller → External Auth
+'[UserController] -right-> [ExternalAuthAPIHandler]
+
+
+
+
+'"HomeGUI" -[hidden]-> "SearchGUI"
+'"SearchGUI" -[hidden]-> "RideSummaryReviewGUI"
+'"RideSummaryReviewGUI" -[hidden]-> "LoginRegistrationGUI"
+'"LoginRegistrationGUI" -[hidden]-> "UserProfileGUI"
+
+
+
+
+
+
+
+
+
+
+'"User Interface (External)" -[hidden]-> "Mobile App (Triplo Application)"
+
+
+
+'interface bgwi
+'UserController --( bgwi
+'bgwi -- BackendAPIHandler
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+interface FirebaseAuth
+p3 --( FirebaseAuth
+FirebaseAuth -- Backend
+
+
+
+'interface external_API
+'p2 --( external_API
+
+
+
+
+
+
+
+
+
+
+interface OS_API
+p1 --( OS_API
+OS_API -- OS
+
+
+
+interface FirebaseFirestore
+p3 --( FirebaseFirestore
+FirebaseFirestore -- Backend
+
+
+
+
+interface FirebaseStorage
+p3 --( FirebaseStorage
+FirebaseStorage -- Backend
+
+
+
+
+
+cloud Google{
+  [google.com]
+}
+
+
+
+
+
+
+
+internetservice -[#green]-( api_i
+
+interface https
+p2 --( https
+https -- Google
+
+
+
+
+
+
+
+
+'UserController -- p1
+'UserController -- p36
+'UserController -- p38
+'APIController -- p36
+'APIController -- p37
+'APIController -- p38
+
+
+
+
+
+
+
+'HomeGUI -[hidden]-> SearchGUI
+'SearchGUI -[hidden]-> RideSummaryReviewGUI
+'RideSummaryReviewGUI -[hidden]-> UserProfileGUI
+'UserProfileGUI -[hidden]-> LoginRegistrationGUI
+
+package "External Services" {
+  component "OpenTopoMap" as OpenTopoMap
+  component "Google Satellite View" as GSW
+  component "OpenWeather" as OpenWeather
+  component "Weatherbit" as Weatherbit
+  component "External Auth Provider (Google)" as GoogleAuth
+    component "Demo Meteo Server" as DemoMeteoServer
+}
+APIController -down- p2
+'pe1 -down- OpenTopoMap
+
+'APIController -down- pe2
+'pe2 -down- GSW
+
+'APIController -down- pe3
+'pe3 -down- OpenWeather
+
+
+
+
+'APIController -down- pe6
+'pe6 -down- Weatherbit
+
+'APIController -down- pe7
+'pe7 -down- DemoMeteoServer
+
+
+
+'APIController -down- pe8
+'pe8 -down- GoogleAuth
+
+
+
+
+
+
+
+
+
+
+
+
+
+'external_API -- GoogleAuth
+
+interface MapAPI 
+interface ExternalAuthAPI
+interface WeatherAPI 
+
+interface WeatherAlertAPI
+
+
+p2 --( MapAPI 
+p2 --( ExternalAuthAPI
+
+interface SatelliteAPI
+
+
+
+
+
+p2 --( WeatherAPI
+p2 --( WeatherAlertAPI
+p2 --( SatelliteAPI
+MapAPI -- OpenTopoMap
+ExternalAuthAPI -- GoogleAuth
+WeatherAPI -- OpenWeather
+WeatherAlertAPI -- Weatherbit
+SatelliteAPI -- GSW
+
+
+
+
+WeatherAlertAPI -- DemoMeteoServer
+
+interface token_verification_API
+Backend --( token_verification_API
+token_verification_API -- GoogleAuth
+
+
+@enduml

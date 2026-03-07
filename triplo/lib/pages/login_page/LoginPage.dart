@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
 
     final userController = context.read<UserController>();
     final diaryController = context.read<DiaryController>();
-    final trekkingController = context.read<TrekkingController>();
+    //final trekkingController = context.read<TrekkingController>();
     try {
       await userController.login(email, password);
       //final uid = controller.currentUser!.uid;
@@ -65,12 +65,17 @@ class _LoginPageState extends State<LoginPage> {
       final uid = user.uid;
       //assign current user instance to _currentUser attribute of diaryController
       diaryController.currentUser = user;
-      await diaryController.loadPublicDiary(uid);
-      await diaryController.loadPrivateDiary(uid);
 
+
+
+      //await diaryController.loadPublicDiary(uid);
+      //await diaryController.loadPrivateDiary(uid);
+      /*
       trekkingController.loadTrekking().then((_) {
         setState(() {});
       });
+
+       */
 
       Navigator.pushReplacement(
         context,

@@ -18,6 +18,7 @@ interface "SearchGUI" as SearchGUI
 interface "TrekkingGUI" as TrekkingGUI
 interface "UserProfileGUI" as UserProfileGUI
 interface "LoginRegistrationGUI" as LoginGUI
+interface "SettingsGUI" as SettingsGUI
 HomeGUI -down- SmartphoneApp
 SearchGUI -down- SmartphoneApp
 TrekkingGUI -down- SmartphoneApp
@@ -26,6 +27,15 @@ LoginGUI -down- SmartphoneApp
 
 
 
+
+
+
+
+
+
+
+
+SettingsGUI -down- SmartphoneApp
 
 interface "GeoWatchGUI" as GeoWatchGUI
 GeoWatchGUI -down- SmartphoneApp
@@ -131,6 +141,8 @@ SmartphoneApp --( MapAPI
 MapAPI -- OpenTopoMap
 SmartphoneApp --(  ExternalAuthAPI 
 ExternalAuthAPI -- GoogleAuth
+
+
 
 
 SmartphoneApp --( WeatherAPI 
