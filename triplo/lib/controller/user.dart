@@ -208,86 +208,6 @@ class UserController extends ChangeNotifier {
   }
 
 
-  /* --------------------------------------------------
-   * DIARY
-   * -------------------------------------------------- */
-
-  Future<Diary?> getDiaryById(String id) async {
-    final snap = await _db.collection("diary").doc(id).get();
-    if (!snap.exists) return null;
-    return Diary.fromMap(snap.data()!, diaryId: id);
-  }
-
-
-
-
-
-
-  // =======================
-// DIARY LISTS
-// =======================
-
-  /*
-  Future<List<Diary>> getPublicDiaries(String uid) async {
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Public_diary"] ?? []);
-
-    final diaries = await Future.wait(ids.map(getDiaryById));
-    return diaries.whereType<Diary>().toList();
-  }
-
-  Future<List<Diary>> getPrivateDiaries(String uid) async {
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Private_diary"] ?? []);
-
-
-    final diaries = await Future.wait(ids.map(getDiaryById));
-    return diaries.whereType<Diary>().toList();
-  }
-
-*/
-// =======================
-// SAVED TREKKINGS
-// =======================
-/*
-  Future<List<Trekking>> getSavedTrekkings(String uid) async {
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
-
-    final trekkings = await Future.wait(ids.map(getTrekkingById));
-    return trekkings.whereType<Trekking>().toList();
-  }
-
- */
-
-  /* --------------------------------------------------
-   * TREKKING
-   * -------------------------------------------------- */
-/*
-  Future<Trekking?> getTrekkingById(String id) async {
-    final snap = await _db.collection("trekking").doc(id).get();
-    if (!snap.exists) return null;
-    return Trekking.fromMap(snap.data()!, docId: id);
-  }
-
-  Future<void> addTrekkingToSaved(String trekkingId) async {
-    final uid = _auth.currentUser!.uid;
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayUnion([trekkingId])
-    });
-    notifyListeners();
-  }
-
-  Future<void> removeTrekkingFromSaved(String trekkingId) async {
-    final uid = _auth.currentUser!.uid;
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayRemove([trekkingId])
-    });
-    notifyListeners();
-  }
-
- */
-
 
   /* --------------------------------------------------
    * PROFILE UPDATE
@@ -478,17 +398,7 @@ class UserController extends ChangeNotifier {
 
 
 
-/*
-  Future<bool> isTrekkingSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return false;
 
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
-    return ids.contains(trekkingId);
-  }
-
- */
 
     Future<void> _ensureUserFirestoreDocs(User user) async {
       final uid = user.uid;

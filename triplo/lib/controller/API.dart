@@ -132,48 +132,7 @@ class API {
     }
   }
 
-  // Retry a task multiple times with delay
-  Future<T?> retry<T>(Future<T?> Function() task,
-      {int retries = 2, int delayMs = 400}) async {
-    T? result;
 
-    for (int i = 0; i <= retries; i++) {
-      result = await task();
-      if (result != null) return result;
-      await Future.delayed(Duration(milliseconds: delayMs));
-    }
-
-    return null;
-  }
-/*
-  // Safe HTTP GET request with error handling
-  Future<dynamic> safeRequest(
-      Uri url, {
-        Duration timeout = const Duration(seconds: 6),
-      }) async {
-    try {
-      final res = await http.get(url).timeout(timeout);
-
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        return jsonDecode(res.body);
-      }
-
-      return ApiError(
-        "Server responded with ${res.statusCode}",
-        statusCode: res.statusCode,
-      );
-    }
-
-    on TimeoutException {
-      return ApiError("Connection timed out");
-    }
-
-    catch (e) {
-      return ApiError("Network error or API unreachable");
-    }
-  }
-
- */
 
   // Check for internet connectivity
   Future<bool> hasInternet() async {
@@ -227,47 +186,7 @@ class API {
     return ['a', 'b', 'c'];
   }
 
-/*
-  Future<List<Map<String, dynamic>>> meteoAlarmAlerts(
-      double lat,
-      double lon,
-      ) async {
 
-    final url =
-        "https://api.meteoalarm.org/edr/v1/collections/warnings/items"
-        "?coords=POINT($lon $lat)";
-
-    try {
-      final res = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 8));
-
-      if (res.statusCode != 200) {
-        debugPrint("MeteoAlarm error ${res.statusCode}");
-        return [];
-      }
-
-      final data = jsonDecode(res.body);
-
-      final List features = data["features"] ?? [];
-
-      return features.map<Map<String, dynamic>>((f) {
-        final p = f["properties"] ?? {};
-        return {
-          "event": p["event"] ?? "Unknown",
-          "severity": p["severity"] ?? "Unknown",
-          "headline": p["headline"] ?? "",
-          "description": p["description"] ?? "",
-          "start": p["effective"],
-          "end": p["expires"],
-        };
-      }).toList();
-    } catch (e) {
-      debugPrint("MeteoAlarm exception $e");
-      return [];
-    }
-  }
-*/
 
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
@@ -334,36 +253,9 @@ class API {
     }
   }
 
-/*
-  LatLng computeCentroid(List<LatLng> points) {
-    double lat = 0;
-    double lon = 0;
 
-    for (final p in points) {
-      lat += p.latitude;
-      lon += p.longitude;
-    }
-
-    return LatLng(
-      lat / points.length,
-      lon / points.length,
-    );
-  }
-
-
- */
 }
 
-// Class to represent API errors
-class ApiError {
-  final String message;
-  final int? statusCode;
-
-  ApiError(this.message, {this.statusCode});
-
-  @override
-  String toString() => "ApiError($statusCode): $message";
-}
 
 // Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
