@@ -290,6 +290,10 @@ class UserController extends ChangeNotifier {
     final uid = _auth.currentUser!.uid;
     await _db.collection("users").doc(uid).update({"Username": username});
     _currentUser?.username = username;
+    await _db.collection("users_index").doc(uid).update({
+      "username": username,
+      "normalized": username.toLowerCase(),
+    });
     notifyListeners();
   }
 

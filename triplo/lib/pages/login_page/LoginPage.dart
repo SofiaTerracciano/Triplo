@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/widgets_for_pages/language_button/language_button.dart';
 import '../../controller/language.dart';
 import '../user-page.dart';
 import 'package:provider/provider.dart';
-import 'package:triplo/controller/trekking.dart';
+
 import 'package:triplo/controller/diary.dart';
 
 /**
