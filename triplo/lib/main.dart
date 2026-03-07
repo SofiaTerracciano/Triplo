@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/pages/user-page-public.dart';
+import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/internetservice.dart';
 import 'firebase_options.dart';
 
@@ -51,13 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) {
-            final controller = UserController();
-            controller.tryAutoLogin();
-            return controller;
-          },
-        ),
+
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
 
@@ -68,6 +63,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<API, InternetService>(
           create: (context) => InternetService(api: context.read<API>())..start(),
           update: (context, api, old) => old ?? InternetService(api: api)..start(),
+        ),
+        ChangeNotifierProvider<AuthService>(
+          create: (_) => AuthService(),
+        ),
+
+        ChangeNotifierProxyProvider<AuthService, UserController>(
+          create: (context) {
+            final controller = UserController(context.read<AuthService>());
+            controller.tryAutoLogin();
+            return controller;
+          },
+          update: (context, authService, previous) =>
+          previous ?? UserController(authService),
         ),
       ],
       child: Consumer2<Language, InternetService>(

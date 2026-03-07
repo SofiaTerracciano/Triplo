@@ -17,7 +17,9 @@ class UserController extends ChangeNotifier {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
+
+  UserController(this._authService);
 
 
 
