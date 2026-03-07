@@ -6,6 +6,7 @@ import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/pages/user-page-public.dart';
 import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/internetservice.dart';
+import 'controller/challenge.dart';
 import 'firebase_options.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
           update: (context, authService, previous) =>
           previous ?? UserController(authService),
         ),
+        ChangeNotifierProvider(create: (_) => ChallengesController()),
       ],
       child: Consumer2<Language, InternetService>(
         builder: (context, lang, internet, child) {

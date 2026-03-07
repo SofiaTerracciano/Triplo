@@ -57,6 +57,10 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
     super.initState();
     final diaryController = context.read<DiaryController>();
     final trekkingController = context.read<TrekkingController>();
+    final userController = context.read<UserController>();
+
+
+
     diaryPage = diaryController.getDiaryById(widget.diaryId)!;
 
     // Date
@@ -126,10 +130,15 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
 
     final List<int> days = List<int>.generate(31, (i) => i + 1);
     final List<int> months = List<int>.generate(12, (i) => i + 1);
+    final int startYear =
+    (selectedYear != null && selectedYear! > DateTime.now().year)
+        ? selectedYear!
+        : DateTime.now().year;
+
     final List<int> years = List<int>.generate(
       100,
-      (i) => 2025 - i,
-    ); // ultimi 100 anni
+          (i) => startYear - i,
+    );
     final List<int> hours = List<int>.generate(24, (i) => i); // 0–23
     final List<int> minutes = List<int>.generate(60, (i) => i); // 0–59
 
@@ -813,7 +822,9 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           images,
                         );
                         photos.addAll(addedPhotos);
-                        diaryController.addDiary(
+
+                        diaryController.currentUser = userController.currentUser!;
+                        await diaryController.addDiary(
                           trekkingName.name,
                           isPublic,
                           castedDate,
@@ -832,6 +843,7 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                           MaterialPageRoute(builder: (context) => UserPage()),
                         );
                       },
+
                     ),
                   ),
                 ],

@@ -598,6 +598,8 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                         _images,
                       );
 
+                      diaryController.currentUser = userController.currentUser!;
+
                       await diaryController.addDiary(
                         trekking.name,
                         isPublic,

@@ -6,6 +6,8 @@ import 'package:triplo/pages/search-page.dart';
 import 'package:triplo/pages/setting-page.dart';
 import 'package:triplo/pages/user-page.dart';
 
+import '../controller/challenge.dart';
+
 class ChallengesPage extends StatefulWidget {
 
   const ChallengesPage({
