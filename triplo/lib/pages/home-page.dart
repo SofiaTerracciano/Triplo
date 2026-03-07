@@ -47,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
 
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -186,7 +187,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   double currentZoom = 12.0;
   LatLng currentCenter = LatLng(46.230, 10.831);
   bool showRecenter = false;
-  final api = API();
+  //final api = API();
 
   // Bounds of the map area
   final LatLngBounds bounds = LatLngBounds(
@@ -255,7 +256,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-
+    final api = context.read<API>();
     return Stack(
       children: [
         FlutterMap(
