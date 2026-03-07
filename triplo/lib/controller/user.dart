@@ -6,13 +6,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../model/user.dart';
-import '../model/diary.dart';
-import '../model/trekking.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
+
+import '../service/authservice.dart' ;
 class UserController extends ChangeNotifier {
+
+
+
+
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
+
 
 
   Users? _currentUser;
@@ -23,98 +29,25 @@ class UserController extends ChangeNotifier {
    * -------------------------------------------------- */
 
   Future<void> register(String email, String password) async {
-    final cred = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = cred.user!.uid;
-    final username = email.split("@")[0];
-
-    // -----------------------
-    // USERS COLLECTION
-    // -----------------------
-    await _db.collection("users").doc(uid).set({
-      "Username": username,
-      "Photo_profile": "",
-      "Name": "",
-      "Surname": "",
-      "Birthdate": DateTime.now().toIso8601String(),
-      "Email": email,
-      "Followers": [],
-      "Following": [],
-      "Public_diary": [],
-      "Private_diary": [],
-      "Saved_trekkings": [],
-      "Level": "Beginner",
-    });
-
-    // -----------------------
-    // USERS_INDEX COLLECTION
-    // -----------------------
-    await _db.collection("users_index").doc(uid).set({
-      "uid": uid,
-      "username": username,
-      "normalized": username.toLowerCase(),
-    });
-
-    await loadUserCore(uid);
+    await _authService.register(email, password);
+    _currentUser = _authService.currentUser;
+    notifyListeners();
   }
 
-
   Future<void> login(String email, String password) async {
-    final cred = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    await loadUserCore(cred.user!.uid);
+    await _authService.login(email, password);
+    _currentUser = _authService.currentUser;
+    notifyListeners();
   }
 
   Future<void> loginWithGoogle() async {
-    final googleSignIn = GoogleSignIn();
-
-    try {
-      // Forza la scelta dell'account ad ogni login
-      await googleSignIn.signOut();
-
-      // Se l'utente aveva già autorizzato l'app con un account Google,
-      // questa chiamata aiuta a mostrare di nuovo il selettore account.
-      try {
-        await googleSignIn.disconnect();
-      } catch (_) {
-        // Può fallire se non c'è un account collegato, in tal caso ignoriamo.
-      }
-
-      final googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        throw Exception("Google sign-in cancelled");
-      }
-
-      final googleAuth = await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final cred = await _auth.signInWithCredential(credential);
-      final user = cred.user;
-
-      if (user == null) {
-        throw StateError("Firebase user is null after Google sign-in");
-      }
-
-      await _ensureUserFirestoreDocs(user);
-      await loadUserCore(user.uid);
-    } catch (e) {
-      rethrow;
-    }
+    await _authService.loginWithGoogle();
+    _currentUser = _authService.currentUser;
+    notifyListeners();
   }
 
-    Future<void> logout() async {
-    await _auth.signOut();
+  Future<void> logout() async {
+    await _authService.logout();
     _currentUser = null;
     notifyListeners();
   }
@@ -273,29 +206,21 @@ class UserController extends ChangeNotifier {
    * -------------------------------------------------- */
 
   Future<void> sendPasswordReset(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    await _authService.sendPasswordReset(email);
   }
 
   Future<void> requestPasswordReset() async {
-    if (_currentUser?.email == null) return;
-    await _auth.sendPasswordResetEmail(email: _currentUser!.email);
+    await _authService.requestPasswordReset();
   }
 
   /* --------------------------------------------------
    * PROVIDERS
    * -------------------------------------------------- */
 
-  bool get isGoogleUser {
-    final user = _auth.currentUser;
-    if (user == null) return false;
-    return user.providerData.any((p) => p.providerId == "google.com");
-  }
+  bool get isGoogleUser => _authService.isGoogleUser;
 
-  bool get isPasswordUser {
-    final user = _auth.currentUser;
-    if (user == null) return false;
-    return user.providerData.any((p) => p.providerId == "password");
-  }
+  bool get isPasswordUser => _authService.isPasswordUser;
+
 
   Future<void> restoreGoogleProfilePhoto() async {
     final user = _auth.currentUser;
