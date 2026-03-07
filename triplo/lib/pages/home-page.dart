@@ -323,7 +323,7 @@ Color difficultyToColor(String difficulty) {
     case "intermediate":
       return Colors.red;
     case "hard":
-      return const Color.fromARGB(250, 135, 1, 162);
+      return Colors.black;
     default:
       return Colors.blueGrey; // fallback
   }

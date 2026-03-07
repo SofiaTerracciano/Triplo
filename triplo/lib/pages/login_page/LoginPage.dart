@@ -104,23 +104,10 @@ class _LoginPageState extends State<LoginPage> {
    * 4. Navigate to the UserPage on success.
    */
   Future<void> _loginGoogle(BuildContext context) async {
-    final googleSignIn = GoogleSignIn();
+    final controller = context.read<UserController>();
 
     try {
-      await googleSignIn.signOut();
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return;
-
-      final googleAuth = await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final controller = Provider.of<UserController>(context, listen: false);
-      await controller.loginWithGoogle(credential);
-
+      await controller.loginWithGoogle();
 
       Navigator.pushReplacement(
         context,
@@ -129,9 +116,9 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Google login failed: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google login failed: $e")),
+      );
     }
   }
 

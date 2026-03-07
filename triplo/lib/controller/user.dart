@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 class UserController extends ChangeNotifier {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -71,17 +71,46 @@ class UserController extends ChangeNotifier {
     await loadUserCore(cred.user!.uid);
   }
 
-  Future<void> loginWithGoogle(AuthCredential credential) async {
-    final cred = await _auth.signInWithCredential(credential);
-    final user = cred.user;
-    if (user == null) {
-      throw StateError("Firebase user è null dopo signInWithCredential");
+  Future<void> loginWithGoogle() async {
+    final googleSignIn = GoogleSignIn();
+
+    try {
+      // Forza la scelta dell'account ad ogni login
+      await googleSignIn.signOut();
+
+      // Se l'utente aveva già autorizzato l'app con un account Google,
+      // questa chiamata aiuta a mostrare di nuovo il selettore account.
+      try {
+        await googleSignIn.disconnect();
+      } catch (_) {
+        // Può fallire se non c'è un account collegato, in tal caso ignoriamo.
+      }
+
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw Exception("Google sign-in cancelled");
+      }
+
+      final googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final cred = await _auth.signInWithCredential(credential);
+      final user = cred.user;
+
+      if (user == null) {
+        throw StateError("Firebase user is null after Google sign-in");
+      }
+
+      await _ensureUserFirestoreDocs(user);
+      await loadUserCore(user.uid);
+    } catch (e) {
+      rethrow;
     }
-
-    // Se è nuovo (o se il doc non esiste), crea Firestore docs
-    await _ensureUserFirestoreDocs(user);
-
-    await loadUserCore(user.uid);
   }
 
     Future<void> logout() async {

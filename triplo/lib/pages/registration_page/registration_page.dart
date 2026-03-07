@@ -33,7 +33,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   bool _isLoading = false;
 
-
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   /** Validates the fields and delegates registration to the controller for the user.*/
   Future<void> _register(BuildContext context) async {

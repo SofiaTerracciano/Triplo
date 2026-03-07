@@ -145,7 +145,7 @@ class API {
 
     return null;
   }
-
+/*
   // Safe HTTP GET request with error handling
   Future<dynamic> safeRequest(
       Uri url, {
@@ -172,6 +172,8 @@ class API {
       return ApiError("Network error or API unreachable");
     }
   }
+
+ */
 
   // Check for internet connectivity
   Future<bool> hasInternet() async {
