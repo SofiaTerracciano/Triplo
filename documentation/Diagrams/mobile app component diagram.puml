@@ -158,6 +158,7 @@ rectangle "Prova" {
   package "lib" {
     [geolocator]
     [compass]
+    [shared preferences]
   }
 }
 
