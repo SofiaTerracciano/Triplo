@@ -60,8 +60,8 @@ LoginSmartwatchGUI -down- WatchApp
 '========================
 database "Firebase" as FirebasePkg {
   component "Firebase Authentication" as FirebaseAuth
-  component "Firestore" as Firestore
-  component "Firebase Storage" as FirebaseStorage
+  database "Firestore" as Firestore
+  database "Firebase Storage" as FirebaseStorage
 }
 
 interface FirebaseAuth as FAuth

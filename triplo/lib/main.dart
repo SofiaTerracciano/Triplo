@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/GeowatchPage/geowatch.dart';
 import 'package:triplo/pages/LoginRegistrationPage/forgotten_password_page/forgotten_password_page.dart';
 import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
@@ -132,6 +133,7 @@ class MyApp extends StatelessWidget {
 
 
               '/offline': (context) => const OfflinePage(),
+              '/navigation': (context) => CompassAltitudePage()
             },
           );
         },
