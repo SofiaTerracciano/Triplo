@@ -294,6 +294,7 @@ lib_i -- lib
 interface osservice_i
 APIController --( osservice_i
 osservice_i -right- OSservice
+languagecontroller --( osservice_i
 }
 
 'package "Mobile OS" {

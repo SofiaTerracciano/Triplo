@@ -9,6 +9,7 @@ import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
 import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
 import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
+import 'package:triplo/service/OSservice.dart';
 import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/internetservice.dart';
 import 'controller/challenge.dart';
@@ -30,8 +31,8 @@ import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
 
 import 'package:triplo/controller/API.dart';
-import 'package:triplo/service/notification.dart';
-import 'package:triplo/service/observer.dart';
+
+
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +42,13 @@ Future<void> main() async {
     debugPrint(".env file not found — continuing without it.");
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  final language = Language();
+  //final language = Language();
+  //await language.loadSavedLocale();
+
+  final os = OSService();
+
+  final language = Language(os: os);
+
   await language.loadSavedLocale();
 
   runApp(MyApp(language: language));
@@ -62,7 +69,13 @@ class MyApp extends StatelessWidget {
 
         ChangeNotifierProvider.value(value: language),
 
-        Provider<API>(create: (_) => API()),
+        Provider<OSService>(
+          create: (_) => OSService(),
+        ),
+
+        ProxyProvider<OSService, API>(
+          update: (_, os, __) => API(os: os),
+        ),
         ChangeNotifierProxyProvider<API, InternetService>(
           create: (context) => InternetService(api: context.read<API>())..start(),
           update: (context, api, old) => old ?? InternetService(api: api)..start(),
@@ -70,7 +83,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AuthService>(
           create: (_) => AuthService(),
         ),
-
         ChangeNotifierProxyProvider<AuthService, UserController>(
           create: (context) {
             final controller = UserController(context.read<AuthService>());

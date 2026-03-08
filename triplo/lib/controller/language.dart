@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../service/OSservice.dart';
+
 class Language extends ChangeNotifier {
   static const _kLocaleCodeKey = "locale_code";
 
   Locale _locale = const Locale('en');
   Locale get locale => _locale;
+  final OSService os;
 
-  // Carica la lingua salvata (da chiamare all'avvio)
+
+  Language({required this.os});
+
+
+
   Future<void> loadSavedLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_kLocaleCodeKey);
+    final code = await os.loadLocaleCode();
 
     if (code == null || code.isEmpty) return;
 
     final loaded = Locale(code);
+
     if (_locale == loaded) return;
 
     _locale = loaded;
