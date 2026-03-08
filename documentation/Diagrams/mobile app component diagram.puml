@@ -100,12 +100,12 @@ component "Mobile Triplo Application" {
   
   rectangle "provaaa" {
   package "controller" #aaaaaa {
+    package "base resources controller" as backendcontroller{
     package "domain controller" as domaincontroller{
     [DiaryController]
     
     [UserController]
     [trekkingController]
-    
     [challengecontroller]
 
     }
@@ -113,7 +113,7 @@ component "Mobile Triplo Application" {
 
 
 
-
+    }
 
     [languagecontroller]
 
@@ -148,9 +148,7 @@ component "Mobile Triplo Application" {
 
 
 rectangle "Prova" {
-  package "Service" {
-    [internetservice]
-  }  
+   
   package "Model" #a62b22ff{
     [DiaryModel]
     [UserModel]
@@ -198,7 +196,9 @@ trekking_i -down[#482408]- trekkingController
 
 LoginRegistrationPage -down[#blue]-( user_i
 user_i -down[#blue]- UserController
-LoginRegistrationPage -down[#red]-( diary_i
+
+
+'LoginRegistrationPage -down[#red]-( diary_i
 
 
 
@@ -263,7 +263,11 @@ compass -- p1
 'trekkingController --p3
 'UserController -- p3
 'DiaryController -- p3
-domaincontroller -- p3
+
+
+
+
+backendcontroller -- p3
 
 
 
@@ -271,9 +275,25 @@ domaincontroller -- p3
 'controller -down-( lib_i
 'lib_i -down- lib
 
-interface " " as prova #transparent
+'interface " " as prova #transparent
 
+'package "Service" {
+    [internetservice]
+    [authservice]
+    [OSservice]
+  '} 
 
+ interface authservice_i
+ UserController --( authservice_i
+ authservice_i -- authservice
+ authservice -- p2
+
+interface lib_i
+OSservice --( lib_i
+lib_i -- lib
+interface osservice_i
+APIController --( osservice_i
+osservice_i -right- OSservice
 }
 
 'package "Mobile OS" {
@@ -411,7 +431,7 @@ p7 -up- DiaryGUI
 
 
 
-UserController -down- p2
+'UserController -down- p2
 ' View → Controller
 '[HomePage] -down-> [BikePathController]
 '[SearchPage] -down-> [BikePathController]
@@ -570,7 +590,7 @@ package "External Services" {
   component "External Auth Provider (Google)" as GoogleAuth
     component "Demo Meteo Server" as DemoMeteoServer
 }
-APIController -down- p2
+'APIController -down- p2
 'pe1 -down- OpenTopoMap
 
 'APIController -down- pe2
