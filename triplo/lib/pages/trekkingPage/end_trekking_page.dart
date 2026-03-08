@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/adding-diary-page.dart';
-import 'package:triplo/pages/home-page.dart';
+import 'package:triplo/pages/DiaryPage/adding-diary-page.dart';
+import 'package:triplo/pages/HomePage/home-page.dart';
 
 class EndTrekkingPage extends StatelessWidget {
   final String trekkingid;

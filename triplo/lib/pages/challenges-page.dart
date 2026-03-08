@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/home-page.dart';
-import 'package:triplo/pages/search-page.dart';
-import 'package:triplo/pages/setting-page.dart';
-import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/HomePage/home-page.dart';
+import 'package:triplo/pages/SearchPage/search-page.dart';
+import 'package:triplo/pages/SettingsPage/setting-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
 
 import '../controller/challenge.dart';
 

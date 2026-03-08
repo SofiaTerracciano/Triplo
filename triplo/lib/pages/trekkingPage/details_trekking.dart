@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/home-page.dart';
-import 'package:triplo/pages/start_trekking.dart';
+import 'package:triplo/pages/HomePage/home-page.dart';
+import 'package:triplo/pages/trekkingPage/start_trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

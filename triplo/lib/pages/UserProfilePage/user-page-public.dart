@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:triplo/pages/diary-page.dart';
-import 'package:triplo/pages/user-list-page-public.dart';
-import '../controller/diary.dart';
-import '../controller/user.dart';
-import '../model/diary.dart';
-import '../model/user.dart';
+import 'package:triplo/pages/DiaryPage/diary-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-list-page-public.dart';
+import '../../controller/diary.dart';
+import '../../controller/user.dart';
+import '../../model/diary.dart';
+import '../../model/user.dart';
 
 class UserPagePublic extends StatefulWidget {
   final String userId;

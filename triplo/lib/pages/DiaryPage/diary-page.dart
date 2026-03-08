@@ -6,10 +6,10 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/model/user.dart';
-import 'package:triplo/pages/change-diary-page.dart';
-import 'package:triplo/pages/user-page-public.dart';
+import 'package:triplo/pages/DiaryPage/change-diary-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
 import 'package:provider/provider.dart';
-import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
 
 // DiaryPage widget to display details of a specific diary that you have created
 class DiaryPage extends StatefulWidget {

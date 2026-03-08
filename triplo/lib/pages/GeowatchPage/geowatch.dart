@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/API.dart';
-import 'package:triplo/pages/geowatch/google_satellite_page.dart';
+
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
 import 'package:triplo/controller/API.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'google_satellite_page.dart';
 
 
 class GeoWatchPage extends StatefulWidget {

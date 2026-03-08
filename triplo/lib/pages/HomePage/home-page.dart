@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
-import 'search-page.dart';
-import 'setting-page.dart';
-import 'user-page.dart';
+import '../SearchPage/search-page.dart';
+import '../SettingsPage/setting-page.dart';
+import '../UserProfilePage/user-page.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
-import 'trekking-page.dart';
+import '../trekkingPage/trekking-page.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:provider/provider.dart';
 

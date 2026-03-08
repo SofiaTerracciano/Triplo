@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 // Import delle pagine
-import 'package:triplo/pages/home-page.dart';
-import 'package:triplo/pages/search-page.dart';
-import 'package:triplo/pages/setting-page.dart';
-import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/HomePage/home-page.dart';
+import 'package:triplo/pages/SearchPage/search-page.dart';
+import 'package:triplo/pages/SettingsPage/setting-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
 
-// Import da sottocartella Login_Page
-import 'package:triplo/pages/login_page/LoginPage.dart';
 
-// Import da sottocartella geowatch
-import 'package:triplo/pages/geowatch/geowatch.dart';
+
+
 
 // Import della pagina admin che carica i punti
 import 'package:triplo/update_points.dart';
 
 import '../../admin_add_trekking.dart';
 import '../../update_user_index.dart';
+import '../GeowatchPage/geowatch.dart';
+import '../LoginRegistrationPage/login_page/LoginPage.dart';
 
 class Landing_Page extends StatefulWidget {
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/model/user.dart';
-import '../pages/user-page-public.dart';
+import 'user-page-public.dart';
 
 class UsersList extends StatelessWidget {
   final String listName; // "Followers" or "Following"

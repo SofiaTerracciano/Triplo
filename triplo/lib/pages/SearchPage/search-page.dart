@@ -5,17 +5,17 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/challenges-page.dart';
-import 'package:triplo/pages/trekking-page.dart';
-import 'package:triplo/pages/user-page-public.dart';
-import '../enum/SearchMode.dart';
-import '../widgets_for_pages/filter/filter.dart';
-import 'home-page.dart';
-import 'user-page.dart';
-import 'setting-page.dart';
-import 'diary-page.dart';
-import '../controller/diary.dart';
-import '../controller/trekking.dart';
-import '../controller/user.dart';
+import 'package:triplo/pages/trekkingPage/trekking-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
+import '../../enum/SearchMode.dart';
+import '../../widgets_for_pages/filter/filter.dart';
+import '../HomePage/home-page.dart';
+import '../UserProfilePage/user-page.dart';
+import '../SettingsPage/setting-page.dart';
+import '../DiaryPage/diary-page.dart';
+import '../../controller/diary.dart';
+import '../../controller/trekking.dart';
+import '../../controller/user.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});

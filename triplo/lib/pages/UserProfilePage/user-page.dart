@@ -4,19 +4,19 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
 import 'package:triplo/pages/challenges-page.dart';
-import 'package:triplo/pages/trekking-page.dart';
-import '../controller/diary.dart';
-import '../controller/trekking.dart';
-import '../model/diary.dart';
-import '../model/trekking.dart';
-import '../model/user.dart';
-import 'diary-page.dart';
-import 'home-page.dart';
-import 'setting-page.dart';
-import 'search-page.dart';
+import 'package:triplo/pages/trekkingPage/trekking-page.dart';
+import '../../controller/diary.dart';
+import '../../controller/trekking.dart';
+import '../../model/diary.dart';
+import '../../model/trekking.dart';
+import '../../model/user.dart';
+import '../DiaryPage/diary-page.dart';
+import '../HomePage/home-page.dart';
+import '../SettingsPage/setting-page.dart';
+import '../SearchPage/search-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
-import '../pages/users-list-page.dart';
+import 'users-list-page.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});

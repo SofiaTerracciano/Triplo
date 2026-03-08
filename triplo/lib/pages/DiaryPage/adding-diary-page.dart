@@ -7,7 +7,7 @@ import 'package:triplo/model/trekking.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/diary.dart';
-import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/pages/loading-page.dart';
 
 class AddingDiaryPage extends StatefulWidget {

@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/src/material/icons.dart';
-import 'package:triplo/pages/adding-diary-page.dart';
-import 'package:triplo/pages/details_trekking.dart';
-import 'package:triplo/pages/geowatch/geowatch.dart';
-import '../controller/trekking.dart';
-import '../controller/user.dart';
+import 'package:triplo/pages/DiaryPage/adding-diary-page.dart';
+import 'package:triplo/pages/trekkingPage/details_trekking.dart';
+
+import '../../controller/trekking.dart';
+import '../../controller/user.dart';
 import 'package:provider/provider.dart';
 
 import 'package:latlong2/latlong.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/widgets_for_pages/weather/weather.dart';
+
+import '../GeowatchPage/geowatch.dart';
 
 
 // TrekkingPage widget to display detailed information about a trekking

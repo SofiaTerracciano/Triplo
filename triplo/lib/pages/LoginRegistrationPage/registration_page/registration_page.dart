@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
-import '../user-page.dart';
+import '../../UserProfilePage/user-page.dart';
+
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 

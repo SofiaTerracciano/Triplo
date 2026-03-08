@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/user.dart';
-import '../pages/user-page-public.dart';
+import 'user-page-public.dart';
 import 'package:provider/provider.dart';
 
 // UsersListPublic widget to display followers or following users of a specified user

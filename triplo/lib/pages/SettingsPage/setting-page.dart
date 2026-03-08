@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/challenges-page.dart';
-import 'package:triplo/pages/watch_pair_page.dart';
-import 'home-page.dart';
-import 'user-page.dart';
-import 'search-page.dart';
-import '../controller/user.dart';
+import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
+import '../HomePage/home-page.dart';
+import '../UserProfilePage/user-page.dart';
+import '../SearchPage/search-page.dart';
+import '../../controller/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 

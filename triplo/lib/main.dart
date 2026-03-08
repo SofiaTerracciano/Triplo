@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
+import 'package:triplo/pages/GeowatchPage/geowatch.dart';
+import 'package:triplo/pages/LoginRegistrationPage/forgotten_password_page/forgotten_password_page.dart';
+import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
+import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
 import 'package:triplo/pages/offline_page.dart';
-import 'package:triplo/pages/user-page-public.dart';
+import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
 import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/internetservice.dart';
 import 'controller/challenge.dart';
@@ -14,10 +18,7 @@ import 'package:triplo/l10n/app_localizations.dart';
 
 import 'package:triplo/pages/landing_page/landing_page.dart';
 
-import 'package:triplo/pages/login_page/LoginPage.dart';
-import 'package:triplo/pages/registration_page/registration_page.dart';
-import 'package:triplo/pages/forgotten_password_page/forgotten_password_page.dart';
-import 'package:triplo/pages/geowatch/geowatch.dart';
+
 
 // solo per caricare i punti di un trekking
 import 'package:triplo/update_points.dart';

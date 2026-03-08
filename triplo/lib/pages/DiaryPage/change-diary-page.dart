@@ -6,7 +6,7 @@ import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/diary.dart';
 import 'package:triplo/pages/loading-page.dart';
-import 'package:triplo/pages/user-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
