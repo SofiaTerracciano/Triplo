@@ -157,9 +157,14 @@ class TrekkingController extends ChangeNotifier {
     debugPrint("getCachedImage -> $imagePath");
 
     try {
+      final inMemory = await os.getImageFromMemory(imagePath);
+      if (inMemory != null) {
+        debugPrint("Image found in RAM cache");
+        return inMemory;
+      }
+
       String cacheableUrl = imagePath;
 
-      // Converte solo se il path è in formato gs://
       if (imagePath.startsWith("gs://")) {
         final ref = FirebaseStorage.instance.refFromURL(imagePath);
         cacheableUrl = await ref.getDownloadURL();
@@ -167,12 +172,15 @@ class TrekkingController extends ChangeNotifier {
 
       final cached = await os.getImageFromCache(cacheableUrl);
       if (cached != null) {
-        debugPrint("Image found in cache");
+        debugPrint("Image found in disk cache");
+        os.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
       debugPrint("Image not in cache, downloading");
-      return await os.cacheImage(cacheableUrl);
+      final file = await os.cacheImage(cacheableUrl);
+      os.saveImageToMemory(imagePath, file);
+      return file;
     } catch (e) {
       debugPrint("getCachedImage error: $e");
       return null;

@@ -77,4 +77,32 @@ class OSService {
 
 
 
+
+  final Map<String, File> _memoryImageCache = {};
+
+  Future<File?> getImageFromMemory(String key) async {
+    final file = _memoryImageCache[key];
+    if (file == null) return null;
+
+    if (await file.exists()) {
+      return file;
+    }
+
+    _memoryImageCache.remove(key);
+    return null;
+  }
+
+  void saveImageToMemory(String key, File file) {
+    _memoryImageCache[key] = file;
+  }
+
+  void removeImageFromMemory(String key) {
+    _memoryImageCache.remove(key);
+  }
+
+  void clearMemoryImageCache() {
+    _memoryImageCache.clear();
+  }
+
+
 }
