@@ -29,7 +29,7 @@ rectangle  {
 component "Mobile Triplo Application" {
 
   
-  portout p1
+  'portout p1
   portout p2
   portout p3
   
@@ -159,7 +159,10 @@ rectangle "Prova" {
     [geolocator]
     [compass]
     [shared preferences]
+    [cache]
+    geolocator -[hidden]right- cache
   }
+  portout p1
 }
 
 
@@ -236,6 +239,7 @@ SearchPage -[#blue]-( user_i
 SearchPage -[#482408]-( trekking_i 
 
 
+languagecontroller -[hidden]right-> APIController
 
 
 
@@ -247,14 +251,12 @@ SearchPage -[#482408]-( trekking_i
 
 
 
-geolocator -- p1
-compass -- p1
 
 
 
-
-
-
+lib -up- p1
+lib -[hidden]- Model
+geolocator -[hidden]up- DiaryModel
 
 
 
@@ -282,19 +284,20 @@ backendcontroller -- p3
     [internetservice]
     [authservice]
     [OSservice]
-  '} 
-
+ ' } 
+'internetservice -[hidden]up- authservice
+OSservice -[hidden]up- internetservice
  interface authservice_i
  UserController --( authservice_i
  authservice_i -- authservice
  authservice -- p2
-
+authservice -- p3
 interface lib_i
 OSservice --( lib_i
 lib_i -- lib
 interface osservice_i
 APIController --( osservice_i
-osservice_i -right- OSservice
+osservice_i -- OSservice
 languagecontroller --( osservice_i
 }
 
@@ -333,9 +336,9 @@ languagecontroller --( osservice_i
 '[ReviewController] ..> [Review]
 '[UserController] ..> [User]
 
+'Model -[hidden]right- lib_i
 
-
-
+Model -[hidden]right- authservice_i
 
 
 
@@ -532,7 +535,7 @@ interface FirebaseFirestore
 p3 --( FirebaseFirestore
 FirebaseFirestore -- Backend
 
-
+FirebaseAuth -[hidden]- OS
 
 
 interface FirebaseStorage
