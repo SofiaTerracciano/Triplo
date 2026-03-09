@@ -535,12 +535,10 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
   // Widget to display a photo section with a loading indicator until the image is loaded and then show the image
   Widget _photoSection(Future<File?> future) {
-
     return FutureBuilder<File?>(
       future: future,
       builder: (context, snapshot) {
-
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
             height: 200,
             alignment: Alignment.center,
@@ -548,13 +546,20 @@ class _TrekkingPageState extends State<TrekkingPage> {
           );
         }
 
-        final file = snapshot.data;
+        if (snapshot.hasError) {
+          return Container(
+            height: 200,
+            alignment: Alignment.center,
+            child: const Icon(Icons.broken_image, size: 40),
+          );
+        }
 
+        final file = snapshot.data;
         if (file == null) {
           return Container(
             height: 200,
             alignment: Alignment.center,
-            child: const Icon(Icons.broken_image),
+            child: const Icon(Icons.image_not_supported, size: 40),
           );
         }
 

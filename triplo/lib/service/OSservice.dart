@@ -57,12 +57,22 @@ class OSService {
   );
 
   Future<File?> getImageFromCache(String url) async {
-    final file = await _cache.getFileFromCache(url);
-    return file?.file;
+    try {
+      final file = await _cache.getFileFromCache(url);
+      return file?.file;
+    } catch (e) {
+      debugPrint("getImageFromCache error: $e");
+      return null;
+    }
   }
 
   Future<File> cacheImage(String url) async {
-    return await _cache.getSingleFile(url);
+    try {
+      return await _cache.getSingleFile(url);
+    } catch (e) {
+      debugPrint("cacheImage error: $e");
+      rethrow;
+    }
   }
 
 

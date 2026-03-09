@@ -153,18 +153,29 @@ class TrekkingController extends ChangeNotifier {
 
 
 
-  Future<File?> getCachedImage(String storagePath) async {
+  Future<File?> getCachedImage(String imagePath) async {
+    debugPrint("getCachedImage -> $imagePath");
 
-    final url = await getDownloadUrl(storagePath);
+    try {
+      String cacheableUrl = imagePath;
 
-    final cached = await os.getImageFromCache(url);
+      // Converte solo se il path è in formato gs://
+      if (imagePath.startsWith("gs://")) {
+        final ref = FirebaseStorage.instance.refFromURL(imagePath);
+        cacheableUrl = await ref.getDownloadURL();
+      }
 
-    if (cached != null) {
-      return cached;
+      final cached = await os.getImageFromCache(cacheableUrl);
+      if (cached != null) {
+        debugPrint("Image found in cache");
+        return cached;
+      }
+
+      debugPrint("Image not in cache, downloading");
+      return await os.cacheImage(cacheableUrl);
+    } catch (e) {
+      debugPrint("getCachedImage error: $e");
+      return null;
     }
-
-    final file = await os.cacheImage(url);
-
-    return file;
   }
 }
