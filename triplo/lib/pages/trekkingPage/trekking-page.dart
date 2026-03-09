@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
@@ -294,8 +296,13 @@ class _TrekkingPageState extends State<TrekkingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+
+
             // Map photo --> close up view
-            _photoSection(trekkingController.getDownloadUrl(trekking.mapPhoto)),
+            _photoSection(
+                trekkingController.getCachedImage(trekking.mapPhoto)
+            ),
 
             const SizedBox(height: 16),
 
@@ -389,7 +396,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
 
             // Ending point photo
             _photoSection(
-              trekkingController.getDownloadUrl(trekking.endingPointPhoto),
+              trekkingController.getCachedImage(trekking.endingPointPhoto),
             ),
 
             const SizedBox(height: 24),
@@ -527,11 +534,12 @@ class _TrekkingPageState extends State<TrekkingPage> {
   }
 
   // Widget to display a photo section with a loading indicator until the image is loaded and then show the image
-  Widget _photoSection(Future<String> future) {
-    // Use FutureBuilder to handle the asynchronous loading of the image URL
-    return FutureBuilder<String>(
+  Widget _photoSection(Future<File?> future) {
+
+    return FutureBuilder<File?>(
       future: future,
       builder: (context, snapshot) {
+
         if (!snapshot.hasData) {
           return Container(
             height: 200,
@@ -539,11 +547,21 @@ class _TrekkingPageState extends State<TrekkingPage> {
             child: const CircularProgressIndicator(),
           );
         }
-        // Once the image URL is loaded, display the image with rounded corners
+
+        final file = snapshot.data;
+
+        if (file == null) {
+          return Container(
+            height: 200,
+            alignment: Alignment.center,
+            child: const Icon(Icons.broken_image),
+          );
+        }
+
         return ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            snapshot.data!,
+          child: Image.file(
+            file,
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,

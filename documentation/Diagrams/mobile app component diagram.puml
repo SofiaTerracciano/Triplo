@@ -118,6 +118,8 @@ component "Mobile Triplo Application" {
     [languagecontroller]
 
   }
+
+  
   
 }
 
@@ -301,6 +303,10 @@ osservice_i -- OSservice
 languagecontroller --( osservice_i
 }
 
+
+
+UserController --( osservice_i
+trekkingController --( osservice_i
 'package "Mobile OS" {
 '  [OS_API]
 '}
@@ -535,7 +541,7 @@ interface FirebaseFirestore
 p3 --( FirebaseFirestore
 FirebaseFirestore -- Backend
 
-FirebaseAuth -[hidden]- OS
+'FirebaseAuth -[hidden]- OS
 
 
 interface FirebaseStorage

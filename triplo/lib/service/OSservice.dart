@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart';
@@ -44,5 +47,24 @@ class OSService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kLocaleCodeKey, code);
   }
+
+  final CacheManager _cache = CacheManager(
+    Config(
+      'triploImageCache',
+      stalePeriod: const Duration(days: 12),
+      maxNrOfCacheObjects: 200,
+    ),
+  );
+
+  Future<File?> getImageFromCache(String url) async {
+    final file = await _cache.getFileFromCache(url);
+    return file?.file;
+  }
+
+  Future<File> cacheImage(String url) async {
+    return await _cache.getSingleFile(url);
+  }
+
+
 
 }

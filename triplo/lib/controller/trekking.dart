@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../service/OSservice.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -11,7 +15,11 @@ class TrekkingController extends ChangeNotifier {
   List<Trekking> _trekkings;
   bool _loaded = false;
 
-  TrekkingController({required List<Trekking> trekkings})
+
+
+  final OSService os;
+
+  TrekkingController({required this.os,required List<Trekking> trekkings})
     : _trekkings = trekkings;
 
   // Getter for all trekkings
@@ -141,5 +149,22 @@ class TrekkingController extends ChangeNotifier {
     final snap = await _db.collection("users").doc(uid).get();
     final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
     return ids.contains(trekkingId);
+  }
+
+
+
+  Future<File?> getCachedImage(String storagePath) async {
+
+    final url = await getDownloadUrl(storagePath);
+
+    final cached = await os.getImageFromCache(url);
+
+    if (cached != null) {
+      return cached;
+    }
+
+    final file = await os.cacheImage(url);
+
+    return file;
   }
 }

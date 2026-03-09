@@ -80,13 +80,19 @@ class MyApp extends StatelessWidget {
 
         /// Controllers
         ChangeNotifierProvider(create: (_) => DiaryController()),
-        ChangeNotifierProvider(create: (_) => TrekkingController(trekkings: [])),
         ChangeNotifierProvider.value(value: language),
 
         /// Services condivisi
         Provider<OSService>.value(value: os),
         ChangeNotifierProvider<AuthService>.value(value: authService),
-
+        ChangeNotifierProxyProvider<OSService, TrekkingController>(
+          create: (context) => TrekkingController(
+            os: context.read<OSService>(),
+            trekkings: [],
+          ),
+          update: (context, os, previous) =>
+          previous ?? TrekkingController(os: os, trekkings: []),
+        ),
         /// API (dipende da OSService)
         ProxyProvider<OSService, API>(
           update: (_, os, __) => API(os: os),
