@@ -178,4 +178,12 @@ class TrekkingController extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<List<File>> getCachedImages(List<String> imagePaths) async {
+    final files = await Future.wait(
+      imagePaths.map((path) async => await getCachedImage(path)),
+    );
+
+    return files.whereType<File>().toList();
+  }
 }

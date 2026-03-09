@@ -426,8 +426,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
             // Challenges section
             _sectionTitle(local.challenges_trekking_label),
             trekking.challenges.isNotEmpty
-                ? FutureBuilder<List<String>>(
-                    future: trekkingController.getDownloadUrls(trekking.challenges),
+                ? FutureBuilder<List<File>>(
+                    future: trekkingController.getCachedImages(trekking.challenges),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Padding(
@@ -458,7 +458,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                                 ),
                               ],
                             ),
-                            child: Image.network(
+                            child: Image.file(
                               url,
                               height: 45, // Dimensione simile agli screenshot
                               width: 45,
