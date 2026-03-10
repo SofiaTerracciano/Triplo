@@ -71,7 +71,26 @@ Future<void> main() async {
     iOS: iosSettings,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(initSettings, );
+  await flutterLocalNotificationsPlugin.initialize(initSettings, onDidReceiveNotificationResponse: (NotificationResponse response) {
+    final context = navKey.currentContext;
+    if (context == null) return;
+
+    final String challenge = response.payload ?? "sfida";
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("🥾 È ora di una sfida!"),
+        content: Text(_getChallengeBody(challenge)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  },);
   runApp(
     MyApp(
       os: os,
@@ -205,5 +224,16 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+String _getChallengeBody(String challenge) {
+  switch (challenge) {
+    case "balance": return "Metti alla prova il tuo equilibrio!";
+    case "hi": return "Saluta qualcuno che incontri sul sentiero!";
+    case "mini_orientiring": return "Trova la tua strada!";
+    case "photo": return "Scatta una foto al paesaggio!";
+    case "silent_walking": return "Cammina in silenzio per qualche minuto!";
+    case "time": return "Quanto tempo riesci senza guardare il telefono?";
+    default: return "È il momento di una nuova sfida. Buona fortuna!";
   }
 }
