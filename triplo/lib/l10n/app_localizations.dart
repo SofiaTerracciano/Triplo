@@ -808,6 +808,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Navigation'**
   String get navigation_page_title;
+
+  /// No description provided for @weather_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather'**
+  String get weather_title;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -129,6 +129,7 @@
   "error_loading_weather_label": "Erreur lors du chargement de la météo",
   "weather_alert_title": "Alerte météo",
 
-  "navigation_page_title": "Bussola"
+  "navigation_page_title": "Bussola",
+  "weather_title": "Météo"
 
 }

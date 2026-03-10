@@ -361,4 +361,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navigation_page_title => 'Bussola';
+
+  @override
+  String get weather_title => 'Météo';
 }

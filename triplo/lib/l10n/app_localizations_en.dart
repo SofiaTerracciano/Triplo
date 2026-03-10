@@ -361,4 +361,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navigation_page_title => 'Navigation';
+
+  @override
+  String get weather_title => 'Weather';
 }

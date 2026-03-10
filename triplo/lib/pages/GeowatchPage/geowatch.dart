@@ -152,12 +152,11 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
     final desc = rawDesc;
 
     return Scaffold(
-
-
-
-
+      appBar: AppBar(
+        title: Text(local.weather_title),
+        centerTitle: true,
+      ),
         extendBodyBehindAppBar: false,
-
         body: Stack(
           children: [
         ListView(
@@ -430,14 +429,14 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
 
         ],
-      ),  // BACK BUTTON FLOATING
-            Positioned(
+      ),  // Back button
+            /*Positioned(
               top: 12,
               left: 12,
               child: SafeArea(
                 child: _buildBackButton(context),
               ),
-            ),], ),
+            ),*/], ),
 
 
 
