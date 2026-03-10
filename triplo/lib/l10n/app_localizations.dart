@@ -134,7 +134,7 @@ abstract class AppLocalizations {
   /// No description provided for @password_label.
   ///
   /// In en, this message translates to:
-  /// **'Password'**
+  /// **'If you want to change your password or if you forgot it, we can send you a password reset link to the email associated with your account.'**
   String get password_label;
 
   /// No description provided for @email_label.
@@ -814,6 +814,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weather'**
   String get weather_title;
+
+  /// No description provided for @password_send_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Send password reset link'**
+  String get password_send_label;
+
+  /// No description provided for @password_reset_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent'**
+  String get password_reset_label;
+
+  /// No description provided for @watch_pair_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair watch'**
+  String get watch_pair_label;
+
+  /// No description provided for @watch_paired_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch paired!'**
+  String get watch_paired_label;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -347,9 +347,7 @@ class _SettingPageState extends State<SettingPage> {
             const SizedBox(height: 8),
 
             Text(
-              "If you want to change your password or if you forgot it, "
-              "we can send you a password reset link to the email associated "
-              "with your account.",
+              local.password_label,
               style: TextStyle(fontSize: 13, color: Colors.black54),
             ),
 
@@ -362,11 +360,11 @@ class _SettingPageState extends State<SettingPage> {
                   await userController.requestPasswordReset();
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Password reset email sent")),
+                    SnackBar(content: Text(local.password_reset_label)),
                   );
                 },
                 icon: const Icon(Icons.email_outlined),
-                label: const Text("Send password reset email"),
+                label: Text(local.password_send_label),
               ),
             ),
           ],
@@ -390,12 +388,12 @@ class _SettingPageState extends State<SettingPage> {
 
               if (ok == true && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Orologio collegato!")),
+                  SnackBar(content: Text(local.watch_paired_label)),
                 );
               }
             },
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text("Pair watch"),
+            label: Text(local.watch_pair_label),
           ),
 
 
@@ -514,6 +512,7 @@ class _SettingPageState extends State<SettingPage> {
     required Future<void> Function(String) onSave,
   }) async {
     final controller = TextEditingController(text: initialValue);
+    final local = AppLocalizations.of(context)!;
 
     await showDialog(
       context: context,
@@ -523,7 +522,7 @@ class _SettingPageState extends State<SettingPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: Text(local.cancel_button_label),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -533,7 +532,7 @@ class _SettingPageState extends State<SettingPage> {
               }
               Navigator.pop(context);
             },
-            child: const Text("Save"),
+            child: Text(local.save_trekking_button_label),
           ),
         ],
       ),

@@ -130,6 +130,12 @@
   "weather_alert_title": "Alerte météo",
 
   "navigation_page_title": "Bussola",
-  "weather_title": "Météo"
+  "weather_title": "Météo",
+
+  "password_label": "Si vous souhaitez modifier votre mot de passe ou si vous l'avez oublié, nous pouvons vous envoyer un lien de réinitialisation du mot de passe à l'adresse e-mail associée à votre compte.",
+  "password_send_label": "Envoyer le lien de réinitialisation du mot de passe",
+  "password_reset_label": "Email de réinitialisation du mot de passe envoyé",
+  "watch_pair_label": "Associer la montre",
+  "watch_paired_label": "Montre associée!"
 
 }

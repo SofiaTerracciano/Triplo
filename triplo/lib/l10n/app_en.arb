@@ -130,5 +130,11 @@
     "weather_alert_title": "Weather Alert",
 
     "navigation_page_title": "Navigation",
-    "weather_title": "Weather"
+    "weather_title": "Weather",
+
+    "password_label": "If you want to change your password or if you forgot it, we can send you a password reset link to the email associated with your account.",
+    "password_send_label": "Send password reset link",
+    "password_reset_label": "Password reset email sent",
+    "watch_pair_label": "Pair watch",
+    "watch_paired_label": "Watch paired!"
 }

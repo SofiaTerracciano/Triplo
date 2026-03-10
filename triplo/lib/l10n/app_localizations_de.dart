@@ -24,7 +24,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get username_label => 'Username';
 
   @override
-  String get password_label => 'Password';
+  String get password_label => 'Wenn du dein Passwort ändern möchtest oder es vergessen hast, können wir dir einen Link zum Zurücksetzen des Passworts an die E-Mail-Adresse senden, die mit deinem Konto verbunden ist.';
 
   @override
   String get email_label => 'Email';
@@ -364,4 +364,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get weather_title => 'Wetter';
+
+  @override
+  String get password_send_label => 'Link zum Zurücksetzen des Passworts senden';
+
+  @override
+  String get password_reset_label => 'E-Mail zum Zurücksetzen des Passworts gesendet';
+
+  @override
+  String get watch_pair_label => 'Uhr koppeln';
+
+  @override
+  String get watch_paired_label => 'Uhr gekoppelt!';
 }
