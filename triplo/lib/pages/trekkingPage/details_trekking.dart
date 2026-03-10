@@ -58,7 +58,7 @@ class DetailsTrekking extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              trekking.name ?? "Trekking", 
+                              trekking.name, 
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 color: Colors.white,

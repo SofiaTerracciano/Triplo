@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:flutter/src/material/icons.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import '../../controller/diary.dart';
@@ -539,6 +540,20 @@ class _UserPageState extends State<UserPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => ChallengesPage()),
+                  );
+                },
+              ),
+              // Navigation page
+              ListTile(
+                leading: Icon(
+                  Icons.explore,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(local.navigation_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => CompassAltitudePage()),
                   );
                 },
               ),

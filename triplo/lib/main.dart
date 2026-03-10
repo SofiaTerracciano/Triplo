@@ -20,6 +20,8 @@ import 'package:triplo/l10n/app_localizations.dart';
 
 import 'package:triplo/pages/landing_page/landing_page.dart';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 // solo per caricare i punti di un trekking
 import 'package:triplo/update_points.dart';
 
@@ -31,6 +33,8 @@ import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/API.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +56,22 @@ Future<void> main() async {
   final language = Language(os: os);
   await language.loadSavedLocale();
 
+  const AndroidInitializationSettings androidSettings =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const DarwinInitializationSettings iosSettings =
+      DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: androidSettings,
+    iOS: iosSettings,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings, );
   runApp(
     MyApp(
       os: os,

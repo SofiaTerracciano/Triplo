@@ -168,12 +168,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
 
+            // Navigation page
             ListTile(
               leading: Icon(
-                Icons.compass_calibration,
+                Icons.explore,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              title: Text("Navigation Page", style: optionStyle),
+              title: Text(local.navigation_page_title, style: optionStyle),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
@@ -339,7 +340,7 @@ Color difficultyToColor(String difficulty) {
     case "intermediate":
       return Colors.red;
     case "hard":
-      return Colors.black;
+      return const Color.fromARGB(255, 135, 1, 162);
     default:
       return Colors.blueGrey; // fallback
   }

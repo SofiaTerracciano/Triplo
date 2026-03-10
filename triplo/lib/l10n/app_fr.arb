@@ -127,12 +127,8 @@
   "trail_weather_label": "Météo du parcours",
   "my_gps_label": "Mon GPS",
   "error_loading_weather_label": "Erreur lors du chargement de la météo",
-  "weather_alert_title": "Alerte météo"
+  "weather_alert_title": "Alerte météo",
 
-
-
-
-
-
+  "navigation_page_title": "Bussola"
 
 }

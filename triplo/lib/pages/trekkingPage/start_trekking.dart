@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/main.dart';
 import 'package:triplo/pages/trekkingPage/end_trekking_page.dart';
 import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:flutter/material.dart';
@@ -32,24 +33,23 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   @override
   void initState() {
     super.initState();
-    _initNotifications();
-    _loadChallenges();
-    _start();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadChallenges();
+      _start();
+    });
   }
 
   void _loadChallenges() {
     final trekkingController = context.read<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(widget.trekkingid);
     if (trekking != null) {
-      _challenges = trekking.challenges;
+      _challenges = trekking.challenges.map((url) {
+        String nome = url.split('/').last;
+        nome = nome.replaceAll('.png', '');
+        nome = nome.replaceAll('_challenge', '');
+        return nome.toLowerCase();
+      }).toList();
     }
-  }
-
-  Future<void> _initNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    await notifications.initialize(
-      const InitializationSettings(android: androidSettings),
-    );
   }
 
   void _start() {
@@ -60,24 +60,83 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
     if (_challenges.isNotEmpty) {
       _challengeTimer = Timer.periodic(
-        const Duration(seconds: 10),
+        const Duration(seconds: 30), // ricordarsi di mettere in minuti in produzione
         (_) => _sendChallengeNotification(),
       );
     }
   }
 
   Future<void> _sendChallengeNotification() async {
-    if (_challenges.isEmpty) return;
-    _challengeIndex++;
-    // Logica notifiche...
+  
+  if (_challenges.isEmpty) return;
+  if (_challengeIndex >= _challenges.length) {
+    _challengeTimer?.cancel();
+    return;
   }
+
+  final challenge = _challenges[_challengeIndex];
+  String title = "🥾 È ora di una sfida!";
+  String body;
+
+  switch (challenge) {
+    case "balance":
+      body = "Metti alla prova il tuo equilibrio!";
+      break;
+    case "hi":
+      body = "Saluta qualcuno che incontri sul sentiero!";
+      break;
+    case "mini_orientiring":
+      body = "Trova la tua strada!";
+      break;
+    case "photo":
+      body = "Scatta una foto al paesaggio!";
+      break;
+    case "silent_walking":
+      body = "Cammina in silenzio per qualche minuto!";
+      break;
+    case "time":
+      body = "Quanto tempo riesci senza guardare il telefono?";
+      break;
+    default:
+      body = "È il momento di una nuova sfida. Buona fortuna!";
+  }
+
+  try {
+    await flutterLocalNotificationsPlugin.show(
+      _challengeIndex,
+      title,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'challenge_channel',
+          'Challenge Notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          visibility: NotificationVisibility.public,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+      payload: challenge,
+    );
+  } catch (e, stack) {
+    print("DEBUG ERRORE notifica: $e");
+    print("DEBUG STACK: $stack");
+  }
+
+  _challengeIndex++;
+}
 
   void _stop() {
     _stopwatch.stop();
     _timer?.cancel();
     _challengeTimer?.cancel();
 
-    // Navighiamo alla pagina di fine trekking passando il tempo finale
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -127,7 +186,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Content
           SafeArea(
             child: Column(
               children: [
@@ -139,7 +197,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                     children: [
                       Icon(Icons.terrain, color: mainColor, size: 22),
                       const SizedBox(width: 8),
-                      
                       Expanded(
                         child: Text(
                           trekking?.name ?? "TREKKING",
@@ -153,7 +210,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ),
 
                 const Spacer(),
@@ -166,7 +223,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Prossesing ring
                         SizedBox(
                           width: circleSize,
                           height: circleSize,
@@ -177,8 +233,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                             valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                           ),
                         ),
-
-                        // Timer text
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [

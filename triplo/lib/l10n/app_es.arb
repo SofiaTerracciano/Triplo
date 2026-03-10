@@ -127,14 +127,7 @@
   "trail_weather_label": "Meteo del recorrido",
   "my_gps_label": "Mi GPS",
   "error_loading_weather_label": "Error al cargar el clima",
-  "weather_alert_title": "Alerta meteorológica"
+  "weather_alert_title": "Alerta meteorológica",
 
-
-
-
-
-
-
-
-
+  "navigation_page_title": "Brújula"
 }

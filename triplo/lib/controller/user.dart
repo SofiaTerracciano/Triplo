@@ -321,12 +321,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-
-
-
-
-
-
     Future<void> _ensureUserFirestoreDocs(User user) async {
       final uid = user.uid;
 

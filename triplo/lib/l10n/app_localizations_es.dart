@@ -358,4 +358,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get weather_alert_title => 'Alerta meteorológica';
+
+  @override
+  String get navigation_page_title => 'Brújula';
 }

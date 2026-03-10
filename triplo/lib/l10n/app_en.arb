@@ -127,5 +127,7 @@
     "trail_weather_label": "Trail weather",
     "my_gps_label": "My GPS",
     "error_loading_weather_label": "Error loading weather",
-    "weather_alert_title": "Weather Alert"
+    "weather_alert_title": "Weather Alert",
+
+    "navigation_page_title": "Navigation"
 }

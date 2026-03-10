@@ -1,7 +1,16 @@
 import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
+
+import '../HomePage/home-page.dart';
+import '../SearchPage/search-page.dart';
+import '../SettingsPage/setting-page.dart';
+import '../challenges-page.dart';
 
 class CompassAltitudePage extends StatefulWidget {
   const CompassAltitudePage({super.key});
@@ -11,11 +20,13 @@ class CompassAltitudePage extends StatefulWidget {
 }
 
 class _CompassAltitudePageState extends State<CompassAltitudePage> {
+
   StreamSubscription<Position>? _positionSub;
+
   double? _altitude;
+  Position? _position;
   String? _error;
 
-  Position? _position;
   @override
   void initState() {
     super.initState();
@@ -23,83 +34,36 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
   }
 
   Future<void> _initLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() {
-          _error = 'Servizi di localizzazione disattivati';
-        });
-        return;
-      }
 
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        setState(() {
-          _error = 'Permesso di localizzazione non concesso';
-        });
-        return;
-      }
+    if (!serviceEnabled) {
+      setState(() => _error = "Location services disabled");
+      return;
+    }
 
-      _positionSub = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.best,
-          distanceFilter: 0,
-        ),
-      ).listen((position) {
-        if (!mounted) return;
-        setState(() {
-          _altitude = position.altitude;
-          _position = position;
-        });
-      });
-    } catch (e) {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      setState(() => _error = "Location permission denied");
+      return;
+    }
+
+    _positionSub = Geolocator.getPositionStream().listen((position) {
+
+      if (!mounted) return;
+
       setState(() {
-        _error = 'Errore: $e';
+        _altitude = position.altitude;
+        _position = position;
       });
-    }
-  }
 
-  String _directionLabel(double heading) {
-    const directions = [
-      'N',
-      'NE',
-      'E',
-      'SE',
-      'S',
-      'SW',
-      'W',
-      'NW'
-    ];
-    final index = ((heading + 22.5) ~/ 45) % 8;
-    return directions[index];
-  }
-
-  String _directionFullLabel(String shortLabel) {
-    switch (shortLabel) {
-      case 'N':
-        return 'Nord';
-      case 'NE':
-        return 'Nord-Est';
-      case 'E':
-        return 'Est';
-      case 'SE':
-        return 'Sud-Est';
-      case 'S':
-        return 'Sud';
-      case 'SW':
-        return 'Sud-Ovest';
-      case 'W':
-        return 'Ovest';
-      case 'NW':
-        return 'Nord-Ovest';
-      default:
-        return shortLabel;
-    }
+    });
   }
 
   @override
@@ -108,122 +72,238 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
     super.dispose();
   }
 
+  String _direction(double heading) {
+
+    const directions = [
+      'N','NE','E','SE','S','SW','W','NW'
+    ];
+
+    final index = ((heading + 22.5) ~/ 45) % 8;
+
+    return directions[index];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text('Navigazione'),
+        title: Text(local.navigation_page_title),
         centerTitle: true,
       ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFE8F5E9),
-                Color(0xFFC8E6C9),
-                Color(0xFFA5D6A7),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: SafeArea(
 
-          child: _error != null
-            ? Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              _error!,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
-            ),
-          ),
-        )
-            : StreamBuilder<CompassEvent>(
-          stream: FlutterCompass.events,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      drawer: _buildDrawer(context),
 
-            final heading = snapshot.data?.heading;
+      body: _error != null
+          ? Center(child: Text(_error!))
+          : StreamBuilder<CompassEvent>(
+        stream: FlutterCompass.events,
+        builder: (context, snapshot) {
 
-            if (heading == null) {
-              return const Center(
-                child: Text(
-                  'Bussola non disponibile',
-                  textAlign: TextAlign.center,
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final heading = snapshot.data!.heading ?? 0;
+
+          final direction = _direction(heading);
+
+          return ListView(
+
+            padding: const EdgeInsets.all(16),
+
+            children: [
+
+              /// COMPASS CARD
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              );
-            }
 
-            final shortDirection = _directionLabel(heading);
-            final fullDirection = _directionFullLabel(shortDirection);
+                elevation: 4,
 
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${heading.toStringAsFixed(0)}°',
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '$fullDirection ($shortDirection)',
-                      style: theme.textTheme.headlineSmall,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 18,
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Altitudine',
-                              style: theme.textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _altitude != null
-                                  ? '${_altitude!.toStringAsFixed(1)} m'
-                                  : 'Calcolo in corso...',
-                              style: theme.textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Posizione',
-                              style: theme.textTheme.titleMedium,
-                            ),
-                            Text(
-                                _position != null
-                                    ? '${_position!.latitude.toStringAsFixed(5)}, ${_position!.longitude.toStringAsFixed(5)}'
-                                    : 'Calcolo coordinate...'
-                            )
-                          ],
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+
+                  child: Column(
+                    children: [
+
+                      Text(
+                        "${heading.toStringAsFixed(0)}° $direction",
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 20),
+
+                      /// BUSSOLA
+                      SizedBox(
+                        height: 250,
+                        width: 250,
+
+                        child: Transform.rotate(
+                          angle: (-heading * (pi / 180)),
+
+                          child: Image.asset(
+                            "images/compass.png",
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+
+              const SizedBox(height: 20),
+
+              /// ALTITUDE CARD
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+
+                  child: Column(
+                    children: [
+
+                      const Icon(Icons.terrain, size: 32),
+
+                      const SizedBox(height: 6),
+
+                      Text(
+                        _altitude != null
+                            ? "${_altitude!.toStringAsFixed(1)} m"
+                            : "Calculating altitude...",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const Divider(),
+
+                      const SizedBox(height: 12),
+
+                      const Icon(Icons.location_on),
+
+                      const SizedBox(height: 6),
+
+                      Text(
+                        _position != null
+                            ? "${_position!.latitude.toStringAsFixed(5)}, ${_position!.longitude.toStringAsFixed(5)}"
+                            : "Loading coordinates...",
+                        textAlign: TextAlign.center,
+                      ),
+
+                    ],
+                  ),
+                ),
+              ),
+
+            ],
+          );
+        },
       ),
-        )
+    );
+  }
+
+  // Drawer
+  Drawer _buildDrawer(BuildContext context) {
+
+    final local = AppLocalizations.of(context)!;
+
+    const optionStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      fontStyle: FontStyle.italic,
+    );
+
+    return Drawer(
+
+      child: ListView(
+        padding: EdgeInsets.zero,
+
+        children: [
+
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: const SizedBox.shrink(),
+          ),
+
+          ListTile(
+            leading: Icon(Icons.home,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(local.home_page_title, style: optionStyle),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => MyHomePage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(Icons.person,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(local.profile_page_title, style: optionStyle),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => UserPage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(Icons.search,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(local.search_page_title, style: optionStyle),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => SearchPage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(Icons.settings,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(local.settings_page_title, style: optionStyle),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => SettingPage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: Icon(Icons.emoji_events,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(local.challeng_title, style: optionStyle),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => ChallengesPage()),
+              );
+            },
+          ),
+
+        ],
+      ),
     );
   }
 }

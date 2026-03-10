@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:triplo/controller/API.dart';
 
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
-import 'package:triplo/controller/API.dart';
 
 import '../../l10n/app_localizations.dart';
 import 'google_satellite_page.dart';
@@ -67,12 +66,8 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   @override
   void initState() {
     super.initState();
-
-
-
-
-
   }
+
   Future<void> _loadAll() async {
     if (_loading) return;
 
@@ -133,8 +128,6 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       });
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -296,13 +289,6 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               );
             },
             icon: const Icon(Icons.map_outlined),
-
-
-
-
-
-
-
             label: Text(local.open_satellite_weather_layers_label),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black12,

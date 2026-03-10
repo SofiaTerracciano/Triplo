@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:triplo/controller/API.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:triplo/pages/SearchPage/search-page.dart';
 import 'package:triplo/pages/SettingsPage/setting-page.dart';
@@ -227,6 +227,20 @@ class _ChallengesPageState extends State<ChallengesPage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => ChallengesPage()),
+                );
+              },
+            ),
+            // Navigation page
+            ListTile(
+              leading: Icon(
+                Icons.explore,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: Text(local.navigation_page_title, style: optionStyle),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => CompassAltitudePage()),
                 );
               },
             ),

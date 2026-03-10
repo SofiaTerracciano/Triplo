@@ -4,6 +4,7 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/challenges-page.dart';
 import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
@@ -290,6 +291,20 @@ class _SearchPageState extends State<SearchPage>
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => ChallengesPage()),
+                );
+              },
+            ),
+            // Navigation page
+            ListTile(
+              leading: Icon(
+                Icons.explore,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: Text(local.navigation_page_title, style: optionStyle),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => CompassAltitudePage()),
                 );
               },
             ),
