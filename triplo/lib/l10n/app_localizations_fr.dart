@@ -24,7 +24,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get username_label => 'Username';
 
   @override
-  String get password_label => 'Password';
+  String get password_label => 'Si vous souhaitez modifier votre mot de passe ou si vous l\'avez oublié, nous pouvons vous envoyer un lien de réinitialisation du mot de passe à l\'adresse e-mail associée à votre compte.';
 
   @override
   String get email_label => 'Email';
@@ -361,4 +361,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navigation_page_title => 'Bussola';
+
+  @override
+  String get weather_title => 'Météo';
+
+  @override
+  String get password_send_label => 'Envoyer le lien de réinitialisation du mot de passe';
+
+  @override
+  String get password_reset_label => 'Email de réinitialisation du mot de passe envoyé';
+
+  @override
+  String get watch_pair_label => 'Associer la montre';
+
+  @override
+  String get watch_paired_label => 'Montre associée!';
 }

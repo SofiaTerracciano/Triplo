@@ -129,7 +129,14 @@
   "error_loading_weather_label": "Fehler beim Laden des Wetters",
   "weather_alert_title": "Wetterwarnung",
 
-  "navigation_page_title": "Bussola"
+  "navigation_page_title": "Bussola",
+  "weather_title": "Wetter",
+
+  "password_label": "Wenn du dein Passwort ändern möchtest oder es vergessen hast, können wir dir einen Link zum Zurücksetzen des Passworts an die E-Mail-Adresse senden, die mit deinem Konto verbunden ist.",
+  "password_send_label": "Link zum Zurücksetzen des Passworts senden",
+  "password_reset_label": "E-Mail zum Zurücksetzen des Passworts gesendet",
+  "watch_pair_label": "Uhr koppeln",
+  "watch_paired_label": "Uhr gekoppelt!"
 }
 
 

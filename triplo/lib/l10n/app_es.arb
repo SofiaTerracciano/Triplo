@@ -129,5 +129,12 @@
   "error_loading_weather_label": "Error al cargar el clima",
   "weather_alert_title": "Alerta meteorológica",
 
-  "navigation_page_title": "Brújula"
+  "navigation_page_title": "Brújula",
+  "weather_title": "Clima",
+
+  "password_label": "Si quieres cambiar tu contraseña o si la olvidaste, podemos enviarte un enlace para restablecer tu contraseña a la dirección de correo asociada a tu cuenta.",
+  "password_send_label": "Enviar enlace para restablecer contraseña",
+  "password_reset_label": "Correo de restablecimiento de contraseña enviado",
+  "watch_pair_label": "Emparejar reloj",
+  "watch_paired_label": "¡Reloj emparejado!"
 }

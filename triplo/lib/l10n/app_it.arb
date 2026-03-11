@@ -130,5 +130,14 @@
     "error_loading_weather_label": "Errore nel caricamento del meteo",
     "weather_alert_title": "Allerta meteo",
 
-    "navigation_page_title": "Bussola"
+    "navigation_page_title": "Bussola",
+    "weather_title": "Meteo",
+
+    "password_label": "Se vuoi cambiare la tua password o se l'hai dimenticata, possiamo inviarti un link per reimpostare la password all'email associata al tuo account.",
+    "password_send_label": "Invia link per rest password",
+    "password_reset_label": "Email per reset password inviata",
+
+    "watch_pair_label": "Collega orologio",
+    "watch_paired_label": "Orologio collegato!"
+
 }
