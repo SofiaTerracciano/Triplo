@@ -5,7 +5,7 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/GeowatchPage/Navigation.dart';
-import 'package:triplo/pages/challenges-page.dart';
+import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
 import '../../enum/SearchMode.dart';

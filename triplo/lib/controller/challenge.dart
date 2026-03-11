@@ -1,11 +1,13 @@
-
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:triplo/model/challenges.dart';
+
+import '../service/OSservice.dart';
 // Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -14,9 +16,8 @@ class ChallengesController extends ChangeNotifier {
   bool _loaded = false;
 
 
-  ChallengesController():
-        _challenges = []
-  ;
+  final OSService os;
+  ChallengesController({required this.os}) : _challenges = [];
 
   // Getter for all trekkings
   List<Challenges> get allChallenges => _challenges;
@@ -43,6 +44,8 @@ class ChallengesController extends ChangeNotifier {
   // Callback when a trekking is selected
   void Function(Challenges challenges)? onTrekkingSelected;
 
+
+
   // Getter trekking per documentId
   Challenges? getChallengesById(String documentId) {
     try {
@@ -58,6 +61,38 @@ class ChallengesController extends ChangeNotifier {
     return await ref.getDownloadURL();
   }
 
+  Future<File?> getCachedImage(String imagePath) async {
+    debugPrint("getCachedImage challenge -> $imagePath");
 
+    try {
+      final inMemory = await os.getImageFromMemory(imagePath);
+      if (inMemory != null) {
+        debugPrint("Challenge image found in RAM cache");
+        return inMemory;
+      }
+
+      String cacheableUrl = imagePath;
+
+      if (imagePath.startsWith("gs://")) {
+        final ref = FirebaseStorage.instance.refFromURL(imagePath);
+        cacheableUrl = await ref.getDownloadURL();
+      }
+
+      final cached = await os.getImageFromCache(cacheableUrl);
+      if (cached != null) {
+        debugPrint("Challenge image found in disk cache");
+        os.saveImageToMemory(imagePath, cached);
+        return cached;
+      }
+
+      debugPrint("Challenge image not in cache, downloading");
+      final file = await os.cacheImage(cacheableUrl);
+      os.saveImageToMemory(imagePath, file);
+      return file;
+    } catch (e) {
+      debugPrint("getCachedImage challenge error: $e");
+      return null;
+    }
+  }
 
 }

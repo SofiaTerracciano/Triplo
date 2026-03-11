@@ -14,6 +14,7 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
   bool _handled = false;
   String? _error;
 
+
   ({String watchId, String token}) _extractPair(String raw) {
     final uri = Uri.tryParse(raw.trim());
     if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {

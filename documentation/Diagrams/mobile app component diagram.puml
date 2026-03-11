@@ -301,6 +301,7 @@ interface osservice_i
 APIController --( osservice_i
 osservice_i -- OSservice
 languagecontroller --( osservice_i
+challengecontroller --( osservice_i
 }
 
 

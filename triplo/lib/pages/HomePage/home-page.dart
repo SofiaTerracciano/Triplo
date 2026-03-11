@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triplo/controller/API.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/pages/challenges-page.dart';
+import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../GeowatchPage/Navigation.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';

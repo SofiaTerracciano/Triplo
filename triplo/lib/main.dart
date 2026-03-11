@@ -156,7 +156,13 @@ class MyApp extends StatelessWidget {
           previous ?? UserController(authService),
         ),
 
-        ChangeNotifierProvider(create: (_) => ChallengesController()),
+        ChangeNotifierProxyProvider<OSService, ChallengesController>(
+          create: (context) => ChallengesController(
+            os: context.read<OSService>(),
+          ),
+          update: (context, os, previous) =>
+          previous ?? ChallengesController(os: os),
+        ),
       ],
 
 

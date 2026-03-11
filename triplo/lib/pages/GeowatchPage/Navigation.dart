@@ -10,7 +10,7 @@ import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
-import '../challenges-page.dart';
+import '../trekkingPage/challenges-page.dart';
 
 class CompassAltitudePage extends StatefulWidget {
   const CompassAltitudePage({super.key});
@@ -150,7 +150,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
                           angle: (-heading * (pi / 180)),
 
                           child: Image.asset(
-                            "images/compass.png",
+                            "images/Bussola.png",
                           ),
                         ),
                       ),
