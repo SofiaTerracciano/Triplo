@@ -44,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
@@ -288,6 +289,8 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
             TileLayer(
               urlTemplate: api.openTopoMapTile(),
               subdomains: api.openTopoMapSubdomains(),
+              tileProvider: NetworkTileProvider(),
+              userAgentPackageName: 'com.example.triplo2',
             ),
 
             // Polylines only at high zoom of all trekkings available

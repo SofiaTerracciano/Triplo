@@ -165,25 +165,27 @@ rectangle "Prova" {
     geolocator -[hidden]right- cache
   }
   portout p1
+  [OSservice]
+  interface lib_i
 }
 
 
 interface dmi
 interface umi
-interface trekkingmi 
-interface challengeminterface
+interface expi 
+interface qi
   DiaryController -down-( dmi
   dmi -down- DiaryModel
   UserController -down-( umi
   umi -down- UserModel
-  trekkingController -down( trekkingmi
-  trekkingmi -down- trekkingModel
-  challengecontroller -down-( challengeminterface
-  challengeminterface -down- challengeModel
-
-
-
-
+  trekkingController -down( expi
+  expi -down- trekkingModel
+  challengecontroller -down-( qi
+  qi -down- challengeModel
+qi -[hidden]- OSservice
+dmi -[hidden] qi
+umi -[hidden] qi
+expi -[hidden] qi
 
 interface diary_i
 interface user_i
@@ -241,7 +243,7 @@ SearchPage -[#blue]-( user_i
 SearchPage -[#482408]-( trekking_i 
 
 
-languagecontroller -[hidden]right-> APIController
+'languagecontroller -[hidden]right-> APIController
 
 
 
@@ -285,7 +287,7 @@ backendcontroller -- p3
 'package "Service" {
     [internetservice]
     [authservice]
-    [OSservice]
+    '[OSservice]
  ' } 
 'internetservice -[hidden]up- authservice
 OSservice -[hidden]up- internetservice
@@ -294,20 +296,23 @@ OSservice -[hidden]up- internetservice
  authservice_i -- authservice
  authservice -- p2
 authservice -- p3
-interface lib_i
+
+'interface lib_i
 OSservice --( lib_i
 lib_i -- lib
 interface osservice_i
-APIController --( osservice_i
+'APIController --( osservice_i
 osservice_i -- OSservice
-languagecontroller --( osservice_i
-challengecontroller --( osservice_i
+'languagecontroller --( osservice_i
+'challengecontroller --( osservice_i
 }
 
 
-
-UserController --( osservice_i
-trekkingController --( osservice_i
+Model -[hidden] authservice_i
+'UserController --( osservice_i
+'trekkingController --( osservice_i
+APIController -- p2
+controller --( osservice_i
 'package "Mobile OS" {
 '  [OS_API]
 '}
@@ -345,7 +350,7 @@ trekkingController --( osservice_i
 
 'Model -[hidden]right- lib_i
 
-Model -[hidden]right- authservice_i
+'Model -[hidden]right- authservice_i
 
 
 
@@ -538,6 +543,8 @@ OS_API -- OS
 
 
 
+
+
 interface FirebaseFirestore
 p3 --( FirebaseFirestore
 FirebaseFirestore -- Backend
@@ -594,7 +601,7 @@ https -- Google
 'RideSummaryReviewGUI -[hidden]-> UserProfileGUI
 'UserProfileGUI -[hidden]-> LoginRegistrationGUI
 
-package "External Services" {
+package "External Services" as externalservices{
   component "OpenTopoMap" as OpenTopoMap
   component "Google Satellite View" as GSW
   component "OpenWeather" as OpenWeather
@@ -637,6 +644,7 @@ package "External Services" {
 
 
 
+
 'external_API -- GoogleAuth
 
 interface MapAPI 
@@ -651,9 +659,9 @@ p2 --( ExternalAuthAPI
 
 interface SatelliteAPI
 
-
-
-
+OS -[hidden]right- externalservices
+OS -[hidden]- Google
+OS -[hidden]down- lib
 
 p2 --( WeatherAPI
 p2 --( WeatherAlertAPI
@@ -672,6 +680,7 @@ WeatherAlertAPI -- DemoMeteoServer
 interface token_verification_API
 Backend --( token_verification_API
 token_verification_API -- GoogleAuth
+
 
 
 @enduml

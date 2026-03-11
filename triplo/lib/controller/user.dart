@@ -373,4 +373,17 @@ class UserController extends ChangeNotifier {
 
       await batch.commit();
     }
+    ({String watchId, String token}) extractWatchPair(String raw) {
+      return _authService.extractWatchPair(raw);
+    }
+
+    Future<void> approveWatchPair({
+      required String watchId,
+      required String token,
+    }) async {
+      await _authService.approveWatchPair(
+        watchId: watchId,
+        token: token,
+      );
+    }
 }

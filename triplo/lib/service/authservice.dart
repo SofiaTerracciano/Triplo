@@ -238,4 +238,63 @@ class AuthService extends ChangeNotifier {
 
     await batch.commit();
   }
+
+  ({String watchId, String token}) extractWatchPair(String raw) {
+    final uri = Uri.tryParse(raw.trim());
+    if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {
+      throw const FormatException("QR non valido");
+    }
+
+    final seg = uri.pathSegments;
+    if (seg.isEmpty) throw const FormatException("watchId mancante");
+
+    final watchId = seg.first.trim();
+    if (watchId.isEmpty) throw const FormatException("watchId mancante");
+
+    final token = uri.queryParameters['t']?.trim();
+    if (token == null || token.isEmpty) {
+      throw const FormatException("token mancante");
+    }
+
+    return (watchId: watchId, token: token);
+  }
+
+  Future<void> approveWatchPair({
+    required String watchId,
+    required String token,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("Devi essere loggato sul telefono.");
+    }
+
+    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(watchId);
+
+    await FirebaseFirestore.instance.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (!snap.exists) {
+        throw Exception("watch_pair non trovato (watchId=$watchId)");
+      }
+
+      final data = snap.data() as Map<String, dynamic>;
+      final status = data['status'] as String?;
+      final qrToken = data['qrToken'] as String?;
+      final expiresAt = data['expiresAt'] as Timestamp?;
+
+      if (status != 'waiting') {
+        throw Exception("QR non in waiting (status=$status)");
+      }
+      if (qrToken != token) {
+        throw Exception("Token non valido / QR rigenerato");
+      }
+      if (expiresAt == null || expiresAt.toDate().isBefore(DateTime.now())) {
+        throw Exception("QR scaduto");
+      }
+
+      tx.update(ref, {
+        'status': 'approved',
+        'uid': user.uid,
+      });
+    });
+  }
 }

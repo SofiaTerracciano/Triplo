@@ -1,7 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
+
+import '../../controller/user.dart';
 
 class WatchPairScannerPage extends StatefulWidget {
   const WatchPairScannerPage({super.key});
@@ -13,71 +15,6 @@ class WatchPairScannerPage extends StatefulWidget {
 class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
   bool _handled = false;
   String? _error;
-
-
-  ({String watchId, String token}) _extractPair(String raw) {
-    final uri = Uri.tryParse(raw.trim());
-    if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {
-      throw const FormatException("QR non valido");
-    }
-
-    final seg = uri.pathSegments;
-    if (seg.isEmpty) throw const FormatException("watchId mancante");
-
-    final watchId = seg.first.trim();
-    if (watchId.isEmpty) throw const FormatException("watchId mancante");
-
-    final token = uri.queryParameters['t']?.trim();
-    if (token == null || token.isEmpty) {
-      throw const FormatException("token mancante");
-    }
-
-    return (watchId: watchId, token: token);
-  }
-
-  Future<void> _approvePair({
-    required String watchId,
-    required String token,
-  }) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      setState(() => _error = "Devi essere loggato sul telefono.");
-      return;
-    }
-
-    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(watchId);
-
-    await FirebaseFirestore.instance.runTransaction((tx) async {
-      final snap = await tx.get(ref);
-      if (!snap.exists) {
-        throw Exception("watch_pair non trovato (watchId=$watchId)");
-      }
-
-      final data = snap.data() as Map<String, dynamic>;
-      final status = data['status'] as String?;
-      final qrToken = data['qrToken'] as String?;
-      final expiresAt = data['expiresAt'] as Timestamp?;
-
-      if (status != 'waiting') {
-        throw Exception("QR non in waiting (status=$status)");
-      }
-      if (qrToken != token) {
-        throw Exception("Token non valido / QR rigenerato");
-      }
-      if (expiresAt == null || expiresAt.toDate().isBefore(DateTime.now())) {
-        throw Exception("QR scaduto");
-      }
-
-      // Coerente con le rules: aggiorna SOLO status e uid
-      tx.update(ref, {
-        'status': 'approved',
-        'uid': user.uid,
-      });
-    });
-
-    if (!mounted) return;
-    Navigator.pop(context, true); // pairing completato
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +38,7 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
               late final String token;
 
               try {
-                final pair = _extractPair(raw);
+                final pair = context.read<UserController>().extractWatchPair(raw);
                 watchId = pair.watchId;
                 token = pair.token;
               } catch (e) {
@@ -131,7 +68,10 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
 
               if (ok == true) {
                 try {
-                  await _approvePair(watchId: watchId, token: token);
+                  await context.read<UserController>().approveWatchPair(
+                    watchId: watchId,
+                    token: token,
+                  );
                 } catch (e) {
                   if (!mounted) return;
                   setState(() => _error = "Errore approvazione: $e");
