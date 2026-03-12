@@ -24,7 +24,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get username_label => 'Username';
 
   @override
-  String get password_label => 'Wenn du dein Passwort ändern möchtest oder es vergessen hast, können wir dir einen Link zum Zurücksetzen des Passworts an die E-Mail-Adresse senden, die mit deinem Konto verbunden ist.';
+  String get password_label => 'Password';
 
   @override
   String get email_label => 'Email';
@@ -366,6 +366,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get weather_title => 'Wetter';
 
   @override
+  String get password_message_label => 'Wenn du dein Passwort ändern möchtest oder es vergessen hast, können wir dir einen Link zum Zurücksetzen des Passworts an die E-Mail-Adresse senden, die mit deinem Konto verbunden ist.';
+
+  @override
   String get password_send_label => 'Link zum Zurücksetzen des Passworts senden';
 
   @override
@@ -376,4 +379,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get watch_paired_label => 'Uhr gekoppelt!';
+
+  @override
+  String get fill_fields_label => 'Bitte füllen Sie beide Felder aus';
+
+  @override
+  String get welcome_label => 'Willkommen in der Triplo App';
 }

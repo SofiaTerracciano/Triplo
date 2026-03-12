@@ -134,7 +134,7 @@ abstract class AppLocalizations {
   /// No description provided for @password_label.
   ///
   /// In en, this message translates to:
-  /// **'If you want to change your password or if you forgot it, we can send you a password reset link to the email associated with your account.'**
+  /// **'Password'**
   String get password_label;
 
   /// No description provided for @email_label.
@@ -815,6 +815,12 @@ abstract class AppLocalizations {
   /// **'Weather'**
   String get weather_title;
 
+  /// No description provided for @password_message_label.
+  ///
+  /// In en, this message translates to:
+  /// **'If you want to change your password or if you forgot it, we can send you a password reset link to the email associated with your account.'**
+  String get password_message_label;
+
   /// No description provided for @password_send_label.
   ///
   /// In en, this message translates to:
@@ -838,6 +844,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Watch paired!'**
   String get watch_paired_label;
+
+  /// No description provided for @fill_fields_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in both fields'**
+  String get fill_fields_label;
+
+  /// No description provided for @welcome_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the Triplo App'**
+  String get welcome_label;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

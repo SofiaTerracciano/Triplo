@@ -22,7 +22,6 @@ import 'package:triplo/pages/landing_page/landing_page.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-// solo per caricare i punti di un trekking
 import 'package:triplo/update_points.dart';
 
 import 'package:provider/provider.dart';
@@ -49,7 +48,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // ===== Service principali creati una sola volta =====
   final os = OSService();
   final authService = AuthService();
 
@@ -71,26 +69,48 @@ Future<void> main() async {
     iOS: iosSettings,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(initSettings, onDidReceiveNotificationResponse: (NotificationResponse response) {
-    final context = navKey.currentContext;
-    if (context == null) return;
+  await flutterLocalNotificationsPlugin.initialize(
+    initSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      final context = navKey.currentContext;
+      if (context == null) return;
 
-    final String challenge = response.payload ?? "sfida";
+      final String payload = response.payload ?? "";
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("🥾 È ora di una sfida!"),
-        content: Text(_getChallengeBody(challenge)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
+      if (payload == 'end_trekking_arrival') {
+        // Dialog for end trekking
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("📍 Destinazione vicina!"),
+            content: Text(_getChallengeBody(payload)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  },);
+        );
+      } else {
+        // Dialog for challenges
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("🥾 È ora di una sfida!"),
+            content: Text(_getChallengeBody(payload)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    },
+  );
+
   runApp(
     MyApp(
       os: os,
@@ -116,12 +136,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-
-        /// Controllers
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider.value(value: language),
-
-        /// Services condivisi
         Provider<OSService>.value(value: os),
         ChangeNotifierProvider<AuthService>.value(value: authService),
         ChangeNotifierProxyProvider<OSService, TrekkingController>(
@@ -130,22 +146,17 @@ class MyApp extends StatelessWidget {
             trekkings: [],
           ),
           update: (context, os, previous) =>
-          previous ?? TrekkingController(os: os, trekkings: []),
+              previous ?? TrekkingController(os: os, trekkings: []),
         ),
-        /// API (dipende da OSService)
         ProxyProvider<OSService, API>(
           update: (_, os, __) => API(os: os),
         ),
-
-        /// InternetService (dipende da API)
         ChangeNotifierProxyProvider<API, InternetService>(
           create: (context) =>
-          InternetService(api: context.read<API>())..start(),
+              InternetService(api: context.read<API>())..start(),
           update: (context, api, old) =>
-          old ?? InternetService(api: api)..start(),
+              old ?? InternetService(api: api)..start(),
         ),
-
-        /// UserController (dipende da AuthService)
         ChangeNotifierProxyProvider<AuthService, UserController>(
           create: (context) {
             final controller = UserController(context.read<AuthService>());
@@ -153,7 +164,7 @@ class MyApp extends StatelessWidget {
             return controller;
           },
           update: (context, authService, previous) =>
-          previous ?? UserController(authService),
+              previous ?? UserController(authService),
         ),
 
         ChangeNotifierProxyProvider<OSService, ChallengesController>(
@@ -165,66 +176,70 @@ class MyApp extends StatelessWidget {
         ),
       ],
 
-
-      child: Consumer2<Language, InternetService>(
-        builder: (context, lang, internet, child) {
-
+      // ---- FIX: Consumer<InternetService> separato da Consumer<Language> ----
+      // Consumer<InternetService> gestisce la navigazione offline/online
+      // Consumer<Language> aggiorna solo il locale di MaterialApp
+      // In questo modo il cambio lingua NON resetta più lo stack di navigazione
+      child: Consumer<InternetService>(
+        builder: (context, internet, child) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final nav = navKey.currentState;
             if (nav == null) return;
 
+            // Naviga a /offline solo se perde la connessione
             if (!internet.isOnline) {
               nav.pushNamedAndRemoveUntil('/offline', (r) => false);
-            } else {
-              nav.pushNamedAndRemoveUntil('/landing_page', (r) => false);
             }
           });
 
-          return MaterialApp(
-            title: 'Triplo',
-            debugShowCheckedModeBanner: false,
-            navigatorKey: navKey,
+          return Consumer<Language>(
+            builder: (context, lang, child) {
+              return MaterialApp(
+                title: 'Triplo',
+                debugShowCheckedModeBanner: false,
+                navigatorKey: navKey,
 
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.lightBlueAccent,
-              ),
-              useMaterial3: true,
-            ),
+                theme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: Colors.lightBlueAccent,
+                  ),
+                  useMaterial3: true,
+                ),
 
-            locale: lang.locale,
+                locale: lang.locale,
 
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
 
-            supportedLocales: const [
-              Locale('en'),
-              Locale('it'),
-              Locale('es'),
-              Locale('de'),
-              Locale('fr'),
-            ],
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('it'),
+                  Locale('es'),
+                  Locale('de'),
+                  Locale('fr'),
+                ],
 
-            initialRoute: '/landing_page',
+                initialRoute: '/landing_page',
 
-            routes: {
-              '/landing_page': (context) => Landing_Page(),
-              '/login': (context) => LoginPage(),
-              '/registration': (context) => RegistrationPage(),
-              '/forgotten_password': (context) => ForgottenPasswordPage(),
-              '/geowatch': (context) => const GeoWatchPage(),
-              '/admin_upload': (context) => const AdminUploadPage(),
-
-              "/userProfileRemote": (context) => UserPagePublic(
-                userId: ModalRoute.of(context)!.settings.arguments as String,
-              ),
-
-              '/offline': (context) => const OfflinePage(),
-              '/navigation': (context) => CompassAltitudePage(),
+                routes: {
+                  '/landing_page': (context) => Landing_Page(),
+                  '/login': (context) => LoginPage(),
+                  '/registration': (context) => RegistrationPage(),
+                  '/forgotten_password': (context) => ForgottenPasswordPage(),
+                  '/geowatch': (context) => const GeoWatchPage(),
+                  '/admin_upload': (context) => const AdminUploadPage(),
+                  "/userProfileRemote": (context) => UserPagePublic(
+                        userId: ModalRoute.of(context)!.settings.arguments
+                            as String,
+                      ),
+                  '/offline': (context) => const OfflinePage(),
+                  '/navigation': (context) => CompassAltitudePage(),
+                },
+              );
             },
           );
         },
@@ -232,14 +247,22 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 String _getChallengeBody(String challenge) {
   switch (challenge) {
-    case "balance": return "Metti alla prova il tuo equilibrio!";
-    case "hi": return "Saluta qualcuno che incontri sul sentiero!";
-    case "mini_orientiring": return "Trova la tua strada!";
-    case "photo": return "Scatta una foto al paesaggio!";
-    case "silent_walking": return "Cammina in silenzio per qualche minuto!";
-    case "time": return "Quanto tempo riesci senza guardare il telefono?";
-    default: return "È il momento di una nuova sfida. Buona fortuna!";
+    case "balance":
+      return "Metti alla prova il tuo equilibrio!";
+    case "hi":
+      return "Saluta qualcuno che incontri sul sentiero!";
+    case "mini_orientiring":
+      return "Trova la tua strada!";
+    case "photo":
+      return "Scatta una foto al paesaggio!";
+    case "silent_walking":
+      return "Cammina in silenzio per qualche minuto!";
+    case "time":
+      return "Quanto tempo riesci senza guardare il telefono?";
+    default:
+      return "Sei quasi arrivato. Tocca per completare il percorso.";
   }
 }

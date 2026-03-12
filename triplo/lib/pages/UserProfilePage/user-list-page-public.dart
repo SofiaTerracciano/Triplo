@@ -5,7 +5,6 @@ import 'package:triplo/model/user.dart';
 import 'user-page-public.dart';
 import 'package:provider/provider.dart';
 
-// UsersListPublic widget to display followers or following users of a specified user
 class UsersListPublic extends StatefulWidget {
   final String listName; 
   final String userId;
@@ -30,11 +29,8 @@ class _UsersListPublicState extends State<UsersListPublic> {
     _loadUsers();
   }
 
-
-
   Future<void> _loadUsers() async {
     final userController = context.read<UserController>();
-
     List<Users> result;
 
     if (widget.listName == 'Followers') {
@@ -51,8 +47,6 @@ class _UsersListPublicState extends State<UsersListPublic> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
@@ -63,38 +57,42 @@ class _UsersListPublicState extends State<UsersListPublic> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.listName)),
-      body: users.isEmpty
-          ? Center(child: Text(local.no_users_found_label))
-          : ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                final user = users[index];
+      // Avvolgiamo il contenuto del body con ScrollConfiguration
+      body: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+        child: users.isEmpty
+            ? Center(child: Text(local.no_users_found_label))
+            : ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  final user = users[index];
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage:
-                        user.photoProfile != null &&
-                            user.photoProfile!.isNotEmpty
-                        ? NetworkImage(user.photoProfile!)
-                        : null,
-                    backgroundColor: Colors.grey[300],
-                    child:
-                        user.photoProfile == null || user.photoProfile!.isEmpty
-                        ? const Icon(Icons.person, size: 20)
-                        : null,
-                  ),
-                  title: Text(user.username),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => UserPagePublic(userId: user.uid),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage:
+                          user.photoProfile != null &&
+                              user.photoProfile!.isNotEmpty
+                          ? NetworkImage(user.photoProfile!)
+                          : null,
+                      backgroundColor: Colors.grey[300],
+                      child:
+                          user.photoProfile == null || user.photoProfile!.isEmpty
+                          ? const Icon(Icons.person, size: 20)
+                          : null,
+                    ),
+                    title: Text(user.username),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => UserPagePublic(userId: user.uid),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+      ),
     );
   }
 }

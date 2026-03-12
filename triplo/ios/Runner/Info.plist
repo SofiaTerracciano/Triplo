@@ -49,5 +49,13 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>PermissionGroupNotification</key>
+		<string>Triplo ha bisogno delle notifiche per avvisarti quando completi una sfida.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Triplo usa la tua posizione per guidarti lungo il sentiero.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Triplo traccia il tuo percorso anche a schermo spento per avvisarti quando arrivi a destinazione.</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>Triplo ha bisogno della posizione in background per le sfide e l'arrivo.</string>
 	</dict>
 </plist>

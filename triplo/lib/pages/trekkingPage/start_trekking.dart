@@ -8,6 +8,9 @@ import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../service/permission_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final FlutterLocalNotificationsPlugin notifications = FlutterLocalNotificationsPlugin();
 
@@ -29,14 +32,88 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   Timer? _challengeTimer;
   int _challengeIndex = 0;
   List<String> _challenges = [];
+  StreamSubscription<Position>? _positionStream;
+  bool _hasEndedAutomatically = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
       _loadChallenges();
       _start();
+      _initGpsTracking();
+      // Chiediamo i permessi tramite il Service centralizzato
+      // Se è la prima volta, appariranno i pop-up.
+      await PermissionService.askPermissionsOnce();
     });
+  }
+
+  void _initGpsTracking() async {
+    // Controlliamo semplicemente se abbiamo il permesso prima di far partire lo stream.
+    // Se non lo abbiamo, usciamo dalla funzione senza dire nulla all'utente.
+    final status = await Permission.location.status;
+    if (!status.isGranted) return;
+
+    LocationSettings locationSettings = AndroidSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 0,
+      intervalDuration: const Duration(seconds: 1),
+    );
+
+    _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position position) {
+      _checkDistance(position);
+    });
+  }
+
+  void _checkDistance(Position currentPos) {
+    if (_hasEndedAutomatically) return;
+
+    final trekkingController = context.read<TrekkingController>();
+    final trekking = trekkingController.getTrekkingById(widget.trekkingid);
+
+    if (trekking != null && trekking.points.last.latitude != null && trekking.points.last.longitude != null) {
+      // Calcola la distanza tra posizione attuale e destinazione
+      double distanceInMeters = Geolocator.distanceBetween(
+        currentPos.latitude,
+        currentPos.longitude,
+        trekking.points.last.latitude, // Assicurati che il tuo modello Trekking abbia questi campi
+        trekking.points.last.longitude,
+      );
+
+      if (distanceInMeters <= 1000) {
+        _hasEndedAutomatically = true;
+        _sendArrivalNotification();
+      }
+    }
+  }
+
+  Future<void> _sendArrivalNotification() async {
+
+    const NotificationDetails platformDetails = NotificationDetails(
+      android: AndroidNotificationDetails(
+          'arrival_channel',
+          'Arrivo Trekking',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          visibility: NotificationVisibility.public,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      999, 
+      "📍 Destinazione vicina!",
+      "Sei quasi arrivato. Tocca per completare il percorso.",
+      platformDetails,
+      payload: 'end_trekking_arrival', // Passiamo anche l'ID nel payload
+    );
   }
 
   void _loadChallenges() {
@@ -75,30 +152,38 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   }
 
   final challenge = _challenges[_challengeIndex];
-  String title = "🥾 È ora di una sfida!";
+  String title;
   String body;
 
+  // Message body for the notification
   switch (challenge) {
     case "balance":
       body = "Metti alla prova il tuo equilibrio!";
+      title = "Sfida: Equilibrio";
       break;
     case "hi":
       body = "Saluta qualcuno che incontri sul sentiero!";
+      title = "Sfida: Saluto";
       break;
     case "mini_orientiring":
       body = "Trova la tua strada!";
+      title = "Sfida: Orientamento";
       break;
     case "photo":
       body = "Scatta una foto al paesaggio!";
+      title = "Sfida: Fotografia";
       break;
     case "silent_walking":
       body = "Cammina in silenzio per qualche minuto!";
+      title = "Sfida: Camminata Silenziosa";
       break;
     case "time":
       body = "Quanto tempo riesci senza guardare il telefono?";
+      title = "Sfida: Tempo senza telefono";
       break;
     default:
-      body = "È il momento di una nuova sfida. Buona fortuna!";
+      body = "Sei quasi arrivato. Tocca per completare il percorso.";
+      title = "Arrivato!";
   }
 
   try {
@@ -108,8 +193,8 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'challenge_channel',
-          'Challenge Notifications',
+          'notifications_channel',
+          'Notifications',
           importance: Importance.max,
           priority: Priority.high,
           playSound: true,
@@ -163,6 +248,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   void dispose() {
     _timer?.cancel();
     _challengeTimer?.cancel();
+    _positionStream?.cancel();
     super.dispose();
   }
 

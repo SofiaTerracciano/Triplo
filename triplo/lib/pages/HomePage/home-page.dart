@@ -110,10 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               title: Text(local.home_page_title, style: optionStyle),
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                );
+                Navigator.pop(context);
               },
             ),
             ListTile(

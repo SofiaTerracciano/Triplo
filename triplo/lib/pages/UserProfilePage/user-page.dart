@@ -18,6 +18,7 @@ import '../SearchPage/search-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import 'users-list-page.dart';
+import '../../service/permission_service.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -51,6 +52,11 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
+    // Eseguiamo il controllo dei permessi dopo il primo frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Chiamiamo il servizio centralizzato
+      PermissionService.askPermissionsOnce();
+    });
   }
   /*
   Future<void> _loadUser() async {
@@ -360,126 +366,109 @@ class _UserPageState extends State<UserPage> {
                 Tab(icon: Icon(Icons.bookmark)),
               ],
             ),
-      Expanded(
-        child: TabBarView(
-          children: [
-
-            // PUBLIC DIARY
-            FutureBuilder<List<Diary>>(
-            future: context.read<DiaryController>().getPublicDiaries(user.uid),
-              builder: (context, snapshot) {
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final diaries = snapshot.data ?? [];
-
-                if (diaries.isEmpty) {
-                  return Center(child: Text(local.no_public_diary_label));
-                }
-
-                return ListView.builder(
-                  itemCount: diaries.length,
-                  itemBuilder: (context, index) {
-                    final diary = diaries[index];
-
-                    return ListTile(
-                      title: Text(diary.trekkigName),
-                      subtitle: Text(diary.date),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                DiaryPage(diaryId: diary.diaryId),
-                          ),
+            Expanded(
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+                child: TabBarView(
+                  children: [
+                    // 1. PUBLIC DIARY
+                    FutureBuilder<List<Diary>>(
+                      future: context.read<DiaryController>().getPublicDiaries(user.uid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final diaries = snapshot.data ?? [];
+                        if (diaries.isEmpty) {
+                          return Center(child: Text(local.no_public_diary_label));
+                        }
+                        return ListView.builder(
+                          itemCount: diaries.length,
+                          itemBuilder: (context, index) {
+                            final diary = diaries[index];
+                            return ListTile(
+                              title: Text(diary.trekkigName),
+                              subtitle: Text(diary.date),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
 
-            // PRIVATE DIARY
-            FutureBuilder<List<Diary>>(
-            future: context.read<DiaryController>().getPrivateDiaries(user.uid),
-              builder: (context, snapshot) {
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final diaries = snapshot.data ?? [];
-
-                if (diaries.isEmpty) {
-                  return Center(child: Text(local.no_private_diary_label));
-                }
-
-                return ListView.builder(
-                  itemCount: diaries.length,
-                  itemBuilder: (context, index) {
-                    final diary = diaries[index];
-
-                    return ListTile(
-                      title: Text(diary.trekkigName),
-                      subtitle: Text(diary.date),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                DiaryPage(diaryId: diary.diaryId),
-                          ),
+                    // 2. PRIVATE DIARY
+                    FutureBuilder<List<Diary>>(
+                      future: context.read<DiaryController>().getPrivateDiaries(user.uid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final diaries = snapshot.data ?? [];
+                        if (diaries.isEmpty) {
+                          return Center(child: Text(local.no_private_diary_label));
+                        }
+                        return ListView.builder(
+                          itemCount: diaries.length,
+                          itemBuilder: (context, index) {
+                            final diary = diaries[index];
+                            return ListTile(
+                              title: Text(diary.trekkigName),
+                              subtitle: Text(diary.date),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
 
-            // SAVED TREKKING
-            FutureBuilder<List<Trekking>>(
-              future: context.read<TrekkingController>().getSavedTrekkings(user.uid),
-              builder: (context, snapshot) {
-
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final trekkings = snapshot.data ?? [];
-
-                if (trekkings.isEmpty) {
-                  return Center(child: Text(local.no_saved_trekking_label));
-                }
-
-                return ListView.builder(
-                  itemCount: trekkings.length,
-                  itemBuilder: (context, index) {
-                    final trekking = trekkings[index];
-
-                    return ListTile(
-                      title: Text(trekking.name),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                TrekkingPage(trekkingId: trekking.documentId),
-                          ),
+                    // 3. SAVED TREKKING
+                    FutureBuilder<List<Trekking>>(
+                      future: context.read<TrekkingController>().getSavedTrekkings(user.uid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final trekkings = snapshot.data ?? [];
+                        if (trekkings.isEmpty) {
+                          return Center(child: Text(local.no_saved_trekking_label));
+                        }
+                        return ListView.builder(
+                          itemCount: trekkings.length,
+                          itemBuilder: (context, index) {
+                            final trekking = trekkings[index];
+                            return ListTile(
+                              title: Text(trekking.name),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TrekkingPage(trekkingId: trekking.documentId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         );
                       },
-                    );
-                  },
-                );
-              },
+                    ),
+                  ],
+                ),
+              ),
             ),
-
-          ],
-        ),
-      ),
           ],
         ),
         //Drawer to control the navigation among pages
@@ -507,10 +496,7 @@ class _UserPageState extends State<UserPage> {
                 leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary,),
                 title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserPage()),
-                  );
+                  Navigator.pop(context);
                 },
               ),
               ListTile(

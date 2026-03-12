@@ -115,180 +115,183 @@ class _DiaryPageState extends State<DiaryPage> {
             ],
           ),
 
-          body: ListView(
-            padding: const EdgeInsets.all(25.0),
-            children: [
-              // Info card
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      // Profile photo
-                      CircleAvatar(
-                        radius: 36,
-                        backgroundImage:
-                            user.photoProfile != null &&
-                                user.photoProfile!.isNotEmpty
-                            ? NetworkImage(user.photoProfile!)
-                            : null,
-                        backgroundColor: Colors.grey[300],
-                        child:
-                            user.photoProfile == null ||
-                                user.photoProfile!.isEmpty
-                            ? const Icon(Icons.person, size: 40)
-                            : null,
-                      ),
-                      const SizedBox(width: 16),
-                      // Username
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextButton(
-                              child: Text(
-                                user.username,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => userController.currentUser!.uid == diary.userId
-                                        ? UserPage()
-                                        : UserPagePublic(userId: diary.userId),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 3),
-                            // Date
-                            infoRow(
-                              Icons.calendar_today,
-                              '${local.date_trekking_label}: ${diary.date}',
-                            ),
-                            // Duration
-                            infoRow(
-                              Icons.timer,
-                              '${local.duration_trekking_label}: $formattedTime',
-                            ),
-                          ],
+          body: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+            child: ListView(
+              padding: const EdgeInsets.all(25.0),
+              children: [
+                // Info card
+                Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        // Profile photo
+                        CircleAvatar(
+                          radius: 36,
+                          backgroundImage:
+                              user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty
+                              ? NetworkImage(user.photoProfile!)
+                              : null,
+                          backgroundColor: Colors.grey[300],
+                          child:
+                              user.photoProfile == null ||
+                                  user.photoProfile!.isEmpty
+                              ? const Icon(Icons.person, size: 40)
+                              : null,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Freinds
-              if (diary.friends.isNotEmpty) ...[
-                SectionTitle(
-                  text: local.friends_trekking_label,
-                  icon: Icons.group,
-                ),
-                Wrap(
-                  spacing: 8,
-                  children: diary.friends.map((id) {
-                    return FutureBuilder<Users?>(
-                      future: userController.getUserById(id),
-                      builder: (_, snap) {
-                        if (!snap.hasData) return const SizedBox.shrink();
-                        final friend = snap.data!;
-                        return ActionChip(
-                          label: Text(friend.username),
-                          avatar: const Icon(Icons.person, size: 18),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    UserPagePublic(userId: friend.uid),
+                        const SizedBox(width: 16),
+                        // Username
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextButton(
+                                child: Text(
+                                  user.username,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => userController.currentUser!.uid == diary.userId
+                                          ? UserPage()
+                                          : UserPagePublic(userId: diary.userId),
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
-
-              // Photos only if you have upload them
-              if (diary.photos.isNotEmpty) ...[
-                SectionTitle(
-                  text: local.photos_trekking_label,
-                  icon: Icons.photo,
-                ),
-                imageScroller(diary.photos, diaryController.getDownloadUrlChild),
-              ],
-
-              // Challenges only if you have done them
-              if (diary.challenges.isNotEmpty) ...[
-                SectionTitle(
-                  text: local.challenges_trekking_label,
-                  icon: Icons.flag,
-                ),
-                imageScroller(diary.challenges, diaryController.getDownloadUrl),
-              ],
-
-              // Mood only if you have selected
-              if (diary.mood.isNotEmpty) ...[
-                SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
-                Wrap(
-                  spacing: 8,
-                  children: diary.mood.map((m) {
-                    return Chip(
-                      label: Text(m, style: const TextStyle(fontSize: 22)),
-                      backgroundColor: Theme.of(context).cardColor,
-                      elevation: 2,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-
-              // Refreshment point only if you have you eaten there
-              if (diary.refreshmentPoint.isNotEmpty) ...[
-                SectionTitle(
-                  text: local.refreshment_point_trekking_label,
-                  icon: Icons.restaurant,
-                ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(diary.refreshmentPoint),
+                              const SizedBox(height: 3),
+                              // Date
+                              infoRow(
+                                Icons.calendar_today,
+                                '${local.date_trekking_label}: ${diary.date}',
+                              ),
+                              // Duration
+                              infoRow(
+                                Icons.timer,
+                                '${local.duration_trekking_label}: $formattedTime',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
 
-              // Notes only if you have written
-              if (diary.notes.isNotEmpty) ...[
-                SectionTitle(
-                  text: local.notes_trekking_label,
-                  icon: Icons.notes,
-                ),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(diary.notes),
+                // Freinds
+                if (diary.friends.isNotEmpty) ...[
+                  SectionTitle(
+                    text: local.friends_trekking_label,
+                    icon: Icons.group,
                   ),
-                ),
+                  Wrap(
+                    spacing: 8,
+                    children: diary.friends.map((id) {
+                      return FutureBuilder<Users?>(
+                        future: userController.getUserById(id),
+                        builder: (_, snap) {
+                          if (!snap.hasData) return const SizedBox.shrink();
+                          final friend = snap.data!;
+                          return ActionChip(
+                            label: Text(friend.username),
+                            avatar: const Icon(Icons.person, size: 18),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      UserPagePublic(userId: friend.uid),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+
+                // Photos only if you have upload them
+                if (diary.photos.isNotEmpty) ...[
+                  SectionTitle(
+                    text: local.photos_trekking_label,
+                    icon: Icons.photo,
+                  ),
+                  imageScroller(diary.photos, diaryController.getDownloadUrlChild),
+                ],
+
+                // Challenges only if you have done them
+                if (diary.challenges.isNotEmpty) ...[
+                  SectionTitle(
+                    text: local.challenges_trekking_label,
+                    icon: Icons.flag,
+                  ),
+                  imageScroller(diary.challenges, diaryController.getDownloadUrl),
+                ],
+
+                // Mood only if you have selected
+                if (diary.mood.isNotEmpty) ...[
+                  SectionTitle(text: local.mood_trekking_label, icon: Icons.mood),
+                  Wrap(
+                    spacing: 8,
+                    children: diary.mood.map((m) {
+                      return Chip(
+                        label: Text(m, style: const TextStyle(fontSize: 22)),
+                        backgroundColor: Theme.of(context).cardColor,
+                        elevation: 2,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+
+                // Refreshment point only if you have you eaten there
+                if (diary.refreshmentPoint.isNotEmpty) ...[
+                  SectionTitle(
+                    text: local.refreshment_point_trekking_label,
+                    icon: Icons.restaurant,
+                  ),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(diary.refreshmentPoint),
+                    ),
+                  ),
+                ],
+
+                // Notes only if you have written
+                if (diary.notes.isNotEmpty) ...[
+                  SectionTitle(
+                    text: local.notes_trekking_label,
+                    icon: Icons.notes,
+                  ),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(diary.notes),
+                    ),
+                  ),
+                ],
               ],
-            ],
-          ),
+            ),
+          )
         );
       },
     );

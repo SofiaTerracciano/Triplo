@@ -21,7 +21,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  //TextStyle for texts
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -33,28 +32,6 @@ class _SettingPageState extends State<SettingPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  //late Users userAccount;
-
-  //late String name;
-
-  //late String surname;
-  //late String username;
-  //late DateTime birthdate;
-  //late String photoProfile;
-  //late String email;
-  //late String password; //da chiedere a Giulio per l'impkementazione
-
-  //void initState() {
-  //  super.initState();
-  //userAccount = widget.userController.currentUser!;
-  //name = userAccount.name;
-  //surname = userAccount.surname;
-  //username = userAccount.username;
-  //birthdate = userAccount.birthdate;
-  //photoProfile = userAccount.photoProfile!;
-  //email = userAccount.email;
-  //}
 
   final TextStyle titleStyle = const TextStyle(
     fontSize: 15,
@@ -109,389 +86,307 @@ class _SettingPageState extends State<SettingPage> {
         ),
       );
     }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(local.settings_page_title),
-        centerTitle: true, // Forced center the title
+        centerTitle: true,
       ),
 
-      body: ListView(
-        padding: const EdgeInsets.all(25.0),
-        children: [
-          // Profile info + avatar
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage:
-                            user.photoProfile != null &&
-                                user.photoProfile!.isNotEmpty
-                            ? NetworkImage(user.photoProfile!)
-                            : null,
-                        backgroundColor: Colors.grey[300],
-                        child:
-                            user.photoProfile == null ||
-                                user.photoProfile!.isEmpty
-                            ? const Icon(Icons.person, size: 40)
-                            : null,
-                      ),
-                      // Edit button
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: _pickProfileImage,
-                          child: CircleAvatar(
-                            radius: 14,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            child: const Icon(
-                              Icons.edit,
-                              size: 17,
-                              color: Colors.white,
+      body: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+        child: ListView(
+          padding: const EdgeInsets.all(25.0),
+          children: [
+            // Profile info + avatar
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage:
+                              user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty
+                              ? NetworkImage(user.photoProfile!)
+                              : null,
+                          backgroundColor: Colors.grey[300],
+                          child:
+                              user.photoProfile == null ||
+                                  user.photoProfile!.isEmpty
+                              ? const Icon(Icons.person, size: 40)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: InkWell(
+                            onTap: _pickProfileImage,
+                            child: CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              child: const Icon(
+                                Icons.edit,
+                                size: 17,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(local.username_label, style: titleStyle),
-                                  const SizedBox(height: 2),
-                                  Text(user.username, style: infoStyle),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit, size: 17),
-                              onPressed: () => _editField(
-                                title: local.username_label,
-                                initialValue: user.username,
-                                onSave: userController.updateUsername,
-                              ), // non chiude il dialog ma cambia lo username --> problemi con user_index
-                            ),
-                          ],
-                        ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(local.username_label, style: titleStyle),
+                                    const SizedBox(height: 2),
+                                    Text(user.username, style: infoStyle),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 17),
+                                onPressed: () => _editField(
+                                  title: local.username_label,
+                                  initialValue: user.username,
+                                  onSave: userController.updateUsername,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 10),
-          // Personal info
-          // Name
-          ListTile(
-            title: Text(local.name_field_label, style: titleStyle),
-            subtitle: Text(
-              user.name.isNotEmpty ? user.name : "-",
-              style: infoStyle,
+            const SizedBox(height: 10),
+
+            ListTile(
+              title: Text(local.name_field_label, style: titleStyle),
+              subtitle: Text(
+                user.name.isNotEmpty ? user.name : "-",
+                style: infoStyle,
+              ),
+              trailing: const Icon(Icons.edit, size: 17),
+              dense: true,
+              onTap: () => _editField(
+                title: local.name_field_label,
+                initialValue: user.name,
+                onSave: userController.updateName,
+              ),
             ),
-            trailing: const Icon(Icons.edit, size: 17),
-            dense: true,
-            onTap: () => _editField(
-              title: local.name_field_label,
-              initialValue: user.name,
-              onSave: userController.updateName,
+
+            const Divider(height: 1),
+            ListTile(
+              title: Text(local.surname_field_label, style: titleStyle),
+              subtitle: Text(
+                user.surname.isNotEmpty ? user.surname : "-",
+                style: infoStyle,
+              ),
+              trailing: const Icon(Icons.edit, size: 17),
+              dense: true,
+              onTap: () => _editField(
+                title: local.surname_field_label,
+                initialValue: user.surname,
+                onSave: userController.updateSurname,
+              ),
             ),
-          ),
 
-          // Surname
-          const Divider(height: 1),
-          ListTile(
-            title: Text(local.surname_field_label, style: titleStyle),
-            subtitle: Text(
-              user.surname.isNotEmpty ? user.surname : "-",
-              style: infoStyle,
+            const Divider(height: 1),
+            ListTile(
+              title: Text(local.birthdate_field_label, style: titleStyle),
+              subtitle: Text(
+                "${user.birthdate.day.toString().padLeft(2, '0')}/"
+                "${user.birthdate.month.toString().padLeft(2, '0')}/"
+                "${user.birthdate.year}",
+                style: infoStyle,
+              ),
+              trailing: const Icon(Icons.calendar_today, size: 17),
+              dense: true,
+              onTap: () => _pickBirthdate(user.birthdate),
             ),
-            trailing: const Icon(Icons.edit, size: 17),
-            dense: true,
-            onTap: () => _editField(
-              title: local.surname_field_label,
-              initialValue: user.surname,
-              onSave: userController.updateSurname,
+
+            const Divider(height: 1),
+            ListTile(
+              title: Text(local.email_label, style: titleStyle),
+              subtitle: Text(user.email, style: infoStyle),
+              dense: true,
+              onTap: () {
+                // TODO: modifica email
+              },
             ),
-          ),
 
-          // Birthdate
-          const Divider(height: 1),
-          ListTile(
-            title: Text(local.birthdate_field_label, style: titleStyle),
-            subtitle: Text(
-              "${user.birthdate.day.toString().padLeft(2, '0')}/"
-              "${user.birthdate.month.toString().padLeft(2, '0')}/"
-              "${user.birthdate.year}",
-              style: infoStyle,
-            ),
-            trailing: const Icon(Icons.calendar_today, size: 17),
-            dense: true,
-            onTap: () => _pickBirthdate(user.birthdate),
-          ),
-
-          // Email
-          const Divider(height: 1),
-          ListTile(
-            title: Text(local.email_label, style: titleStyle),
-            subtitle: Text(user.email, style: infoStyle),
-            //trailing: const Icon(Icons.edit, size: 17),
-            dense: true,
-            onTap: () {
-              // TODO: modifica email
-            },
-          ),
-
-          const Divider(height: 1),
-          // Language selection
-          ListTile(
-            title: Text(local.language_field_label, style: titleStyle),
-            subtitle: Text(
-              _getLanguageName(languageController.locale.languageCode),
-              style: infoStyle,
-            ),
-            trailing: const Icon(Icons.language, size: 17),
-            dense: true,
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (_) => LanguageDialog(
-                  onLocaleSelected: languageController.setLocale,
-                ),
-              );
-            },
-          ),
-
-          //const SizedBox(height: 32),
-          /*
-          Divider(),
-
-          const SizedBox(height: 16),
-
-          Text(
-            "Password",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            "If you want to change your password or if you forgot it, "
-                "we can send you a password reset link to the email associated "
-                "with your account.",
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.black54,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                await widget.userController.requestPasswordReset();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Password reset email sent"),
+            const Divider(height: 1),
+            ListTile(
+              title: Text(local.language_field_label, style: titleStyle),
+              subtitle: Text(
+                _getLanguageName(languageController.locale.languageCode),
+                style: infoStyle,
+              ),
+              trailing: const Icon(Icons.language, size: 17),
+              dense: true,
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => LanguageDialog(
+                    onLocaleSelected: languageController.setLocale,
                   ),
                 );
               },
-              icon: const Icon(Icons.email_outlined),
-              label: const Text("Send password reset email"),
             ),
-          ),
-        if (context.read<UserController>().isGoogleUser)
-              TextButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Restore Google photo"),
-                  onPressed: widget.userController.restoreGoogleProfilePhoto,
+
+            if (context.read<UserController>().isPasswordUser) ...[
+              const SizedBox(height: 32),
+              const Divider(),
+              const SizedBox(height: 16),
+
+              Text(
+                local.password_label,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-        ],
 
+              const SizedBox(height: 8),
 
+              Text(
+                local.password_message_label,
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+              ),
 
+              const SizedBox(height: 12),
 
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await userController.requestPasswordReset();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(local.password_reset_label)),
+                    );
+                  },
+                  icon: const Icon(Icons.email_outlined),
+                  label: Text(local.password_send_label),
+                ),
+              ),
+            ],
 
-           */
-          if (context.read<UserController>().isPasswordUser) ...[
-            const SizedBox(height: 32),
-            const Divider(),
-            const SizedBox(height: 16),
-
-            Text(
-              "Password",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              local.password_label,
-              style: TextStyle(fontSize: 13, color: Colors.black54),
-            ),
+            if (context.read<UserController>().isGoogleUser) ...[
+              const SizedBox(height: 24),
+              TextButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text("Restore Google profile photo"),
+                onPressed: userController.restoreGoogleProfilePhoto,
+              ),
+            ],
 
             const SizedBox(height: 12),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  await userController.requestPasswordReset();
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(local.password_reset_label)),
-                  );
-                },
-                icon: const Icon(Icons.email_outlined),
-                label: Text(local.password_send_label),
-              ),
-            ),
-          ],
-
-          if (context.read<UserController>().isGoogleUser) ...[
-            const SizedBox(height: 24),
-
-            TextButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text("Restore Google profile photo"),
-              onPressed: userController.restoreGoogleProfilePhoto,
-            ),
-          ],
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: () async {
-              final ok = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(builder: (_) => const WatchPairScannerPage()),
-              );
-
-              if (ok == true && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(local.watch_paired_label)),
+            ElevatedButton.icon(
+              onPressed: () async {
+                final ok = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WatchPairScannerPage()),
                 );
-              }
-            },
-            icon: const Icon(Icons.qr_code_scanner),
-            label: Text(local.watch_pair_label),
-          ),
 
+                if (ok == true && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(local.watch_paired_label)),
+                  );
+                }
+              },
+              icon: const Icon(Icons.qr_code_scanner),
+              label: Text(local.watch_pair_label),
+            ),
 
-          const SizedBox(height: 30)
-        ],
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
 
-      //Drawer to control the navigation among pages
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: const SizedBox.shrink(),
               ),
-              child: const SizedBox.shrink(),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.home,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.home_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                  );
+                },
               ),
-              title: Text(local.home_page_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.person,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.profile_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserPage()),
+                  );
+                },
               ),
-              title: Text(local.profile_page_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => UserPage()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.search,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.search_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => SearchPage()),
+                  );
+                },
               ),
-              title: Text(local.search_page_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SearchPage()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.settings,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.settings_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pop(context);
+                },
               ),
-              title: Text(local.settings_page_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingPage()),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.emoji_events,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.emoji_events, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.challeng_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ChallengesPage()),
+                  );
+                },
               ),
-              title: Text(local.challeng_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => ChallengesPage()),
-                );
-              },
-            ),
-            // Navigation page
-            ListTile(
-              leading: Icon(
-                Icons.explore,
-                color: Theme.of(context).colorScheme.primary,
+              ListTile(
+                leading: Icon(Icons.explore, color: Theme.of(context).colorScheme.primary),
+                title: Text(local.navigation_page_title, style: optionStyle),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => CompassAltitudePage()),
+                  );
+                },
               ),
-              title: Text(local.navigation_page_title, style: optionStyle),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => CompassAltitudePage()),
-                );
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -500,9 +395,7 @@ class _SettingPageState extends State<SettingPage> {
   Future<void> _pickProfileImage() async {
     final userController = context.read<UserController>();
     final picked = await _picker.pickImage(source: ImageSource.gallery);
-
     if (picked == null) return;
-
     await userController.updateProfilePhoto(File(picked.path));
   }
 
@@ -547,9 +440,7 @@ class _SettingPageState extends State<SettingPage> {
       firstDate: DateTime(1900, 1, 1),
       lastDate: DateTime.now(),
     );
-
     if (picked == null) return;
-
     await userController.updateBirthdate(picked);
   }
 }
@@ -588,8 +479,8 @@ class LanguageDialog extends StatelessWidget {
     return ListTile(
       leading: Text(flag, style: const TextStyle(fontSize: 22)),
       title: Text(name),
-      onTap: () {
-        onLocaleSelected(locale);
+      onTap: () async {
+        await onLocaleSelected(locale);
         Navigator.pop(context);
       },
     );

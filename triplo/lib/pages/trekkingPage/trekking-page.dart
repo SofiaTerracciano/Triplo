@@ -291,227 +291,230 @@ class _TrekkingPageState extends State<TrekkingPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body:ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
 
 
-            // Map photo --> close up view
-            _photoSection(
-                trekkingController.getCachedImage(trekking.mapPhoto)
-            ),
-
-            const SizedBox(height: 16),
-
-            // Title --> Trekking name
-            Text(
-              trekking.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Info card --> starting point, ending point, level, distance, time, elevation gain
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              // Map photo --> close up view
+              _photoSection(
+                  trekkingController.getCachedImage(trekking.mapPhoto)
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    // Starting point
-                    _infoRichRow(
-                      Icons.place,
-                      local.starting_point_trekking_label,
-                      trekking.starting_point_name,
-                    ),
-                    // Ending point
-                    _infoRichRow(
-                      Icons.flag,
-                      local.ending_point_trekking_label,
-                      trekking.ending_point_name,
-                    ),
-                    // Difficulty level
-                    _infoRow(
-                      Icons.terrain,
-                      local.level_label,
-                      trekking.difficulty_level == "easy"
-                          ? local.beginner_level
-                          : trekking.difficulty_level == "intermediate"
-                          ? local.intermediate_level
-                          : local.advanced_level,
-                      valueColor: _difficultyColor(trekking.difficulty_level),
-                    ),
-                    // Distance
-                    _infoRow(
-                      Icons.straighten,
-                      local.distance_trekking_label,
-                      "${trekking.distance} km",
-                    ),
-                    // Estimated time
-                    _infoRow(
-                      Icons.schedule,
-                      local.estimated_time_trekking_label,
-                      formattedTime,
-                    ),
-                    // Elevation gain whit up and down arrows
-                    _elevationRow(
-                      local.elevaition_gain_trekking_label,
-                      trekking.elevation_gain,
-                      trekking.upGain,
-                      trekking.downGain,
-                    ),
-                    
-                    if (trekking.pic_nic_area == true || trekking.family_firendly == true ) 
-                      const Divider(),
-                    
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          // Picnic area
-                          if (trekking.refreshment_point.isNotEmpty)
-                            const Padding(
-                              padding: EdgeInsets.only(right: 12),
-                              child: Icon(Icons.table_restaurant,  size: 25),
-                            ),
-                          
-                          // Family Friendly
-                          if (trekking.family_firendly)
-                            const Icon(Icons.family_restroom, size: 25),
-                        ],
+
+              const SizedBox(height: 16),
+
+              // Title --> Trekking name
+              Text(
+                trekking.name,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Info card --> starting point, ending point, level, distance, time, elevation gain
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    children: [
+                      // Starting point
+                      _infoRichRow(
+                        Icons.place,
+                        local.starting_point_trekking_label,
+                        trekking.starting_point_name,
                       ),
-                    ),
-                  ],
-                ),
-              )
-            ),
-
-            const SizedBox(height: 24),
-
-            // Ending point photo
-            _photoSection(
-              trekkingController.getCachedImage(trekking.endingPointPhoto),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Info section
-            _sectionTitle(local.info_trekking_label),
-            Text(trekking.info[langIndex]),
-
-            const SizedBox(height: 16),
-
-            // Description section
-            _sectionTitle(local.description_trekking_label),
-            Text(trekking.description[langIndex]),
-
-            const SizedBox(height: 16),
-
-            // Refreshment point
-            _refreshmentRow(
-              local.refreshment_point_trekking_label,
-              trekking.refreshment_point.isNotEmpty
-                  ? trekking.refreshment_point
-                  : local.refreshment_point_available_trekking_label,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Challenges section
-            _sectionTitle(local.challenges_trekking_label),
-            trekking.challenges.isNotEmpty
-                ? FutureBuilder<List<File>>(
-                    future: trekkingController.getCachedImages(trekking.challenges),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        );
-                      }
+                      // Ending point
+                      _infoRichRow(
+                        Icons.flag,
+                        local.ending_point_trekking_label,
+                        trekking.ending_point_name,
+                      ),
+                      // Difficulty level
+                      _infoRow(
+                        Icons.terrain,
+                        local.level_label,
+                        trekking.difficulty_level == "easy"
+                            ? local.beginner_level
+                            : trekking.difficulty_level == "intermediate"
+                            ? local.intermediate_level
+                            : local.advanced_level,
+                        valueColor: _difficultyColor(trekking.difficulty_level),
+                      ),
+                      // Distance
+                      _infoRow(
+                        Icons.straighten,
+                        local.distance_trekking_label,
+                        "${trekking.distance} km",
+                      ),
+                      // Estimated time
+                      _infoRow(
+                        Icons.schedule,
+                        local.estimated_time_trekking_label,
+                        formattedTime,
+                      ),
+                      // Elevation gain whit up and down arrows
+                      _elevationRow(
+                        local.elevaition_gain_trekking_label,
+                        trekking.elevation_gain,
+                        trekking.upGain,
+                        trekking.downGain,
+                      ),
                       
-                      if (snapshot.hasError || !snapshot.hasData) {
-                        return Text(local.challenges_available_trekking_label);
-                      }
-
-                      return Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: snapshot.data!.map((url) {
-                          return Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Colors.grey.withOpacity(0.2)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Image.file(
-                              url,
-                              height: 45, // Dimensione simile agli screenshot
-                              width: 45,
-                              fit: BoxFit.contain,
-                              // Se l'immagine specifica ha un errore di caricamento
-                              errorBuilder: (context, error, stackTrace) => 
-                                  const Icon(Icons.broken_image, color: Colors.grey),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  )
-                : Text(local.challenges_available_trekking_label),
-
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                local.weather_near_trail_label,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                      if (trekking.pic_nic_area == true || trekking.family_firendly == true ) 
+                        const Divider(),
+                      
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            // Picnic area
+                            if (trekking.refreshment_point.isNotEmpty)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 12),
+                                child: Icon(Icons.table_restaurant,  size: 25),
+                              ),
+                            
+                            // Family Friendly
+                            if (trekking.family_firendly)
+                              const Icon(Icons.family_restroom, size: 25),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ),
-            ),
-        GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GeoWatchPage(
-                    trailCenter: center,
+
+              const SizedBox(height: 24),
+
+              // Ending point photo
+              _photoSection(
+                trekkingController.getCachedImage(trekking.endingPointPhoto),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Info section
+              _sectionTitle(local.info_trekking_label),
+              Text(trekking.info[langIndex]),
+
+              const SizedBox(height: 16),
+
+              // Description section
+              _sectionTitle(local.description_trekking_label),
+              Text(trekking.description[langIndex]),
+
+              const SizedBox(height: 16),
+
+              // Refreshment point
+              _refreshmentRow(
+                local.refreshment_point_trekking_label,
+                trekking.refreshment_point.isNotEmpty
+                    ? trekking.refreshment_point
+                    : local.refreshment_point_available_trekking_label,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Challenges section
+              _sectionTitle(local.challenges_trekking_label),
+              trekking.challenges.isNotEmpty
+                  ? FutureBuilder<List<File>>(
+                      future: trekkingController.getCachedImages(trekking.challenges),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        }
+                        
+                        if (snapshot.hasError || !snapshot.hasData) {
+                          return Text(local.challenges_available_trekking_label);
+                        }
+
+                        return Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: snapshot.data!.map((url) {
+                            return Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Image.file(
+                                url,
+                                height: 45, // Dimensione simile agli screenshot
+                                width: 45,
+                                fit: BoxFit.contain,
+                                // Se l'immagine specifica ha un errore di caricamento
+                                errorBuilder: (context, error, stackTrace) => 
+                                    const Icon(Icons.broken_image, color: Colors.grey),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    )
+                  : Text(local.challenges_available_trekking_label),
+
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text(
+                  local.weather_near_trail_label,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              );
-            },
-
-
-              child: Weather(
-                weather: weather,
-                loading: loadingWeather,
-                error: weatherError,
-                hideLocationName: true,
               ),
-            ),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GeoWatchPage(
+                      trailCenter: center,
+                    ),
+                  ),
+                );
+              },
+
+
+                child: Weather(
+                  weather: weather,
+                  loading: loadingWeather,
+                  error: weatherError,
+                  hideLocationName: true,
+                ),
+              ),
 
 
 
-            const SizedBox(width: 10),
-          ],
+              const SizedBox(width: 10),
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 

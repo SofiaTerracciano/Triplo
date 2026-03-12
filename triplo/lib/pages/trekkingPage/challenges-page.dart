@@ -12,9 +12,7 @@ import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import '../../controller/challenge.dart';
 
 class ChallengesPage extends StatefulWidget {
-
-  const ChallengesPage({
-    super.key});
+  const ChallengesPage({super.key});
 
   @override
   State<ChallengesPage> createState() => _ChallengesPageState();
@@ -66,11 +64,15 @@ class _ChallengesPageState extends State<ChallengesPage> {
       appBar: AppBar(title: Text(local.challeng_title)),
       body: challenges.isEmpty
           ? Center(child: Text(local.no_challenge))
-          : ListView.builder(
-        itemCount: challenges.length,
-        itemBuilder: (context, index) {
-          final challenge = challenges[index];
-          final langIndex = getLanguageSelected(locale.languageCode);
+          : ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+              child: ListView.builder(
+                itemCount: challenges.length,
+                itemBuilder: (context, index) {
+                  final challenge = challenges[index];
+
+                  // Selezione lingua
+                  final langIndex = getLanguageSelected(locale.languageCode);
 
           final title = (challenge.title.length > langIndex)
               ? challenge.title[langIndex]
@@ -87,7 +89,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
           final photoFuture =
           challengesController.getCachedImage(challenge.photo);
 
-          final isEven = index % 2 == 0;
+            final isEven = index % 2 == 0;
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -164,6 +166,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
           );
         },
       ),
+      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -233,10 +236,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
               ),
               title: Text(local.challeng_title, style: optionStyle),
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ChallengesPage()),
-                );
+                Navigator.pop(context);
               },
             ),
             ListTile(

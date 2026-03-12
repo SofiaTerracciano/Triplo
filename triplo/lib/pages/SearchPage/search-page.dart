@@ -262,10 +262,7 @@ class _SearchPageState extends State<SearchPage>
               ),
               title: Text(local.search_page_title, style: optionStyle),
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => SearchPage()),
-                );
+                Navigator.pop(context);
               },
             ),
             ListTile(

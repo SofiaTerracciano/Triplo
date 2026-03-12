@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:triplo/controller/user.dart';
@@ -45,10 +46,11 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loginEmailPwd(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
+    final local = AppLocalizations.of(context)!;
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in both fields")),
+        SnackBar(content: Text(local.fill_fields_label)),
       );
       return;
     }
@@ -127,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final language = context.watch<Language>();
+    final local = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -167,8 +170,8 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset('images/Triplo_def.png', height: 120),
                 const SizedBox(height: 24),
 
-                const Text(
-                  'Welcome to the Triplo App',
+                Text(
+                  local.welcome_label,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
