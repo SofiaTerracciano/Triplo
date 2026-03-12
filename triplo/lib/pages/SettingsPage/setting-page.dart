@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/GeowatchPage/Navigation.dart';
-import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
+import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../HomePage/home-page.dart';
 import '../UserProfilePage/user-page.dart';
 import '../SearchPage/search-page.dart';
@@ -255,7 +255,7 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 16),
 
               Text(
-                local.password_label,
+                local.password_message_label,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
 
