@@ -16,6 +16,11 @@
 
 
 The Triplo system is designed according to a modular architecture in which the main application logic is implemented on the client side, while backend functionalities are delegated to managed services and external APIs, as illustrated in Figures 2.1 and 2.2. \\
+\begin{figure}[H]
+    \label{Overview Diagram}
+    \centering
+    \includegraphics[width=\linewidth]{./images/Overview.png}
+\end{figure}
 The system separates concerns between presentation, application logic, and data management. Both the presentation layer and the core application logic are implemented within the Flutter-based applications. In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources. \\ \\
 The application directly manages user interactions, business logic, and coordination between components. \\
 Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. This design choice shifts part of the traditional server-side responsibilities to the client, which becomes responsible for orchestrating application logic and interactions with backend services.  \\
@@ -83,6 +88,89 @@ Therefore, in the proposed architecture:
 
 
 \section{Runtime view}
+
+\subsection{Watch--Phone Pairing Mechanism}
+
+\subsubsection{Overview}
+
+The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore.
+
+\subsubsection{Device Identity}
+
+Each watch generates (or restores) a persistent \texttt{watchId}, stored securely on-device.  
+A corresponding document exists in:
+
+\begin{verbatim}
+watch/{watchId}
+\end{verbatim}
+
+The \texttt{watchId} uniquely identifies the physical device and is never deleted during logout.
+
+\subsubsection{Pairing Flow}
+
+\textbf{1. Initialization (Watch)}  
+The watch generates a random UUID (\texttt{qrToken}) and writes:
+
+\begin{verbatim}
+watch_pair/{watchId}
+\end{verbatim}
+
+with:
+\begin{itemize}
+    \item \texttt{status = "waiting"}
+    \item \texttt{uid = null}
+    \item \texttt{qrToken}
+    \item \texttt{createdAt}, \texttt{expiresAt}
+\end{itemize}
+
+A QR code encoding \texttt{watchId} and \texttt{qrToken} is displayed.
+
+\textbf{2. Approval (Phone)}  
+After scanning the QR, the authenticated mobile app:
+\begin{itemize}
+    \item Verifies token validity and expiration.
+    \item Updates the document with:
+    \begin{itemize}
+        \item \texttt{status = "approved"}
+        \item \texttt{uid = request.auth.uid}
+    \end{itemize}
+\end{itemize}
+
+\textbf{3. Completion (Watch)}  
+The watch listens to the document in real time.  
+When \texttt{status == "approved"} and \texttt{uid} is set, pairing is considered complete and the watch loads user data using that \texttt{uid}.
+
+\subsubsection{Session Restoration}
+
+On startup, the watch checks:
+
+
+\begin{verbatim}
+watch_pair/{watchId}
+\end{verbatim}
+
+If the document is already approved, the session is restored automatically.
+
+\subsection{Logout}
+
+Logout does not delete the device identity. Instead, the watch resets:
+
+\begin{itemize}
+    \item \texttt{status = "waiting"}
+    \item \texttt{uid = null}
+\end{itemize}
+
+This preserves device identity while removing user association.
+
+\subsection{Security Properties}
+
+\begin{itemize}
+    \item Only the watch may create/reset pairing in \texttt{waiting} state.
+    \item Only authenticated users may approve pairing.
+    \item QR tokens are random and time-limited.
+\end{itemize}
+
+This design cleanly separates device identity from user authentication while minimizing credential exposure on the wearable device.
 
 \section{Component interfaces}
 
