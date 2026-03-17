@@ -385,4 +385,64 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get welcome_label => 'Bienvenue dans l\'application Triplo';
+
+  @override
+  String get title_notification_arrival => '📍 Presque arrivé !';
+
+  @override
+  String get body_notification_arrival => 'Touchez pour terminer le trek.';
+
+  @override
+  String get title_challenge_balance => 'Défi : Équilibre';
+
+  @override
+  String get body_challenge_balance => 'Teste ton équilibre !';
+
+  @override
+  String get alert_challenge_balance => 'Trouve une pierre ou une racine et essaie de garder l’équilibre pendant quelques secondes.';
+
+  @override
+  String get title_challenge_hi => 'Défi : Saluer';
+
+  @override
+  String get body_challenge_hi => 'Salue quelqu’un sur le sentier !';
+
+  @override
+  String get alert_challenge_hi => 'Salue au moins 4 personnes que tu rencontres sur le sentier et rends la randonnée plus sociale.';
+
+  @override
+  String get title_challenge_mini_orientiring => 'Défi : Orientation';
+
+  @override
+  String get body_challenge_mini_orientiring => 'Sais-tu dans quelle direction tu vas ?';
+
+  @override
+  String get alert_challenge_mini_orientiring => 'Observe le soleil et le sentier et essaie de comprendre dans quelle direction tu marches (Nord, Sud, Est ou Ouest). Pas besoin de répondre dans l’application.';
+
+  @override
+  String get title_challenge_photo => 'Défi : Photo';
+
+  @override
+  String get body_challenge_photo => 'Prends une photo du paysage !';
+
+  @override
+  String get alert_challenge_photo => 'Prends une photo de quelque chose de spécial sur le chemin : un animal, une cascade ou un détail de la nature.';
+
+  @override
+  String get title_challenge_silent_walking => 'Défi : Marche silencieuse';
+
+  @override
+  String get body_challenge_silent_walking => 'Essaie de marcher en silence.';
+
+  @override
+  String get alert_challenge_silent_walking => 'Marche en silence pendant quelques minutes et écoute les sons de la nature.';
+
+  @override
+  String get title_challenge_time => 'Défi : Contre la montre';
+
+  @override
+  String get body_challenge_time => 'Peux-tu battre le temps ?';
+
+  @override
+  String get alert_challenge_time => 'Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?';
 }

@@ -1,11 +1,11 @@
 {
-     "@@locale": "it",
+    "@@locale": "it",
 
-     "menu_title": "Menu",
-     
+    "menu_title": "Menu",
+    
     "home_page_title": "Home",
     "repositioning_button_label": "Riposizionami",
-    
+
     "profile_page_title": "Profilo",
     "username_label": "Username",
     "password_label": "Password",
@@ -141,5 +141,33 @@
     "watch_paired_label": "Orologio collegato!",
 
     "fill_fields_label": "Per favore, compila entrambi i campi",
-    "welcome_label": "Benvenuto nell'app Triplo"
+    "welcome_label": "Benvenuto nell'app Triplo",
+
+    "title_notification_arrival": "📍 Quasi arrivato!",
+    "body_notification_arrival": "Tocca per completare il trekking.",
+
+    
+    "title_challenge_balance": "Sfida: Equilibrio",
+    "body_challenge_balance": "Metti alla prova il tuo equilibrio!",
+    "alert_challenge_balance": "Trova un sasso o una radice e prova a restare in equilibrio per qualche secondo!",
+
+    "title_challenge_hi": "Sfida: Saluto",
+    "body_challenge_hi": "Saluta qualcuno sul sentiero!",
+    "alert_challenge_hi": "Saluta almeno 4 persone che incontri lungo il percorso e rendi il trekking più sociale.",
+
+    "title_challenge_mini_orientiring": "Sfida: Orientamento",
+    "body_challenge_mini_orientiring": "Sai in che direzione stai andando?",
+    "alert_challenge_mini_orientiring": "Osserva il sole e il sentiero e prova a capire in che direzione stai andando (Nord, Sud, Est o Ovest). Non serve rispondere nell’app, prova a orientarti da solo.",
+
+    "title_challenge_photo": "Sfida: Fotografia",
+    "body_challenge_photo": "Scatta una foto al paesaggio!",
+    "alert_challenge_photo": "Scatta una foto a qualcosa di particolare lungo il percorso: un animale, una cascata o un dettaglio della natura.",
+
+    "title_challenge_silent_walking": "Sfida: Camminata silenziosa",
+    "body_challenge_silent_walking": "Prova a camminare in silenzio.",
+    "alert_challenge_silent_walking": "Cammina in silenzio per qualche minuto e ascolta i suoni della natura intorno a te.",
+
+    "title_challenge_time": "Sfida: Contro il tempo",
+    "body_challenge_time": "Riuscirai a battere il tempo?",
+    "alert_challenge_time": "Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?"
 }

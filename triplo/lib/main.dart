@@ -75,15 +75,23 @@ Future<void> main() async {
       final context = navKey.currentContext;
       if (context == null) return;
 
+      final local = AppLocalizations.of(context);
+      if (local == null) return;
+
       final String payload = response.payload ?? "";
+      
+      // Recuperiamo i testi tradotti usando la tua funzione
+      final challengeContent = _getChallengeContent(payload, local);
+      final String title = challengeContent['title'] ?? "";
+      final String body = challengeContent['body'] ?? "";
 
       if (payload == 'end_trekking_arrival') {
-        // Dialog for end trekking
+        // Tuo alert originale per l'arrivo
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("📍 Destinazione vicina!"),
-            content: Text(_getChallengeBody(payload)),
+            title: Text("📍 $title"), // Usa il titolo tradotto dell'arrivo
+            content: Text(body),       // Usa il corpo tradotto dell'arrivo
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -93,12 +101,12 @@ Future<void> main() async {
           ),
         );
       } else {
-        // Dialog for challenges
+        // Tuo alert originale per le sfide
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text("🥾 È ora di una sfida!"),
-            content: Text(_getChallengeBody(payload)),
+            title: Text("🥾 $title"), // Usa il titolo specifico della sfida
+            content: Text(body),       // Usa il corpo specifico della sfida
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -248,21 +256,47 @@ class MyApp extends StatelessWidget {
   }
 }
 
-String _getChallengeBody(String challenge) {
-  switch (challenge) {
+Map<String, String> _getChallengeContent(String payload, AppLocalizations local) {
+  switch (payload) {
     case "balance":
-      return "Metti alla prova il tuo equilibrio!";
+      return {
+        'title': local.title_challenge_balance,
+        'body': local.body_challenge_balance,
+      };
     case "hi":
-      return "Saluta qualcuno che incontri sul sentiero!";
+      return {
+        'title': local.title_challenge_hi,
+        'body': local.body_challenge_hi,
+      };
     case "mini_orientiring":
-      return "Trova la tua strada!";
+      return {
+        'title': local.title_challenge_mini_orientiring,
+        'body': local.body_challenge_mini_orientiring,
+      };
     case "photo":
-      return "Scatta una foto al paesaggio!";
+      return {
+        'title': local.title_challenge_photo,
+        'body': local.body_challenge_photo,
+      };
     case "silent_walking":
-      return "Cammina in silenzio per qualche minuto!";
+      return {
+        'title': local.title_challenge_silent_walking,
+        'body': local.body_challenge_silent_walking,
+      };
     case "time":
-      return "Quanto tempo riesci senza guardare il telefono?";
+      return {
+        'title': local.title_challenge_time,
+        'body': local.body_challenge_time,
+      };
+    case "end_trekking_arrival":
+      return {
+        'title': local.title_notification_arrival,
+        'body': local.body_notification_arrival,
+      };
     default:
-      return "Sei quasi arrivato. Tocca per completare il percorso.";
+      return {
+        'title': "",
+        'body': "",
+      };
   }
 }

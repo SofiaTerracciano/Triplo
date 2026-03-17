@@ -1,41 +1,32 @@
 import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OSService {
-
-  // TO DO: togliere i permessi --> li gestiamo solo in permission_service
-  // questo prende la posizione e la cache
+  
+  // --- POSIZIONE GPS ---
   Future<LatLng?> userLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) return null;
 
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return null;
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return null;
-      }
-
+      // Su Wear OS il fix del GPS può essere lento, mettiamo un timeout
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10), 
       );
 
       return LatLng(pos.latitude, pos.longitude);
     } catch (e) {
-      debugPrint("Error getting location: $e");
+      debugPrint("Error getting location (probabilmente permessi mancanti o timeout): $e");
       return null;
     }
   }
 
+  // --- GESTIONE LINGUA / LOCALE ---
   static const _kLocaleCodeKey = "locale_code";
 
   Future<String?> loadLocaleCode() async {
@@ -48,36 +39,36 @@ class OSService {
     await prefs.setString(_kLocaleCodeKey, code);
   }
 
+  // --- CACHE MANAGER (Configurazione per Wear OS) ---
   final CacheManager _cache = CacheManager(
     Config(
       'triploImageCache',
-      stalePeriod: const Duration(days: 12),
-      maxNrOfCacheObjects: 200,
+      stalePeriod: const Duration(days: 7), // Ridotto per risparmiare spazio
+      maxNrOfCacheObjects: 50,             // Gli smartwatch hanno poca memoria
     ),
   );
 
   Future<File?> getImageFromCache(String url) async {
     try {
-      final file = await _cache.getFileFromCache(url);
-      return file?.file;
+      final fileInfo = await _cache.getFileFromCache(url);
+      return fileInfo?.file;
     } catch (e) {
       debugPrint("getImageFromCache error: $e");
       return null;
     }
   }
 
-  Future<File> cacheImage(String url) async {
+  Future<File?> cacheImage(String url) async {
     try {
+      // getSingleFile scarica e restituisce il file
       return await _cache.getSingleFile(url);
     } catch (e) {
       debugPrint("cacheImage error: $e");
-      rethrow;
+      return null; 
     }
   }
 
-
-
-
+  // --- MEMORY CACHE ---
   final Map<String, File> _memoryImageCache = {};
 
   Future<File?> getImageFromMemory(String key) async {
@@ -103,6 +94,4 @@ class OSService {
   void clearMemoryImageCache() {
     _memoryImageCache.clear();
   }
-
-
 }

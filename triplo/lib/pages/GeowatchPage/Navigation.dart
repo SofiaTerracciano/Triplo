@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
-
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
-
 import '../../service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 

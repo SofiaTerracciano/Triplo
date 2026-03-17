@@ -44,7 +44,7 @@ class _PairingServiceState extends State<PairingService> {
     return Consumer<UserController>(
       builder: (context, ctrl, _) {
         final uid = ctrl.effectiveUid;
-
+        
         // se non paired => pagina QR
         if (uid == null) return const LoginPage();
 

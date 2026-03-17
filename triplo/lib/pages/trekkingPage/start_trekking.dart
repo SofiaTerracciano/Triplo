@@ -12,15 +12,14 @@ import 'package:geolocator/geolocator.dart';
 import '../../service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-final FlutterLocalNotificationsPlugin notifications = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin notifications =
+    FlutterLocalNotificationsPlugin();
 
 class StartTrekkingPage extends StatefulWidget {
   final String trekkingid;
 
-  const StartTrekkingPage({
-    Key? key,
-    required this.trekkingid,
-  }) : super(key: key);
+  const StartTrekkingPage({Key? key, required this.trekkingid})
+    : super(key: key);
 
   @override
   State<StartTrekkingPage> createState() => _StartTrekkingPageState();
@@ -38,13 +37,10 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _loadChallenges();
       _start();
       _initGpsTracking();
-      // Chiediamo i permessi tramite il Service centralizzato
-      // Se è la prima volta, appariranno i pop-up.
-      await PermissionService.askPermissionsOnce();
     });
   }
 
@@ -60,10 +56,12 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       intervalDuration: const Duration(seconds: 1),
     );
 
-    _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
-      _checkDistance(position);
-    });
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) {
+            _checkDistance(position);
+          },
+        );
   }
 
   void _checkDistance(Position currentPos) {
@@ -72,12 +70,17 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     final trekkingController = context.read<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(widget.trekkingid);
 
-    if (trekking != null && trekking.points.last.latitude != null && trekking.points.last.longitude != null) {
+    if (trekking != null &&
+        trekking.points.last.latitude != null &&
+        trekking.points.last.longitude != null) {
       // Calcola la distanza tra posizione attuale e destinazione
       double distanceInMeters = Geolocator.distanceBetween(
         currentPos.latitude,
         currentPos.longitude,
-        trekking.points.last.latitude, // Assicurati che il tuo modello Trekking abbia questi campi
+        trekking
+            .points
+            .last
+            .latitude, // Assicurati che il tuo modello Trekking abbia questi campi
         trekking.points.last.longitude,
       );
 
@@ -89,28 +92,31 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   }
 
   Future<void> _sendArrivalNotification() async {
+    if (!mounted) return;
 
+    final local = AppLocalizations.of(context)!;
+    
     const NotificationDetails platformDetails = NotificationDetails(
       android: AndroidNotificationDetails(
-          'arrival_channel',
-          'Arrivo Trekking',
-          importance: Importance.max,
-          priority: Priority.high,
-          playSound: true,
-          enableVibration: true,
-          visibility: NotificationVisibility.public,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
+        'arrival_channel',
+        'Arrivo Trekking',
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        visibility: NotificationVisibility.public,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
 
     await flutterLocalNotificationsPlugin.show(
-      999, 
-      "📍 Destinazione vicina!",
-      "Sei quasi arrivato. Tocca per completare il percorso.",
+      999,
+      local.title_notification_arrival,
+      local.body_notification_arrival,
       platformDetails,
       payload: 'end_trekking_arrival', // Passiamo anche l'ID nel payload
     );
@@ -137,85 +143,88 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
     if (_challenges.isNotEmpty) {
       _challengeTimer = Timer.periodic(
-        const Duration(seconds: 30), // ricordarsi di mettere in minuti in produzione
+        const Duration(
+          seconds: 30,
+        ), // ricordarsi di mettere in minuti in produzione
         (_) => _sendChallengeNotification(),
       );
     }
   }
 
   Future<void> _sendChallengeNotification() async {
-  
-  if (_challenges.isEmpty) return;
-  if (_challengeIndex >= _challenges.length) {
-    _challengeTimer?.cancel();
-    return;
-  }
+    if (_challenges.isEmpty || !mounted) return;
+    if (_challengeIndex >= _challenges.length) {
+      _challengeTimer?.cancel();
+      return;
+    }
 
-  final challenge = _challenges[_challengeIndex];
-  String title;
-  String body;
+    final local = AppLocalizations.of(context)!;
+    final challenge = _challenges[_challengeIndex];
+    String title;
+    String body;
 
-  // Message body for the notification
-  switch (challenge) {
-    case "balance":
-      body = "Metti alla prova il tuo equilibrio!";
-      title = "Sfida: Equilibrio";
-      break;
-    case "hi":
-      body = "Saluta qualcuno che incontri sul sentiero!";
-      title = "Sfida: Saluto";
-      break;
-    case "mini_orientiring":
-      body = "Trova la tua strada!";
-      title = "Sfida: Orientamento";
-      break;
-    case "photo":
-      body = "Scatta una foto al paesaggio!";
-      title = "Sfida: Fotografia";
-      break;
-    case "silent_walking":
-      body = "Cammina in silenzio per qualche minuto!";
-      title = "Sfida: Camminata Silenziosa";
-      break;
-    case "time":
-      body = "Quanto tempo riesci senza guardare il telefono?";
-      title = "Sfida: Tempo senza telefono";
-      break;
-    default:
-      body = "Sei quasi arrivato. Tocca per completare il percorso.";
-      title = "Arrivato!";
-  }
 
-  try {
-    await flutterLocalNotificationsPlugin.show(
-      _challengeIndex,
-      title,
-      body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'notifications_channel',
-          'Notifications',
-          importance: Importance.max,
-          priority: Priority.high,
-          playSound: true,
-          enableVibration: true,
-          visibility: NotificationVisibility.public,
+    // Message body for the notification
+    switch (challenge) {
+      case "balance":
+        body = local.body_challenge_balance;
+        title = local.title_challenge_balance;
+        break;
+      case "hi":
+        body = local.body_challenge_hi;
+        title = local.title_challenge_hi;
+        break;
+      case "mini_orientiring":
+        body = local.body_challenge_mini_orientiring;
+        title = local.title_challenge_mini_orientiring;
+        break;
+      case "photo":
+        body = local.body_challenge_photo;
+        title = local.title_challenge_photo;
+        break;
+      case "silent_walking":
+        body = local.body_challenge_silent_walking;
+        title = local.title_challenge_silent_walking;
+        break;
+      case "time":
+        body = local.body_challenge_time;
+        title = local.title_challenge_time;
+        break;
+      default:
+        body = "";
+        title = "";
+    }
+
+    try {
+      await flutterLocalNotificationsPlugin.show(
+        _challengeIndex,
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'notifications_channel',
+            'Notifications',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+            visibility: NotificationVisibility.public,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-      payload: challenge,
-    );
-  } catch (e, stack) {
-    print("DEBUG ERRORE notifica: $e");
-    print("DEBUG STACK: $stack");
-  }
+        payload: challenge,
+      );
+    } catch (e, stack) {
+      print("DEBUG ERRORE notifica: $e");
+      print("DEBUG STACK: $stack");
+    }
 
-  _challengeIndex++;
-}
+    _challengeIndex++;
+  }
 
   void _stop() {
     _stopwatch.stop();
@@ -277,7 +286,10 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
               children: [
                 // Header with trekking name and icon
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -313,10 +325,14 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                           width: circleSize,
                           height: circleSize,
                           child: CircularProgressIndicator(
-                            value: (_stopwatch.elapsed.inMilliseconds % 60000) / 60000,
+                            value:
+                                (_stopwatch.elapsed.inMilliseconds % 60000) /
+                                60000,
                             strokeWidth: 6,
                             backgroundColor: Colors.white10,
-                            valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              mainColor,
+                            ),
                           ),
                         ),
                         Column(

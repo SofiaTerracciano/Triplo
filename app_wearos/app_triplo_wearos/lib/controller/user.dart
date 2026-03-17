@@ -10,10 +10,10 @@ import '../model/diary.dart';
 import '../model/trekking.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-
 
   Users? _currentUser;
 
@@ -22,7 +22,6 @@ class UserController extends ChangeNotifier {
   bool get isLoggedIn => _auth.currentUser != null;
 
   late final StreamSubscription<User?> _authSub;
-
 
   final _uuid = const Uuid();
 
@@ -44,22 +43,12 @@ class UserController extends ChangeNotifier {
 
   static const Duration _qrTtl = Duration(minutes: 2);
 
-
-
-
-
-
-
-
   String? _pairedUid;
   String? get pairedUid => _pairedUid;
   String? get effectiveUid {
-
-
-
-
     return _pairedUid;
   }
+
   static const _storage = FlutterSecureStorage();
   static const _watchIdKey = 'watch_id';
 
@@ -74,6 +63,7 @@ class UserController extends ChangeNotifier {
     if (_watchId == null || _qrToken == null) return null;
     return "triplo://watch-pair/$_watchId?t=$_qrToken";
   }
+
   bool get hasValidPairId {
     if (_pairId == null || _pairCreatedAtLocal == null) {
       return false;
@@ -81,9 +71,9 @@ class UserController extends ChangeNotifier {
 
     return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
   }
+
   UserController({required String watchId}) {
     _watchId = watchId;
-
 
     _authSub = _auth.authStateChanges().listen((firebaseUser) async {
       if (firebaseUser == null) {
@@ -94,9 +84,6 @@ class UserController extends ChangeNotifier {
       await loadUserCore(firebaseUser.uid);
     });
   }
-
-
-
 
   @override
   void dispose() {
@@ -153,7 +140,6 @@ class UserController extends ChangeNotifier {
     await loadUserCore(cred.user!.uid);
   }
 
-
   Future<void> loginWithCredential(AuthCredential credential) async {
     final cred = await _auth.signInWithCredential(credential);
     await loadUserCore(cred.user!.uid);
@@ -181,8 +167,6 @@ class UserController extends ChangeNotifier {
     final data = snap.data()!;
 
     _currentUser = Users.fromMap(data, uid: uid);
-
-
 
     notifyListeners();
   }
@@ -278,7 +262,7 @@ class UserController extends ChangeNotifier {
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayUnion([trekkingId])
+      "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
     });
 
     notifyListeners();
@@ -289,7 +273,7 @@ class UserController extends ChangeNotifier {
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayRemove([trekkingId])
+      "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
     });
 
     notifyListeners();
@@ -360,14 +344,11 @@ class UserController extends ChangeNotifier {
     await ref.putFile(image);
     final url = await ref.getDownloadURL();
 
-    await _db.collection("users").doc(uid).update({
-      "Photo_profile": url,
-    });
+    await _db.collection("users").doc(uid).update({"Photo_profile": url});
 
     _currentUser?.photoProfile = url;
     notifyListeners();
   }
-
 
   Future<void> loginWithCustomToken(String token) async {
     final cred = await _auth.signInWithCustomToken(token);
@@ -395,7 +376,6 @@ class UserController extends ChangeNotifier {
     _expiryTimer?.cancel();
     _expiryTimer = null;
 
-
     if (isLoggedIn) {
       await Future.delayed(const Duration(milliseconds: 50));
       await logout();
@@ -413,8 +393,6 @@ class UserController extends ChangeNotifier {
     final docRef = _db.collection('watch_pair').doc(_watchId);
 
     try {
-
-
       await docRef.set({
         'watchId': _watchId,
         'qrToken': token,
@@ -430,31 +408,33 @@ class UserController extends ChangeNotifier {
         notifyListeners();
       });
 
-      _pairSub = docRef.snapshots().listen((doc) {
-        final data = doc.data();
-        if (data == null) return;
+      _pairSub = docRef.snapshots().listen(
+        (doc) {
+          final data = doc.data();
+          if (data == null) return;
 
-        final status = data['status'] as String?;
-        final uid = data['uid'] as String?;
-        final tokenOnDb = data['qrToken'] as String?;
+          final status = data['status'] as String?;
+          final uid = data['uid'] as String?;
+          final tokenOnDb = data['qrToken'] as String?;
 
+          if (tokenOnDb != _qrToken) return;
 
-        if (tokenOnDb != _qrToken) return;
+          if (status == 'approved' && uid != null && uid.isNotEmpty) {
+            _expiryTimer?.cancel();
+            _pairedUid = uid;
+            notifyListeners();
+          }
 
-        if (status == 'approved' && uid != null && uid.isNotEmpty) {
-          _expiryTimer?.cancel();
-          _pairedUid = uid;
+          if (status == 'expired') {
+            _pairingError = "QR scaduto, rigenera.";
+            notifyListeners();
+          }
+        },
+        onError: (e) {
+          _pairingError = "Errore listener pairing: $e";
           notifyListeners();
-        }
-
-        if (status == 'expired') {
-          _pairingError = "QR scaduto, rigenera.";
-          notifyListeners();
-        }
-      }, onError: (e) {
-        _pairingError = "Errore listener pairing: $e";
-        notifyListeners();
-      });
+        },
+      );
     } catch (e) {
       _pairingError = "Errore pairing: $e";
     } finally {
@@ -462,6 +442,7 @@ class UserController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> stopWatchPairing({bool clearId = false}) async {
     _expiryTimer?.cancel();
     _expiryTimer = null;
@@ -477,18 +458,7 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
-
-
-
-
-
-
-
-
   Future<void> logoutWatch() async {
-
     _expiryTimer?.cancel();
     _expiryTimer = null;
 
@@ -502,7 +472,6 @@ class UserController extends ChangeNotifier {
     _pairedUid = null;
     _pairingError = null;
 
-
     if (isLoggedIn) {
       await logout();
     }
@@ -510,10 +479,8 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<bool> restoreWatchPairing() async {
     if (_watchId == null) return false;
-
 
     _pairingError = null;
 
@@ -533,7 +500,6 @@ class UserController extends ChangeNotifier {
         if (status == 'approved' && uid != null && uid.isNotEmpty) {
           _pairedUid = uid;
           notifyListeners();
-
 
           _pairSub = docRef.snapshots().listen((doc) {
             final d = doc.data();
@@ -555,19 +521,21 @@ class UserController extends ChangeNotifier {
       debugPrint("restoreWatchPairing get failed: $e");
     }
 
-
-    _pairSub = docRef.snapshots().listen((doc) {
-      final d = doc.data();
-      if (d == null) return;
-      final st = d['status'] as String?;
-      final u = d['uid'] as String?;
-      if (st == 'approved' && u != null && u.isNotEmpty) {
-        _pairedUid = u;
-        notifyListeners();
-      }
-    }, onError: (e) {
-      debugPrint("restoreWatchPairing listener error: $e");
-    });
+    _pairSub = docRef.snapshots().listen(
+      (doc) {
+        final d = doc.data();
+        if (d == null) return;
+        final st = d['status'] as String?;
+        final u = d['uid'] as String?;
+        if (st == 'approved' && u != null && u.isNotEmpty) {
+          _pairedUid = u;
+          notifyListeners();
+        }
+      },
+      onError: (e) {
+        debugPrint("restoreWatchPairing listener error: $e");
+      },
+    );
 
     return false;
   }
@@ -596,7 +564,6 @@ class UserController extends ChangeNotifier {
         _pairId = newToken;
         _pairCreatedAtLocal = now;
       } else {
-
         await docRef.set({
           'status': 'waiting',
           'uid': null,

@@ -4,6 +4,7 @@ import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:triplo/pages/SearchPage/search-page.dart';
 import 'package:triplo/pages/SettingsPage/setting-page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
+import 'package:triplo/service/permission_service.dart' show PermissionService;
 
 
 
@@ -32,6 +33,11 @@ class _Landing_PageState extends State<Landing_Page> {
   @override
   void initState() {
     super.initState();
+     // Eseguiamo il controllo dei permessi dopo il primo frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Chiamiamo il servizio centralizzato
+      PermissionService.askPermissionsOnce();
+    });
   }
 
   // Se non è uno smartwatch, mostra la landing page normale
