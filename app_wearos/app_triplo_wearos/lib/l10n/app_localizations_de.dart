@@ -307,4 +307,67 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get no_users_found_label => 'Keine Benutzer gefunden';
+
+  @override
+  String get title_notification_arrival => '📍 Fast angekommen!';
+
+  @override
+  String get body_notification_arrival => 'Tippen, um die Wanderung abzuschließen.';
+
+  @override
+  String get alert_notification_arrival => 'Du bist fast am Ziel angekommen. Denke daran, den Timer zu stoppen und dein Tagebuch auszufüllen.';
+
+  @override
+  String get title_challenge_balance => '🪨 Challenge: Gleichgewicht';
+
+  @override
+  String get body_challenge_balance => 'Teste dein Gleichgewicht!';
+
+  @override
+  String get alert_challenge_balance => 'Finde einen Stein oder eine Wurzel und versuche einige Sekunden das Gleichgewicht zu halten.';
+
+  @override
+  String get title_challenge_hi => '👋🏻 Challenge: Grüßen';
+
+  @override
+  String get body_challenge_hi => 'Grüße jemanden auf dem Weg!';
+
+  @override
+  String get alert_challenge_hi => 'Grüße mindestens 4 Personen, die du auf dem Weg triffst, und mache die Wanderung sozialer.';
+
+  @override
+  String get title_challenge_mini_orientiring => '🧭 Challenge: Orientierung';
+
+  @override
+  String get body_challenge_mini_orientiring => 'Weißt du, wohin du gehst?';
+
+  @override
+  String get alert_challenge_mini_orientiring => 'Beobachte die Sonne und den Weg und versuche herauszufinden, in welche Richtung du gehst (Norden, Süden, Osten oder Westen). Du musst nichts in der App beantworten.';
+
+  @override
+  String get title_challenge_photo => '📷 Challenge: Foto';
+
+  @override
+  String get body_challenge_photo => 'Mach ein Foto von der Landschaft!';
+
+  @override
+  String get alert_challenge_photo => 'Mache ein Foto von etwas Besonderem auf dem Weg: ein Tier, ein Wasserfall oder ein Detail der Natur.';
+
+  @override
+  String get title_challenge_silent_walking => '🧘🏻 Challenge: Stiller Spaziergang';
+
+  @override
+  String get body_challenge_silent_walking => 'Versuche in Stille zu gehen.';
+
+  @override
+  String get alert_challenge_silent_walking => 'Gehe ein paar Minuten in Stille und höre auf die Geräusche der Natur.';
+
+  @override
+  String get title_challenge_time => '⏱️ Challenge: Gegen die Zeit';
+
+  @override
+  String get body_challenge_time => 'Schaffst du es rechtzeitig?';
+
+  @override
+  String get alert_challenge_time => 'Versuche die Strecke in der geschätzten Zeit zu schaffen. Kannst du die Zeit schlagen?';
 }

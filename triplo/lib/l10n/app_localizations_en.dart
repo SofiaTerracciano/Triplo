@@ -393,7 +393,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get body_notification_arrival => 'Tap to complete the trek.';
 
   @override
-  String get title_challenge_balance => 'Challenge: Balance';
+  String get alert_notification_arrival => 'You are close to the arrival point; remember to stop the timer and complete your diary.';
+
+  @override
+  String get title_challenge_balance => '🪨 Challenge: Balance';
 
   @override
   String get body_challenge_balance => 'Test your balance!';
@@ -402,7 +405,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alert_challenge_balance => 'Find a rock or root and try to keep your balance for a few seconds!';
 
   @override
-  String get title_challenge_hi => 'Challenge: Say hello';
+  String get title_challenge_hi => '👋🏻 Challenge: Say hello';
 
   @override
   String get body_challenge_hi => 'Say hello on the trail!';
@@ -411,7 +414,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alert_challenge_hi => 'Say hello to at least 4 people you meet along the trail and make the hike more social.';
 
   @override
-  String get title_challenge_mini_orientiring => 'Challenge: Navigation';
+  String get title_challenge_mini_orientiring => '🧭 Challenge: Navigation';
 
   @override
   String get body_challenge_mini_orientiring => 'Do you know which way you\'re heading?';
@@ -420,7 +423,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alert_challenge_mini_orientiring => 'Look at the sun and the trail and try to understand which direction you\'re heading (North, South, East or West). No need to answer in the app, just orient yourself.';
 
   @override
-  String get title_challenge_photo => 'Challenge: Photo';
+  String get title_challenge_photo => '📷 Challenge: Photo';
 
   @override
   String get body_challenge_photo => 'Take a photo of the landscape!';
@@ -429,7 +432,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alert_challenge_photo => 'Take a photo of something special along the trail: an animal, a waterfall or an interesting detail in nature.';
 
   @override
-  String get title_challenge_silent_walking => 'Challenge: Silent walk';
+  String get title_challenge_silent_walking => '🧘🏻 Challenge: Silent walk';
 
   @override
   String get body_challenge_silent_walking => 'Try walking in silence.';
@@ -438,7 +441,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alert_challenge_silent_walking => 'Walk in silence for a few minutes and listen to the sounds of nature around you.';
 
   @override
-  String get title_challenge_time => 'Challenge: Beat the clock';
+  String get title_challenge_time => '⏱️ Challenge: Beat the clock';
 
   @override
   String get body_challenge_time => 'Can you beat the time?';

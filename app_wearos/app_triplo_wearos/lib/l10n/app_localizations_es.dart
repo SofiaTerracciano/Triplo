@@ -307,4 +307,67 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get no_users_found_label => 'No se encontraron usuarios';
+
+  @override
+  String get title_notification_arrival => '📍 ¡Casi has llegado!';
+
+  @override
+  String get body_notification_arrival => 'Toca para completar el trekking.';
+
+  @override
+  String get alert_notification_arrival => 'Estás cerca del punto de llegada, recuerda detener el cronómetro y completar el diario.';
+
+  @override
+  String get title_challenge_balance => '🪨 Desafío: Equilibrio';
+
+  @override
+  String get body_challenge_balance => '¡Pon a prueba tu equilibrio!';
+
+  @override
+  String get alert_challenge_balance => 'Encuentra una piedra o raíz e intenta mantener el equilibrio durante unos segundos.';
+
+  @override
+  String get title_challenge_hi => '👋🏻 Desafío: Saludo';
+
+  @override
+  String get body_challenge_hi => '¡Saluda a alguien en el camino!';
+
+  @override
+  String get alert_challenge_hi => 'Saluda al menos a 4 personas que encuentres durante el recorrido y haz el trekking más social.';
+
+  @override
+  String get title_challenge_mini_orientiring => '🧭 Desafío: Orientación';
+
+  @override
+  String get body_challenge_mini_orientiring => '¿Sabes hacia dónde vas?';
+
+  @override
+  String get alert_challenge_mini_orientiring => 'Observa el sol y el camino e intenta descubrir en qué dirección estás caminando (Norte, Sur, Este u Oeste). No hace falta responder en la app.';
+
+  @override
+  String get title_challenge_photo => '📷 Desafío: Foto';
+
+  @override
+  String get body_challenge_photo => '¡Toma una foto del paisaje!';
+
+  @override
+  String get alert_challenge_photo => 'Toma una foto de algo especial durante el recorrido: un animal, una cascada o un detalle de la naturaleza.';
+
+  @override
+  String get title_challenge_silent_walking => '🧘🏻 Desafío: Caminata silenciosa';
+
+  @override
+  String get body_challenge_silent_walking => 'Intenta caminar en silencio.';
+
+  @override
+  String get alert_challenge_silent_walking => 'Camina en silencio durante unos minutos y escucha los sonidos de la naturaleza.';
+
+  @override
+  String get title_challenge_time => '⏱️ Desafío: Contra el tiempo';
+
+  @override
+  String get body_challenge_time => '¿Puedes vencer al tiempo?';
+
+  @override
+  String get alert_challenge_time => 'Intenta completar la ruta dentro del tiempo estimado. ¿Puedes vencer al cronómetro?';
 }

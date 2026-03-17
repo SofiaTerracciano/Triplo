@@ -92,7 +92,7 @@ class ChallengesController extends ChangeNotifier {
       }
 
       debugPrint("Challenge image not in cache, downloading");
-      final file = await memory.cacheImageOnDisk(cacheableUrl); // <-- CORRETTO QUI
+      final file = await memory.cacheImageOnDisk(cacheableUrl); 
       memory.saveImageToMemory(imagePath, file);
       return file;
 

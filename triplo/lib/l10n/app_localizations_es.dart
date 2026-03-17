@@ -393,7 +393,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get body_notification_arrival => 'Toca para completar el trekking.';
 
   @override
-  String get title_challenge_balance => 'Desafío: Equilibrio';
+  String get alert_notification_arrival => 'Estás cerca del punto de llegada, recuerda detener el cronómetro y completar el diario.';
+
+  @override
+  String get title_challenge_balance => '🪨 Desafío: Equilibrio';
 
   @override
   String get body_challenge_balance => '¡Pon a prueba tu equilibrio!';
@@ -402,7 +405,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alert_challenge_balance => 'Encuentra una piedra o raíz e intenta mantener el equilibrio durante unos segundos.';
 
   @override
-  String get title_challenge_hi => 'Desafío: Saludo';
+  String get title_challenge_hi => '👋🏻 Desafío: Saludo';
 
   @override
   String get body_challenge_hi => '¡Saluda a alguien en el camino!';
@@ -411,7 +414,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alert_challenge_hi => 'Saluda al menos a 4 personas que encuentres durante el recorrido y haz el trekking más social.';
 
   @override
-  String get title_challenge_mini_orientiring => 'Desafío: Orientación';
+  String get title_challenge_mini_orientiring => '🧭 Desafío: Orientación';
 
   @override
   String get body_challenge_mini_orientiring => '¿Sabes hacia dónde vas?';
@@ -420,7 +423,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alert_challenge_mini_orientiring => 'Observa el sol y el camino e intenta descubrir en qué dirección estás caminando (Norte, Sur, Este u Oeste). No hace falta responder en la app.';
 
   @override
-  String get title_challenge_photo => 'Desafío: Foto';
+  String get title_challenge_photo => '📷 Desafío: Foto';
 
   @override
   String get body_challenge_photo => '¡Toma una foto del paisaje!';
@@ -429,7 +432,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alert_challenge_photo => 'Toma una foto de algo especial durante el recorrido: un animal, una cascada o un detalle de la naturaleza.';
 
   @override
-  String get title_challenge_silent_walking => 'Desafío: Caminata silenciosa';
+  String get title_challenge_silent_walking => '🧘🏻 Desafío: Caminata silenciosa';
 
   @override
   String get body_challenge_silent_walking => 'Intenta caminar en silencio.';
@@ -438,7 +441,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alert_challenge_silent_walking => 'Camina en silencio durante unos minutos y escucha los sonidos de la naturaleza.';
 
   @override
-  String get title_challenge_time => 'Desafío: Contra el tiempo';
+  String get title_challenge_time => '⏱️ Desafío: Contra el tiempo';
 
   @override
   String get body_challenge_time => '¿Puedes vencer al tiempo?';
