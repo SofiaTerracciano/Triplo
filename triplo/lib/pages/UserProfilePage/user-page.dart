@@ -18,7 +18,6 @@ import '../SearchPage/search-page.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import 'users-list-page.dart';
-import '../../service/permission_service.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -52,11 +51,6 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
-    // Eseguiamo il controllo dei permessi dopo il primo frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Chiamiamo il servizio centralizzato
-      PermissionService.askPermissionsOnce();
-    });
   }
   /*
   Future<void> _loadUser() async {

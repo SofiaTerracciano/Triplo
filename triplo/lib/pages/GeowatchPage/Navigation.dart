@@ -9,7 +9,7 @@ import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
-import '../../service/permission_service.dart';
+import '../../service/permission.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CompassAltitudePage extends StatefulWidget {

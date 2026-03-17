@@ -565,7 +565,8 @@ Widget _buildSkeletonWeather() {
   );
 
 }
-Widget _buildBackButton(BuildContext context) {
+
+/*Widget _buildBackButton(BuildContext context) {
   return Container(
     decoration: BoxDecoration(
       color: Colors.white.withOpacity(0.95),
@@ -582,9 +583,7 @@ Widget _buildBackButton(BuildContext context) {
       onPressed: () => Navigator.pop(context),
     ),
   );
-}
-
-
+}*/
 
 class AlertDetailPage extends StatelessWidget {
   final String event;

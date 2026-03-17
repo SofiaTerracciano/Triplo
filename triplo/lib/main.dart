@@ -9,18 +9,20 @@ import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
 import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
 import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
-import 'package:triplo/service/OSservice.dart';
 import 'package:triplo/service/authservice.dart';
+import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/internetservice.dart';
+import 'package:triplo/service/memory.dart';
+import 'package:triplo/service/permission.dart';
 import 'controller/challenge.dart';
 import 'firebase_options.dart';
+import '../service/notification.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 
 import 'package:triplo/pages/landing_page/landing_page.dart';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:triplo/update_points.dart';
 
@@ -32,8 +34,7 @@ import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/API.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,96 +49,44 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final os = OSService();
+  final memoryService = MemoryService();
+  final geoService= GeoService();
   final authService = AuthService();
 
-  final language = Language(os: os);
+  final language = Language();
   await language.loadSavedLocale();
 
-  const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  PermissionService.askPermissionsOnce();
 
-  const DarwinInitializationSettings iosSettings =
-      DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
-
-  const InitializationSettings initSettings = InitializationSettings(
-    android: androidSettings,
-    iOS: iosSettings,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(
-    initSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
-      final context = navKey.currentContext;
-      if (context == null) return;
-
-      final local = AppLocalizations.of(context);
-      if (local == null) return;
-
-      final String payload = response.payload ?? "";
-      
-      // Recuperiamo i testi tradotti usando la tua funzione
-      final challengeContent = _getChallengeContent(payload, local);
-      final String title = challengeContent['title'] ?? "";
-      final String body = challengeContent['body'] ?? "";
-
-      if (payload == 'end_trekking_arrival') {
-        // Tuo alert originale per l'arrivo
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("📍 $title"), // Usa il titolo tradotto dell'arrivo
-            content: Text(body),       // Usa il corpo tradotto dell'arrivo
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      } else {
-        // Tuo alert originale per le sfide
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text("🥾 $title"), // Usa il titolo specifico della sfida
-            content: Text(body),       // Usa il corpo specifico della sfida
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-      }
-    },
-  );
+  final notification = NotificationService();
+  notification.setNavKey(navKey);
+  await notification.init();
 
   runApp(
     MyApp(
-      os: os,
+      memoryService: memoryService,
+      geoService: geoService,
       authService: authService,
       language: language,
+      notification: notification,
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final OSService os;
+  final MemoryService memoryService;
+  final GeoService geoService;
   final AuthService authService;
   final Language language;
+  final NotificationService notification;
 
   const MyApp({
     super.key,
-    required this.os,
+    required this.memoryService,
+    required this.geoService,
     required this.authService,
     required this.language,
+    required this.notification,
   });
 
   @override
@@ -146,18 +95,35 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider.value(value: language),
-        Provider<OSService>.value(value: os),
+        Provider<MemoryService>.value(value: memoryService),
+        Provider<GeoService>.value(value: geoService),
         ChangeNotifierProvider<AuthService>.value(value: authService),
-        ChangeNotifierProxyProvider<OSService, TrekkingController>(
+        Provider<NotificationService>.value(value: notification),
+        ChangeNotifierProxyProvider3<GeoService, MemoryService, NotificationService, TrekkingController>(
           create: (context) => TrekkingController(
-            os: context.read<OSService>(),
+            geo: context.read<GeoService>(),
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
             trekkings: [],
           ),
-          update: (context, os, previous) =>
-              previous ?? TrekkingController(os: os, trekkings: []),
+          update: (context, geo, memory, notification, previous) {
+            if (previous != null) {
+              previous.geo = geo;
+              previous.memory = memory;
+              previous.notification = notification;
+              return previous;
+            }
+            return TrekkingController(
+              geo: geo,
+              memory: memory,
+              notification: notification,
+              trekkings: [],
+            );
+          },
         ),
-        ProxyProvider<OSService, API>(
-          update: (_, os, __) => API(os: os),
+        ProxyProvider2<GeoService, MemoryService, API>(
+          update: (context, geo, memory, previous) => 
+              API(geo: geo, memory: memory),
         ),
         ChangeNotifierProxyProvider<API, InternetService>(
           create: (context) =>
@@ -174,13 +140,22 @@ class MyApp extends StatelessWidget {
           update: (context, authService, previous) =>
               previous ?? UserController(authService),
         ),
-
-        ChangeNotifierProxyProvider<OSService, ChallengesController>(
+        ChangeNotifierProxyProvider<MemoryService, ChallengesController>(
           create: (context) => ChallengesController(
-            os: context.read<OSService>(),
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
           ),
-          update: (context, os, previous) =>
-          previous ?? ChallengesController(os: os),
+          update: (context, memory, previous) {
+            if (previous != null) {
+              previous.memory = memory;
+              previous.notification = context.read<NotificationService>();
+              return previous;
+            }
+            return ChallengesController(
+              memory: memory, 
+              notification: context.read<NotificationService>(),
+            );
+          },
         ),
       ],
 
@@ -256,47 +231,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Map<String, String> _getChallengeContent(String payload, AppLocalizations local) {
-  switch (payload) {
-    case "balance":
-      return {
-        'title': local.title_challenge_balance,
-        'body': local.body_challenge_balance,
-      };
-    case "hi":
-      return {
-        'title': local.title_challenge_hi,
-        'body': local.body_challenge_hi,
-      };
-    case "mini_orientiring":
-      return {
-        'title': local.title_challenge_mini_orientiring,
-        'body': local.body_challenge_mini_orientiring,
-      };
-    case "photo":
-      return {
-        'title': local.title_challenge_photo,
-        'body': local.body_challenge_photo,
-      };
-    case "silent_walking":
-      return {
-        'title': local.title_challenge_silent_walking,
-        'body': local.body_challenge_silent_walking,
-      };
-    case "time":
-      return {
-        'title': local.title_challenge_time,
-        'body': local.body_challenge_time,
-      };
-    case "end_trekking_arrival":
-      return {
-        'title': local.title_notification_arrival,
-        'body': local.body_notification_arrival,
-      };
-    default:
-      return {
-        'title': "",
-        'body': "",
-      };
-  }
-}

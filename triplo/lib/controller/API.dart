@@ -1,24 +1,25 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
-import '../service/OSservice.dart';
+import '../service/memory.dart';
+import '../service/geo.dart';
+import '../service/permission.dart';
 
 // API controller for external services
 class API {
   late final String openWeatherKey;
   late final String weatherbitKey;
 
-  final OSService os;
+  MemoryService memory;
+  GeoService geo;
+  late PermissionService permission;
 
   // Constructor to load API keys from .env
-  API({required this.os}) {
+  API({required this.memory, required this.geo}) {
 
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
@@ -29,6 +30,11 @@ class API {
     if (weatherbitKey.isEmpty) {
       debugPrint("WARNING: WEATHERBIT_API_KEY missing");
     }
+  }
+
+  // Se ti serve chiamare i permessi dall'API, fai così:
+  Future<void> initPermissions() async {
+    await PermissionService.askPermissionsOnce();
   }
 
 
@@ -53,7 +59,7 @@ class API {
 
   // Get user's current location
   Future<LatLng?> userLocation() {
-    return os.userLocation();
+    return geo.userLocation();
   }
 
   // Fetch current weather data for given coordinates

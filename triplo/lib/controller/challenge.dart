@@ -5,9 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/challenges.dart';
 
-import '../service/OSservice.dart';
+import '../service/notification.dart';
+import '../service/memory.dart';
 // Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -16,8 +18,11 @@ class ChallengesController extends ChangeNotifier {
   bool _loaded = false;
 
 
-  final OSService os;
-  ChallengesController({required this.os}) : _challenges = [];
+  NotificationService notification;
+  MemoryService memory;
+
+
+  ChallengesController({required this.notification, required this.memory}) : _challenges = [];
 
   // Getter for all trekkings
   List<Challenges> get allChallenges => _challenges;
@@ -65,7 +70,8 @@ class ChallengesController extends ChangeNotifier {
     debugPrint("getCachedImage challenge -> $imagePath");
 
     try {
-      final inMemory = await os.getImageFromMemory(imagePath);
+      // 1. RAM Cache (Corretto)
+      final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
         debugPrint("Challenge image found in RAM cache");
         return inMemory;
@@ -78,21 +84,33 @@ class ChallengesController extends ChangeNotifier {
         cacheableUrl = await ref.getDownloadURL();
       }
 
-      final cached = await os.getImageFromCache(cacheableUrl);
+      final cached = await memory.getImageFromDisk(cacheableUrl);
       if (cached != null) {
         debugPrint("Challenge image found in disk cache");
-        os.saveImageToMemory(imagePath, cached);
+        memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
       debugPrint("Challenge image not in cache, downloading");
-      final file = await os.cacheImage(cacheableUrl);
-      os.saveImageToMemory(imagePath, file);
+      final file = await memory.cacheImageOnDisk(cacheableUrl); // <-- CORRETTO QUI
+      memory.saveImageToMemory(imagePath, file);
       return file;
+
     } catch (e) {
       debugPrint("getCachedImage challenge error: $e");
       return null;
     }
+  }
+
+  void notifyNewChallenge(String challengeType, AppLocalizations local) {
+    final content = getChallengeContent(challengeType, local);
+    
+    notification.showTrekkingNotification(
+      id: DateTime.now().millisecond,
+      title: content['title']!,
+      body: content['body']!,
+      payload: challengeType,
+    );
   }
 
 }
