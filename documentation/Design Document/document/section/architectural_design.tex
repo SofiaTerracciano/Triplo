@@ -3,9 +3,91 @@
 \begin{document}
 \chapter{Architectural Design}
 
+
+
+
+
+
 \section{Overview}
+\subsection{High-level components}
 
 
+
+
+
+The Triplo system is designed according to a modular architecture in which the main application logic is implemented on the client side, while backend functionalities are delegated to managed services and external APIs, as illustrated in Figures 2.1 and 2.2. \\
+The system separates concerns between presentation, application logic, and data management. Both the presentation layer and the core application logic are implemented within the Flutter-based applications. In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources. \\ \\
+The application directly manages user interactions, business logic, and coordination between components. \\
+Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. This design choice shifts part of the traditional server-side responsibilities to the client, which becomes responsible for orchestrating application logic and interactions with backend services.  \\
+The adoption of Backend-as-a-Service (BaaS) solutions enables the system to replace a traditional custom server-side layer with a more lightweight and scalable architecture. By delegating data management, authentication, and storage to managed services, architectural complexity is reduced by eliminating the need for maintaining a dedicated custom backend infrastructure.
+In addition to Firebase, the system integrates external third-party services (e.g., weather, map, and satellite APIs), which are accessed via RESTful APIs over HTTPS. \\
+This architectural approach emphasizes a client-driven design, reduces backend complexity, and enables scalability by leveraging managed cloud services.
+
+
+
+
+
+
+
+
+\subsection{High level components interaction}
+
+
+
+
+
+
+The mobile application represents the entry point of the system and runs on the user's device. It is responsible for handling user interaction, application logic, and coordination between components according to an MVC-inspired architecture. \\
+The system relies on different application components to interact with the required services. \\
+In particular, domain controllers, for example the \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, \texttt{ChallengeController} coordinate access to data and backend resources, while specialized components such as the \texttt{APIController} manage communication with external third-party APIs. \\
+Data persistence, authentication, and file storage are handled through Firebase, which is adopted as a Backend-as-a-Service (BaaS) platform. Interaction with Firebase services (Authentication, Cloud Firestore, and Storage) is performed through platform-specific SDKs rather than through explicitly defined REST APIs. \\
+Communication with external third-party services (e.g., weather, map, or satellite APIs) is instead performed using RESTful APIs over HTTPS. \\
+This approach removes the need for a dedicated backend gateway or custom server-side components, allowing the application to directly orchestrate interactions with backend services and external resources. \\
+
+
+\section{Component view}
+\subsection{High level component view}
+
+
+
+\subsection{Mobile Smartphone App component view}
+
+
+
+
+
+
+Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, and \texttt{ChallengeController}, are responsible for coordinating the application logic related to their respective functional domains. These controllers manage interactions between the View layer and the Model layer, and they also mediate access to backend resources such as Firebase services.
+
+The \texttt{APIController}, instead, has a more specialized role. It is not intended as a gateway to Firebase, but rather as a component dedicated to managing the communication with external third-party services, such as weather, map, satellite, or other external APIs required by the application.
+
+Therefore, in the proposed architecture:
+\begin{itemize}
+    \item domain controllers manage the application use cases and the interaction with Firebase-related resources;
+    \item \texttt{APIController} manages the communication with external non-Firebase services, it is specifically responsible for handling communication with external third-party APIs (e.g., weather, map, or satellite services), which are conceptually distinct from Firebase-managed services. For this reason, the name \texttt{APIController} is preserved for consistency with the existing codebase, while its responsibilities are clearly defined within the architectural description.
+    \item Firebase is modeled as a set of backend services used by the application, rather than as a custom backend.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\subsection{Mobile Smartwatch App component view}
+
+\section{Deployment view}
+
+
+\section{Runtime view}
+
+\section{Component interfaces}
+
+
+\section{Selected architectural styles and patterns}
 
 
 \end{document}
