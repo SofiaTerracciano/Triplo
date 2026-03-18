@@ -19,8 +19,14 @@ The Triplo system is designed according to a modular architecture in which the m
 \begin{figure}[H]
     \label{Overview Diagram}
     \centering
-    \includegraphics[width=\linewidth]{./images/Overview.png}
+    \includegraphics[width=0.8\linewidth]{./images/Overview.png}
+    \caption{Overview Diagram: Blue lines denote the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines denote the smartwatch application’s connectivity, which is limited to selected Firebase services, Firestore and Storage and specific external services, for example OpenTopoMap.}
 \end{figure}
+\newpage
+
+
+
+
 The system separates concerns between presentation, application logic, and data management. Both the presentation layer and the core application logic are implemented within the Flutter-based applications. In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources. \\ \\
 The application directly manages user interactions, business logic, and coordination between components. \\
 Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. This design choice shifts part of the traditional server-side responsibilities to the client, which becomes responsible for orchestrating application logic and interactions with backend services.  \\
@@ -176,6 +182,31 @@ This design cleanly separates device identity from user authentication while min
 
 
 \section{Selected architectural styles and patterns}
+
+
+
+\section{Other Design Decisions}
+\subsection{Network Connectivity Requirements and Platform Justification}
+
+The smartwatch application requires reliable access to internet connectivity in order to provide a complete and consistent user experience. 
+In particular, network access is necessary for several core functionalities of the system.
+
+The application relies on external services to retrieve real-time data, such as maps, which are essential for trekking activities. 
+
+Internet access enables communication with backend services and APIs, allowing the application to fetch dynamic content and maintain updated information.
+
+Given these requirements, the choice of Wear OS as the target platform is appropriate and justified. 
+Wear OS supports multiple network communication modes, including:
+
+\begin{itemize}
+    \item \textbf{Bluetooth connectivity}: allows the smartwatch to access the internet indirectly through a paired smartphone.
+    \item \textbf{Wi-Fi connectivity}: enables the device to connect directly to wireless networks, allowing standalone operation in specific scenarios.
+    \item \textbf{Cellular connectivity (LTE with eSIM)}: available on selected devices, providing full independence from the smartphone and ensuring continuous connectivity during outdoor activities.
+\end{itemize}
+
+This flexibility ensures that the application can operate under different conditions, ranging from smartphone-assisted usage to fully autonomous scenarios. 
+In particular, the availability of LTE-enabled devices makes Wear OS especially suitable for outdoor and trekking contexts, where the user may not always have access to their smartphone.
+
 
 
 \end{document}
