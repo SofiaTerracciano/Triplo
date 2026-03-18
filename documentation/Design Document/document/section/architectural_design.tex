@@ -99,7 +99,7 @@ Therefore, in the proposed architecture:
 
 
 The identified use cases provide an abstract representation of the interactions between the user and the system. They have been selected to capture the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
-These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. As such, it serves as a conceptual foundation for subsequent design and analysis activities.
+These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. 
 \begin{itemize}
     \item Add Diary Page
     \item Explore trekkings on Map
@@ -117,6 +117,20 @@ These set of use cases is representative of the main system capabilities and sup
 
 
 
+
+
+\subsection{Add Diary Page use case sequence diagram}
+The most important part of the \textit{Add Diary Page} sequence diagram is the save phase, where the data entered by the user is stored in the system.
+
+When the user presses the save button, the \texttt{DiaryPage} starts the process by showing a loading page and then it formats the date, computing the duration from hours and minutes. If the user has selected photos, the page calls the \texttt{DiaryController} to upload them to \texttt{FirebaseStorage}. The controller uploads each image and returns a list of paths, which will be stored in the diary instance.
+
+After this step, the \texttt{DiaryPage} calls the \texttt{addDiary(...)} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{DiaryModel} object.
+
+Before saving the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is necessary because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists.
+
+Once converted, the map is stored in the \texttt{diary} collection in Firestore. At the same time, the controller updates the user document, adding the diary identifier to either the public or private diary list, depending on the selected visibility.
+
+Finally, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation.
 
 
 

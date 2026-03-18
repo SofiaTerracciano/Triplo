@@ -1,0 +1,233 @@
+@startuml
+title Add Diary Page Sequence Diagram
+
+actor User
+participant DiaryPage #darkgreen-white
+participant LoadingPage 
+participant UserPage #darkgreen-white
+participant trekkingcontroller as trekkingcontroller #blue-white
+participant UserController as usercontroller #blue-white
+participant DiaryController as diarycontroller #blue-white
+participant DiaryModel as "<color:white>DiaryModel</color>" #151b8e
+collections FirebaseAuth
+database FirebaseFirestore
+database FirebaseStorage
+
+
+
+'== Diary controller bootstrap ==
+
+
+'diarycontroller -> FirebaseAuth : _auth.currentUser!.uid
+'FirebaseAuth --> diarycontroller : UUID
+'note right of diarycontroller
+'reads from Firebase Auth the id of the user
+'end note
+
+
+
+
+
+'== Open Add Diary Page UI==
+
+opt Modify Date
+    opt Modify Day
+    User -> DiaryPage : Open Day Field
+    DiaryPage --> User : Row dropdown
+    User -> DiaryPage : Select Day Field
+    DiaryPage -> DiaryPage : setState(() => selectedDay = v)
+    end
+   opt Modify Month
+    User -> DiaryPage : Open Month Field
+    DiaryPage --> User : Row dropdown
+    User -> DiaryPage : Select Month Field
+    DiaryPage -> DiaryPage : setState(() => selectedMonth = v)
+    end
+
+
+    opt Modify Year
+    User -> DiaryPage : Open Year Field
+    DiaryPage --> User : Row dropdown
+    User -> DiaryPage : Select Year Field
+    DiaryPage -> DiaryPage : setState(() => selectedYear = v)
+    end
+
+end
+
+opt Modify Duration
+    opt Modify Hours
+    User -> DiaryPage : Open Hours Field
+    DiaryPage --> User : Row dropdown
+    User -> DiaryPage : Select Hours Field
+    DiaryPage -> DiaryPage : setState(() => selectedHours = v)
+    end
+   opt Modify Minutes
+    User -> DiaryPage : Open Minutes Field
+    DiaryPage --> User : Row dropdown
+    User -> DiaryPage : Select Minutes Field
+    DiaryPage -> DiaryPage : setState(() => selectedMonth = v)
+    end
+end
+
+opt Select friends 
+    User -> DiaryPage : Open friends field
+    DiaryPage -> usercontroller : userController.currentUser!.following  
+    usercontroller --> DiaryPage : List<User>
+    DiaryPage -> DiaryPage : onTap: () => setState(() { selected ? friends.remove(u.uid) : friends.add(u.uid);})
+end
+
+opt Add notes
+    User -> DiaryPage : Writes notes
+    DiaryPage -> DiaryPage : TextField(TextEditingController: _notesController)
+end
+
+
+opt Refreshment input
+    User -> DiaryPage : Uses ChoiceChip
+    DiaryPage -> DiaryPage : onSelected: (_) => setState(() => usedRefreshment = true)
+end
+
+
+
+opt Challenges selector
+    User -> DiaryPage : Open challenges field
+    DiaryPage -> trekkingcontroller : trekkingController.getDownloadUrl(challenge)
+
+    trekkingcontroller --> DiaryPage : List<String>
+    DiaryPage -> DiaryPage : onTap: () => setState(() { final index =\n trekking.challenges.indexOf(c);\n challenges.remove(c); \nselectedChallengeIndexes.remove(index);})
+end
+
+
+opt Mood selector
+    User -> DiaryPage : Open mood field
+    DiaryPage --> User : ListTile list
+    User -> DiaryPage : Select mood
+    DiaryPage -> DiaryPage : setState(() { selected ? moods.remove(emoji) : moods.add(emoji); })
+end
+
+opt Add photos
+    User -> DiaryPage : Press add photo button
+    DiaryPage -> DiaryPage : _pickImages()
+    DiaryPage --> User : Open image picker
+    User -> DiaryPage : Select photos
+    DiaryPage -> DiaryPage : setState(() {\n_images.clear();\n_images.addAll(picked.map((x) => File(x.path)));\n})
+end
+
+opt Remove selected photo
+    User -> DiaryPage : Press remove photo button
+    DiaryPage -> DiaryPage : setState(() => _images.removeAt(i))
+end
+
+opt Set diary visibility
+    opt Set public diary
+        User -> DiaryPage : Press Public button
+        DiaryPage -> DiaryPage : setState(() => isPublic = true)
+    end
+
+    opt Set private diary
+        User -> DiaryPage : Press Private button
+        DiaryPage -> DiaryPage : setState(() => isPublic = false)
+    end
+end
+
+
+
+
+
+
+'== Save diary ==
+
+opt Save diary
+    User -> DiaryPage : Press Save button
+
+    DiaryPage -> LoadingPage : Navigator.push(context, LoadingPage)
+    LoadingPage --> User : Show loading page
+
+    DiaryPage -> DiaryPage : Build date string
+    note right of DiaryPage
+    final date =
+    "${selectedDay.padLeft(2,'0')}/
+    ${selectedMonth.padLeft(2,'0')}/
+    $selectedYear"
+    end note
+
+    DiaryPage -> DiaryPage : Compute duration
+    note right of DiaryPage
+    final duration =
+    selectedHours * 60 + selectedMinutes
+    end note
+
+    opt Upload selected images
+        DiaryPage -> diarycontroller : uploadDiaryImages(_images)
+
+        loop for each selected image
+            diarycontroller -> diarycontroller : Check file extension
+            diarycontroller -> FirebaseStorage : ref().child(path).putFile(image)
+            FirebaseStorage --> diarycontroller : Upload completed
+            diarycontroller -> diarycontroller : paths.add(path)
+        end
+
+        diarycontroller --> DiaryPage : List<String> photos
+    end
+
+    DiaryPage -> usercontroller : userController.currentUser
+    usercontroller --> DiaryPage : currentUser
+
+    DiaryPage -> diarycontroller : diaryController.currentUser = currentUser
+
+    DiaryPage -> diarycontroller : addDiary(trekking.name, isPublic, date,\nduration.toDouble(), friends, photos,\nchallenges, refreshmentPoint,\nmoods, notes, false, "")
+
+    diarycontroller -> FirebaseAuth : _auth.currentUser!.uid
+    FirebaseAuth --> diarycontroller : uid
+
+    diarycontroller -> diarycontroller : Generate diaryId with Uuid().v4()
+
+    diarycontroller -> FirebaseFirestore : collection("diary").doc(newId).get()
+    FirebaseFirestore --> diarycontroller : Document snapshot
+
+    diarycontroller -> DiaryModel : Create Diary instance
+    note right of DiaryModel
+    Diary(
+      diaryId: newId,
+      userId: uid,
+      trekkigName: title,
+      date: date,
+      duration: duration,
+      friends: friends,
+      photos: photos,
+      challenges: challenges,
+      refreshmentPoint: refreshmentPoint,
+      mood: mood,
+      notes: notes,
+      isPublic: isPublic
+    )
+    end note
+
+    diarycontroller -> diarycontroller : _diaries.add(page)
+
+    alt Diary is public
+        diarycontroller -> FirebaseFirestore : collection("users").doc(uid).update(\n"Public_diary": FieldValue.arrayUnion([page.diaryId]) )
+        FirebaseFirestore --> diarycontroller : Update completed
+        diarycontroller -> diarycontroller : _currentUser!.publicDiaryPages.add(page)
+    else Diary is private
+        diarycontroller -> FirebaseFirestore : collection("users").doc(uid).update(\n"Private_diary": FieldValue.arrayUnion([page.diaryId]) )
+        FirebaseFirestore --> diarycontroller : Update completed
+        diarycontroller -> diarycontroller : _currentUser!.privateDiaryPages.add(page)
+    end
+
+    diarycontroller -> DiaryModel : toMap()
+    DiaryModel --> diarycontroller : Map<String, dynamic>
+
+    diarycontroller -> FirebaseFirestore : collection("diary").doc(page.diaryId).set(page.toMap())
+    FirebaseFirestore --> diarycontroller : Save completed
+
+    diarycontroller --> DiaryPage : addDiary completed
+
+    DiaryPage -> usercontroller : updateUserLevel(trekking.difficulty_level)
+    usercontroller --> DiaryPage : Update completed
+
+    DiaryPage -> UserPage : Navigator.pushReplacement(context, UserPage)
+    UserPage --> User : Show updated user page
+end
+
+@enduml
