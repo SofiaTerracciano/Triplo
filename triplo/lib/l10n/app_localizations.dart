@@ -869,10 +869,16 @@ abstract class AppLocalizations {
   /// **'Tap to complete the trek.'**
   String get body_notification_arrival;
 
+  /// No description provided for @alert_notification_arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'You are close to the arrival point; remember to stop the timer and complete your diary.'**
+  String get alert_notification_arrival;
+
   /// No description provided for @title_challenge_balance.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Balance'**
+  /// **'🪨 Challenge: Balance'**
   String get title_challenge_balance;
 
   /// No description provided for @body_challenge_balance.
@@ -890,7 +896,7 @@ abstract class AppLocalizations {
   /// No description provided for @title_challenge_hi.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Say hello'**
+  /// **'👋🏻 Challenge: Say hello'**
   String get title_challenge_hi;
 
   /// No description provided for @body_challenge_hi.
@@ -908,7 +914,7 @@ abstract class AppLocalizations {
   /// No description provided for @title_challenge_mini_orientiring.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Navigation'**
+  /// **'🧭 Challenge: Navigation'**
   String get title_challenge_mini_orientiring;
 
   /// No description provided for @body_challenge_mini_orientiring.
@@ -926,7 +932,7 @@ abstract class AppLocalizations {
   /// No description provided for @title_challenge_photo.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Photo'**
+  /// **'📷 Challenge: Photo'**
   String get title_challenge_photo;
 
   /// No description provided for @body_challenge_photo.
@@ -944,7 +950,7 @@ abstract class AppLocalizations {
   /// No description provided for @title_challenge_silent_walking.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Silent walk'**
+  /// **'🧘🏻 Challenge: Silent walk'**
   String get title_challenge_silent_walking;
 
   /// No description provided for @body_challenge_silent_walking.
@@ -962,7 +968,7 @@ abstract class AppLocalizations {
   /// No description provided for @title_challenge_time.
   ///
   /// In en, this message translates to:
-  /// **'Challenge: Beat the clock'**
+  /// **'⏱️ Challenge: Beat the clock'**
   String get title_challenge_time;
 
   /// No description provided for @body_challenge_time.

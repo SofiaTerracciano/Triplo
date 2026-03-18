@@ -4,7 +4,7 @@ import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:triplo/pages/SearchPage/search-page.dart';
 import 'package:triplo/pages/SettingsPage/setting-page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
-import 'package:triplo/service/permission_service.dart' show PermissionService;
+import 'package:triplo/service/permission.dart' show PermissionService;
 
 
 

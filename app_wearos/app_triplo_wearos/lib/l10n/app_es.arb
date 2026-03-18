@@ -109,5 +109,32 @@
   "public_diaries_label": "Diarios públicos",
   "private_diaries_label": "Diarios privados",
 
-  "no_users_found_label": "No se encontraron usuarios"
+  "no_users_found_label": "No se encontraron usuarios",
+  "title_notification_arrival": "📍 ¡Casi has llegado!",
+  "body_notification_arrival": "Toca para completar el trekking.",
+  "alert_notification_arrival": "Estás cerca del punto de llegada, recuerda detener el cronómetro y completar el diario.",
+
+  "title_challenge_balance": "🪨 Desafío: Equilibrio",
+  "body_challenge_balance": "¡Pon a prueba tu equilibrio!",
+  "alert_challenge_balance": "Encuentra una piedra o raíz e intenta mantener el equilibrio durante unos segundos.",
+
+  "title_challenge_hi": "👋🏻 Desafío: Saludo",
+  "body_challenge_hi": "¡Saluda a alguien en el camino!",
+  "alert_challenge_hi": "Saluda al menos a 4 personas que encuentres durante el recorrido y haz el trekking más social.",
+
+  "title_challenge_mini_orientiring": "🧭 Desafío: Orientación",
+  "body_challenge_mini_orientiring": "¿Sabes hacia dónde vas?",
+  "alert_challenge_mini_orientiring": "Observa el sol y el camino e intenta descubrir en qué dirección estás caminando (Norte, Sur, Este u Oeste). No hace falta responder en la app.",
+
+  "title_challenge_photo": "📷 Desafío: Foto",
+  "body_challenge_photo": "¡Toma una foto del paisaje!",
+  "alert_challenge_photo": "Toma una foto de algo especial durante el recorrido: un animal, una cascada o un detalle de la naturaleza.",
+
+  "title_challenge_silent_walking": "🧘🏻 Desafío: Caminata silenciosa",
+  "body_challenge_silent_walking": "Intenta caminar en silencio.",
+  "alert_challenge_silent_walking": "Camina en silencio durante unos minutos y escucha los sonidos de la naturaleza.",
+
+  "title_challenge_time": "⏱️ Desafío: Contra el tiempo",
+  "body_challenge_time": "¿Puedes vencer al tiempo?",
+  "alert_challenge_time": "Intenta completar la ruta dentro del tiempo estimado. ¿Puedes vencer al cronómetro?"
 }

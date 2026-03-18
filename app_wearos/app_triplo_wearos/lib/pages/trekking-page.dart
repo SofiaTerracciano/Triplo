@@ -43,7 +43,7 @@ class TrekkingPage extends StatelessWidget {
             scrollDirection: Axis.vertical,
             children: [
               // List of sections
-              _buildHeroSection(trekking, mainColor),
+              _buildHeroSection(context, trekking, mainColor),
               _buildTechnicalSection(
                 trekking,
                 trekking.estimated_time.toInt(),
@@ -63,7 +63,19 @@ class TrekkingPage extends StatelessWidget {
   }
 
   // Title and level
-  Widget _buildHeroSection(var trekking, Color color) {
+  Widget _buildHeroSection(BuildContext context, var trekking, Color color) {
+    final local = AppLocalizations.of(context)!;
+    String level;
+
+    // Logica per il livello
+    if (trekking.difficulty_level == "easy") { 
+      level = local.beginner_level;
+    } else if (trekking.difficulty_level == "intermediate") {
+      level = local.intermediate_level;
+    } else {
+      level = local.advanced_level;
+    }
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -84,8 +96,9 @@ class TrekkingPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
+
             Text(
-              trekking.difficulty_level.toUpperCase(),
+              level.toUpperCase(),
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.bold,

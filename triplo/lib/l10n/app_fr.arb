@@ -143,28 +143,29 @@
 
   "title_notification_arrival": "📍 Presque arrivé !",
   "body_notification_arrival": "Touchez pour terminer le trek.",
+  "alert_notification_arrival": "Vous êtes proche de l'arrivée ; n'oubliez pas d'arrêter le chronomètre et de compléter votre journal.",
 
-  "title_challenge_balance": "Défi : Équilibre",
+  "title_challenge_balance": "🪨 Défi : Équilibre",
   "body_challenge_balance": "Teste ton équilibre !",
   "alert_challenge_balance": "Trouve une pierre ou une racine et essaie de garder l’équilibre pendant quelques secondes.",
 
-  "title_challenge_hi": "Défi : Saluer",
+  "title_challenge_hi": "👋🏻 Défi : Saluer",
   "body_challenge_hi": "Salue quelqu’un sur le sentier !",
   "alert_challenge_hi": "Salue au moins 4 personnes que tu rencontres sur le sentier et rends la randonnée plus sociale.",
 
-  "title_challenge_mini_orientiring": "Défi : Orientation",
+  "title_challenge_mini_orientiring": "🧭 Défi : Orientation",
   "body_challenge_mini_orientiring": "Sais-tu dans quelle direction tu vas ?",
   "alert_challenge_mini_orientiring": "Observe le soleil et le sentier et essaie de comprendre dans quelle direction tu marches (Nord, Sud, Est ou Ouest). Pas besoin de répondre dans l’application.",
 
-  "title_challenge_photo": "Défi : Photo",
+  "title_challenge_photo": "📷 Défi : Photo",
   "body_challenge_photo": "Prends une photo du paysage !",
   "alert_challenge_photo": "Prends une photo de quelque chose de spécial sur le chemin : un animal, une cascade ou un détail de la nature.",
 
-  "title_challenge_silent_walking": "Défi : Marche silencieuse",
+  "title_challenge_silent_walking": "🧘🏻 Défi : Marche silencieuse",
   "body_challenge_silent_walking": "Essaie de marcher en silence.",
   "alert_challenge_silent_walking": "Marche en silence pendant quelques minutes et écoute les sons de la nature.",
 
-  "title_challenge_time": "Défi : Contre la montre",
+  "title_challenge_time": "⏱️ Défi : Contre la montre",
   "body_challenge_time": "Peux-tu battre le temps ?",
   "alert_challenge_time": "Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?"
 }

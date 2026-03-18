@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:triplo/controller/challenge.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/main.dart';
 import 'package:triplo/pages/trekkingPage/end_trekking_page.dart';
 import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 final FlutterLocalNotificationsPlugin notifications =
@@ -69,57 +68,22 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
     final trekkingController = context.read<TrekkingController>();
     final trekking = trekkingController.getTrekkingById(widget.trekkingid);
+    final local = AppLocalizations.of(context)!;
 
-    if (trekking != null &&
-        trekking.points.last.latitude != null &&
-        trekking.points.last.longitude != null) {
-      // Calcola la distanza tra posizione attuale e destinazione
+    if (trekking != null && trekking.points.isNotEmpty) {
       double distanceInMeters = Geolocator.distanceBetween(
         currentPos.latitude,
         currentPos.longitude,
-        trekking
-            .points
-            .last
-            .latitude, // Assicurati che il tuo modello Trekking abbia questi campi
+        trekking.points.last.latitude,
         trekking.points.last.longitude,
       );
 
       if (distanceInMeters <= 1000) {
         _hasEndedAutomatically = true;
-        _sendArrivalNotification();
+        // Il controller ora gestisce la logica della notifica
+        trekkingController.checkArrival(widget.trekkingid, distanceInMeters, local);
       }
     }
-  }
-
-  Future<void> _sendArrivalNotification() async {
-    if (!mounted) return;
-
-    final local = AppLocalizations.of(context)!;
-    
-    const NotificationDetails platformDetails = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'arrival_channel',
-        'Arrivo Trekking',
-        importance: Importance.max,
-        priority: Priority.high,
-        playSound: true,
-        enableVibration: true,
-        visibility: NotificationVisibility.public,
-      ),
-      iOS: DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-    );
-
-    await flutterLocalNotificationsPlugin.show(
-      999,
-      local.title_notification_arrival,
-      local.body_notification_arrival,
-      platformDetails,
-      payload: 'end_trekking_arrival', // Passiamo anche l'ID nel payload
-    );
   }
 
   void _loadChallenges() {
@@ -153,75 +117,17 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
 
   Future<void> _sendChallengeNotification() async {
     if (_challenges.isEmpty || !mounted) return;
+    
     if (_challengeIndex >= _challenges.length) {
       _challengeTimer?.cancel();
       return;
     }
 
     final local = AppLocalizations.of(context)!;
-    final challenge = _challenges[_challengeIndex];
-    String title;
-    String body;
-
-
-    // Message body for the notification
-    switch (challenge) {
-      case "balance":
-        body = local.body_challenge_balance;
-        title = local.title_challenge_balance;
-        break;
-      case "hi":
-        body = local.body_challenge_hi;
-        title = local.title_challenge_hi;
-        break;
-      case "mini_orientiring":
-        body = local.body_challenge_mini_orientiring;
-        title = local.title_challenge_mini_orientiring;
-        break;
-      case "photo":
-        body = local.body_challenge_photo;
-        title = local.title_challenge_photo;
-        break;
-      case "silent_walking":
-        body = local.body_challenge_silent_walking;
-        title = local.title_challenge_silent_walking;
-        break;
-      case "time":
-        body = local.body_challenge_time;
-        title = local.title_challenge_time;
-        break;
-      default:
-        body = "";
-        title = "";
-    }
-
-    try {
-      await flutterLocalNotificationsPlugin.show(
-        _challengeIndex,
-        title,
-        body,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'notifications_channel',
-            'Notifications',
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-            enableVibration: true,
-            visibility: NotificationVisibility.public,
-          ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          ),
-        ),
-        payload: challenge,
-      );
-    } catch (e, stack) {
-      print("DEBUG ERRORE notifica: $e");
-      print("DEBUG STACK: $stack");
-    }
+    final challengePayload = _challenges[_challengeIndex];
+    
+    // Usiamo il controller delle sfide
+    context.read<ChallengesController>().notifyNewChallenge(challengePayload, local);
 
     _challengeIndex++;
   }
@@ -230,6 +136,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     _stopwatch.stop();
     _timer?.cancel();
     _challengeTimer?.cancel();
+    _positionStream?.cancel(); // Importante: ferma il GPS!
 
     Navigator.pushReplacement(
       context,

@@ -700,6 +700,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No users found'**
   String get no_users_found_label;
+
+  /// No description provided for @title_notification_arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'📍 Almost there!'**
+  String get title_notification_arrival;
+
+  /// No description provided for @body_notification_arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to complete the trek.'**
+  String get body_notification_arrival;
+
+  /// No description provided for @alert_notification_arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'You are close to the arrival point; remember to stop the timer and complete your diary.'**
+  String get alert_notification_arrival;
+
+  /// No description provided for @title_challenge_balance.
+  ///
+  /// In en, this message translates to:
+  /// **'🪨 Challenge: Balance'**
+  String get title_challenge_balance;
+
+  /// No description provided for @body_challenge_balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Test your balance!'**
+  String get body_challenge_balance;
+
+  /// No description provided for @alert_challenge_balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a rock or root and try to keep your balance for a few seconds!'**
+  String get alert_challenge_balance;
+
+  /// No description provided for @title_challenge_hi.
+  ///
+  /// In en, this message translates to:
+  /// **'👋🏻 Challenge: Say hello'**
+  String get title_challenge_hi;
+
+  /// No description provided for @body_challenge_hi.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hello on the trail!'**
+  String get body_challenge_hi;
+
+  /// No description provided for @alert_challenge_hi.
+  ///
+  /// In en, this message translates to:
+  /// **'Say hello to at least 4 people you meet along the trail and make the hike more social.'**
+  String get alert_challenge_hi;
+
+  /// No description provided for @title_challenge_mini_orientiring.
+  ///
+  /// In en, this message translates to:
+  /// **'🧭 Challenge: Navigation'**
+  String get title_challenge_mini_orientiring;
+
+  /// No description provided for @body_challenge_mini_orientiring.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you know which way you\'re heading?'**
+  String get body_challenge_mini_orientiring;
+
+  /// No description provided for @alert_challenge_mini_orientiring.
+  ///
+  /// In en, this message translates to:
+  /// **'Look at the sun and the trail and try to understand which direction you\'re heading (North, South, East or West). No need to answer in the app, just orient yourself.'**
+  String get alert_challenge_mini_orientiring;
+
+  /// No description provided for @title_challenge_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'📷 Challenge: Photo'**
+  String get title_challenge_photo;
+
+  /// No description provided for @body_challenge_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of the landscape!'**
+  String get body_challenge_photo;
+
+  /// No description provided for @alert_challenge_photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of something special along the trail: an animal, a waterfall or an interesting detail in nature.'**
+  String get alert_challenge_photo;
+
+  /// No description provided for @title_challenge_silent_walking.
+  ///
+  /// In en, this message translates to:
+  /// **'🧘🏻 Challenge: Silent walk'**
+  String get title_challenge_silent_walking;
+
+  /// No description provided for @body_challenge_silent_walking.
+  ///
+  /// In en, this message translates to:
+  /// **'Try walking in silence.'**
+  String get body_challenge_silent_walking;
+
+  /// No description provided for @alert_challenge_silent_walking.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk in silence for a few minutes and listen to the sounds of nature around you.'**
+  String get alert_challenge_silent_walking;
+
+  /// No description provided for @title_challenge_time.
+  ///
+  /// In en, this message translates to:
+  /// **'⏱️ Challenge: Beat the clock'**
+  String get title_challenge_time;
+
+  /// No description provided for @body_challenge_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Can you beat the time?'**
+  String get body_challenge_time;
+
+  /// No description provided for @alert_challenge_time.
+  ///
+  /// In en, this message translates to:
+  /// **'Try to complete the route within the estimated time. Can you beat the clock?'**
+  String get alert_challenge_time;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -4,6 +4,7 @@ import 'home-page.dart';
 import 'login.dart';
 import 'user.dart';
 
+// Ma a cosa la usiamo sta pagina?
 class DebugLandingPage extends StatelessWidget {
   const DebugLandingPage({super.key});
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/pages/SettingsPage/setting-page.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
-import '../../UserProfilePage/user-page.dart';
-
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 
@@ -14,7 +13,6 @@ class RegistrationPage extends StatefulWidget {
   const RegistrationPage({
     super.key,
   });
-
 
   @override
   State<StatefulWidget> createState() => _RegistrationPageState();
@@ -76,7 +74,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => UserPage()),
+          builder: (_) => SettingPage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

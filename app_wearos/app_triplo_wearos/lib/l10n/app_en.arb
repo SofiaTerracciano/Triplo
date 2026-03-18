@@ -109,5 +109,32 @@
     "public_diaries_label": "Public diaries",
     "private_diaries_label": "Private diaries",
 
-    "no_users_found_label": "No users found"
+    "no_users_found_label": "No users found",
+    "title_notification_arrival": "📍 Almost there!",
+    "body_notification_arrival": "Tap to complete the trek.",
+    "alert_notification_arrival": "You are close to the arrival point; remember to stop the timer and complete your diary.",
+
+    "title_challenge_balance": "🪨 Challenge: Balance",
+    "body_challenge_balance": "Test your balance!",
+    "alert_challenge_balance": "Find a rock or root and try to keep your balance for a few seconds!",
+
+    "title_challenge_hi": "👋🏻 Challenge: Say hello",
+    "body_challenge_hi": "Say hello on the trail!",
+    "alert_challenge_hi": "Say hello to at least 4 people you meet along the trail and make the hike more social.",
+
+    "title_challenge_mini_orientiring": "🧭 Challenge: Navigation",
+    "body_challenge_mini_orientiring": "Do you know which way you're heading?",
+    "alert_challenge_mini_orientiring": "Look at the sun and the trail and try to understand which direction you're heading (North, South, East or West). No need to answer in the app, just orient yourself.",
+
+    "title_challenge_photo": "📷 Challenge: Photo",
+    "body_challenge_photo": "Take a photo of the landscape!",
+    "alert_challenge_photo": "Take a photo of something special along the trail: an animal, a waterfall or an interesting detail in nature.",
+
+    "title_challenge_silent_walking": "🧘🏻 Challenge: Silent walk",
+    "body_challenge_silent_walking": "Try walking in silence.",
+    "alert_challenge_silent_walking": "Walk in silence for a few minutes and listen to the sounds of nature around you.",
+
+    "title_challenge_time": "⏱️ Challenge: Beat the clock",
+    "body_challenge_time": "Can you beat the time?",
+    "alert_challenge_time": "Try to complete the route within the estimated time. Can you beat the clock?"
 }

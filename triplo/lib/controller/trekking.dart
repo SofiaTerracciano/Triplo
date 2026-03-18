@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/service/geo.dart';
+import 'package:triplo/service/memory.dart';
+import 'package:triplo/service/notification.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../service/OSservice.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -15,12 +18,16 @@ class TrekkingController extends ChangeNotifier {
   List<Trekking> _trekkings;
   bool _loaded = false;
 
+  GeoService geo;
+  MemoryService memory;
+  NotificationService notification;
 
-
-  final OSService os;
-
-  TrekkingController({required this.os,required List<Trekking> trekkings})
-    : _trekkings = trekkings;
+  TrekkingController({
+    required this.geo,
+    required this.memory,
+    required this.notification,
+    required List<Trekking> trekkings,
+  }) : _trekkings = trekkings;
 
   // Getter for all trekkings
   List<Trekking> get allTrekkings => _trekkings;
@@ -31,10 +38,7 @@ class TrekkingController extends ChangeNotifier {
     _loaded = true;
 
     // Fetch trekking documents from Firestore
-    final snap = await _db
-        .collection('trekking') 
-        .get();
-
+    final snap = await _db.collection('trekking').get();
 
     // Map documents to Trekking objects and store in the list --> this function create a
     //list of istance of trekkning (model)
@@ -69,10 +73,12 @@ class TrekkingController extends ChangeNotifier {
   // Fetch image URLs from Firebase Storage given a list of complete firestore url
   // It returns a list of download URLs that can be used to display images
   Future<List<String>> getDownloadUrls(List<String> paths) async {
-    return await Future.wait(paths.map((path) async {
-      Reference ref = FirebaseStorage.instance.refFromURL(path);
-      return await ref.getDownloadURL();
-    }));
+    return await Future.wait(
+      paths.map((path) async {
+        Reference ref = FirebaseStorage.instance.refFromURL(path);
+        return await ref.getDownloadURL();
+      }),
+    );
   }
 
   // Fetch image URL from Firebase Storage given complete firestore url
@@ -99,10 +105,11 @@ class TrekkingController extends ChangeNotifier {
       final trekking = getTrekkingById(trekkingId);
       if (trekking != null) results.add(trekking);
     }
-    
+
     print(results);
     return results;
   }
+
   Future<Trekking?> fetchTrekkingById(String id) async {
     final snap = await _db.collection("trekking").doc(id).get();
     if (!snap.exists) return null;
@@ -151,13 +158,12 @@ class TrekkingController extends ChangeNotifier {
     return ids.contains(trekkingId);
   }
 
-
-
   Future<File?> getCachedImage(String imagePath) async {
     debugPrint("getCachedImage -> $imagePath");
 
     try {
-      final inMemory = await os.getImageFromMemory(imagePath);
+      // 1. Cerca in RAM (questo è rimasto uguale)
+      final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
         debugPrint("Image found in RAM cache");
         return inMemory;
@@ -170,20 +176,41 @@ class TrekkingController extends ChangeNotifier {
         cacheableUrl = await ref.getDownloadURL();
       }
 
-      final cached = await os.getImageFromCache(cacheableUrl);
+      // 2. ERRORE QUI: getImageFromCache -> DIVENTA -> getImageFromDisk
+      final cached = await memory.getImageFromDisk(cacheableUrl); 
       if (cached != null) {
         debugPrint("Image found in disk cache");
-        os.saveImageToMemory(imagePath, cached);
+        memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
       debugPrint("Image not in cache, downloading");
-      final file = await os.cacheImage(cacheableUrl);
-      os.saveImageToMemory(imagePath, file);
+      
+      // 3. ERRORE QUI: cacheImage -> DIVENTA -> cacheImageOnDisk
+      final file = await memory.cacheImageOnDisk(cacheableUrl); 
+      memory.saveImageToMemory(imagePath, file);
       return file;
+      
     } catch (e) {
       debugPrint("getCachedImage error: $e");
       return null;
+    }
+  }
+
+  // Metodo per gestire l'arrivo
+  Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
+    // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
+    if (distanceInMeters <= 1000) {
+      final content = getChallengeContent('end_trekking_arrival', local);
+
+      await notification.showTrekkingNotification(
+        id: 999,
+        title: content['title']!,
+        body: content['body']!,
+        payload: 'end_trekking_arrival',
+        channelId: 'arrival_channel',
+        channelName: 'Arrivo Trekking',
+      );
     }
   }
 
