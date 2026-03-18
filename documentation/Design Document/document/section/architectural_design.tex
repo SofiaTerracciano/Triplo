@@ -94,6 +94,31 @@ Therefore, in the proposed architecture:
 
 
 \section{Runtime view}
+\subsection{Selected Use Cases}
+
+
+
+The identified use cases provide an abstract representation of the interactions between the user and the system. They have been selected to capture the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
+These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. As such, it serves as a conceptual foundation for subsequent design and analysis activities.
+\begin{itemize}
+    \item Add Diary Page
+    \item Explore trekkings on Map
+    \item View trekking information
+    \item View weather information
+    \item Search Users
+    \item Search trekking
+    \item View compass and altitude information
+    \item Participate in Route Challenge
+    \item Login
+    \item Register
+    \item Pair Smartwatch
+    \item Update User Profile
+\end{itemize}
+
+
+
+
+
 
 \subsection{Watch--Phone Pairing Mechanism}
 
@@ -113,6 +138,7 @@ watch/{watchId}
 The \texttt{watchId} uniquely identifies the physical device and is never deleted during logout.
 
 \subsubsection{Pairing Flow}
+
 
 \textbf{1. Initialization (Watch)}  
 The watch generates a random UUID (\texttt{qrToken}) and writes:
