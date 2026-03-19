@@ -71,12 +71,12 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     final trekking = trekkingController.getTrekkingById(widget.trekkingid);
     final local = AppLocalizations.of(context)!;
 
-    if (trekking != null && trekking.points.last.latitude != null && trekking.points.last.longitude != null) {
+    if (trekking != null /*&& trekking.points.last.latitude != null && trekking.points.last.longitude != null*/) {
       // Calcola la distanza tra posizione attuale e destinazione
       double distanceInMeters = Geolocator.distanceBetween(
         currentPos.latitude,
         currentPos.longitude,
-        trekking.points.last.latitude, // Assicurati che il tuo modello Trekking abbia questi campi
+        trekking.points.last.latitude, 
         trekking.points.last.longitude,
       );
 

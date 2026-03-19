@@ -35,8 +35,8 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        "Connetti",
+                      Text(
+                        local.connect_label,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -85,10 +85,10 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const SizedBox(
+                        SizedBox(
                           width: 160,
                           child: Text(
-                            "Scansiona con il telefono",
+                            local.scan_qr_code_label,
                             style: TextStyle(color: Colors.white70, fontSize: 12),
                             textAlign: TextAlign.center,
                             maxLines: 2,
@@ -96,8 +96,8 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                       ] else ...[
-                        const Text(
-                          "Generazione QR…",
+                        Text(
+                          local.qr_generated_label,
                           style: TextStyle(color: Colors.white70, fontSize: 12),
                           textAlign: TextAlign.center,
                         ),
@@ -120,7 +120,7 @@ class LoginPage extends StatelessWidget {
                             shape: const StadiumBorder(),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
-                          child: const Text("New QR"),
+                          child: Text(local.new_qr_label),
                         ),
                       ),
                     ],

@@ -47,55 +47,74 @@ class NotificationService {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        // Rendi il fondo scuro o coerente con Wear OS
-        backgroundColor: Colors.grey[900],
-        // Arrotonda molto i bordi per seguire la forma circolare
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        insetPadding: const EdgeInsets.all(10),
-        contentPadding: const EdgeInsets.fromLTRB(15, 15, 15, 5),
-        content: Container(
-          // Forziamo una larghezza che stia bene nello schermo tondo
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: SingleChildScrollView( // Fondamentale se il testo è lungo
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
+      barrierDismissible: true, // Permette di chiudere toccando fuori
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent, // Sfondo trasparente per il dialog esterno
+        insetPadding: const EdgeInsets.all(12), // Margine esterno per distanziare dai bordi dell'orologio
+        child: Container(
+          // QUESTA È LA CHIAVE: Un cerchio perfetto!
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E), // Grigio molto scuro, coerente con Wear OS
+            shape: BoxShape.circle, // Forza il popup a essere tondo
+            border: Border.all(color: Colors.white24, width: 1), // Bordo sottile opzionale per definizione
+          ),
+          // Padding interno importante per spingere il testo al centro del cerchio
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Occupa solo lo spazio necessario
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Titolo (Bold, più grande)
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14, 
+                  fontWeight: FontWeight.bold, 
+                  color: Colors.white
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              
+              // Corpo (Scrollabile se lungo)
+              // Fondamentale su schermi tondi: SingleChildScrollView per testo lungo
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Text(
+                    textToShow,
+                    style: const TextStyle(
+                      fontSize: 13, 
+                      color: Colors.white70,
+                      height: 1.3 // Leggermente più distanziato per leggibilità
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 10),
+              
+              // Bottone OK (Distaccato dal testo)
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(
+                  // Riduciamo la densità visiva del bottone
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                ),
+                child: Text(
+                  "OK",
+                  style: TextStyle(
                     fontSize: 13, 
                     fontWeight: FontWeight.bold, 
-                    color: Colors.white
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  textToShow,
-                  style: const TextStyle(
-                    fontSize: 12, 
-                    color: Colors.white70
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              visualDensity: VisualDensity.compact,
-            ),
-            child: const Text(
-              "OK",
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.lightBlueAccent),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -321,69 +321,70 @@ class UserController extends ChangeNotifier {
     }
   }
 
-    Future<void> _ensureUserFirestoreDocs(User user) async {
-      final uid = user.uid;
+  Future<void> _ensureUserFirestoreDocs(User user) async {
+    final uid = user.uid;
 
-      final userRef = _db.collection("users").doc(uid);
-      final indexRef = _db.collection("users_index").doc(uid);
+    final userRef = _db.collection("users").doc(uid);
+    final indexRef = _db.collection("users_index").doc(uid);
 
-      final snap = await userRef.get();
-      if (snap.exists) return;
+    final snap = await userRef.get();
+    if (snap.exists) return;
 
-      // Dati base presi da Google
-      final email = user.email ?? "";
-      final displayName = user.displayName ?? "";
-      final photoUrl = user.photoURL ?? "";
+    // Dati base presi da Google
+    final email = user.email ?? "";
+    final displayName = user.displayName ?? "";
+    final photoUrl = user.photoURL ?? "";
 
-      // Username: prova displayName, altrimenti parte dell'email, altrimenti uid corto
-      String username;
-      if (displayName.trim().isNotEmpty) {
-        username = displayName.trim().split(RegExp(r"\s+")).first;
-      } else if (email.contains("@")) {
-        username = email.split("@")[0];
-      } else {
-        username = uid.substring(0, 8);
-      }
-
-
-      final batch = _db.batch();
-
-      batch.set(userRef, {
-        "Username": username,
-        "Photo_profile": photoUrl,
-        "Name": displayName,
-        "Surname": "",
-        "Birthdate": DateTime.now().toIso8601String(),
-        "Email": email,
-        "Followers": [],
-        "Following": [],
-        "Public_diary": [],
-        "Private_diary": [],
-        "Saved_trekkings": [],
-        "Level": "Beginner",
-        "Advanced": 0,
-        "Intermediate": 0,
-      });
-
-      batch.set(indexRef, {
-        "uid": uid,
-        "username": username,
-        "normalized": username.toLowerCase(),
-      });
-
-      await batch.commit();
-    }
-    ({String watchId, String token}) extractWatchPair(String raw) {
-      return _authService.extractWatchPair(raw);
+    // Username: prova displayName, altrimenti parte dell'email, altrimenti uid corto
+    String username;
+    if (displayName.trim().isNotEmpty) {
+      username = displayName.trim().split(RegExp(r"\s+")).first;
+    } else if (email.contains("@")) {
+      username = email.split("@")[0];
+    } else {
+      username = uid.substring(0, 8);
     }
 
-    Future<void> approveWatchPair({
-      required String watchId,
-      required String token,
-    }) async {
-      await _authService.approveWatchPair(
-        watchId: watchId,
-        token: token,
-      );
-    }
+
+    final batch = _db.batch();
+
+    batch.set(userRef, {
+      "Username": username,
+      "Photo_profile": photoUrl,
+      "Name": displayName,
+      "Surname": "",
+      "Birthdate": DateTime.now().toIso8601String(),
+      "Email": email,
+      "Followers": [],
+      "Following": [],
+      "Public_diary": [],
+      "Private_diary": [],
+      "Saved_trekkings": [],
+      "Level": "Beginner",
+      "Advanced": 0,
+      "Intermediate": 0,
+    });
+
+    batch.set(indexRef, {
+      "uid": uid,
+      "username": username,
+      "normalized": username.toLowerCase(),
+    });
+
+    await batch.commit();
+  }
+
+  ({String watchId, String token}) extractWatchPair(String raw) {
+    return _authService.extractWatchPair(raw);
+  }
+
+  Future<void> approveWatchPair({
+    required String watchId,
+    required String token,
+  }) async {
+    await _authService.approveWatchPair(
+      watchId: watchId,
+      token: token,
+    );
+  }
 }
