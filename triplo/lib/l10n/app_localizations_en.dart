@@ -448,4 +448,175 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alert_challenge_time => 'Try to complete the route within the estimated time. Can you beat the clock?';
+
+  @override
+  String get please_login_label => 'Please login';
+
+  @override
+  String get login_button => 'Login';
+
+  @override
+  String get google_signin_button => 'Sign in with Google';
+
+  @override
+  String get no_account_label => 'Don\'t have an account?';
+
+  @override
+  String get signup_label => 'Sign up';
+
+  @override
+  String get forgot_password_label => 'Forgot password?';
+
+  @override
+  String get fill_fields_login_label => 'Please fill all fields';
+
+  @override
+  String get login_success => 'Logged in';
+
+  @override
+  String get login_failed => 'Login failed';
+
+  @override
+  String get google_login_failed => 'Google login failed';
+
+  @override
+  String get follower => 'Follower';
+
+  @override
+  String get following => 'Following';
+
+  @override
+  String get registration_title => 'Register on Triplo';
+
+  @override
+  String get confirm_password_label => 'Confirm password';
+
+  @override
+  String get register_button => 'Register';
+
+  @override
+  String get back_to_login => 'Go back to login page';
+
+  @override
+  String get fill_all_fields => 'Please fill in every field';
+
+  @override
+  String get passwords_not_match => 'Passwords do not match';
+
+  @override
+  String get registration_success => 'Registration successful';
+
+  @override
+  String get registration_failed => 'Registration failed';
+
+  @override
+  String get not_logged_title => 'You are not logged in';
+
+  @override
+  String get not_logged_subtitle => 'Please login to access your profile';
+
+  @override
+  String get go_to_login_button => 'Go to Login';
+
+  @override
+  String get user_not_found => 'User not found';
+
+  @override
+  String get save_route_error => 'Unable to save route';
+
+  @override
+  String get no_title => 'No title';
+
+  @override
+  String get no_description => 'No description';
+
+  @override
+  String get restore_google_photo_label => 'Restore Google profile photo';
+
+  @override
+  String get scan_qr_label => 'Scan watch QR';
+
+  @override
+  String get not_valid_qr_label => 'Invalid QR code';
+
+  @override
+  String get connect_watch_label => 'Connect the watch?';
+
+  @override
+  String get cancel_label => 'Cancel';
+
+  @override
+  String get confirm_label => 'Confirm';
+
+  @override
+  String get diary_not_found => 'Diary not found';
+
+  @override
+  String get offline_mode_label => 'Offline mode';
+
+  @override
+  String get no_internet => 'No internet connection';
+
+  @override
+  String get forgot_password_title => 'Forgot your password?';
+
+  @override
+  String get forgot_password_subtitle => 'Enter your email below';
+
+  @override
+  String get enter_email_prompt => 'We’ll send you a link to reset your password';
+
+  @override
+  String get send_reset_link_button => 'Send reset link';
+
+  @override
+  String get email_required => 'Please enter your email address';
+
+  @override
+  String get reset_link_sent => 'Password reset link sent! Check your email.';
+
+  @override
+  String get generic_error => 'An error occurred';
+
+  @override
+  String get satellite_weather_layers_title => 'Satellite map with weather layers';
+
+  @override
+  String get weather_layers_label => 'Weather Layers';
+
+  @override
+  String get layer_precipitation => 'Precipitation';
+
+  @override
+  String get layer_snow => 'Snow';
+
+  @override
+  String get layer_wind => 'Wind';
+
+  @override
+  String get layer_clouds => 'Clouds';
+
+  @override
+  String get layer_temperature => 'Temperature';
+
+  @override
+  String get layer_pressure => 'Pressure';
+
+  @override
+  String get gps_disabled => 'GPS Disabled';
+
+  @override
+  String get permission_denied => 'Permission Denied';
+
+  @override
+  String get gps_disabled_message => 'GPS is turned off';
+
+  @override
+  String get permission_denied_message => 'I don\'t have the required permissions to provide the information';
+
+  @override
+  String get open_settings_button => 'Open Settings';
+
+  @override
+  String get loading_coordinates => 'Loading coordinates...';
 }

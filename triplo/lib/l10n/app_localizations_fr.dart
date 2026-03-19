@@ -448,4 +448,175 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get alert_challenge_time => 'Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?';
+
+  @override
+  String get please_login_label => 'Veuillez vous connecter';
+
+  @override
+  String get login_button => 'Se connecter';
+
+  @override
+  String get google_signin_button => 'Se connecter avec Google';
+
+  @override
+  String get no_account_label => 'Vous n\'avez pas de compte ?';
+
+  @override
+  String get signup_label => 'S\'inscrire';
+
+  @override
+  String get forgot_password_label => 'Mot de passe oublié ?';
+
+  @override
+  String get fill_fields_login_label => 'Veuillez remplir tous les champs';
+
+  @override
+  String get login_success => 'Connexion réussie';
+
+  @override
+  String get login_failed => 'Échec de la connexion';
+
+  @override
+  String get google_login_failed => 'Échec de la connexion Google';
+
+  @override
+  String get follower => 'Follower';
+
+  @override
+  String get following => 'Following';
+
+  @override
+  String get registration_title => 'Inscrivez-vous sur Triplo';
+
+  @override
+  String get confirm_password_label => 'Confirmer le mot de passe';
+
+  @override
+  String get register_button => 'S\'inscrire';
+
+  @override
+  String get back_to_login => 'Retour à la page de connexion';
+
+  @override
+  String get fill_all_fields => 'Veuillez remplir tous les champs';
+
+  @override
+  String get passwords_not_match => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get registration_success => 'Inscription réussie';
+
+  @override
+  String get registration_failed => 'Échec de l\'inscription';
+
+  @override
+  String get not_logged_title => 'Vous n\'êtes pas connecté';
+
+  @override
+  String get not_logged_subtitle => 'Veuillez vous connecter pour accéder à votre profil';
+
+  @override
+  String get go_to_login_button => 'Aller à la connexion';
+
+  @override
+  String get user_not_found => 'Utilisateur non trouvé';
+
+  @override
+  String get save_route_error => 'Impossible d\'enregistrer le parcours';
+
+  @override
+  String get no_title => 'Aucun titre';
+
+  @override
+  String get no_description => 'Aucune description';
+
+  @override
+  String get restore_google_photo_label => 'Restaurer la photo de profil Google';
+
+  @override
+  String get scan_qr_label => 'Scanner le QR de la montre';
+
+  @override
+  String get not_valid_qr_label => 'QR non valide';
+
+  @override
+  String get connect_watch_label => 'Connecter la montre ?';
+
+  @override
+  String get cancel_label => 'Annuler';
+
+  @override
+  String get confirm_label => 'Confirmer';
+
+  @override
+  String get diary_not_found => 'Journal non trouvé';
+
+  @override
+  String get offline_mode_label => 'Mode hors ligne';
+
+  @override
+  String get no_internet => 'Pas de connexion internet';
+
+  @override
+  String get forgot_password_title => 'Mot de passe oublié ?';
+
+  @override
+  String get forgot_password_subtitle => 'Entrez votre email ci-dessous';
+
+  @override
+  String get enter_email_prompt => 'Nous vous enverrons un lien pour réinitialiser votre mot de passe';
+
+  @override
+  String get send_reset_link_button => 'Envoyer le lien';
+
+  @override
+  String get email_required => 'Veuillez entrer votre adresse email';
+
+  @override
+  String get reset_link_sent => 'Lien envoyé ! Vérifiez votre email.';
+
+  @override
+  String get generic_error => 'Une erreur s\'est produite';
+
+  @override
+  String get satellite_weather_layers_title => 'Carte satellite avec couches météo';
+
+  @override
+  String get weather_layers_label => 'Couches météo';
+
+  @override
+  String get layer_precipitation => 'Précipitations';
+
+  @override
+  String get layer_snow => 'Neige';
+
+  @override
+  String get layer_wind => 'Vent';
+
+  @override
+  String get layer_clouds => 'Nuages';
+
+  @override
+  String get layer_temperature => 'Température';
+
+  @override
+  String get layer_pressure => 'Pression';
+
+  @override
+  String get gps_disabled => 'GPS Désactivé';
+
+  @override
+  String get permission_denied => 'Permission Refusée';
+
+  @override
+  String get gps_disabled_message => 'Le GPS est éteint';
+
+  @override
+  String get permission_denied_message => 'Je n\'ai pas les permissions nécessaires pour fournir les informations';
+
+  @override
+  String get open_settings_button => 'Ouvrir les paramètres';
+
+  @override
+  String get loading_coordinates => 'Chargement des coordonnées...';
 }

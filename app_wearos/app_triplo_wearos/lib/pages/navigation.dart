@@ -1,8 +1,6 @@
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../controller/user.dart';
 import '../pages/home-page.dart';
 import '../pages/user.dart';
 import '../service/pairing_service.dart';
@@ -14,8 +12,9 @@ class NavigationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = context.watch<UserController>();
+    //final ctrl = context.watch<UserController>();
     final languageController = context.watch<Language>();
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -42,7 +41,7 @@ class NavigationPage extends StatelessWidget {
                   children: [
                     NavigationButton(
                       icon: Icons.home,
-                      label: "Home",
+                      label: local.home_label,
                       color: const Color(0xFF2F80ED),
                       onTap: () {
                         Navigator.push(
@@ -54,7 +53,7 @@ class NavigationPage extends StatelessWidget {
                     const SizedBox(width: 10), // Ridotto da 14
                     NavigationButton(
                       icon: Icons.person,
-                      label: "User",
+                      label: local.user_label,
                       color: const Color(0xFF27AE60),
                       onTap: () {
                         Navigator.push(
@@ -74,7 +73,6 @@ class NavigationPage extends StatelessWidget {
                 GestureDetector(
                   behavior: HitTestBehavior.opaque, // <--- AGGIUNGI QUESTO: rende tutta l'area cliccabile
                   onTap: () {
-                    print("Click lingua intercettato!"); // Debug per vedere se il tocco arriva
                     showDialog(
                       context: context,
                       builder: (_) => LanguageDialog(
@@ -94,8 +92,8 @@ class NavigationPage extends StatelessWidget {
                           size: 18,
                           color: Colors.orange.withOpacity(0.8),
                         ),
-                        const Text(
-                          "Lingua",
+                        Text(
+                          local.language_label,
                           style: TextStyle(color: Colors.white70, fontSize: 8),
                         ),
                       ],
@@ -119,6 +117,7 @@ class LanguageDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     return Dialog(
       backgroundColor: Colors.black, // Sfondo nero come il resto dell'app
       insetPadding: EdgeInsets.zero, // Occupa tutto lo spazio disponibile
@@ -128,8 +127,8 @@ class LanguageDialog extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20), // Spazio per la curvatura superiore
-            const Text(
-              "Lingua",
+            Text(
+              local.language_label,
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const SizedBox(height: 10),

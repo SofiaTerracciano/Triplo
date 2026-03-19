@@ -110,7 +110,6 @@
     "add_to_diary_label": "Aggiungi al diario",
     "not_now": "Non ora, torna alla home",
 
-
     "no_users_found_label": "Nessun utente trovato",
     "weather_near_trail_label": "Meteo vicino al percorso",
     "weather_error_label": "Errore",
@@ -169,5 +168,75 @@
 
     "title_challenge_time": "⏱️ Sfida: Contro il tempo",
     "body_challenge_time": "Riuscirai a battere il tempo?",
-    "alert_challenge_time": "Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?"
+    "alert_challenge_time": "Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?",
+
+    "please_login_label": "Effettua il login",
+    "login_button": "Accedi",
+    "google_signin_button": "Accedi con Google",
+    "no_account_label": "Non hai un account?",
+    "signup_label": "Registrati",
+    "forgot_password_label": "Password dimenticata?",
+    "fill_fields_login_label": "Compila tutti i campi",
+    "login_success": "Accesso effettuato",
+    "login_failed": "Accesso fallito",
+    "google_login_failed": "Accesso con Google fallito",
+
+    "follower": "Follower",
+    "following": "Following",
+
+    "registration_title": "Registrati su Triplo",
+    "confirm_password_label": "Conferma password",
+    "register_button": "Registrati",
+    "back_to_login": "Torna alla pagina di login",
+    "fill_all_fields": "Compila tutti i campi",
+    "passwords_not_match": "Le password non coincidono",
+    "registration_success": "Registrazione completata",
+    "registration_failed": "Registrazione fallita",
+
+    "not_logged_title": "Non hai effettuato l'accesso",
+    "not_logged_subtitle": "Accedi per visualizzare il tuo profilo",
+    "go_to_login_button": "Vai al login",
+
+    "user_not_found": "Utente non trovato",
+
+    "save_route_error": "Impossibile salvare il percorso",
+
+    "no_title": "Nessun titolo",
+    "no_description": "Nessuna descrizione",
+
+    "restore_google_photo_label": "Ripristina foto profilo di Google",
+    "scan_qr_label": "Scan watch QR",
+    "not_valid_qr_label": "QR non valido",
+    "connect_watch_label": "Connettere l'orologio?",
+    "cancel_label": "Annulla",
+    "confirm_label": "Conferma",
+
+    "diary_not_found": "Diario non trovato",
+
+    "offline_mode_label": "Modalità offline",
+    "no_internet": "Nessuna connessione internet",
+
+    "forgot_password_title": "Password dimenticata?",
+    "forgot_password_subtitle": "Inserisci la tua email qui sotto",
+    "enter_email_prompt": "Ti invieremo un link per reimpostare la password",
+    "send_reset_link_button": "Invia link di reset",
+    "email_required": "Inserisci il tuo indirizzo email",
+    "reset_link_sent": "Link di reset inviato! Controlla la tua email.",
+    "generic_error": "Si è verificato un errore",
+
+    "satellite_weather_layers_title": "Mappa satellitare con livelli meteo",
+    "weather_layers_label": "Livelli meteo",
+    "layer_precipitation": "Precipitazioni",
+    "layer_snow": "Neve",
+    "layer_wind": "Vento",
+    "layer_clouds": "Nuvole",
+    "layer_temperature": "Temperatura",
+    "layer_pressure": "Pressione",
+
+    "gps_disabled": "GPS spento",
+    "permission_denied": "Permesso Negato",
+    "gps_disabled_message": "Il GPS è spento",
+    "permission_denied_message": "Non ho i permessi necessari per poter darti le informazioni",
+    "open_settings_button": "Apri Impostazioni",
+    "loading_coordinates": "Caricamento coordinate..."
 }

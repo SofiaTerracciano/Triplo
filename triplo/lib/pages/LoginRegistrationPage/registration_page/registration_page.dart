@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/SettingsPage/setting-page.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:provider/provider.dart';
@@ -45,17 +46,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
     final confirm = confirmPasswordController.text.trim();
+    final local = AppLocalizations.of(context)!;
 
     if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in every field")),
+        SnackBar(content: Text(local.fill_all_fields)),
       );
       return;
     }
 
     if (password != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
+        SnackBar(content: Text(local.passwords_not_match)),
       );
       return;
     }
@@ -68,7 +70,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       await userController.register(email, password);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registration successful")),
+        SnackBar(content: Text(local.registration_success)),
       );
 
       Navigator.pushReplacement(
@@ -78,7 +80,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Registration failed: $e")),
+        SnackBar(content: Text("$local.registration_failed $e")),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -88,6 +90,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   /** UI for the Registration Page */
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -98,8 +102,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Register on the Triplo application',
+                Text(
+                  local.registration_title,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
@@ -107,7 +111,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 24),
 
                 BoxField(
-                  label: 'email',
+                  label: local.email_label,
                   isEmail: true,
                   controller: emailController,
                 ),
@@ -115,7 +119,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
 
                 BoxField(
-                  label: 'password',
+                  label: local.password_label,
                   isPassword: true,
                   controller: passwordController,
                 ),
@@ -123,7 +127,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
 
                 BoxField(
-                  label: 'confirm password',
+                  label: local.confirm_password_label,
                   isPassword: true,
                   controller: confirmPasswordController,
                 ),
@@ -139,7 +143,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : () => _register(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -147,7 +151,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                          : const Text("Register", style: TextStyle(fontSize: 18, color: Colors.white)),
+                          : Text(local.register_button, style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
                   ),
                 ),
@@ -158,9 +162,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Go back to login page',
-                    style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+                  child: Text(
+                    local.back_to_login,
+                    style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
               ],

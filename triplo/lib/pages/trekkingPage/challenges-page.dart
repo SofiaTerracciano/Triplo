@@ -30,7 +30,6 @@ class _ChallengesPageState extends State<ChallengesPage> {
     });
   }
 
-
   Future<void> _loadChallenges() async {
     await context.read<ChallengesController>().loadChallenges();
     if (!mounted) return;
@@ -38,10 +37,6 @@ class _ChallengesPageState extends State<ChallengesPage> {
       _loading = false;
     });
   }
-
-
-
-
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
@@ -65,7 +60,9 @@ class _ChallengesPageState extends State<ChallengesPage> {
       body: challenges.isEmpty
           ? Center(child: Text(local.no_challenge))
           : ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+              behavior: ScrollConfiguration.of(
+                context,
+              ).copyWith(overscroll: false),
               child: ListView.builder(
                 itemCount: challenges.length,
                 itemBuilder: (context, index) {
@@ -74,99 +71,100 @@ class _ChallengesPageState extends State<ChallengesPage> {
                   // Selezione lingua
                   final langIndex = getLanguageSelected(locale.languageCode);
 
-          final title = (challenge.title.length > langIndex)
-              ? challenge.title[langIndex]
-              : challenge.title.isNotEmpty
-              ? challenge.title[0]
-              : "No title";
+                  final title = (challenge.title.length > langIndex)
+                      ? challenge.title[langIndex]
+                      : challenge.title.isNotEmpty
+                      ? challenge.title[0]
+                      : local.no_title;
 
-          final description = (challenge.description.length > langIndex)
-              ? challenge.description[langIndex]
-              : challenge.description.isNotEmpty
-              ? challenge.description[0]
-              : "No description";
+                  final description = (challenge.description.length > langIndex)
+                      ? challenge.description[langIndex]
+                      : challenge.description.isNotEmpty
+                      ? challenge.description[0]
+                      : local.no_description;
 
-          final photoFuture =
-          challengesController.getCachedImage(challenge.photo);
+                  final photoFuture = challengesController.getCachedImage(
+                    challenge.photo,
+                  );
 
-            final isEven = index % 2 == 0;
+                  final isEven = index % 2 == 0;
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (!isEven)
-                  FutureBuilder<File?>(
-                    future: photoFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!isEven)
+                          FutureBuilder<File?>(
+                            future: photoFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasError || snapshot.data == null) {
+                                return _buildBrokenImage();
+                              }
+
+                              return _buildImage(snapshot.data!);
+                            },
                           ),
-                        );
-                      }
-
-                      if (snapshot.hasError || snapshot.data == null) {
-                        return _buildBrokenImage();
-                      }
-
-                      return _buildImage(snapshot.data!);
-                    },
-                  ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                softWrap: true,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                description,
+                                style: const TextStyle(fontSize: 16),
+                                softWrap: true,
+                              ),
+                            ],
+                          ),
                         ),
-                        softWrap: true,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        description,
-                        style: const TextStyle(fontSize: 16),
-                        softWrap: true,
-                      ),
-                    ],
-                  ),
-                ),
-                if (isEven)
-                  FutureBuilder<File?>(
-                    future: photoFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+                        if (isEven)
+                          FutureBuilder<File?>(
+                            future: photoFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+
+                              if (snapshot.hasError || snapshot.data == null) {
+                                return _buildBrokenImage();
+                              }
+
+                              return _buildImage(snapshot.data!);
+                            },
                           ),
-                        );
-                      }
-
-                      if (snapshot.hasError || snapshot.data == null) {
-                        return _buildBrokenImage();
-                      }
-
-                      return _buildImage(snapshot.data!);
-                    },
-                  ),
-              ],
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          );
-        },
-      ),
-      ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,

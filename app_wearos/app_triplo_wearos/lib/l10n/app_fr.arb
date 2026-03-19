@@ -136,5 +136,18 @@
 
   "title_challenge_time": "⏱️ Défi : Contre la montre",
   "body_challenge_time": "Peux-tu battre le temps ?",
-  "alert_challenge_time": "Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?"
+  "alert_challenge_time": "Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?",
+
+  "connect_label": "Connecter",
+  "scan_qr_code_label": "Scanner avec le mobile",
+  "qr_generated_label": "Génération de QR",
+  "new_qr_label": "Nouveau QR",
+
+  "language_label": "Langue",
+  "home_label": "Home",
+  "u_label": "User",
+
+  "follower_label": "Follower",
+  "following_label": "Following",
+  "logout_label": "Logout"
 }

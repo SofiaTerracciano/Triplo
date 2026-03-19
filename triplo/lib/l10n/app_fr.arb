@@ -27,6 +27,18 @@
   "follow_label": "Suivre",
   "followed_label": "Suivi",
 
+  "restore_google_photo_label": "Restaurer la photo de profil Google",
+  "scan_qr_label": "Scanner le QR de la montre",
+  "not_valid_qr_label": "QR non valide",
+  "connect_watch_label": "Connecter la montre ?",
+  "cancel_label": "Annuler",
+  "confirm_label": "Confirmer",
+
+  "diary_not_found": "Journal non trouvé",
+
+  "offline_mode_label": "Mode hors ligne",
+  "no_internet": "Pas de connexion internet",
+
   "search_page_title": "Rechercher",
   "cancel_button_label": "Annuler",
   "user_label": "Utilisateurs",
@@ -167,5 +179,63 @@
 
   "title_challenge_time": "⏱️ Défi : Contre la montre",
   "body_challenge_time": "Peux-tu battre le temps ?",
-  "alert_challenge_time": "Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?"
+  "alert_challenge_time": "Essaie de terminer le parcours dans le temps estimé. Peux-tu battre le chronomètre ?",
+
+  "please_login_label": "Veuillez vous connecter",
+  "login_button": "Se connecter",
+  "google_signin_button": "Se connecter avec Google",
+  "no_account_label": "Vous n'avez pas de compte ?",
+  "signup_label": "S'inscrire",
+  "forgot_password_label": "Mot de passe oublié ?",
+  "fill_fields_login_label": "Veuillez remplir tous les champs",
+  "login_success": "Connexion réussie",
+  "login_failed": "Échec de la connexion",
+  "google_login_failed": "Échec de la connexion Google",
+
+  "follower": "Follower",
+  "following": "Following",
+
+  "registration_title": "Inscrivez-vous sur Triplo",
+  "confirm_password_label": "Confirmer le mot de passe",
+  "register_button": "S'inscrire",
+  "back_to_login": "Retour à la page de connexion",
+  "fill_all_fields": "Veuillez remplir tous les champs",
+  "passwords_not_match": "Les mots de passe ne correspondent pas",
+  "registration_success": "Inscription réussie",
+  "registration_failed": "Échec de l'inscription",
+
+  "not_logged_title": "Vous n'êtes pas connecté",
+  "not_logged_subtitle": "Veuillez vous connecter pour accéder à votre profil",
+  "go_to_login_button": "Aller à la connexion",
+
+  "user_not_found": "Utilisateur non trouvé",
+
+  "save_route_error": "Impossible d'enregistrer le parcours",
+
+  "no_title": "Aucun titre",
+  "no_description": "Aucune description",
+
+  "forgot_password_title": "Mot de passe oublié ?",
+  "forgot_password_subtitle": "Entrez votre email ci-dessous",
+  "enter_email_prompt": "Nous vous enverrons un lien pour réinitialiser votre mot de passe",
+  "send_reset_link_button": "Envoyer le lien",
+  "email_required": "Veuillez entrer votre adresse email",
+  "reset_link_sent": "Lien envoyé ! Vérifiez votre email.",
+  "generic_error": "Une erreur s'est produite",
+
+  "satellite_weather_layers_title": "Carte satellite avec couches météo",
+  "weather_layers_label": "Couches météo",
+  "layer_precipitation": "Précipitations",
+  "layer_snow": "Neige",
+  "layer_wind": "Vent",
+  "layer_clouds": "Nuages",
+  "layer_temperature": "Température",
+  "layer_pressure": "Pression",
+
+  "gps_disabled": "GPS Désactivé",
+  "permission_denied": "Permission Refusée",
+  "gps_disabled_message": "Le GPS est éteint",
+  "permission_denied_message": "Je n'ai pas les permissions nécessaires pour fournir les informations",
+  "open_settings_button": "Ouvrir les paramètres",
+  "loading_coordinates": "Chargement des coordonnées..."
 }

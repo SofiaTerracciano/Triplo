@@ -826,6 +826,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try to complete the route within the estimated time. Can you beat the clock?'**
   String get alert_challenge_time;
+
+  /// No description provided for @connect_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect_label;
+
+  /// No description provided for @scan_qr_code_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan with your phone'**
+  String get scan_qr_code_label;
+
+  /// No description provided for @qr_generated_label.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Generation'**
+  String get qr_generated_label;
+
+  /// No description provided for @new_qr_label.
+  ///
+  /// In en, this message translates to:
+  /// **'New QR'**
+  String get new_qr_label;
+
+  /// No description provided for @language_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language_label;
+
+  /// No description provided for @home_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home_label;
+
+  /// No description provided for @u_label.
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get u_label;
+
+  /// No description provided for @follower_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Follower'**
+  String get follower_label;
+
+  /// No description provided for @following_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get following_label;
+
+  /// No description provided for @logout_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout_label;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -167,7 +167,77 @@
 
   "title_challenge_time": "⏱️ Challenge: Gegen die Zeit",
   "body_challenge_time": "Schaffst du es rechtzeitig?",
-  "alert_challenge_time": "Versuche die Strecke in der geschätzten Zeit zu schaffen. Kannst du die Zeit schlagen?"
+  "alert_challenge_time": "Versuche die Strecke in der geschätzten Zeit zu schaffen. Kannst du die Zeit schlagen?",
+
+  "please_login_label": "Bitte anmelden",
+  "login_button": "Anmelden",
+  "google_signin_button": "Mit Google anmelden",
+  "no_account_label": "Noch kein Konto?",
+  "signup_label": "Registrieren",
+  "forgot_password_label": "Passwort vergessen?",
+  "fill_fields_login_label": "Bitte alle Felder ausfüllen",
+  "login_success": "Erfolgreich angemeldet",
+  "login_failed": "Anmeldung fehlgeschlagen",
+  "google_login_failed": "Google-Anmeldung fehlgeschlagen",
+
+  "follower": "Follower",
+  "following": "Following",
+
+  "registration_title": "Bei Triplo registrieren",
+  "confirm_password_label": "Passwort bestätigen",
+  "register_button": "Registrieren",
+  "back_to_login": "Zurück zur Login-Seite",
+  "fill_all_fields": "Bitte alle Felder ausfüllen",
+  "passwords_not_match": "Passwörter stimmen nicht überein",
+  "registration_success": "Registrierung erfolgreich",
+  "registration_failed": "Registrierung fehlgeschlagen",
+
+  "not_logged_title": "Du bist nicht angemeldet",
+  "not_logged_subtitle": "Bitte melde dich an, um dein Profil zu sehen",
+  "go_to_login_button": "Zum Login",
+
+  "user_not_found": "Benutzer nicht gefunden",
+
+  "save_route_error": "Impossible d'enregistrer le parcours",
+
+  "no_title": "Kein Titel",
+  "no_description": "Keine Beschreibung",
+
+  "restore_google_photo_label": "Google-Profilbild wiederherstellen",
+  "scan_qr_label": "Uhr-QR scannen",
+  "not_valid_qr_label": "Ungültiger QR-Code",
+  "connect_watch_label": "Uhr verbinden?",
+  "cancel_label": "Abbrechen",
+  "confirm_label": "Bestätigen",
+
+  "diary_not_found": "Tagebuch nicht gefunden",
+
+  "offline_mode_label": "Offline-Modus",
+  "no_internet": "Keine Internetverbindung",
+
+  "forgot_password_title": "Passwort vergessen?",
+  "forgot_password_subtitle": "Gib unten deine E-Mail ein",
+  "enter_email_prompt": "Wir senden dir einen Link zum Zurücksetzen",
+  "send_reset_link_button": "Link senden",
+  "email_required": "Bitte gib deine E-Mail-Adresse ein",
+  "reset_link_sent": "Link gesendet! Prüfe deine E-Mails.",
+  "generic_error": "Ein Fehler ist aufgetreten",
+
+  "satellite_weather_layers_title": "Satellitenkarte mit Wetterebenen",
+  "weather_layers_label": "Wetterebenen",
+  "layer_precipitation": "Niederschlag",
+  "layer_snow": "Schnee",
+  "layer_wind": "Wind",
+  "layer_clouds": "Wolken",
+  "layer_temperature": "Temperatur",
+  "layer_pressure": "Druck",
+
+  "gps_disabled": "GPS Ausgeschaltet",
+  "permission_denied": "Zugriff verweigert",
+  "gps_disabled_message": "GPS ist ausgeschaltet",
+  "permission_denied_message": "Ich habe nicht die erforderlichen Berechtigungen, um die Informationen bereitzustellen",
+  "open_settings_button": "Einstellungen öffnen",
+  "loading_coordinates": "Koordinaten werden geladen..."
 }
 
 

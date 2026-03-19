@@ -448,4 +448,175 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get alert_challenge_time => 'Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?';
+
+  @override
+  String get please_login_label => 'Effettua il login';
+
+  @override
+  String get login_button => 'Accedi';
+
+  @override
+  String get google_signin_button => 'Accedi con Google';
+
+  @override
+  String get no_account_label => 'Non hai un account?';
+
+  @override
+  String get signup_label => 'Registrati';
+
+  @override
+  String get forgot_password_label => 'Password dimenticata?';
+
+  @override
+  String get fill_fields_login_label => 'Compila tutti i campi';
+
+  @override
+  String get login_success => 'Accesso effettuato';
+
+  @override
+  String get login_failed => 'Accesso fallito';
+
+  @override
+  String get google_login_failed => 'Accesso con Google fallito';
+
+  @override
+  String get follower => 'Follower';
+
+  @override
+  String get following => 'Following';
+
+  @override
+  String get registration_title => 'Registrati su Triplo';
+
+  @override
+  String get confirm_password_label => 'Conferma password';
+
+  @override
+  String get register_button => 'Registrati';
+
+  @override
+  String get back_to_login => 'Torna alla pagina di login';
+
+  @override
+  String get fill_all_fields => 'Compila tutti i campi';
+
+  @override
+  String get passwords_not_match => 'Le password non coincidono';
+
+  @override
+  String get registration_success => 'Registrazione completata';
+
+  @override
+  String get registration_failed => 'Registrazione fallita';
+
+  @override
+  String get not_logged_title => 'Non hai effettuato l\'accesso';
+
+  @override
+  String get not_logged_subtitle => 'Accedi per visualizzare il tuo profilo';
+
+  @override
+  String get go_to_login_button => 'Vai al login';
+
+  @override
+  String get user_not_found => 'Utente non trovato';
+
+  @override
+  String get save_route_error => 'Impossibile salvare il percorso';
+
+  @override
+  String get no_title => 'Nessun titolo';
+
+  @override
+  String get no_description => 'Nessuna descrizione';
+
+  @override
+  String get restore_google_photo_label => 'Ripristina foto profilo di Google';
+
+  @override
+  String get scan_qr_label => 'Scan watch QR';
+
+  @override
+  String get not_valid_qr_label => 'QR non valido';
+
+  @override
+  String get connect_watch_label => 'Connettere l\'orologio?';
+
+  @override
+  String get cancel_label => 'Annulla';
+
+  @override
+  String get confirm_label => 'Conferma';
+
+  @override
+  String get diary_not_found => 'Diario non trovato';
+
+  @override
+  String get offline_mode_label => 'Modalità offline';
+
+  @override
+  String get no_internet => 'Nessuna connessione internet';
+
+  @override
+  String get forgot_password_title => 'Password dimenticata?';
+
+  @override
+  String get forgot_password_subtitle => 'Inserisci la tua email qui sotto';
+
+  @override
+  String get enter_email_prompt => 'Ti invieremo un link per reimpostare la password';
+
+  @override
+  String get send_reset_link_button => 'Invia link di reset';
+
+  @override
+  String get email_required => 'Inserisci il tuo indirizzo email';
+
+  @override
+  String get reset_link_sent => 'Link di reset inviato! Controlla la tua email.';
+
+  @override
+  String get generic_error => 'Si è verificato un errore';
+
+  @override
+  String get satellite_weather_layers_title => 'Mappa satellitare con livelli meteo';
+
+  @override
+  String get weather_layers_label => 'Livelli meteo';
+
+  @override
+  String get layer_precipitation => 'Precipitazioni';
+
+  @override
+  String get layer_snow => 'Neve';
+
+  @override
+  String get layer_wind => 'Vento';
+
+  @override
+  String get layer_clouds => 'Nuvole';
+
+  @override
+  String get layer_temperature => 'Temperatura';
+
+  @override
+  String get layer_pressure => 'Pressione';
+
+  @override
+  String get gps_disabled => 'GPS spento';
+
+  @override
+  String get permission_denied => 'Permesso Negato';
+
+  @override
+  String get gps_disabled_message => 'Il GPS è spento';
+
+  @override
+  String get permission_denied_message => 'Non ho i permessi necessari per poter darti le informazioni';
+
+  @override
+  String get open_settings_button => 'Apri Impostazioni';
+
+  @override
+  String get loading_coordinates => 'Caricamento coordinate...';
 }

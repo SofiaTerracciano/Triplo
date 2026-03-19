@@ -1,17 +1,24 @@
+import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
-
+import '../service/notification.dart';
+import '../service/geo.dart';
+import '../service/memory.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  GeoService geo;
+  MemoryService memory;
+  NotificationService notification;
+
   List<Trekking> _trekkings;
   bool _loaded = false;
 
-  TrekkingController({required List<Trekking> trekkings})
+  TrekkingController({required List<Trekking> trekkings, required this.geo, required this.memory, required this.notification })
     : _trekkings = trekkings;
 
   // Getter for all trekkings
@@ -73,6 +80,27 @@ class TrekkingController extends ChangeNotifier {
     return await ref.getDownloadURL();
   }
 
+   // Metodo per gestire l'arrivo
+  Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
+    // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
+    debugPrint("🔔 checkArrival chiamato — distanza: $distanceInMeters");
+    if (distanceInMeters <= 1000) {
+      final content = getChallengeContent('end_trekking_arrival', local);
+      debugPrint("📦 title: ${content['title']}, body: ${content['body']}");
+
+      await notification.showTrekkingNotification(
+        id: 999,
+        title: content['title']!,
+        body: content['body']!,
+        payload: 'end_trekking_arrival',
+        channelId: 'arrival_channel',
+        channelName: 'Arrivo Trekking',
+      );
+      debugPrint("📨 Notifica inviata");
+    }
+  }
+
+  
   /* Search trekkings by name using normalized search in Firestore
   Future<List<Trekking>> searchTrekking(String query) async {
     final q = query.trim().toLowerCase();
@@ -94,4 +122,6 @@ class TrekkingController extends ChangeNotifier {
     print(results);
     return results;
   }*/
+
+  
 }

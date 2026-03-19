@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/widgets_for_pages/box_field/box_field.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
@@ -12,10 +13,11 @@ class ForgottenPasswordPage extends StatelessWidget {
   /// Validates the email and calls the controller method.
   Future<void> _submit(BuildContext context) async {
     final email = emailController.text.trim();
+    final local = AppLocalizations.of(context)!;
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your email address")),
+        SnackBar(content: Text(local.email_required)),
       );
       return;
     }
@@ -27,8 +29,8 @@ class ForgottenPasswordPage extends StatelessWidget {
       await controller.sendPasswordReset(email);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Password reset link sent! Check your email."),
+        SnackBar(
+          content: Text(local.reset_link_sent),
         ),
       );
 
@@ -49,6 +51,8 @@ class ForgottenPasswordPage extends StatelessWidget {
   /** UI for the Forgotten Password Page */
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -61,8 +65,8 @@ class ForgottenPasswordPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Forgot your password?',
+                  Text(
+                    local.forgot_password_title,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -70,14 +74,14 @@ class ForgottenPasswordPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Enter your email below and we’ll send you a link to reset your password',
+                  Text(
+                    "$local.forgot_password_subtitle $local.enter_email_prompt",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 24),
                   BoxField(
-                      label: 'email',
+                      label: local.email_label,
                     isEmail: true,
                     controller: emailController,),
 
@@ -85,14 +89,14 @@ class ForgottenPasswordPage extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => _submit(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      "Send reset link",
+                    child: Text(
+                      local.send_reset_link_button,
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
@@ -100,9 +104,9 @@ class ForgottenPasswordPage extends StatelessWidget {
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Back to Login',
-                      style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+                    child: Text(
+                      local.go_to_login_button,
+                      style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
                 ],

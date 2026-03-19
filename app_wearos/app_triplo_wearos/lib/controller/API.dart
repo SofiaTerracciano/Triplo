@@ -1,21 +1,25 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
+import '../service/geo.dart';
+import '../service/permission_service.dart';
+import '../service/memory.dart';
 
 // API controller for external services
 class API {
   late final String openWeatherKey;
   late final String weatherbitKey;
 
+  MemoryService memory;
+  GeoService geo;
+  late PermissionService permission;
+
   // Constructor to load API keys from .env
-  API() {
+  API({required this.memory, required this.geo}) {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
 
@@ -50,29 +54,7 @@ class API {
 
   // Get user's current location
   Future<LatLng?> userLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return null;
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) return null;
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return null;
-      }
-
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      return LatLng(pos.latitude, pos.longitude);
-    } catch (e) {
-      debugPrint("Error getting location: $e");
-      return null;
-    }
+    return geo.userLocation();
   }
 
   // Fetch current weather data for given coordinates

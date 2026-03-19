@@ -136,5 +136,18 @@
 
   "title_challenge_time": "⏱️ Desafío: Contra el tiempo",
   "body_challenge_time": "¿Puedes vencer al tiempo?",
-  "alert_challenge_time": "Intenta completar la ruta dentro del tiempo estimado. ¿Puedes vencer al cronómetro?"
+  "alert_challenge_time": "Intenta completar la ruta dentro del tiempo estimado. ¿Puedes vencer al cronómetro?",
+
+  "connect_label": "Conectar",
+  "scan_qr_code_label": "Escanea con el móvil",
+  "qr_generated_label": "Generación de QR",
+  "new_qr_label": "Nuevo QR",
+
+  "language_label": "Idioma",
+  "home_label": "Home",
+  "u_label": "User",
+
+  "follower_label": "Follower",
+  "following_label": "Following",
+  "logout_label": "Logout"
 }

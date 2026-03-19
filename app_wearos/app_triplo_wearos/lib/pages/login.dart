@@ -1,3 +1,4 @@
+import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -11,6 +12,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userController = context.watch<UserController>();
+    final local = AppLocalizations.of(context)!;
 
     if (userController.pairedUid != null || userController.currentUser != null) {
       return const UserPage();

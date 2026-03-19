@@ -164,13 +164,13 @@ class _TrekkingPageState extends State<TrekkingPage> {
             children: [
               const Icon(Icons.person_off, size: 70, color: Colors.grey),
               const SizedBox(height: 16),
-              const Text(
-                "You are not logged in",
+              Text(
+                local.not_logged_title,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "Please login to access your profile",
+              Text(
+                local.not_logged_subtitle,
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 20),
@@ -178,7 +178,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
-                child: const Text("Go to Login"),
+                child: Text(local.go_to_login_button),
               ),
             ],
           ),
@@ -282,8 +282,8 @@ class _TrekkingPageState extends State<TrekkingPage> {
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Errore: impossibile aggiornare il bookmark"),
+                  SnackBar(
+                    content: Text(local.save_route_error),
                   ),
                 );
               }

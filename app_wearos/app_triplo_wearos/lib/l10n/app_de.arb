@@ -136,5 +136,18 @@
 
   "title_challenge_time": "⏱️ Challenge: Gegen die Zeit",
   "body_challenge_time": "Schaffst du es rechtzeitig?",
-  "alert_challenge_time": "Versuche die Strecke in der geschätzten Zeit zu schaffen. Kannst du die Zeit schlagen?"
+  "alert_challenge_time": "Versuche die Strecke in der geschätzten Zeit zu schaffen. Kannst du die Zeit schlagen?",
+
+  "connect_label": "Verbinden",
+  "scan_qr_code_label": "Mit dem Handy scannen",
+  "qr_generated_label": "QR-Generierung",
+  "new_qr_label": "Neuer QR",
+
+  "language_label": "Sprache",
+  "home_label": "Home",
+  "u_label": "User",
+
+  "follower_label": "Follower",
+  "following_label": "Following",
+  "logout_label": "Logout"
 }

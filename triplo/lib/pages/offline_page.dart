@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 
 class OfflinePage extends StatelessWidget {
   const OfflinePage({super.key});
@@ -7,6 +8,7 @@ class OfflinePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: Padding(
@@ -19,13 +21,13 @@ class OfflinePage extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 16),
-              const Text(
-                "Offline mode",
+              Text(
+                local.offline_mode_label,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "No internet connection. ",
+              Text(
+                local.no_internet,
                 textAlign: TextAlign.center,
               ),
             ],

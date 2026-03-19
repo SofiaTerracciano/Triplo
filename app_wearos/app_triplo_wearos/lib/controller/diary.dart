@@ -1,16 +1,12 @@
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:app_triplo_wearos/model/diary.dart';
 import 'package:app_triplo_wearos/model/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uuid/uuid.dart';
 
 // Controller for managing diary data from and to Firestore
 class DiaryController extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   List<Diary> _diaries = [];

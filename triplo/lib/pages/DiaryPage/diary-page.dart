@@ -56,7 +56,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
     final diary = diaryController.getDiaryById(widget.diaryId);
     if (diary == null) {
-      return const Scaffold(body: Center(child: Text('Diary not found')));
+      return Scaffold(body: Center(child: Text(local.diary_not_found)));
     }
 
     // Format duration into hours and minutes
@@ -81,8 +81,8 @@ class _DiaryPageState extends State<DiaryPage> {
         }
 
         if (!snapshot.hasData || snapshot.data == null) {
-          return const Scaffold(
-            body: Center(child: Text("This user doesn't exist")),
+          return Scaffold(
+            body: Center(child: Text(local.user_not_found)),
           );
         }
 

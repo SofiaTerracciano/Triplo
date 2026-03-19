@@ -370,4 +370,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alert_challenge_time => 'Try to complete the route within the estimated time. Can you beat the clock?';
+
+  @override
+  String get connect_label => 'Connect';
+
+  @override
+  String get scan_qr_code_label => 'Scan with your phone';
+
+  @override
+  String get qr_generated_label => 'QR Generation';
+
+  @override
+  String get new_qr_label => 'New QR';
+
+  @override
+  String get language_label => 'Language';
+
+  @override
+  String get home_label => 'Home';
+
+  @override
+  String get u_label => 'User';
+
+  @override
+  String get follower_label => 'Follower';
+
+  @override
+  String get following_label => 'Following';
+
+  @override
+  String get logout_label => 'Logout';
 }

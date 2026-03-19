@@ -28,7 +28,7 @@ class UsersList extends StatelessWidget {
       body: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
         child: FutureBuilder<List<Users>>(
-          future: listName == 'Followers'
+          future: listName == local.follower
               ? controller.getFollowers(myUid)
               : controller.getFollowing(myUid),
           builder: (context, snapshot) {

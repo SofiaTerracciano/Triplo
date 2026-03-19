@@ -1,9 +1,14 @@
 import 'package:app_triplo_wearos/controller/API.dart';
+import 'package:app_triplo_wearos/controller/challenge.dart';
 import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/navigation.dart';
+import 'package:app_triplo_wearos/service/geo.dart';
+import 'package:app_triplo_wearos/service/memory.dart';
+import 'package:app_triplo_wearos/service/notification.dart';
+import 'package:app_triplo_wearos/service/permission_service.dart';
 import 'package:app_triplo_wearos/service/watch_id_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -11,14 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'package:app_triplo_wearos/controller/user.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-    final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,186 +30,162 @@ Future<void> main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-
-
   final watchId = await WatchIdService.getOrCreateWatchId();
 
-  const AndroidInitializationSettings androidSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+  /*Init NotificationService centralizzato
+  final notificationService = NotificationService();
+  await notificationService.init();
+  notificationService.setNavKey(navKey); // <- passa il navKey
 
-  const InitializationSettings initSettings = InitializationSettings(
-    android: androidSettings,
+  // Crea i canali Android
+  final androidPlugin = notificationService
+      // ignore: invalid_use_of_visible_for_testing_member
+      .plugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+  await androidPlugin?.createNotificationChannel(
+    const AndroidNotificationChannel(
+      'notifications_channel',
+      'Notifications',
+      importance: Importance.high,
+    ),
   );
 
-  await flutterLocalNotificationsPlugin.initialize(
-    initSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse response) {
-      final context = navKey.currentContext;
-      if (context == null) return;
-
-      final String payload = response.payload ?? "";
-
-      if (payload == 'end_trekking_arrival') {
-        showDialog(
-          context: context,
-          builder: (_) => Dialog(
-            insetPadding: const EdgeInsets.all(8),
-            child: SizedBox(
-              width: 160,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "📍 Destinazione vicina!",
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _getChallengeBody(payload),
-                      style: const TextStyle(fontSize: 10),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 28,
-                      width: double.infinity,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text("OK", style: TextStyle(fontSize: 11)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (_) => Dialog(
-            insetPadding: const EdgeInsets.all(8),
-            child: SizedBox(
-              width: 160,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "🥾 È ora di una sfida!",
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _getChallengeBody(payload),
-                      style: const TextStyle(fontSize: 10),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 28,
-                      width: double.infinity,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text("OK", style: TextStyle(fontSize: 11)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    },
-  );
-
-  await flutterLocalNotificationsPlugin
-    .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-    ?.createNotificationChannel(
-      const AndroidNotificationChannel(
-        'notifications_channel',
-        'Notifications',
-        importance: Importance.high,
-      ),
-    );
-  
-  await flutterLocalNotificationsPlugin
-  .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-  ?.createNotificationChannel(
+  await androidPlugin?.createNotificationChannel(
     const AndroidNotificationChannel(
       'arrival_channel',
       'Arrivo Trekking',
       importance: Importance.high,
     ),
+  );*/
+  
+  final memoryService = MemoryService();
+  final geoService= GeoService();
+
+  final language = Language();
+  await language.loadSavedLocale();
+
+  await PermissionService.askPermissionsOnce();
+
+  final notification = NotificationService();
+  notification.setNavKey(navKey);
+  await notification.init();
+
+  runApp(
+    TriploWatchApp(
+      watchId: watchId,
+      memoryService: memoryService,
+      geoService: geoService,
+      language: language,
+      notification: notification,
+    )
   );
-
-  runApp(TriploWatchApp(watchId: watchId));
 }
 
-class TriploWatchApp extends StatefulWidget {
+class TriploWatchApp extends StatelessWidget {
   final String watchId;
-  const TriploWatchApp({super.key, required this.watchId});
-
-
-  @override
-  State<TriploWatchApp> createState() => _TriploWatchAppState();
-}
-
-
-
-
-class _TriploWatchAppState extends State<TriploWatchApp> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  final MemoryService memoryService;
+  final GeoService geoService;
+  final Language language;
+  final NotificationService notification;
+  const TriploWatchApp({
+    super.key, 
+    required this.watchId, 
+    required this.memoryService,
+    required this.geoService,
+    required this.language,
+    required this.notification,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      // Provide controllers to the app --> state management
       providers: [
-        //ChangeNotifierProvider(create: (_) => UserController()),
-        ChangeNotifierProvider(create: (_) => DiaryController()),
-        ChangeNotifierProvider(
-          create: (_) => TrekkingController(trekkings: []),
-        ),
-        ChangeNotifierProvider(create: (_) => Language()),
-        ChangeNotifierProvider(create: (_) => UserController(watchId: widget.watchId)),
-        Provider<API>(create: (_) => API()),
+        // 1. Inietta prima i servizi base (Provider semplici)
+        Provider<MemoryService>.value(value: memoryService),
+        Provider<GeoService>.value(value: geoService),
+        Provider<NotificationService>.value(value: notification),
+        ChangeNotifierProvider.value(value: language),
 
-        /*
-        Provider<NotificationService>(
-          create: (_) {
-            final service = NotificationService();
-            service.init();
-            return service;
+        // 2. Inietta i controller che dipendono dai servizi
+        ChangeNotifierProvider(create: (_) => DiaryController()),
+        ChangeNotifierProvider(create: (_) => UserController(watchId: watchId)),
+
+        // API (Provider semplice perché non è un ChangeNotifier)
+        Provider<API>(create: (context) => API(
+          geo: context.read<GeoService>(), 
+          memory: context.read<MemoryService>(),
+        )),
+
+        // TrekkingController con le dipendenze passate correttamente
+        ChangeNotifierProvider(create: (context) => TrekkingController(
+          geo: context.read<GeoService>(),
+          memory: context.read<MemoryService>(),
+          notification: context.read<NotificationService>(),
+          trekkings: [],
+        )),
+
+        // ChallengesController con le dipendenze passate correttamente
+        ChangeNotifierProvider(create: (context) => ChallengesController(
+          memory: context.read<MemoryService>(),
+          notification: context.read<NotificationService>(),
+        )),
+        
+        /*ChangeNotifierProvider(create: (_) => DiaryController()),
+        ChangeNotifierProvider.value(value: language),
+        Provider<MemoryService>.value(value: memoryService),
+        Provider<GeoService>.value(value: geoService),
+        Provider<NotificationService>.value(value: notification),
+        ChangeNotifierProxyProvider3<GeoService, MemoryService, NotificationService, TrekkingController>(
+          create: (context) => TrekkingController(
+            geo: context.read<GeoService>(),
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
+            trekkings: [],
+          ),
+          update: (context, geo, memory, notification, previous) {
+            if (previous != null) {
+              previous.geo = geo;
+              previous.memory = memory;
+              previous.notification = notification;
+              return previous;
+            }
+            return TrekkingController(
+              geo: geo,
+              memory: memory,
+              notification: notification,
+              trekkings: [],
+            );
           },
         ),
-
-        Provider<ObserverService>(
-          create: (context) => ObserverService(
-            api: context.read<API>(),
-            notificationService: context.read<NotificationService>(),
-          ),
+        ChangeNotifierProvider(create: (_) => UserController(watchId: widget.watchId)),
+        ProxyProvider2<GeoService, MemoryService, API>(
+          update: (context, geo, memory, previous) => 
+              API(geo: geo, memory: memory),
         ),
-         */
+        ChangeNotifierProxyProvider<API>(
+          create: (context) =>
+              InternetService(api: context.read<API>())..start(),
+          update: (context, api, old) =>
+              old ?? InternetService(api: api)..start(),
+        ),
+        ChangeNotifierProxyProvider<MemoryService, ChallengesController>(
+          create: (context) => ChallengesController(
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
+          ),
+          update: (context, memory, previous) {
+            if (previous != null) {
+              previous.memory = memory;
+              previous.notification = context.read<NotificationService>();
+              return previous;
+            }
+            return ChallengesController(
+              memory: memory, 
+              notification: context.read<NotificationService>(),
+            );
+          },
+        ),*/
       ],
       child: Consumer<Language>(
         builder: (context, lang, child) {
@@ -218,20 +194,16 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
             debugShowCheckedModeBanner: false,
             navigatorKey: navKey,
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.lightBlueAccent,
-              ),
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
               useMaterial3: true,
             ),
-            // This is for localization --> set the app language based on Language controller
-            locale: lang.locale, //
+            locale: lang.locale,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            // Supported locales --> English, Italian, Spanish, German, French
             supportedLocales: const [
               Locale('en'),
               Locale('it'),
@@ -244,25 +216,5 @@ class _TriploWatchAppState extends State<TriploWatchApp> {
         },
       ),
     );
-  }
-
-}
-
-String _getChallengeBody(String challenge) {
-  switch (challenge) {
-    case "balance":
-      return "Metti alla prova il tuo equilibrio!";
-    case "hi":
-      return "Saluta qualcuno che incontri sul sentiero!";
-    case "mini_orientiring":
-      return "Trova la tua strada!";
-    case "photo":
-      return "Scatta una foto al paesaggio!";
-    case "silent_walking":
-      return "Cammina in silenzio per qualche minuto!";
-    case "time":
-      return "Quanto tempo riesci senza guardare il telefono?";
-    default:
-      return "Sei quasi arrivato. Tocca per completare il percorso.";
   }
 }

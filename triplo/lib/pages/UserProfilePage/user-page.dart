@@ -102,13 +102,13 @@ class _UserPageState extends State<UserPage> {
             children: [
               const Icon(Icons.person_off, size: 70, color: Colors.grey),
               const SizedBox(height: 16),
-              const Text(
-                "You are not logged in",
+              Text(
+                local.not_logged_title,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "Please login to access your profile",
+              Text(
+                local.not_logged_subtitle,
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 20),
@@ -116,7 +116,7 @@ class _UserPageState extends State<UserPage> {
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
-                child: const Text("Go to Login"),
+                child: Text(local.go_to_login_button),
               ),
             ],
           ),
@@ -266,7 +266,7 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: 'Followers'),
+                                    builder: (_) => UsersList(listName: local.follower),
                                   ),
                                 );
                               },
@@ -274,7 +274,7 @@ class _UserPageState extends State<UserPage> {
                                 future: context.read<UserController>().getFollowers(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
-                                    label: 'Follower',
+                                    label: local.follower,
                                     value: '${snap.data?.length ?? 0}',
                                   );
                                 },
@@ -286,7 +286,7 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: 'Following'),
+                                    builder: (_) => UsersList(listName: local.following),
                                   ),
                                 );
                               },
@@ -294,7 +294,7 @@ class _UserPageState extends State<UserPage> {
                                 future: context.read<UserController>().getFollowing(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
-                                    label: 'Following',
+                                    label: local.following,
                                     value: '${snap.data?.length ?? 0}',
                                   );
                                 },

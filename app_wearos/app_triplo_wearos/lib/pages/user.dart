@@ -167,13 +167,13 @@ class UserPage extends StatelessWidget {
                           children: [
                             _statButton(
                               context: context, 
-                              label: "Followers", 
+                              label: local.follower_label, 
                               value: followers.length,
                               onTap: () => Navigator.push(
                                 context, 
                                 MaterialPageRoute(
                                   builder: (_) => UserListPage(
-                                    title: "Followers", 
+                                    title: local.follower_label, 
                                     uids: followers
                                   )
                                 )
@@ -182,13 +182,13 @@ class UserPage extends StatelessWidget {
                             const SizedBox(width: 4),
                             _statButton(
                               context: context, 
-                              label: "Following", 
+                              label: local.following_label, 
                               value: following.length,
                               onTap: () => Navigator.push(
                                 context, 
                                 MaterialPageRoute(
                                   builder: (_) => UserListPage(
-                                    title: "Following", 
+                                    title: local.following_label, 
                                     uids: following
                                   )
                                 )
@@ -277,8 +277,8 @@ class UserPage extends StatelessWidget {
                         shape: const StadiumBorder(),
                       ),
                       onPressed: () => userCtrl.logoutWatch(),
-                      child: const Text(
-                        "Logout", 
+                      child: Text(
+                        local.logout_label, 
                         style: TextStyle(fontSize: 11)
                       ),
                     ),

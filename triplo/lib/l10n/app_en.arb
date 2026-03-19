@@ -167,5 +167,75 @@
 
     "title_challenge_time": "⏱️ Challenge: Beat the clock",
     "body_challenge_time": "Can you beat the time?",
-    "alert_challenge_time": "Try to complete the route within the estimated time. Can you beat the clock?"
+    "alert_challenge_time": "Try to complete the route within the estimated time. Can you beat the clock?",
+
+    "please_login_label": "Please login",
+    "login_button": "Login",
+    "google_signin_button": "Sign in with Google",
+    "no_account_label": "Don't have an account?",
+    "signup_label": "Sign up",
+    "forgot_password_label": "Forgot password?",
+    "fill_fields_login_label": "Please fill all fields",
+    "login_success": "Logged in",
+    "login_failed": "Login failed",
+    "google_login_failed": "Google login failed",
+
+    "follower": "Follower",
+    "following": "Following",
+
+    "registration_title": "Register on Triplo",
+    "confirm_password_label": "Confirm password",
+    "register_button": "Register",
+    "back_to_login": "Go back to login page",
+    "fill_all_fields": "Please fill in every field",
+    "passwords_not_match": "Passwords do not match",
+    "registration_success": "Registration successful",
+    "registration_failed": "Registration failed",
+
+    "not_logged_title": "You are not logged in",
+    "not_logged_subtitle": "Please login to access your profile",
+    "go_to_login_button": "Go to Login",
+
+    "user_not_found": "User not found",
+
+    "save_route_error": "Unable to save route",
+
+    "no_title": "No title",
+    "no_description": "No description",
+
+    "restore_google_photo_label": "Restore Google profile photo",
+    "scan_qr_label": "Scan watch QR",
+    "not_valid_qr_label": "Invalid QR code",
+    "connect_watch_label": "Connect the watch?",
+    "cancel_label": "Cancel",
+    "confirm_label": "Confirm",
+
+    "diary_not_found": "Diary not found",
+
+    "offline_mode_label": "Offline mode",
+    "no_internet": "No internet connection",
+    
+    "forgot_password_title": "Forgot your password?",
+    "forgot_password_subtitle": "Enter your email below",
+    "enter_email_prompt": "We’ll send you a link to reset your password",
+    "send_reset_link_button": "Send reset link",
+    "email_required": "Please enter your email address",
+    "reset_link_sent": "Password reset link sent! Check your email.",
+    "generic_error": "An error occurred",
+
+    "satellite_weather_layers_title": "Satellite map with weather layers",
+    "weather_layers_label": "Weather Layers",
+    "layer_precipitation": "Precipitation",
+    "layer_snow": "Snow",
+    "layer_wind": "Wind",
+    "layer_clouds": "Clouds",
+    "layer_temperature": "Temperature",
+    "layer_pressure": "Pressure",
+
+    "gps_disabled": "GPS Disabled",
+    "permission_denied": "Permission Denied",
+    "gps_disabled_message": "GPS is turned off",
+    "permission_denied_message": "I don't have the required permissions to provide the information",
+    "open_settings_button": "Open Settings",
+    "loading_coordinates": "Loading coordinates..."
 }

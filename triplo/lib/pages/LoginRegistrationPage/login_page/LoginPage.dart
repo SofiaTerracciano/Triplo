@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       if (user == null) {
         throw StateError("currentUser è null dopo il login");
       }
-      final uid = user.uid;
+      //final uid = user.uid;
       //assign current user instance to _currentUser attribute of diaryController
       diaryController.currentUser = user;
 
@@ -89,12 +89,12 @@ class _LoginPageState extends State<LoginPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Logged in")));
+      ).showSnackBar(SnackBar(content: Text(local.login_success)));
     } catch (e) {
       debugPrint("Login error: $e\n");
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Login failed: $e")));
+      ).showSnackBar(SnackBar(content: Text("$local.login_failed : $e")));
     }
   }
 
@@ -108,6 +108,8 @@ class _LoginPageState extends State<LoginPage> {
    */
   Future<void> _loginGoogle(BuildContext context) async {
     final controller = context.read<UserController>();
+    final local = AppLocalizations.of(context)!;
+
 
     try {
       await controller.loginWithGoogle();
@@ -120,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google login failed: $e")),
+        SnackBar(content: Text("$local.google_login_failed $e")),
       );
     }
   }
@@ -177,16 +179,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
 
-                const Text(
-                  'Please login',
+                Text(
+                  local.please_login_label,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 24),
 
-                // email
+                // Email
                 BoxField(
-                  label: 'email',
+                  label: local.email_label,
                   isEmail: true,
                   controller: emailController,
                 ),
@@ -194,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // password
                 BoxField(
-                  label: 'password',
+                  label: local.password_label,
                   isPassword: true,
                   controller: passwordController,
                 ),
@@ -206,14 +208,14 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                       onPressed: () => _loginEmailPwd(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
-                        'Login',
+                      child: Text(
+                        local.login_button,
                         style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ),
@@ -231,8 +233,8 @@ class _LoginPageState extends State<LoginPage> {
                         width: 18,
                         height: 18,
                       ),
-                      label: const Text(
-                        'Sign-in with Google',
+                      label: Text(
+                        local.google_signin_button,
                         style: TextStyle(fontSize: 16, color: Colors.black87),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -251,9 +253,9 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, '/registration'),
-                  child: const Text(
-                    "Don't have an account? Sign up",
-                    style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+                  child: Text(
+                    "$local.no_account_label $local.signup_label",
+                    style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
 
@@ -262,11 +264,11 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, '/forgotten_password'),
-                  child: const Text(
-                    'Forgot password?',
+                  child: Text(
+                    local.forgot_password_label,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.blueAccent,
+                      color: Theme.of(context).colorScheme.primary,
                       decoration: TextDecoration.underline,
                     ),
                   ),

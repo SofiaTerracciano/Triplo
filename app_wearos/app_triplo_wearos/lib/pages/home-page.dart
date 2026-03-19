@@ -19,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   // Initial zoom level
   double currentZoom = 13.0;
 
-  final api = API();
 
   // Inizialization: loading of data directly without login and listen to map events for zoom level updates
   //(since on watch we want to show subito the map with i trekking) --> capire però come fare e cosa perchè mobile devi avere il login
@@ -46,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
+    final api = context.watch<API>();
 
     return Scaffold(
       backgroundColor: Colors.black,

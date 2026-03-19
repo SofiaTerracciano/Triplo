@@ -65,13 +65,13 @@ class _SettingPageState extends State<SettingPage> {
             children: [
               const Icon(Icons.person_off, size: 70, color: Colors.grey),
               const SizedBox(height: 16),
-              const Text(
-                "You are not logged in",
+              Text(
+                local.not_logged_title,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "Please login to access your settings",
+              Text(
+                local.not_logged_subtitle,
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 20),
@@ -79,7 +79,7 @@ class _SettingPageState extends State<SettingPage> {
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
-                child: const Text("Go to Login"),
+                child: Text(local.please_login_label),
               ),
             ],
           ),
@@ -288,7 +288,7 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 24),
               TextButton.icon(
                 icon: const Icon(Icons.refresh),
-                label: const Text("Restore Google profile photo"),
+                label: Text(local.restore_google_photo_label),
                 onPressed: userController.restoreGoogleProfilePhoto,
               ),
             ],

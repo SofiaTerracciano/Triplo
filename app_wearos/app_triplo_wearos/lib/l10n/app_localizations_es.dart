@@ -370,4 +370,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get alert_challenge_time => 'Intenta completar la ruta dentro del tiempo estimado. ¿Puedes vencer al cronómetro?';
+
+  @override
+  String get connect_label => 'Conectar';
+
+  @override
+  String get scan_qr_code_label => 'Escanea con el móvil';
+
+  @override
+  String get qr_generated_label => 'Generación de QR';
+
+  @override
+  String get new_qr_label => 'Nuevo QR';
+
+  @override
+  String get language_label => 'Idioma';
+
+  @override
+  String get home_label => 'Home';
+
+  @override
+  String get u_label => 'User';
+
+  @override
+  String get follower_label => 'Follower';
+
+  @override
+  String get following_label => 'Following';
+
+  @override
+  String get logout_label => 'Logout';
 }

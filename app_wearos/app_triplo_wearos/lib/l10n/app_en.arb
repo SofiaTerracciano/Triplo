@@ -136,5 +136,18 @@
 
     "title_challenge_time": "⏱️ Challenge: Beat the clock",
     "body_challenge_time": "Can you beat the time?",
-    "alert_challenge_time": "Try to complete the route within the estimated time. Can you beat the clock?"
+    "alert_challenge_time": "Try to complete the route within the estimated time. Can you beat the clock?",
+
+    "connect_label": "Connect",
+    "scan_qr_code_label": "Scan with your phone",
+    "qr_generated_label": "QR Generation",
+    "new_qr_label": "New QR",
+
+    "language_label": "Language",
+    "home_label": "Home",
+    "u_label": "User",
+
+    "follower_label": "Follower",
+    "following_label": "Following",
+    "logout_label": "Logout"
 }

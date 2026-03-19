@@ -9,7 +9,6 @@ import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
-import '../../service/permission.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CompassAltitudePage extends StatefulWidget {
@@ -19,7 +18,8 @@ class CompassAltitudePage extends StatefulWidget {
   State<CompassAltitudePage> createState() => _CompassAltitudePageState();
 }
 
-class _CompassAltitudePageState extends State<CompassAltitudePage> {
+/*class _CompassAltitudePageState extends State<CompassAltitudePage> {*/
+class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsBindingObserver {
   StreamSubscription<Position>? _positionSub;
 
   double? _altitude;
@@ -27,11 +27,11 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
   String? _error;
   bool _isChecking = true;
 
-  @override
+  /*@override
   void initState() {
     super.initState();
     _initLocation();
-  }
+  }*/
 
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
@@ -39,7 +39,34 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
     fontStyle: FontStyle.italic,
   );
 
-  Future<void> _initLocation() async {
+  @override
+  void initState() {
+    super.initState();
+    // 1. Registra l'observer per sentire quando l'app torna in primo piano
+    WidgetsBinding.instance.addObserver(this); 
+    _initLocation();
+  }
+
+  @override
+  void dispose() {
+    // 2. Rimuovi l'observer e cancella lo stream per evitare memory leak
+    WidgetsBinding.instance.removeObserver(this); 
+    _positionSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 3. Se l'utente torna nell'app (es. dopo aver cambiato i permessi nelle impostazioni)
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _isChecking = true;
+      });
+      _initLocation();
+    }
+  }
+
+  /*Future<void> _initLocation() async {
     await PermissionService.askPermissionsOnce();
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -80,13 +107,53 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
         _isChecking = false;
       });
     });
+  }*/
+
+  Future<void> _initLocation() async {
+    // Controlliamo lo stato attuale senza mostrare pop-up (gestiti all'avvio dell'app)
+    PermissionStatus status = await Permission.location.status;
+
+    if (status.isGranted) {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          setState(() {
+            _error = "GPS_DISABLED";
+            _isChecking = false;
+          });
+        }
+        return;
+      }
+
+      // Se tutto ok, avviamo il tracciamento
+      _positionSub?.cancel(); // Cancella eventuali stream precedenti
+      _positionSub = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      ).listen((position) {
+        if (!mounted) return;
+        setState(() {
+          _altitude = position.altitude;
+          _position = position;
+          _error = null;
+          _isChecking = false;
+        });
+      });
+    } else {
+      // Se non abbiamo il permesso, mostriamo lo stato di errore
+      if (mounted) {
+        setState(() {
+          _error = "PERMISSION_DENIED";
+          _isChecking = false;
+        });
+      }
+    }
   }
 
-  @override
+  /*@override
   void dispose() {
     _positionSub?.cancel();
     super.dispose();
-  }
+  }*/
 
   String _direction(double heading) {
     const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -96,12 +163,12 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
 
   Widget _buildErrorState(String errorType, AppLocalizations local) {
     String title = errorType == "GPS_DISABLED"
-        ? "GPS Spento"
-        : "Permesso Negato";
+        ? local.gps_disabled_message
+        : local.permission_denied;
 
     String message = errorType == "GPS_DISABLED"
-        ? "GPS spento"
-        : "Non ho i permessi necessari per poter darti le informazioni";
+        ? local.gps_disabled
+        : local.permission_denied_message;
 
     return Center(
       child: Column(
@@ -126,7 +193,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
             onPressed: () => errorType == "GPS_DISABLED"
                 ? Geolocator.openLocationSettings()
                 : openAppSettings(),
-            child: const Text("Apri Impostazioni"),
+            child: Text(local.open_settings_button),
           ),
         ],
       ),
@@ -272,7 +339,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> {
                                       Text(
                                         _position != null
                                             ? "${_position!.latitude.toStringAsFixed(5)}, ${_position!.longitude.toStringAsFixed(5)}"
-                                            : "Loading coordinates...",
+                                            : local.loading_coordinates,
                                         textAlign: TextAlign.center,
                                       ),
                                     ],

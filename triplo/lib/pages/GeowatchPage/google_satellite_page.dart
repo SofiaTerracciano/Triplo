@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/widgets_for_pages/weather_legend/weather_layer.dart';
 import 'package:triplo/controller/API.dart';
 
@@ -47,11 +48,11 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
   @override
   Widget build(BuildContext context) {
     final legendWidget = _buildLegendWidget();
-
+    final local = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Satellite map with weather layers"),
+        title: Text(local.satellite_weather_layers_title),
         backgroundColor: Colors.green[700],
       ),
       body: Stack(
@@ -147,7 +148,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
           Positioned(
             top: 10,
             right: 10,
-            child: _buildLayerMenu(),
+            child: _buildLayerMenu(context),
           ),
 
           // Legend
@@ -163,7 +164,9 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
     );
   }
 
-  Widget _buildLayerMenu() {
+  Widget _buildLayerMenu(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Card(
       elevation: 4,
       color: Colors.white,
@@ -175,48 +178,48 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Weather Layers",
+            Text(
+              local.weather_layers_label,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(height: 8),
 
-            _buildSwitch("Precipitation", showPrecip, (v) {
+            _buildSwitch(local.layer_precipitation, showPrecip, (v) {
               setState(() {
                 showPrecip = v;
                 if (v) _disableOthers("precip");
               });
             }),
 
-            _buildSwitch("Snow", showSnow, (v) {
+            _buildSwitch(local.layer_snow, showSnow, (v) {
               setState(() {
                 showSnow = v;
                 if (v) _disableOthers("snow");
               });
             }),
 
-            _buildSwitch("Wind", showWind, (v) {
+            _buildSwitch(local.layer_snow, showWind, (v) {
               setState(() {
                 showWind = v;
                 if (v) _disableOthers("wind");
               });
             }),
 
-            _buildSwitch("Clouds", showClouds, (v) {
+            _buildSwitch(local.layer_clouds, showClouds, (v) {
               setState(() {
                 showClouds = v;
                 if (v) _disableOthers("clouds");
               });
             }),
 
-            _buildSwitch("Temperature", showTemp, (v) {
+            _buildSwitch(local.layer_temperature, showTemp, (v) {
               setState(() {
                 showTemp = v;
                 if (v) _disableOthers("temp");
               });
             }),
 
-            _buildSwitch("Pressure", showPressure, (v) {
+            _buildSwitch(local.layer_temperature, showPressure, (v) {
               setState(() {
                 showPressure = v;
                 if (v) _disableOthers("pressure");

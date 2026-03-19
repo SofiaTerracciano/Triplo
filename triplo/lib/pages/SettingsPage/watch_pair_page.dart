@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 
 import '../../controller/user.dart';
 
@@ -18,8 +19,9 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("Scan watch QR")),
+      appBar: AppBar(title: Text(local.scan_qr_label)),
       body: Stack(
         children: [
           MobileScanner(
@@ -43,7 +45,7 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
                 token = pair.token;
               } catch (e) {
                 if (!mounted) return;
-                setState(() => _error = "QR non valido: $e");
+                setState(() => _error = "${local.not_valid_qr_label}: $e");
                 _handled = false;
                 return;
               }
@@ -51,16 +53,16 @@ class _WatchPairScannerPageState extends State<WatchPairScannerPage> {
               final ok = await showDialog<bool>(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: const Text("Connettere l'orologio?"),
+                  title: Text(local.connect_watch_label),
                   content: Text("WatchId:\n$watchId"),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text("Annulla"),
+                      child: Text(local.cancel_button_label),
                     ),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text("Approva"),
+                      child: Text(local.confirm_label),
                     ),
                   ],
                 ),

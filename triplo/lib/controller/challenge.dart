@@ -27,7 +27,7 @@ class ChallengesController extends ChangeNotifier {
   // Getter for all trekkings
   List<Challenges> get allChallenges => _challenges;
 
-  // Load trekkings from Firestore
+  // Load challenges from Firestore
   Future<void> loadChallenges() async {
     if (_loaded) return; // To avoid reloading
     _loaded = true;

@@ -33,7 +33,7 @@ class _UsersListPublicState extends State<UsersListPublic> {
     final userController = context.read<UserController>();
     List<Users> result;
 
-    if (widget.listName == 'Followers') {
+    if (widget.listName == 'Follower') {
       result = await userController.getFollowers(widget.userId);
     } else {
       result = await userController.getFollowing(widget.userId);

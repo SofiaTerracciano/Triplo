@@ -9,7 +9,6 @@ import '../model/user.dart';
 import '../model/diary.dart';
 import '../model/trekking.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -49,8 +48,8 @@ class UserController extends ChangeNotifier {
     return _pairedUid;
   }
 
-  static const _storage = FlutterSecureStorage();
-  static const _watchIdKey = 'watch_id';
+  //static const _storage = FlutterSecureStorage();
+  //static const _watchIdKey = 'watch_id';
 
   String? _watchId;
   String? get watchId => _watchId;

@@ -50,8 +50,8 @@ class _UserPagePublicState extends State<UserPagePublic> {
     }
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("User not found")),
+      return Scaffold(
+        body: Center(child: Text(local.user_not_found)),
       );
     }
 
@@ -190,7 +190,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersListPublic(
-                                      listName: 'Followers',
+                                      listName: local.follower,
                                       userId: u.uid,
                                     ),
                                   ),
@@ -200,7 +200,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                 future: context.read<UserController>().getFollowers(u.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
-                                    label: 'Follower',
+                                    label: local.following,
                                     value: '${snap.data?.length ?? 0}',
                                   );
                                 },
@@ -213,7 +213,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UsersListPublic(
-                                      listName: 'Following',
+                                      listName: local.following,
                                       userId: u.uid,
                                     ),
                                   ),
@@ -223,7 +223,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
                                 future: context.read<UserController>().getFollowing(u.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
-                                    label: 'Following',
+                                    label: local.following,
                                     value: '${snap.data?.length ?? 0}',
                                   );
                                 },

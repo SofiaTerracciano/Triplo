@@ -136,5 +136,18 @@
 
     "title_challenge_time": "⏱️ Sfida: Contro il tempo",
     "body_challenge_time": "Riuscirai a battere il tempo?",
-    "alert_challenge_time": "Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?"
+    "alert_challenge_time": "Prova a completare il percorso entro il tempo stimato. Riuscirai a battere il cronometro?",
+
+    "connect_label": "Connetti",
+    "scan_qr_code_label": "Scansiona con il telefono",
+    "qr_generated_label": "Generazione QR",
+    "new_qr_label": "Nuovo QR",
+
+    "language_label": "Lingua",
+    "home_label": "Home",
+    "u_label": "User",
+
+    "follower_label": "Follower",
+    "following_label": "Following",
+    "logout_label": "Logout"
 }

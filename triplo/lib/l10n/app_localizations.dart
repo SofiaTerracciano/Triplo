@@ -982,6 +982,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try to complete the route within the estimated time. Can you beat the clock?'**
   String get alert_challenge_time;
+
+  /// No description provided for @please_login_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login'**
+  String get please_login_label;
+
+  /// No description provided for @login_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login_button;
+
+  /// No description provided for @google_signin_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get google_signin_button;
+
+  /// No description provided for @no_account_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get no_account_label;
+
+  /// No description provided for @signup_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get signup_label;
+
+  /// No description provided for @forgot_password_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgot_password_label;
+
+  /// No description provided for @fill_fields_login_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill all fields'**
+  String get fill_fields_login_label;
+
+  /// No description provided for @login_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged in'**
+  String get login_success;
+
+  /// No description provided for @login_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed'**
+  String get login_failed;
+
+  /// No description provided for @google_login_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google login failed'**
+  String get google_login_failed;
+
+  /// No description provided for @follower.
+  ///
+  /// In en, this message translates to:
+  /// **'Follower'**
+  String get follower;
+
+  /// No description provided for @following.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get following;
+
+  /// No description provided for @registration_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Register on Triplo'**
+  String get registration_title;
+
+  /// No description provided for @confirm_password_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirm_password_label;
+
+  /// No description provided for @register_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register_button;
+
+  /// No description provided for @back_to_login.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back to login page'**
+  String get back_to_login;
+
+  /// No description provided for @fill_all_fields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in every field'**
+  String get fill_all_fields;
+
+  /// No description provided for @passwords_not_match.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwords_not_match;
+
+  /// No description provided for @registration_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration successful'**
+  String get registration_success;
+
+  /// No description provided for @registration_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration failed'**
+  String get registration_failed;
+
+  /// No description provided for @not_logged_title.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not logged in'**
+  String get not_logged_title;
+
+  /// No description provided for @not_logged_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to access your profile'**
+  String get not_logged_subtitle;
+
+  /// No description provided for @go_to_login_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Login'**
+  String get go_to_login_button;
+
+  /// No description provided for @user_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found'**
+  String get user_not_found;
+
+  /// No description provided for @save_route_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save route'**
+  String get save_route_error;
+
+  /// No description provided for @no_title.
+  ///
+  /// In en, this message translates to:
+  /// **'No title'**
+  String get no_title;
+
+  /// No description provided for @no_description.
+  ///
+  /// In en, this message translates to:
+  /// **'No description'**
+  String get no_description;
+
+  /// No description provided for @restore_google_photo_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Google profile photo'**
+  String get restore_google_photo_label;
+
+  /// No description provided for @scan_qr_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan watch QR'**
+  String get scan_qr_label;
+
+  /// No description provided for @not_valid_qr_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR code'**
+  String get not_valid_qr_label;
+
+  /// No description provided for @connect_watch_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect the watch?'**
+  String get connect_watch_label;
+
+  /// No description provided for @cancel_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel_label;
+
+  /// No description provided for @confirm_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm_label;
+
+  /// No description provided for @diary_not_found.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary not found'**
+  String get diary_not_found;
+
+  /// No description provided for @offline_mode_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline mode'**
+  String get offline_mode_label;
+
+  /// No description provided for @no_internet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get no_internet;
+
+  /// No description provided for @forgot_password_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot your password?'**
+  String get forgot_password_title;
+
+  /// No description provided for @forgot_password_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email below'**
+  String get forgot_password_subtitle;
+
+  /// No description provided for @enter_email_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll send you a link to reset your password'**
+  String get enter_email_prompt;
+
+  /// No description provided for @send_reset_link_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get send_reset_link_button;
+
+  /// No description provided for @email_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email address'**
+  String get email_required;
+
+  /// No description provided for @reset_link_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset link sent! Check your email.'**
+  String get reset_link_sent;
+
+  /// No description provided for @generic_error.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred'**
+  String get generic_error;
+
+  /// No description provided for @satellite_weather_layers_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite map with weather layers'**
+  String get satellite_weather_layers_title;
+
+  /// No description provided for @weather_layers_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather Layers'**
+  String get weather_layers_label;
+
+  /// No description provided for @layer_precipitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Precipitation'**
+  String get layer_precipitation;
+
+  /// No description provided for @layer_snow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get layer_snow;
+
+  /// No description provided for @layer_wind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get layer_wind;
+
+  /// No description provided for @layer_clouds.
+  ///
+  /// In en, this message translates to:
+  /// **'Clouds'**
+  String get layer_clouds;
+
+  /// No description provided for @layer_temperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get layer_temperature;
+
+  /// No description provided for @layer_pressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get layer_pressure;
+
+  /// No description provided for @gps_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS Disabled'**
+  String get gps_disabled;
+
+  /// No description provided for @permission_denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Denied'**
+  String get permission_denied;
+
+  /// No description provided for @gps_disabled_message.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS is turned off'**
+  String get gps_disabled_message;
+
+  /// No description provided for @permission_denied_message.
+  ///
+  /// In en, this message translates to:
+  /// **'I don\'t have the required permissions to provide the information'**
+  String get permission_denied_message;
+
+  /// No description provided for @open_settings_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get open_settings_button;
+
+  /// No description provided for @loading_coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading coordinates...'**
+  String get loading_coordinates;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
