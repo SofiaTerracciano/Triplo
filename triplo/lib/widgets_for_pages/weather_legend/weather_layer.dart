@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:triplo/l10n/app_localizations.dart' show AppLocalizations;
 
 /// This file provides reusable weather layer widgets
 /// for FlutterMap (6.x compatible).
@@ -20,20 +21,14 @@ class WeatherLayer {
     );
   }
 
-
-
-
-
-
-
-
-
   /// Returns a legend widget for the given layer type.
-  static Widget legend(String type) {
+  static Widget legend(String type, BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+    
     switch (type) {
       case "precipitation":
         return _buildGradientLegend(
-          "Precipitation (mm)",
+          "$local.layer_precipitation (mm)",
           [
             Color(0xFFE0F7FA), // quasi bianco
             Color(0xFF1976D2), // blu
@@ -48,7 +43,7 @@ class WeatherLayer {
 
       case "snow":
         return _buildGradientLegend(
-          "Snow (mm)",
+          "$local.layer_snow (mm)",
           [
             Color(0xFFE0F7FA), // quasi bianco
             Color(0xFF81D4FA), // azzurro
@@ -63,7 +58,7 @@ class WeatherLayer {
 
       case "wind":
         return _buildGradientLegend(
-          "Wind (m/s)",
+          "$local.layer_wind (m/s)",
           [
             Color(0xFF0D47A1), // blu scuro
             Color(0xFF1976D2), // blu
@@ -77,7 +72,7 @@ class WeatherLayer {
 
       case "temp":
         return _buildGradientLegend(
-          "Temperature (°C)",
+          "$local.layer_temperature (°C)",
           [
             Color(0xFF0D47A1), // molto freddo
             Color(0xFF1976D2), // freddo
@@ -91,7 +86,7 @@ class WeatherLayer {
 
       case "clouds":
         return _buildGradientLegend(
-          "Cloud Coverage (%)",
+          "$local.layer_clouds (%)",
           [
             Color.fromARGB(0, 255, 255, 255),
             Color.fromARGB(80, 255, 255, 255),
@@ -103,7 +98,7 @@ class WeatherLayer {
 
       case "pressure":
         return _buildGradientLegend(
-          "Pressure (Pa)",
+          "$local.layer_pressure (Pa)",
           [
             Color(0xFF2C7BB6),
             Color(0xFFABD9E9),

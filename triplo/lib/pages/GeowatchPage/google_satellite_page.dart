@@ -255,12 +255,12 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
   }
 
   Widget? _buildLegendWidget() {
-    if (showPrecip) return WeatherLayer.legend("precipitation");
-    if (showSnow) return WeatherLayer.legend("snow");
-    if (showWind) return WeatherLayer.legend("wind");
-    if (showTemp) return WeatherLayer.legend("temp");
-    if (showClouds) return WeatherLayer.legend("clouds");
-    if (showPressure) return WeatherLayer.legend("pressure");
+    if (showPrecip) return WeatherLayer.legend("precipitation", context);
+    if (showSnow) return WeatherLayer.legend("snow", context);
+    if (showWind) return WeatherLayer.legend("wind", context);
+    if (showTemp) return WeatherLayer.legend("temp", context);
+    if (showClouds) return WeatherLayer.legend("clouds", context);
+    if (showPressure) return WeatherLayer.legend("pressure", context);
     return null;
   }
 }
