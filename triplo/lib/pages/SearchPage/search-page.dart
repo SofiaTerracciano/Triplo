@@ -561,14 +561,29 @@ class _SearchPageState extends State<SearchPage>
         itemBuilder: (context, index) {
           final trekking = _trekkingResults[index];
           return ListTile(
-            leading: const Icon(Icons.terrain), 
+            leading: Icon(
+              Icons.terrain, 
+              color: trekking.difficulty_level == "easy"
+                  ? Colors.lightBlue
+                  : trekking.difficulty_level == "intermediate"
+                      ? Colors.red
+                      : const Color.fromARGB(255, 135, 1, 162)),
             title: Text(trekking.name),
             subtitle: Text(
               trekking.difficulty_level == "easy"
                   ? local.beginner_level
                   : trekking.difficulty_level == "intermediate"
                       ? local.intermediate_level
-                      : local.advanced_level
+                      : local.advanced_level,
+              style: TextStyle(
+                color: (trekking.difficulty_level == "easy"
+                    ? Colors.lightBlue
+                    : trekking.difficulty_level == "intermediate"
+                        ? Colors.red
+                        : const Color.fromARGB(255, 135, 1, 162))
+                    .withOpacity(0.7), 
+                fontSize: 14,
+              ),
             ),
             onTap: () {
               Navigator.push(
