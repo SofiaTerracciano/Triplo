@@ -39,7 +39,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get private_trekking_label => 'Privati';
 
   @override
-  String get share_profile_button_label => 'Condividi Profilo';
+  String get share_profile_button_label => 'Condividi';
 
   @override
   String get watch_profile_dialog_level => 'Guarda il mio profilo su Triplo!';

@@ -368,7 +368,7 @@ class _SearchPageState extends State<SearchPage>
     try {
       if (_searchMode == SearchMode.users) {
         _userResults = await userController.searchUsers(query);
-      } else {
+      } else if (_searchMode == SearchMode.trekking) {
         _trekkingResults =
         await trekkingController.searchTrekking(query);
       }

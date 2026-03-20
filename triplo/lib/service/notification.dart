@@ -35,6 +35,15 @@ class NotificationService {
         _handleNotificationTap(response.payload ?? "");
       },
     );
+
+    await _notifications
+      .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
   }
 
   // Tutta la logica del tap sulla notifica è qui dentro

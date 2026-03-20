@@ -99,15 +99,34 @@ class TrekkingController extends ChangeNotifier {
 
     final List<Trekking> results = [];
 
+    // Funzione che serve a cercare su firestore nel caso non sia accora avventa la laod dei trekking
+    // altrimenti cerca nella lista dei trekking già scaricati 
     for (var d in snap.docs) {
       final trekkingId = d["Trekking_id"] as String;
-      print(trekkingId);
-      final trekking = getTrekkingById(trekkingId);
-      if (trekking != null) results.add(trekking);
+      
+      // 1. Prova a cercarlo nella lista locale (veloce)
+      var trekking = getTrekkingById(trekkingId);
+      
+      // 2. Se non c'è in locale, caricalo da Firestore (sicuro)
+      if (trekking == null) {
+        trekking = await fetchTrekkingById(trekkingId);
+      }
+
+      if (trekking != null) {
+        results.add(trekking);
+      }
     }
 
-    print(results);
     return results;
+
+    /*for (var d in snap.docs) {
+      final trekkingId = d["Trekking_id"] as String;
+      final trekking = await getTrekkingById(trekkingId);
+      if (trekking != null) 
+        results.add(trekking);
+    }
+
+    return results;*/
   }
 
   Future<Trekking?> fetchTrekkingById(String id) async {
