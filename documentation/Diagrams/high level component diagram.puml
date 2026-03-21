@@ -58,7 +58,7 @@ LoginSmartwatchGUI -down- WatchApp
 '========================
 ' Firebase as backend
 '========================
-database "Firebase" as FirebasePkg {
+package "Firebase" as FirebasePkg {
   component "Firebase Authentication" as FirebaseAuth
   database "Firestore" as Firestore
   database "Firebase Storage" as FirebaseStorage
@@ -189,10 +189,10 @@ WatchApp --( MapAPI
 
 
 
-component SmartphoneOS
-component WatchOS
+component "    <<platform>>\n Smartphone OS" as SmartphoneOS
+component "<<platform>>\n WatchOS" as WatchOS
 
-interface SmartphoneOSAPI
+interface PhoneOSAPI
 interface WatchOSAPI
 
 
@@ -201,8 +201,8 @@ interface WatchOSAPI
 
 
 
-SmartphoneApp -left-( SmartphoneOSAPI
-SmartphoneOSAPI -left- SmartphoneOS
+SmartphoneApp -left-( PhoneOSAPI
+PhoneOSAPI -left- SmartphoneOS
 WatchApp -right-( WatchOSAPI
 WatchOSAPI -right- WatchOS
 @enduml
