@@ -63,7 +63,7 @@ class AuthService extends ChangeNotifier {
 
     await loadUserCore(cred.user!.uid);
   }
-
+  /*
   Future<void> loginWithGoogle() async {
     final googleSignIn = GoogleSignIn();
 
@@ -105,8 +105,82 @@ class AuthService extends ChangeNotifier {
       rethrow;
     }
   }
+   */
 
-  Future<void> logout() async {
+
+  Future<void> loginWithGoogle() async {
+    final googleSignIn = GoogleSignIn(
+      scopes: ['email'],
+    );
+
+    try {
+      debugPrint("AuthService: Google login start");
+
+      debugPrint("AuthService: calling googleSignIn.signOut()");
+      await googleSignIn.signOut();
+      debugPrint("AuthService: signOut completed");
+
+      // Per ora toglierei disconnect, per non complicare il test
+      // try {
+      //   debugPrint("AuthService: calling googleSignIn.disconnect()");
+      //   await googleSignIn.disconnect();
+      //   debugPrint("AuthService: disconnect completed");
+      // } catch (e) {
+      //   debugPrint("AuthService: disconnect skipped/failed: $e");
+      // }
+
+      debugPrint("AuthService: opening Google account picker");
+      final googleUser = await googleSignIn.signIn();
+
+      debugPrint("AuthService: signIn() returned");
+      if (googleUser == null) {
+        debugPrint("AuthService: Google sign-in cancelled by user");
+        throw Exception("Google sign-in cancelled");
+      }
+
+      debugPrint("AuthService: selected Google account = ${googleUser.email}");
+
+      debugPrint("AuthService: requesting Google authentication tokens");
+      final googleAuth = await googleUser.authentication;
+      debugPrint("AuthService: tokens received");
+      debugPrint("AuthService: accessToken null? ${googleAuth.accessToken == null}");
+      debugPrint("AuthService: idToken null? ${googleAuth.idToken == null}");
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      debugPrint("AuthService: Firebase credential created");
+
+      debugPrint("AuthService: calling FirebaseAuth.signInWithCredential()");
+      final cred = await _auth.signInWithCredential(credential);
+      debugPrint("AuthService: Firebase signInWithCredential completed");
+
+      final user = cred.user;
+      debugPrint("AuthService: Firebase user uid = ${user?.uid}");
+      debugPrint("AuthService: Firebase user email = ${user?.email}");
+
+      if (user == null) {
+        throw StateError("Firebase user is null after Google sign-in");
+      }
+
+      debugPrint("AuthService: ensuring Firestore docs");
+      await _ensureUserFirestoreDocs(user);
+      debugPrint("AuthService: Firestore docs ensured");
+
+      debugPrint("AuthService: loading user core");
+      await loadUserCore(user.uid);
+      debugPrint("AuthService: loadUserCore completed");
+    } catch (e, st) {
+      debugPrint("AuthService: Google login failed");
+      debugPrint("AuthService ERROR: $e");
+      debugPrintStack(stackTrace: st);
+      rethrow;
+    }
+  }
+
+
+    Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
     notifyListeners();

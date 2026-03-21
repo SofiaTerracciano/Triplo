@@ -43,9 +43,23 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> loginWithGoogle() async {
-    await _authService.loginWithGoogle();
-    _currentUser = _authService.currentUser;
-    notifyListeners();
+    debugPrint("UserController: loginWithGoogle() start");
+
+    try {
+      await _authService.loginWithGoogle();
+      debugPrint("UserController: AuthService.loginWithGoogle() completed");
+
+      _currentUser = _authService.currentUser;
+      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}");
+
+      notifyListeners();
+      debugPrint("UserController: notifyListeners() called");
+    } catch (e, st) {
+      debugPrint("UserController: loginWithGoogle() failed");
+      debugPrint("UserController ERROR: $e");
+      debugPrintStack(stackTrace: st);
+      rethrow;
+    }
   }
 
   Future<void> logout() async {

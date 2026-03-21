@@ -108,11 +108,15 @@ class _LoginPageState extends State<LoginPage> {
    */
   Future<void> _loginGoogle(BuildContext context) async {
     final controller = context.read<UserController>();
-    final local = AppLocalizations.of(context)!;
 
+    debugPrint("UI: Google login button pressed");
 
     try {
+      debugPrint("UI: calling UserController.loginWithGoogle()");
       await controller.loginWithGoogle();
+      debugPrint("UI: UserController.loginWithGoogle() completed");
+
+      debugPrint("UI: currentUser after Google login = ${controller.currentUser?.uid}");
 
       Navigator.pushReplacement(
         context,
@@ -120,9 +124,16 @@ class _LoginPageState extends State<LoginPage> {
           builder: (_) => UserPage(),
         ),
       );
-    } catch (e) {
+
+      debugPrint("UI: navigation to UserPage completed");
+    } catch (e, st) {
+      debugPrint("UI: Google login failed");
+      debugPrint("UI ERROR: $e");
+      debugPrintStack(stackTrace: st);
+
+      final local = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$local.google_login_failed $e")),
+        SnackBar(content: Text("${local.google_login_failed}: $e")),
       );
     }
   }
