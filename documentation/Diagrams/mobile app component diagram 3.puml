@@ -1,0 +1,351 @@
+@startuml
+title Triplo Application Smartphone App - Component Diagram
+top to bottom direction
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor transparent
+  FontColor transparent
+}
+
+
+
+
+
+component "Mobile Triplo Application" {
+
+  
+  portout p1
+  portout p2
+  'portout p3
+  
+  portout pgoogleauth
+  portout pfirebaseauth
+  portout pfirebasefirestore
+
+
+  portout pfirebasestorage
+
+'portout p36
+'portout p37
+'portout p38
+
+
+
+
+
+
+
+
+
+
+
+ 'portout pe1
+  'portout pe2
+  'portout pOS
+  
+  
+
+
+
+
+'portout pe6
+'portout pe7
+'portout pe8
+
+
+}
+  
+
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+
+database "Firebase Backend" as Backend
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+component "                  <<platform>> \n                   MobileOS\n GPS, sensors, file system, storage" as OS
+
+
+
+
+
+
+
+
+
+
+
+
+'() "HomeGUI"
+'() "SearchGUI"
+'() "RideSummaryReviewGUI"
+'() "UserProfileGUI"
+'() "LoginRegistrationGUI"
+
+
+
+
+
+
+'UserController -down- p2
+' View → Controller
+'[HomePage] -down-> [BikePathController]
+'[SearchPage] -down-> [BikePathController]
+'[RideSummaryReviewUI] -down-> [ReviewController]
+'[UserProfilePage] -down-> [UserController]
+'[LoginRegistrationPage] -down-> [UserController]
+
+' Controller → Model
+'[BikePathController] -down-> [BikePathModel]
+'[tripController] -down-> [tripModel]
+'[ReviewController] -down-> [ReviewModel]
+'[UserController] -down-> [UserModel]
+
+
+
+
+
+' Controller → Backend
+'[BikePathController] -right-> [BackendAPIHandler]
+'[tripController] -right-> [BackendAPIHandler]
+'[ReviewController] -right-> [BackendAPIHandler]
+'[UserController] -right-> [BackendAPIHandler]
+' Controller → OS
+'[tripController] -right-> [OSAPIHandler]
+'[ReviewController] -right-> [OSAPIHandler]
+
+
+
+
+' Controller → External Auth
+'[UserController] -right-> [ExternalAuthAPIHandler]
+
+
+
+
+'"HomeGUI" -[hidden]-> "SearchGUI"
+'"SearchGUI" -[hidden]-> "RideSummaryReviewGUI"
+'"RideSummaryReviewGUI" -[hidden]-> "LoginRegistrationGUI"
+'"LoginRegistrationGUI" -[hidden]-> "UserProfileGUI"
+
+
+
+
+
+
+
+
+
+
+'"User Interface (External)" -[hidden]-> "Mobile App (Triplo Application)"
+
+
+
+'interface bgwi
+'UserController --( bgwi
+'bgwi -- BackendAPIHandler
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+interface FirebaseAuth
+pfirebaseauth --( FirebaseAuth
+FirebaseAuth -- Backend
+
+
+
+'interface external_API
+'p2 --( external_API
+
+
+
+
+
+
+
+
+
+
+interface OS_API
+p1 --( OS_API
+OS_API -- OS
+
+
+
+
+
+interface FirebaseFirestore
+pfirebasefirestore --( FirebaseFirestore
+FirebaseFirestore -- Backend
+
+'FirebaseAuth -[hidden]- OS
+
+
+
+
+
+
+interface FirebaseStorage
+pfirebasestorage --( FirebaseStorage
+FirebaseStorage -- Backend
+
+
+
+
+
+cloud Google{
+  [google.com]
+}
+
+
+
+
+
+
+
+
+
+interface https
+p2 --( https
+https -- Google
+
+
+
+
+
+
+
+
+'UserController -- p1
+'UserController -- p36
+'UserController -- p38
+'APIController -- p36
+'APIController -- p37
+'APIController -- p38
+
+
+
+
+
+
+
+'HomeGUI -[hidden]-> SearchGUI
+'SearchGUI -[hidden]-> RideSummaryReviewGUI
+'RideSummaryReviewGUI -[hidden]-> UserProfileGUI
+'UserProfileGUI -[hidden]-> LoginRegistrationGUI
+
+package "External Services" as externalservices{
+  component "OpenTopoMap" as OpenTopoMap
+  component "Google Satellite View" as GSW
+  component "OpenWeather" as OpenWeather
+  component "Weatherbit" as Weatherbit
+  component "External Auth Provider (Google)" as GoogleAuth
+    component "Demo Meteo Server" as DemoMeteoServer
+}
+'APIController -down- p2
+'pe1 -down- OpenTopoMap
+
+'APIController -down- pe2
+'pe2 -down- GSW
+
+'APIController -down- pe3
+'pe3 -down- OpenWeather
+
+
+
+
+'APIController -down- pe6
+'pe6 -down- Weatherbit
+
+'APIController -down- pe7
+'pe7 -down- DemoMeteoServer
+
+
+
+'APIController -down- pe8
+'pe8 -down- GoogleAuth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'external_API -- GoogleAuth
+
+interface MapAPI 
+interface ExternalAuthAPI
+interface WeatherAPI 
+
+interface WeatherAlertAPI
+
+
+p2 --( MapAPI 
+pgoogleauth --( ExternalAuthAPI
+
+interface SatelliteAPI
+
+'OS -[hidden]right- externalservices
+'OS -[hidden]- Google
+'OS -[hidden]down- lib
+
+p2 --( WeatherAPI
+p2 --( WeatherAlertAPI
+p2 --( SatelliteAPI
+MapAPI -- OpenTopoMap
+ExternalAuthAPI -- GoogleAuth
+WeatherAPI -- OpenWeather
+WeatherAlertAPI -- Weatherbit
+SatelliteAPI -- GSW
+
+
+
+
+WeatherAlertAPI -- DemoMeteoServer
+
+interface token_verification_API
+Backend --( token_verification_API
+token_verification_API -- GoogleAuth
+
+
+
+@enduml

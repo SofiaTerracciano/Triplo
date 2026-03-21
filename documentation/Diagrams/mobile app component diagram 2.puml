@@ -29,14 +29,16 @@ rectangle  {
 component "Mobile Triplo Application" {
 
   
-  'portout p1
+  portout p1
   portout p2
-  portout p3
+  'portout p3
   
-  portout pgoogle
+  portout pgoogleauth
+  portout pfirebaseauth
+  portout pfirebasefirestore
 
 
-
+  portout pfirebasestorage
 
 'portout p36
 'portout p37
@@ -149,7 +151,7 @@ component "Mobile Triplo Application" {
 
 
 
-rectangle "Prova" {
+'rectangle "Prova" {
    
   package "Model" #a62b22ff{
     [DiaryModel]
@@ -158,10 +160,10 @@ rectangle "Prova" {
     [challengeModel]
   }
   
-  portout p1
+  'portout p1
   '[OSservice]
   'interface lib_i
-}
+'}
 
 package "OSservice" {
   [memoryservice]
@@ -342,8 +344,10 @@ lib -- p1
 
 
 
-domaincontroller -- p3
 
+'domaincontroller -- p3
+domaincontroller -- pfirebasefirestore
+domaincontroller -- pfirebasestorage
 
 
 'interface lib_i
@@ -362,8 +366,8 @@ domaincontroller -- p3
  interface authservice_i
  UserController --( authservice_i
  authservice_i -- authservice
- authservice -- pgoogle
-authservice -- p3
+ authservice -- pgoogleauth
+authservice -- pfirebaseauth
 
 'interface lib_i
 'OSservice --( lib_i
@@ -376,7 +380,7 @@ authservice -- p3
 }
 
 
-Model -[hidden] authservice_i
+'Model -[hidden] authservice_i
 'UserController --( osservice_i
 'trekkingController --( osservice_i
 APIController -- p2
@@ -438,7 +442,6 @@ APIController -- p2
 
 
 
-database "Firebase Backend" as Backend
 
 
 
@@ -455,7 +458,8 @@ database "Firebase Backend" as Backend
 
 
 
-component "                  <<platform>> \n                   MobileOS\n GPS, sensors, file system, storage" as OS
+
+
 
 
 
@@ -587,9 +591,7 @@ p7 -up- DiaryGUI
 
 
 
-interface FirebaseAuth
-p3 --( FirebaseAuth
-FirebaseAuth -- Backend
+
 
 
 
@@ -605,32 +607,25 @@ FirebaseAuth -- Backend
 
 
 
-interface OS_API
-p1 --( OS_API
-OS_API -- OS
 
 
 
 
 
-interface FirebaseFirestore
-p3 --( FirebaseFirestore
-FirebaseFirestore -- Backend
-
-'FirebaseAuth -[hidden]- OS
-
-
-interface FirebaseStorage
-p3 --( FirebaseStorage
-FirebaseStorage -- Backend
 
 
 
 
 
-cloud Google{
-  [google.com]
-}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -640,9 +635,7 @@ cloud Google{
 
 internetservice -[#green]-( api_i
 
-interface https
-p2 --( https
-https -- Google
+
 
 
 
@@ -669,14 +662,7 @@ https -- Google
 'RideSummaryReviewGUI -[hidden]-> UserProfileGUI
 'UserProfileGUI -[hidden]-> LoginRegistrationGUI
 
-package "External Services" as externalservices{
-  component "OpenTopoMap" as OpenTopoMap
-  component "Google Satellite View" as GSW
-  component "OpenWeather" as OpenWeather
-  component "Weatherbit" as Weatherbit
-  component "External Auth Provider (Google)" as GoogleAuth
-    component "Demo Meteo Server" as DemoMeteoServer
-}
+
 'APIController -down- p2
 'pe1 -down- OpenTopoMap
 
@@ -715,39 +701,14 @@ package "External Services" as externalservices{
 
 'external_API -- GoogleAuth
 
-interface MapAPI 
-interface ExternalAuthAPI
-interface WeatherAPI 
-
-interface WeatherAlertAPI
-
-
-p2 --( MapAPI 
-pgoogle --( ExternalAuthAPI
-
-interface SatelliteAPI
-
-OS -[hidden]right- externalservices
-OS -[hidden]- Google
-OS -[hidden]down- lib
-
-p2 --( WeatherAPI
-p2 --( WeatherAlertAPI
-p2 --( SatelliteAPI
-MapAPI -- OpenTopoMap
-ExternalAuthAPI -- GoogleAuth
-WeatherAPI -- OpenWeather
-WeatherAlertAPI -- Weatherbit
-SatelliteAPI -- GSW
 
 
 
 
-WeatherAlertAPI -- DemoMeteoServer
 
-interface token_verification_API
-Backend --( token_verification_API
-token_verification_API -- GoogleAuth
+
+
+
 
 
 

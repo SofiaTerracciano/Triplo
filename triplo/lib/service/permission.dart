@@ -23,7 +23,7 @@ class PermissionService {
     if (status.isGranted) {
       // Nota: su Android questo potrebbe mandare l'utente in una pagina 
       // di impostazioni invece di mostrare un pop-up. 
-      // Se vuoi essere super "soft", puoi anche commentare la riga sotto.
+
       await Permission.locationAlways.request();
     }
 

@@ -17,7 +17,7 @@ class TrekkingController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Trekking> _trekkings;
   bool _loaded = false;
-
+  //geo non è usato nel codice ma solo nel costruttore, va lasciato?
   GeoService geo;
   MemoryService memory;
   NotificationService notification;
@@ -195,7 +195,7 @@ class TrekkingController extends ChangeNotifier {
         cacheableUrl = await ref.getDownloadURL();
       }
 
-      // 2. ERRORE QUI: getImageFromCache -> DIVENTA -> getImageFromDisk
+
       final cached = await memory.getImageFromDisk(cacheableUrl); 
       if (cached != null) {
         debugPrint("Image found in disk cache");
@@ -205,7 +205,7 @@ class TrekkingController extends ChangeNotifier {
 
       debugPrint("Image not in cache, downloading");
       
-      // 3. ERRORE QUI: cacheImage -> DIVENTA -> cacheImageOnDisk
+
       final file = await memory.cacheImageOnDisk(cacheableUrl); 
       memory.saveImageToMemory(imagePath, file);
       return file;

@@ -14,8 +14,11 @@ class API {
   late final String openWeatherKey;
   late final String weatherbitKey;
 
+
+  //memory è usato solo nel costruttore, va lasciato?
   MemoryService memory;
   GeoService geo;
+  //permission è usato nel metodo initPermissions che non è mai usato, va lasciato?
   late PermissionService permission;
 
   // Constructor to load API keys from .env
@@ -32,6 +35,7 @@ class API {
     }
   }
 
+  //metodo che non è mai usato, va lasciato?
   // Se ti serve chiamare i permessi dall'API, fai così:
   Future<void> initPermissions() async {
     await PermissionService.askPermissionsOnce();
@@ -139,6 +143,7 @@ class API {
   }
 
 
+  //metodo che non è mai usato, vedo se eliminarlo
   /// Extract weather information from a weather response
   Map<String, dynamic> parseWeather(Map<String, dynamic> raw) {
     return {
