@@ -7,7 +7,7 @@ import '../service/notification.dart';
 import '../service/memory.dart';
 // Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
-  // Aggiungi queste variabili che riceverai nel costruttore
+
   final NotificationService notification;
   final MemoryService memory;
 

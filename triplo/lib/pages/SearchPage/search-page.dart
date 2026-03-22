@@ -510,7 +510,16 @@ class _SearchPageState extends State<SearchPage>
 
     if (_searchController.text.isEmpty) {
       if (randomDiaries.isEmpty) {
-        return Center(child: Text(local.no_friends));
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text(
+              local.no_friends,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ),
+        );
       }
       return _buildRandomDiaryGrid();
     }
