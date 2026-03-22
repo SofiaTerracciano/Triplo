@@ -4,6 +4,7 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
+import '../../exception/change_email_exception.dart';
 import '../HomePage/home-page.dart';
 import '../UserProfilePage/user-page.dart';
 import '../SearchPage/search-page.dart';
@@ -12,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:provider/provider.dart';
+
 
 class SettingPage extends StatefulWidget {
   SettingPage({super.key});
@@ -27,6 +29,19 @@ class _SettingPageState extends State<SettingPage> {
     fontStyle: FontStyle.italic,
   );
 
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await context.read<UserController>().refreshEmailFromAuth();
+      } catch (_) {
+
+      }
+    });
+  }
+  bool _emailChangeRequested = false;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
@@ -42,6 +57,7 @@ class _SettingPageState extends State<SettingPage> {
     fontSize: 14,
     color: Color.fromARGB(255, 72, 72, 72),
   );
+
 
   final ImagePicker _picker = ImagePicker();
 
@@ -224,11 +240,59 @@ class _SettingPageState extends State<SettingPage> {
             ListTile(
               title: Text(local.email_label, style: titleStyle),
               subtitle: Text(user.email, style: infoStyle),
+              trailing: const Icon(Icons.edit, size: 17),
               dense: true,
-              onTap: () {
-                // TODO: modifica email
+              onTap: () async {
+                if (context.read<UserController>().isGoogleUser) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Per gli account Google l'email è gestita dal provider di accesso."),
+                    ),
+                  );
+                  return;
+                }
+
+                await _showChangeEmailDialog();
               },
             ),
+
+            if (context.watch<UserController>().isPasswordUser && _emailChangeRequested)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.login),
+                  label: const Text("Sign in again with the new email"),
+                  onPressed: () async {
+                    await context.read<UserController>().logout();
+                    if (!context.mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                          (route) => false,
+                    );
+                  },
+                ),
+              ),
+
+            //const SizedBox(height: 6),
+
+            if (context.watch<UserController>().isPasswordUser && _emailChangeRequested)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.login),
+                  label: const Text("Sign in again with the new email"),
+                  onPressed: () async {
+                    await context.read<UserController>().logout();
+                    if (!context.mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                          (route) => false,
+                    );
+                  },
+                ),
+              ),
 
             const Divider(height: 1),
             ListTile(
@@ -260,11 +324,11 @@ class _SettingPageState extends State<SettingPage> {
               ),
 
               const SizedBox(height: 8),
-
-              Text(
-                local.password_message_label,
-                style: TextStyle(fontSize: 13, color: Colors.black54),
-              ),
+              //
+              //Text(
+              //  local.password_message_label,
+              //  style: TextStyle(fontSize: 13, color: Colors.black54),
+              //),
 
               const SizedBox(height: 12),
 
@@ -442,6 +506,120 @@ class _SettingPageState extends State<SettingPage> {
     );
     if (picked == null) return;
     await userController.updateBirthdate(picked);
+  }
+
+  Future<void> _showChangeEmailDialog() async {
+    final local = AppLocalizations.of(context)!;
+    final userController = context.read<UserController>();
+
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
+    bool obscure = true;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(local.email_label),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: "Nuova email",
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: obscure,
+                    decoration: InputDecoration(
+                      labelText: "Password attuale",
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscure ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            obscure = !obscure;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(local.cancel_button_label),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newEmail = emailController.text.trim();
+                    final currentPassword = passwordController.text.trim();
+
+                    if (newEmail.isEmpty || currentPassword.isEmpty) {
+                      return;
+                    }
+
+
+                    try {
+                      await userController.changeEmail(
+                        newEmail: newEmail,
+                        currentPassword: currentPassword,
+                      );
+
+                      if (!mounted) return;
+                      setState(() {
+                        _emailChangeRequested = true;
+                      });
+
+                      if (!dialogContext.mounted) return;
+                      Navigator.pop(dialogContext);
+
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Ti abbiamo inviato un link di conferma alla nuova email. Dopo averla confermata, accedi di nuovo con la nuova email.",
+                          ),
+                        ),
+                      );
+                    } on ChangeEmailException catch (e) {
+                      String msg = "Errore durante il cambio email";
+
+                      if (e.code == "wrong-password") {
+                        msg = "La password attuale non è corretta";
+                      } else if (e.code == "email-already-in-use") {
+                        msg = "Questa email è già in uso";
+                      } else if (e.code == "invalid-email") {
+                        msg = "L'indirizzo email non è valido";
+                      } else if (e.code == "requires-recent-login") {
+                        msg = "Devi autenticarti di nuovo prima di cambiare email";
+                      } else if (e.code == "not-authenticated") {
+                        msg = "Nessun utente autenticato";
+                      }
+
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(msg)),
+                      );
+                    }
+                  },
+                  child: Text(local.save_trekking_button_label),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }
 

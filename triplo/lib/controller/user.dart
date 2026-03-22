@@ -26,24 +26,45 @@ class UserController extends ChangeNotifier {
   Users? _currentUser;
   Users? get currentUser => _currentUser;
 
+
+  bool _isLoading = true;
+  bool get isLoading => _isLoading;
+
   /* --------------------------------------------------
    * AUTH
    * -------------------------------------------------- */
 
   Future<void> register(String email, String password) async {
-    await _authService.register(email, password);
-    _currentUser = _authService.currentUser;
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      await _authService.register(email, password);
+      _currentUser = _authService.currentUser;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> login(String email, String password) async {
-    await _authService.login(email, password);
-    _currentUser = _authService.currentUser;
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      await _authService.login(email, password);
+      _currentUser = _authService.currentUser;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> loginWithGoogle() async {
     debugPrint("UserController: loginWithGoogle() start");
+
+    _isLoading = true;
+    notifyListeners();
 
     try {
       await _authService.loginWithGoogle();
@@ -52,20 +73,29 @@ class UserController extends ChangeNotifier {
       _currentUser = _authService.currentUser;
       debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}");
 
-      notifyListeners();
       debugPrint("UserController: notifyListeners() called");
     } catch (e, st) {
       debugPrint("UserController: loginWithGoogle() failed");
       debugPrint("UserController ERROR: $e");
       debugPrintStack(stackTrace: st);
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<void> logout() async {
-    await _authService.logout();
-    _currentUser = null;
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      await _authService.logout();
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   /* --------------------------------------------------
@@ -328,12 +358,23 @@ class UserController extends ChangeNotifier {
 
 
   Future<void> tryAutoLogin() async {
-    final user = _auth.currentUser;
+    _isLoading = true;
+    notifyListeners();
 
-    if (user != null) {
-      await loadUserCore(user.uid);
+    try {
+      final user = _auth.currentUser;
+
+      if (user != null) {
+        await loadUserCore(user.uid);
+      } else {
+        _currentUser = null;
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
+
 
   Future<void> _ensureUserFirestoreDocs(User user) async {
     final uid = user.uid;
@@ -401,4 +442,24 @@ class UserController extends ChangeNotifier {
       token: token,
     );
   }
+
+
+
+  Future<void> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  }) async {
+    await _authService.changeEmail(
+      newEmail: newEmail,
+      currentPassword: currentPassword,
+    );
+  }
+
+  Future<void> refreshEmailFromAuth() async {
+    await _authService.refreshEmailFromAuth();
+    _currentUser = _authService.currentUser;
+    notifyListeners();
+  }
+
+
 }

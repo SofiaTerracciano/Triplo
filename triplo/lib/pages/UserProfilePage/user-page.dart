@@ -94,6 +94,19 @@ class _UserPageState extends State<UserPage> {
     final userController = context.watch<UserController>();
     final user = userController.currentUser;
 
+
+
+
+
+    if (userController.isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+
     if (user == null) {
       return Scaffold(
         body: Center(

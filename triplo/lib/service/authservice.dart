@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../exception/change_email_exception.dart';
 import '../model/user.dart';
 
 class AuthService extends ChangeNotifier {
@@ -10,6 +11,7 @@ class AuthService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Users? _currentUser;
+
   Users? get currentUser => _currentUser;
 
   /* --------------------------------------------------
@@ -63,6 +65,7 @@ class AuthService extends ChangeNotifier {
 
     await loadUserCore(cred.user!.uid);
   }
+
   /*
   Future<void> loginWithGoogle() async {
     final googleSignIn = GoogleSignIn();
@@ -143,7 +146,8 @@ class AuthService extends ChangeNotifier {
       debugPrint("AuthService: requesting Google authentication tokens");
       final googleAuth = await googleUser.authentication;
       debugPrint("AuthService: tokens received");
-      debugPrint("AuthService: accessToken null? ${googleAuth.accessToken == null}");
+      debugPrint(
+          "AuthService: accessToken null? ${googleAuth.accessToken == null}");
       debugPrint("AuthService: idToken null? ${googleAuth.idToken == null}");
 
       final credential = GoogleAuthProvider.credential(
@@ -180,7 +184,7 @@ class AuthService extends ChangeNotifier {
   }
 
 
-    Future<void> logout() async {
+  Future<void> logout() async {
     await _auth.signOut();
     _currentUser = null;
     notifyListeners();
@@ -277,8 +281,13 @@ class AuthService extends ChangeNotifier {
     final photoUrl = user.photoURL ?? "";
 
     String username;
-    if (displayName.trim().isNotEmpty) {
-      username = displayName.trim().split(RegExp(r"\s+")).first;
+    if (displayName
+        .trim()
+        .isNotEmpty) {
+      username = displayName
+          .trim()
+          .split(RegExp(r"\s+"))
+          .first;
     } else if (email.contains("@")) {
       username = email.split("@")[0];
     } else {
@@ -342,7 +351,8 @@ class AuthService extends ChangeNotifier {
       throw Exception("Devi essere loggato sul telefono.");
     }
 
-    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(watchId);
+    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(
+        watchId);
 
     await FirebaseFirestore.instance.runTransaction((tx) async {
       final snap = await tx.get(ref);
@@ -370,5 +380,65 @@ class AuthService extends ChangeNotifier {
         'uid': user.uid,
       });
     });
+  }
+
+  Future<void> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw ChangeEmailException("not-authenticated");
+    }
+
+    final email = user.email;
+    if (email == null || email.isEmpty) {
+      throw ChangeEmailException("missing-current-email");
+    }
+
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      await user.verifyBeforeUpdateEmail(newEmail);
+    } on FirebaseAuthException catch (e) {
+      throw ChangeEmailException(e.code);
+    } catch (_) {
+      throw ChangeEmailException("unknown");
+    }
+  }
+
+  Future<void> refreshEmailFromAuth() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("Nessun utente autenticato");
+    }
+
+    await user.reload();
+
+    final refreshedUser = _auth.currentUser;
+    if (refreshedUser == null) {
+      throw Exception("Utente non disponibile dopo reload");
+    }
+
+    // forza refresh del token
+    await refreshedUser.getIdToken(true);
+
+    final refreshedEmail = refreshedUser.email;
+    if (refreshedEmail == null || refreshedEmail.isEmpty) {
+      throw Exception("Email non disponibile");
+    }
+
+    debugPrint("refreshEmailFromAuth: email Firebase Auth = $refreshedEmail");
+    debugPrint("refreshEmailFromAuth: uid = ${refreshedUser.uid}");
+
+    await _db.collection("users").doc(refreshedUser.uid).update({
+      "Email": refreshedEmail,
+    });
+
+    await loadUserCore(refreshedUser.uid);
   }
 }
