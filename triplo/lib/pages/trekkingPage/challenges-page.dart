@@ -137,8 +137,8 @@ class _ChallengesPageState extends State<ChallengesPage> {
                             ],
                           ),
                         ),
-                        if (isEven)
-                          FutureBuilder<File?>(
+                        if (isEven) _buildChallengeImageWidget(photoFuture),
+                          /*FutureBuilder<File?>(
                             future: photoFuture,
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
@@ -158,7 +158,7 @@ class _ChallengesPageState extends State<ChallengesPage> {
 
                               return _buildImage(snapshot.data!);
                             },
-                          ),
+                          ),*/
                       ],
                     ),
                   );
@@ -255,6 +255,25 @@ class _ChallengesPageState extends State<ChallengesPage> {
       ),
     );
   }
+
+  Widget _buildChallengeImageWidget(Future<File?> futureFile) {
+  return FutureBuilder<File?>(
+    future: futureFile,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const SizedBox(
+          width: 100,
+          height: 100,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+      if (snapshot.hasError || snapshot.data == null) {
+        return _buildBrokenImage();
+      }
+      return _buildImage(snapshot.data!);
+    },
+  );
+}
 
   Widget _buildImage(File file) {
     return Padding(

@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/model/trekking.dart';
 import 'package:triplo/pages/DiaryPage/adding-diary-page.dart';
 import 'package:triplo/pages/HomePage/home-page.dart';
 
@@ -138,15 +140,18 @@ class EndTrekkingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFixedBackground(TrekkingController controller, var trekking) {
+  Widget _buildFixedBackground(TrekkingController controller, Trekking trekking) {
     return Stack(
       children: [
         Positioned.fill(
-          child: FutureBuilder<String>(
-            future: controller.getDownloadUrl(trekking.endingPointPhoto),
+          child: FutureBuilder<File?>(
+            future: controller.getCachedImage(trekking.endingPointPhoto),
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(color: Colors.black);
+              }
               if (!snapshot.hasData) return Container(color: Colors.black);
-              return Image.network(snapshot.data!, fit: BoxFit.cover);
+              return Image.file(snapshot.data!, fit: BoxFit.cover);
             },
           ),
         ),

@@ -240,4 +240,30 @@ class TrekkingController extends ChangeNotifier {
 
     return files.whereType<File>().toList();
   }
+
+  // Scarica il trekking specifico da Firestore e lo aggiunge alla cache (lista locale _trekkings)
+  // prima controlla se esiste già in locale (quindi se c'è già stato un load) 
+  Future<Trekking?> getTrekkingByIdAsync(String trekkingId) async {
+    // 1. Cerca nella lista locale (cache)
+    try {
+      return _trekkings.firstWhere((t) => t.documentId == trekkingId);
+    } catch (_) {
+      // 2. Se non lo trova, lo scarica da Firestore
+      try {
+        final doc = await _db.collection('trekking').doc(trekkingId).get(); 
+        if (doc.exists) {
+          final trekking = Trekking.fromMap(doc.data()!, docId: doc.id);
+          
+          // Aggiungilo alla lista locale per i build futuri??
+          _trekkings.add(trekking);
+          notifyListeners(); // Notifica che la lista è cambiata
+          
+          return trekking;
+        }
+      } catch (e) {
+        debugPrint("Errore nel recupero del trekking: $e");
+      }
+    }
+    return null;
+  }
 }

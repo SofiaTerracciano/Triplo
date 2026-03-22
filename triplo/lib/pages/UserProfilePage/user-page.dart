@@ -52,6 +52,17 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     super.initState();
   }
+
+  Future<void> _loadDiaries() async {
+    final diaryController = context.read<DiaryController>();
+    final userController = context.read<UserController>();
+    final currentUserId = userController.currentUser!.uid;
+    
+    // Load both public and private diaries for the current user
+    await diaryController.loadPublicDiary(currentUserId);
+    await diaryController.loadPrivateDiary(currentUserId);
+
+  }
   /*
   Future<void> _loadUser() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -92,7 +103,18 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
     final userController = context.watch<UserController>();
+    
+    if (userController.isLoading) { 
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(), // O un logo della tua app
+        ),
+      );
+    }
     final user = userController.currentUser;
+    _loadDiaries();
+    Color levelColor;
+    String levelText;
 
 
 
@@ -137,6 +159,24 @@ class _UserPageState extends State<UserPage> {
       );
     }
 
+    switch (user.level) {
+      case 'Beginner':
+        levelColor = Colors.lightBlue;
+        levelText = local.beginner_level;
+        break;
+      case 'Intermediate':
+        levelColor = Colors.red;
+        levelText = local.intermediate_level;
+        break;
+      case 'Advanced':
+        levelColor = const Color.fromARGB(255, 135, 1, 162);
+        levelText = local.advanced_level;
+        break;
+      default:
+        levelColor = Colors.black;
+        levelText = '';
+    }
+
     // TabController for tabs in the body (public, private, saved)
     return DefaultTabController(
       length: 3,
@@ -152,10 +192,7 @@ class _UserPageState extends State<UserPage> {
 
                 await userController.logout();
 
-                Navigator.pushReplacementNamed(
-                  context, 
-                  '/login'
-                );
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],
@@ -174,18 +211,21 @@ class _UserPageState extends State<UserPage> {
                     flex: 1,
                     child: Column(
                       children: [
-                        // Photo 
+                        // Photo
                         CircleAvatar(
-                            radius: 36,
-                            backgroundImage: user.photoProfile != null &&
-                                    user.photoProfile!.isNotEmpty
-                                ? NetworkImage(user.photoProfile!)
-                                : null,
-                            backgroundColor: Colors.grey[300],
-                            child: user.photoProfile == null || user.photoProfile!.isEmpty
-                                ? const Icon(Icons.person, size: 40)
-                                : null,
-                          ),
+                          radius: 36,
+                          backgroundImage:
+                              user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty
+                              ? NetworkImage(user.photoProfile!)
+                              : null,
+                          backgroundColor: Colors.grey[300],
+                          child:
+                              user.photoProfile == null ||
+                                  user.photoProfile!.isEmpty
+                              ? const Icon(Icons.person, size: 40)
+                              : null,
+                        ),
                         const SizedBox(height: 8),
                         // Username
                         Row(
@@ -195,7 +235,9 @@ class _UserPageState extends State<UserPage> {
                                 user.username,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -203,25 +245,21 @@ class _UserPageState extends State<UserPage> {
                           ],
                         ),
                         const SizedBox(height: 2),
-                        // Level display --> Beginner, Intermediate, Advanced
-                        if (user.level == 'Beginner')
-                          Text(
-                            '${local.level_label}: ${local.beginner_level}',
-                            style:
-                                const TextStyle(fontSize: 13, color: Colors.lightBlue),
-                          )
-                        else if (user.level == 'Intermediate')
-                          Text(
-                            '${local.level_label}: ${local.intermediate_level}',
-                          style:
-                              const TextStyle(fontSize: 13, color: Colors.red),
-                        )
-                        else if (user.level == 'Advanced')
-                          Text(
-                            '${local.level_label}: ${local.advanced_level}',
-                            style:
-                                const TextStyle(fontSize: 13, color: const Color.fromARGB(255, 135, 1, 162)),
-                          )
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.black,
+                            ),
+                            children: [
+                              TextSpan(text: '${local.level_label}: '),
+                              TextSpan(
+                                text: levelText,
+                                style: TextStyle(color: levelColor),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -240,8 +278,10 @@ class _UserPageState extends State<UserPage> {
                               child: Text(
                                 '${user.name} ${user.surname}',
                                 textAlign: TextAlign.center,
-                                style:
-                                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -255,12 +295,15 @@ class _UserPageState extends State<UserPage> {
                           children: [
                             // TOTAL DIARIES
                             FutureBuilder<List<Diary>>(
-                              future: context.read<DiaryController>().getPublicDiaries(user.uid),
+                              future: context
+                                  .read<DiaryController>()
+                                  .getPublicDiaries(user.uid),
                               builder: (context, pubSnap) {
                                 return FutureBuilder<List<Diary>>(
-                                  future: context.read<DiaryController>().getPrivateDiaries(user.uid),
+                                  future: context
+                                      .read<DiaryController>()
+                                      .getPrivateDiaries(user.uid),
                                   builder: (context, privSnap) {
-
                                     final pub = pubSnap.data?.length ?? 0;
                                     final priv = privSnap.data?.length ?? 0;
 
@@ -279,12 +322,15 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: local.follower),
+                                    builder: (_) =>
+                                        UsersList(listName: local.follower),
                                   ),
                                 );
                               },
                               child: FutureBuilder<List<Users>>(
-                                future: context.read<UserController>().getFollowers(user.uid),
+                                future: context
+                                    .read<UserController>()
+                                    .getFollowers(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
                                     label: local.follower,
@@ -299,12 +345,15 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: local.following),
+                                    builder: (_) =>
+                                        UsersList(listName: local.following),
                                   ),
                                 );
                               },
                               child: FutureBuilder<List<Users>>(
-                                future: context.read<UserController>().getFollowing(user.uid),
+                                future: context
+                                    .read<UserController>()
+                                    .getFollowing(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
                                     label: local.following,
@@ -313,7 +362,6 @@ class _UserPageState extends State<UserPage> {
                                 },
                               ),
                             ),
-
                           ],
                         ),
                       ],
@@ -348,18 +396,20 @@ class _UserPageState extends State<UserPage> {
                       icon: const Icon(Icons.share),
                       label: Text(local.share_profile_button_label),
                       onPressed: () {
-                        final renderBox = context.findRenderObject() as RenderBox?;
+                        final renderBox =
+                            context.findRenderObject() as RenderBox?;
                         if (renderBox == null) return;
 
                         // Share profile link --> it return https://triplo.app/user/username
                         Share.share(
                           '${local.watch_profile_dialog_level}\nhttps://triplo.app/user/${user.username}',
                           sharePositionOrigin:
-                              renderBox.localToGlobal(Offset.zero) & renderBox.size,
+                              renderBox.localToGlobal(Offset.zero) &
+                              renderBox.size,
                         );
-                      }
+                      },
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -375,19 +425,28 @@ class _UserPageState extends State<UserPage> {
             ),
             Expanded(
               child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+                behavior: ScrollConfiguration.of(
+                  context,
+                ).copyWith(overscroll: false),
                 child: TabBarView(
                   children: [
                     // 1. PUBLIC DIARY
                     FutureBuilder<List<Diary>>(
-                      future: context.read<DiaryController>().getPublicDiaries(user.uid),
+                      future: context.read<DiaryController>().getPublicDiaries(
+                        user.uid,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final diaries = snapshot.data ?? [];
                         if (diaries.isEmpty) {
-                          return Center(child: Text(local.no_public_diary_label));
+                          return Center(
+                            child: Text(local.no_public_diary_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: diaries.length,
@@ -400,7 +459,8 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                    builder: (_) =>
+                                        DiaryPage(diaryId: diary.diaryId),
                                   ),
                                 );
                               },
@@ -412,14 +472,21 @@ class _UserPageState extends State<UserPage> {
 
                     // 2. PRIVATE DIARY
                     FutureBuilder<List<Diary>>(
-                      future: context.read<DiaryController>().getPrivateDiaries(user.uid),
+                      future: context.read<DiaryController>().getPrivateDiaries(
+                        user.uid,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final diaries = snapshot.data ?? [];
                         if (diaries.isEmpty) {
-                          return Center(child: Text(local.no_private_diary_label));
+                          return Center(
+                            child: Text(local.no_private_diary_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: diaries.length,
@@ -432,7 +499,8 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                    builder: (_) =>
+                                        DiaryPage(diaryId: diary.diaryId),
                                   ),
                                 );
                               },
@@ -444,14 +512,21 @@ class _UserPageState extends State<UserPage> {
 
                     // 3. SAVED TREKKING
                     FutureBuilder<List<Trekking>>(
-                      future: context.read<TrekkingController>().getSavedTrekkings(user.uid),
+                      future: context
+                          .read<TrekkingController>()
+                          .getSavedTrekkings(user.uid),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final trekkings = snapshot.data ?? [];
                         if (trekkings.isEmpty) {
-                          return Center(child: Text(local.no_saved_trekking_label));
+                          return Center(
+                            child: Text(local.no_saved_trekking_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: trekkings.length,
@@ -463,7 +538,9 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => TrekkingPage(trekkingId: trekking.documentId),
+                                    builder: (_) => TrekkingPage(
+                                      trekkingId: trekking.documentId,
+                                    ),
                                   ),
                                 );
                               },
@@ -490,7 +567,10 @@ class _UserPageState extends State<UserPage> {
                 child: const SizedBox.shrink(),
               ),
               ListTile(
-                leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.home,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.home_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -500,14 +580,20 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary,),
+                leading: Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.search, color: Theme.of(context).colorScheme.primary,),
+                leading: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -517,7 +603,10 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary,),
+                leading: Icon(
+                  Icons.settings,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -527,7 +616,10 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.emoji_events, color: Theme.of(context).colorScheme.primary,),
+                leading: Icon(
+                  Icons.emoji_events,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.challeng_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -590,5 +682,3 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
-
-

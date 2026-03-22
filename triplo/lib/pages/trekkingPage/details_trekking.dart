@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/model/trekking.dart';
 import 'package:triplo/pages/HomePage/home-page.dart';
 import 'package:triplo/pages/trekkingPage/start_trekking.dart';
 import 'package:flutter/material.dart';
@@ -207,15 +209,18 @@ class DetailsTrekking extends StatelessWidget {
     );
   }
 
-  Widget _buildFixedBackground(TrekkingController controller, var trekking) {
+  Widget _buildFixedBackground(TrekkingController controller, Trekking trekking) {
     return Stack(
       children: [
         Positioned.fill(
-          child: FutureBuilder<String>(
-            future: controller.getDownloadUrl(trekking.endingPointPhoto),
+          child: FutureBuilder<File?>(
+            future: controller.getCachedImage(trekking.endingPointPhoto),
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(color: Colors.black);
+              }
               if (!snapshot.hasData) return Container(color: Colors.black);
-              return Image.network(snapshot.data!, fit: BoxFit.cover);
+              return Image.file(snapshot.data!, fit: BoxFit.cover);
             },
           ),
         ),
@@ -240,10 +245,15 @@ class DetailsTrekking extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildChallengeImage(TrekkingController controller, String url, Color color, {double size = 64}) {
-    return FutureBuilder<String>(
-      future: controller.getDownloadUrl(url),
+  
+  Widget _buildChallengeImage(
+  TrekkingController controller,
+  String imagePath,
+  Color color, {
+  double size = 64,
+  }) {
+    return FutureBuilder<File?>(
+      future: controller.getCachedImage(imagePath),
       builder: (context, snapshot) {
         return Container(
           width: size,
@@ -254,12 +264,14 @@ class DetailsTrekking extends StatelessWidget {
             border: Border.all(color: color.withOpacity(0.4), width: 1.5),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: snapshot.hasData 
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(snapshot.data!, fit: BoxFit.contain),
-              )
-            : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          child: snapshot.connectionState == ConnectionState.waiting
+              ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+              : snapshot.hasData
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(snapshot.data!, fit: BoxFit.contain),
+                    )
+                  : const Center(child: Icon(Icons.broken_image, color: Colors.white38)),
         );
       },
     );

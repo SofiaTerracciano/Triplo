@@ -10,79 +10,63 @@ import '../model/user.dart';
 
 import '../service/authservice.dart' ;
 class UserController extends ChangeNotifier {
-
-
-
-
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final AuthService _authService;
 
-  UserController(this._authService);
-
-
-
-  Users? _currentUser;
-  Users? get currentUser => _currentUser;
-
+  //UserController(this._authService);
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
+
+  UserController(this._authService) {
+    // Chiamiamo l'inizializzazione appena il controller nasce
+    _init();
+  }
+
+  Future<void> _init() async {
+    _isLoading = true;
+    // Non facciamo notifyListeners qui perché il costruttore sta ancora girando
+    
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        // Carica i dati dal DB se l'utente è già loggato
+        await loadUserCore(user.uid);
+      }
+    } catch (e) {
+      debugPrint("Errore inizializzazione: $e");
+    } finally {
+      // IMPORTANTE: Questo interrompe il caricamento infinito
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Users? _currentUser;
+  Users? get currentUser => _currentUser;
 
   /* --------------------------------------------------
    * AUTH
    * -------------------------------------------------- */
 
   Future<void> register(String email, String password) async {
-    _isLoading = true;
+    await _authService.register(email, password);
+    _currentUser = _authService.currentUser;
     notifyListeners();
-
-    try {
-      await _authService.register(email, password);
-      _currentUser = _authService.currentUser;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   Future<void> login(String email, String password) async {
     _isLoading = true;
+    await _authService.login(email, password);
+    _currentUser = _authService.currentUser;
     notifyListeners();
-
-    try {
-      await _authService.login(email, password);
-      _currentUser = _authService.currentUser;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   Future<void> loginWithGoogle() async {
-    debugPrint("UserController: loginWithGoogle() start");
-
-    _isLoading = true;
+    await _authService.loginWithGoogle();
+    _currentUser = _authService.currentUser;
     notifyListeners();
-
-    try {
-      await _authService.loginWithGoogle();
-      debugPrint("UserController: AuthService.loginWithGoogle() completed");
-
-      _currentUser = _authService.currentUser;
-      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}");
-
-      debugPrint("UserController: notifyListeners() called");
-    } catch (e, st) {
-      debugPrint("UserController: loginWithGoogle() failed");
-      debugPrint("UserController ERROR: $e");
-      debugPrintStack(stackTrace: st);
-      rethrow;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   Future<void> logout() async {

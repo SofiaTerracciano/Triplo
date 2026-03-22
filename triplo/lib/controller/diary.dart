@@ -421,4 +421,26 @@ class DiaryController extends ChangeNotifier {
         .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
   }
+
+  // Scarica il trekking specifico da Firestore e lo aggiunge alla cache (lista locale _trekkings)
+  // prima controlla se esiste già in locale (quindi se c'è già stato un load)  
+  Future<Diary?> getDiaryByIdAsync(String diaryId) async {
+    // 1. Cerca prima in locale
+    final local = getDiaryById(diaryId);
+    if (local != null) return local;
+
+    // 2. Se non c'è, cercalo su Firestore
+    try {
+      final doc = await _db.collection('diary').doc(diaryId).get();
+      if (doc.exists) {
+        final diary = Diary.fromMap(doc.data()!, diaryId: doc.id);
+        // Opzionale: aggiungilo alla lista locale per il futuro ??
+        _diaries.add(diary); 
+        return diary;
+      }
+    } catch (e) {
+      debugPrint("Errore recupero diario singolo: $e");
+    }
+    return null;
+  }
 }
