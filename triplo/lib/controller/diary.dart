@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
-// Controller for managing diary data from and to Firestore
+/// Controller responsible for managing diary entries, including creation, 
+/// updates, deletions, and synchronization with Firestore and Firebase Storage.
 class DiaryController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -17,6 +18,7 @@ class DiaryController extends ChangeNotifier {
   bool _loaded = false;
   Users? _currentUser;
 
+  /// The currently authenticated user model.
   Users? get currentUser => _currentUser;
 
   set currentUser(Users user) {
@@ -25,10 +27,11 @@ class DiaryController extends ChangeNotifier {
 
   DiaryController();
 
-  // Getter for all diaries
+  /// Returns the local list of all currently loaded diary entries.
   List<Diary> get allDiaries => _diaries;
 
-  // Load public diaries from Firestore
+  /// Fetches public diaries for a specific [userId] from Firestore.
+  /// Prevents duplicate loading using the [_loaded] flag.
   Future<void> loadPublicDiary(String userId) async {
     if (_loaded) return; // To avoid reloading
     _loaded = true;
@@ -41,7 +44,7 @@ class DiaryController extends ChangeNotifier {
         .get();
 
     // Map documents to Diary objects and store in the list --> this function create a
-    //list of instance of diary (model)
+    // list of instance of diary (model)
     final publicDiaries = snap.docs
         .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
@@ -52,7 +55,7 @@ class DiaryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Load private diaries from Firestore
+  /// Fetches private diaries for a specific [userId] from Firestore.
   Future<void> loadPrivateDiary(String userId) async {
     // Fetch diary documents from Firestore
     final snap = await _db
@@ -62,7 +65,7 @@ class DiaryController extends ChangeNotifier {
         .get();
 
     // Map documents to Diary objects and store in the list --> this function create a
-    //list of instance of diary (model)
+    // list of instance of diary (model)
     final privateDiaries = snap.docs
         .map((doc) => Diary.fromMap(doc.data(), diaryId: doc.id))
         .toList();
@@ -73,7 +76,8 @@ class DiaryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update diary page
+  /// Updates the local [Diary] object properties.
+  /// This is used as a helper before committing changes to the database.
   Diary updateDiary(
     Diary page,
     bool isPublic,
@@ -99,7 +103,7 @@ class DiaryController extends ChangeNotifier {
     return page;
   }
 
-  // Getter diaries per documentId
+  /// Finds a diary entry in the local list using its [documentId].
   Diary? getDiaryById(String documentId) {
     try {
       return _diaries.firstWhere((t) => t.diaryId == documentId);
@@ -108,7 +112,8 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Add or modify diary page based on 'modify' flag
+  /// Adds a new diary entry or modifies an existing one based on the [modify] flag.
+  /// Handles ID generation, user profile updates (Public/Private lists), and Firestore document creation.
   Future<void> addDiary(
     String title,
     bool isPublic,
@@ -149,7 +154,7 @@ class DiaryController extends ChangeNotifier {
       );
       _diaries.add(page);
 
-      // Update user's diary lists
+      // Synchronize the user's diary collection in Firestore
       if (page.isPublic) {
         // Update DB
         await _db.collection("users").doc(uid).update({
@@ -168,6 +173,7 @@ class DiaryController extends ChangeNotifier {
       // Create diary document
       await _db.collection("diary").doc(page.diaryId).set(page.toMap());
     } else {
+      // Logic for MODIFYING an existing diary entry
       final uid = _auth.currentUser!.uid;
       page = getDiaryById(diaryId)!;
       final oldIsPublic = page.isPublic;
@@ -191,7 +197,7 @@ class DiaryController extends ChangeNotifier {
       .update(page.toMap());
 
 
-      // If privacy changed, update user's diary lists
+      // Update user lists if privacy settings changed
       if (oldIsPublic != isPublic) {
         await _db.collection("users").doc(uid).update({
           oldIsPublic ? "Public_diary" : "Private_diary":
@@ -206,7 +212,7 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Remove diary page
+  /// Removes a diary entry from Firestore, Storage, and the user's profile lists.
   Future<void> removeDiary(String diaryId) async {
     final page = getDiaryById(diaryId)!;
     final uid = _auth.currentUser!.uid;
@@ -234,7 +240,7 @@ class DiaryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch diaries by user ID --> it returns a list of diaries for a specific user
+  /// Fetches all diary entries for a specific [userId]. Returns a List or null if empty.
   Future<List<Diary>?> fetchDiaryById(String userId) async {
     final doc = await _db
         .collection('diary')
@@ -253,8 +259,8 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Upload diary images to Firebase Storage and return their paths --> it returns a path child
-  // not the complete url
+  /// Uploads a list of [File] images to Firebase Storage.
+  /// Filters for common image extensions and returns the Storage paths.
   Future<List<String>> uploadDiaryImages(List<File> images) async {
     List<String> paths = [];
 
@@ -280,7 +286,7 @@ class DiaryController extends ChangeNotifier {
     return paths;
   }
 
-  // Fetch image URL from Firebase Storage given only path
+  /// Gets the download URL for a Firebase Storage child [path].
   Future<String?> getDownloadUrlChild(String? path) async {
     // If you don't have any photos return null
     if (path == null || path.isEmpty) return null;
@@ -294,7 +300,7 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Fetch image URL from Firebase Storage given complete firestore url
+  /// Gets the download URL for a complete Firebase Storage URL [path].
   Future<String?> getDownloadUrl(String? path) async {
     // If you don't have any return null
     if (path == null || path.isEmpty) return null;
@@ -308,7 +314,7 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Delete photo from diary both in Firestore and Firebase Storage
+  /// Deletes a specific photo from both the Firestore diary document and Firebase Storage.
   Future<void> deletePhotoFromDb(String diaryId, String photoPath) async {
     try {
       // Remove from Firestore
@@ -330,8 +336,8 @@ class DiaryController extends ChangeNotifier {
     }
   }
 
-  // Fetch random public diaries from users being followed --> it returns a list of diaries
-  // used for the explore page
+  /// Fetches a randomized list of public diaries from users defined in [followingIds].
+  /// Used primarily for the Discovery/Explore feed.
   Future<List<Diary>> getRandomPublicDiariesFromFollowing({
     required List<String> followingIds,
     required int limit,
@@ -398,6 +404,7 @@ class DiaryController extends ChangeNotifier {
     return diaries.take(limit).toList();
   }
 
+  /// Returns all public diaries for a specific [userId].
   Future<List<Diary>> getPublicDiaries(String userId) async {
     final snap = await _db
         .collection('diary')
@@ -410,6 +417,7 @@ class DiaryController extends ChangeNotifier {
         .toList();
   }
 
+  /// Returns all private diaries for a specific [userId].
   Future<List<Diary>> getPrivateDiaries(String userId) async {
     final snap = await _db
         .collection('diary')
@@ -422,19 +430,17 @@ class DiaryController extends ChangeNotifier {
         .toList();
   }
 
-  // Scarica il trekking specifico da Firestore e lo aggiunge alla cache (lista locale _trekkings)
-  // prima controlla se esiste già in locale (quindi se c'è già stato un load)  
+  /// Asynchronously fetches a single diary entry. Checks local list first as a cache.
   Future<Diary?> getDiaryByIdAsync(String diaryId) async {
-    // 1. Cerca prima in locale
+    // Search in local list
     final local = getDiaryById(diaryId);
     if (local != null) return local;
 
-    // 2. Se non c'è, cercalo su Firestore
+    // If there is not, search on Firestore
     try {
       final doc = await _db.collection('diary').doc(diaryId).get();
       if (doc.exists) {
         final diary = Diary.fromMap(doc.data()!, diaryId: doc.id);
-        // Opzionale: aggiungilo alla lista locale per il futuro ??
         _diaries.add(diary); 
         return diary;
       }

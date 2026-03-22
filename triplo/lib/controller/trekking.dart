@@ -11,13 +11,16 @@ import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// Controller for managing trekking data
+ /// Controller responsible for managing trekking data, handling 
+ /// synchronization with Firestore, image caching, and user favorites.
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   List<Trekking> _trekkings;
   bool _loaded = false;
-  //geo non è usato nel codice ma solo nel costruttore, va lasciato?
+
+  // Services used for geolocation, local storage, and push notifications
   GeoService geo;
   MemoryService memory;
   NotificationService notification;
@@ -29,10 +32,11 @@ class TrekkingController extends ChangeNotifier {
     required List<Trekking> trekkings,
   }) : _trekkings = trekkings;
 
-  // Getter for all trekkings
+  /// Returns the local list of all loaded trekking instances.
   List<Trekking> get allTrekkings => _trekkings;
 
-  //Load trekkings from Firestore
+  /// Loads the full list of trekking documents from Firestore.
+  /// Prevents redundant network calls by checking the [_loaded] flag.
   Future<void> loadTrekking() async {
     if (_loaded) return; // To avoid reloading
     _loaded = true;
@@ -49,10 +53,11 @@ class TrekkingController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Callback when a trekking is selected
+  /// Optional callback triggered when a specific trekking is selected in the UI
   void Function(Trekking trekking)? onTrekkingSelected;
 
-  // Getter trekking per documentId --> it return the trekking instance given the ID
+  /// Retrieves a trekking instance from the local list using its unique document ID.
+  /// Returns null if no match is found.
   Trekking? getTrekkingById(String documentId) {
     try {
       return _trekkings.firstWhere((t) => t.documentId == documentId);
@@ -61,7 +66,7 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-  //Getter trekkingID by name --> if you have the name you can get the ID
+  /// Finds the document ID associated with a trekking name.
   String? getTrekkingId(String name) {
     try {
       return _trekkings.firstWhere((t) => t.name == name).documentId;
@@ -70,8 +75,7 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-  // Fetch image URLs from Firebase Storage given a list of complete firestore url
-  // It returns a list of download URLs that can be used to display images
+  /// Converts a list of Firebase Storage paths (gs://) into usable download URLs.
   Future<List<String>> getDownloadUrls(List<String> paths) async {
     return await Future.wait(
       paths.map((path) async {
@@ -81,14 +85,14 @@ class TrekkingController extends ChangeNotifier {
     );
   }
 
-  // Fetch image URL from Firebase Storage given complete firestore url
-  // It returns a only one download URL that can be used to display the image
+  /// Converts a single Firebase Storage path (gs://) into a download URL.
   Future<String> getDownloadUrl(String path) async {
     Reference ref = FirebaseStorage.instance.refFromURL(path);
     return await ref.getDownloadURL();
   }
 
-  // Search trekkings by name using normalized search in Firestore
+  /// Performs a search on the 'trekking_index' collection using a normalized query.
+  /// Checks the local cache first before fetching missing trekking data from Firestore.
   Future<List<Trekking>> searchTrekking(String query) async {
     final q = query.trim().toLowerCase();
     final snap = await _db
@@ -97,17 +101,17 @@ class TrekkingController extends ChangeNotifier {
         .where("Normalized", isLessThanOrEqualTo: "$q\uf8ff")
         .get();
 
+    // Try local cache first for performance
     final List<Trekking> results = [];
 
-    // Funzione che serve a cercare su firestore nel caso non sia accora avventa la laod dei trekking
-    // altrimenti cerca nella lista dei trekking già scaricati 
+    // If not in cache, fetch directly from the main trekking collection
     for (var d in snap.docs) {
       final trekkingId = d["Trekking_id"] as String;
-      
-      // 1. Prova a cercarlo nella lista locale (veloce)
+
+      // Try to search in local list
       var trekking = getTrekkingById(trekkingId);
-      
-      // 2. Se non c'è in locale, caricalo da Firestore (sicuro)
+
+      // If there is not, search on Firestore
       if (trekking == null) {
         trekking = await fetchTrekkingById(trekkingId);
       }
@@ -129,12 +133,14 @@ class TrekkingController extends ChangeNotifier {
     return results;*/
   }
 
+  /// Fetches a specific trekking document from Firestore by its ID.
   Future<Trekking?> fetchTrekkingById(String id) async {
     final snap = await _db.collection("trekking").doc(id).get();
     if (!snap.exists) return null;
     return Trekking.fromMap(snap.data()!, docId: id);
   }
 
+  /// Retrieves all trekking items saved as favorites by a specific user.
   Future<List<Trekking>> getSavedTrekkings(String uid) async {
     final userSnap = await FirebaseFirestore.instance
         .collection("users")
@@ -146,6 +152,7 @@ class TrekkingController extends ChangeNotifier {
     return trekkings.whereType<Trekking>().toList();
   }
 
+  /// Adds a trekking ID to the current user's 'Saved_trekkings' array in Firestore.
   Future<void> addTrekkingToSaved(String trekkingId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
@@ -157,6 +164,7 @@ class TrekkingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Removes a trekking ID from the current user's 'Saved_trekkings' array in Firestore.
   Future<void> removeTrekkingFromSaved(String trekkingId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
@@ -168,6 +176,7 @@ class TrekkingController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Checks if a specific trekking ID exists in the user's favorites list.
   Future<bool> isTrekkingSaved(String trekkingId) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return false;
@@ -177,11 +186,15 @@ class TrekkingController extends ChangeNotifier {
     return ids.contains(trekkingId);
   }
 
+  /// Manages a multi-layer image cache:
+  /// 1. Checks RAM (MemoryService).
+  /// 2. Checks Disk (Local file storage).
+  ///3. Downloads from Storage/Network if not found locally.
   Future<File?> getCachedImage(String imagePath) async {
     debugPrint("getCachedImage -> $imagePath");
 
     try {
-      // 1. Cerca in RAM (questo è rimasto uguale)
+      // Search in RAM
       final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
         debugPrint("Image found in RAM cache");
@@ -190,35 +203,38 @@ class TrekkingController extends ChangeNotifier {
 
       String cacheableUrl = imagePath;
 
+      // Handle Firebase gs:// protocol conversion
       if (imagePath.startsWith("gs://")) {
         final ref = FirebaseStorage.instance.refFromURL(imagePath);
         cacheableUrl = await ref.getDownloadURL();
       }
 
-
-      final cached = await memory.getImageFromDisk(cacheableUrl); 
+      // Search in local disk storage
+      final cached = await memory.getImageFromDisk(cacheableUrl);
       if (cached != null) {
         debugPrint("Image found in disk cache");
         memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
+      // Download and save to disk/memory caches
       debugPrint("Image not in cache, downloading");
-      
-
-      final file = await memory.cacheImageOnDisk(cacheableUrl); 
+      final file = await memory.cacheImageOnDisk(cacheableUrl);
       memory.saveImageToMemory(imagePath, file);
       return file;
-      
     } catch (e) {
       debugPrint("getCachedImage error: $e");
       return null;
     }
   }
 
-  // Metodo per gestire l'arrivo
-  Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
-    // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
+  /// Monitors user's proximity to a trekking destination.
+  /// Triggers a push notification when the user is within 1000 meters.
+  Future<void> checkArrival(
+    String trekkingId,
+    double distanceInMeters,
+    AppLocalizations local,
+  ) async {
     if (distanceInMeters <= 1000) {
       final content = getChallengeContent('end_trekking_arrival', local);
 
@@ -233,6 +249,7 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
+  /// Batched version of getCachedImage to handle multiple image paths simultaneously.
   Future<List<File>> getCachedImages(List<String> imagePaths) async {
     final files = await Future.wait(
       imagePaths.map((path) async => await getCachedImage(path)),
@@ -241,27 +258,27 @@ class TrekkingController extends ChangeNotifier {
     return files.whereType<File>().toList();
   }
 
-  // Scarica il trekking specifico da Firestore e lo aggiunge alla cache (lista locale _trekkings)
-  // prima controlla se esiste già in locale (quindi se c'è già stato un load) 
+  /// Retrieves a specific trekking item. 
+  /// It checks the local cache first; if missing, it fetches it from Firestore 
+  /// and updates the local list for future use.
   Future<Trekking?> getTrekkingByIdAsync(String trekkingId) async {
-    // 1. Cerca nella lista locale (cache)
+    // Search on local list
     try {
       return _trekkings.firstWhere((t) => t.documentId == trekkingId);
     } catch (_) {
-      // 2. Se non lo trova, lo scarica da Firestore
+      // if there is not, search on Firestore
       try {
-        final doc = await _db.collection('trekking').doc(trekkingId).get(); 
+        final doc = await _db.collection('trekking').doc(trekkingId).get();
         if (doc.exists) {
           final trekking = Trekking.fromMap(doc.data()!, docId: doc.id);
-          
-          // Aggiungilo alla lista locale per i build futuri??
+          // Add to local list to minimize future Firestore reads
           _trekkings.add(trekking);
-          notifyListeners(); // Notifica che la lista è cambiata
-          
+          notifyListeners();
+
           return trekking;
         }
       } catch (e) {
-        debugPrint("Errore nel recupero del trekking: $e");
+        debugPrint("Errore to find the trekking: $e");
       }
     }
     return null;

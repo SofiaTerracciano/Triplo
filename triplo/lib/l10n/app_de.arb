@@ -237,7 +237,9 @@
   "gps_disabled_message": "GPS ist ausgeschaltet",
   "permission_denied_message": "Ich habe nicht die erforderlichen Berechtigungen, um die Informationen bereitzustellen",
   "open_settings_button": "Einstellungen öffnen",
-  "loading_coordinates": "Koordinaten werden geladen..."
+  "loading_coordinates": "Koordinaten werden geladen...",
+
+  "no_friends": "Dein Feed wartet auf neue Abenteuer! Folge anderen Trekkern, um ihre neuesten Reisen hier zu sehen."
 }
 
 

@@ -1324,6 +1324,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading coordinates...'**
   String get loading_coordinates;
+
+  /// No description provided for @no_friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here.'**
+  String get no_friends;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

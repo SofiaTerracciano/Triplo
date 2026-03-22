@@ -237,5 +237,7 @@
   "gps_disabled_message": "El GPS está apagado",
   "permission_denied_message": "No tengo los permisos necesarios para proporcionar la información",
   "open_settings_button": "Abrir Configuración",
-  "loading_coordinates": "Cargando coordenadas..."
+  "loading_coordinates": "Cargando coordenadas...",
+
+  "no_friends": "¡Tu feed está esperando nuevas aventuras! Sigue a altri senderistas para ver sus últimos viajes aquí."
 }

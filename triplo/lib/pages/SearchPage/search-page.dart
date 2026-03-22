@@ -510,7 +510,7 @@ class _SearchPageState extends State<SearchPage>
 
     if (_searchController.text.isEmpty) {
       if (randomDiaries.isEmpty) {
-        return Center(child: Text(local.no_diary_found_label));
+        return Center(child: Text(local.no_friends));
       }
       return _buildRandomDiaryGrid();
     }

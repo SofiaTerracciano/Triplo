@@ -237,5 +237,7 @@
   "gps_disabled_message": "Le GPS est éteint",
   "permission_denied_message": "Je n'ai pas les permissions nécessaires pour fournir les informations",
   "open_settings_button": "Ouvrir les paramètres",
-  "loading_coordinates": "Chargement des coordonnées..."
+  "loading_coordinates": "Chargement des coordonnées...",
+
+  "no_friends":"Votre fil d'actualité n'attend que l'aventure ! Suivez d'autres randonneurs per découvrir leurs derniers périples ici."
 }

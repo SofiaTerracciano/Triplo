@@ -9,16 +9,23 @@ import '../service/memory.dart';
 import '../service/geo.dart';
 import '../service/permission.dart';
 
-// API controller for external services
+/// Controller for managing external API integrations.
+/// It handles weather data fetching (OpenWeather, Weatherbit), map tile URLs, 
+/// and connectivity checks.
 class API {
+  /// API key for OpenWeather services.
   late final String openWeatherKey;
+
+  /// API key for Weatherbit services (used for alerts).
   late final String weatherbitKey;
 
-
-  //memory è usato solo nel costruttore, va lasciato?
+  /// Service for managing local image/data caching.
   MemoryService memory;
+
+  /// Service for handling device geolocation.
   GeoService geo;
-  //permission è usato nel metodo initPermissions che non è mai usato, va lasciato?
+
+  /// Service for managing system permissions.
   late PermissionService permission;
 
   // Constructor to load API keys from .env
@@ -35,19 +42,12 @@ class API {
     }
   }
 
-  //metodo che non è mai usato, va lasciato?
-  // Se ti serve chiamare i permessi dall'API, fai così:
-  Future<void> initPermissions() async {
-    await PermissionService.askPermissionsOnce();
-  }
-
-
-  /// Build OpenWeather tile URL for FlutterMap
+  /// Builds an OpenWeather tile URL for FlutterMap layers (e.g., precipitation, wind).
   String weatherTile(String layer) {
     return "https://tile.openweathermap.org/map/$layer/{z}/{x}/{y}.png?appid=$openWeatherKey";
   }
 
-  /// Provide map of supported layers for cleaner UI code
+  /// Maps internal layer IDs to OpenWeather's specific layer naming convention.
   String? resolveLayer(String id) {
     const map = {
       "precip": "precipitation",
@@ -61,19 +61,19 @@ class API {
     return map[id];
   }
 
-  // Get user's current location
+  /// Retrieves the user's current [LatLng] coordinates using the [GeoService].
   Future<LatLng?> userLocation() {
     return geo.userLocation();
   }
 
-  // Fetch current weather data for given coordinates
+  /// Fetches current weather data from OpenWeather for the given [lat] and [lon].
+  /// [lang] defines the language for the weather description.
   Future<Map<String, dynamic>?> weather(double lat, double lon, String lang) async {
     if (openWeatherKey.isEmpty) return null;
 
     final url =
         "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon"
         "&appid=$openWeatherKey&units=metric&lang=$lang";
-
 
     try {
       final res = await http
@@ -91,7 +91,8 @@ class API {
     }
   }
 
-  // Fetch 5-day weather forecast for given coordinates
+  /// Fetches a 5-day weather forecast (3-hour intervals) from OpenWeather.
+  /// Returns a list of forecast entries sampled daily.
   Future<List<Map<String, dynamic>>?> forecast(
       double lat, double lon, String lang) async {
     if (openWeatherKey.isEmpty) return null;
@@ -109,7 +110,7 @@ class API {
         final data = jsonDecode(res.body);
         final list = List<Map<String, dynamic>>.from(data['list']);
 
-
+        // Returns one sample every 24 hours (8 entries * 3 hours = 24h)
         return [
           for (int i = 0; i < list.length; i += 8) list[i],
         ];
@@ -123,9 +124,7 @@ class API {
     }
   }
 
-
-
-  // Check for internet connectivity
+  /// Performs a low-level check for internet connectivity by looking up google.com.
   Future<bool> hasInternet() async {
     try {
       final result = await InternetAddress.lookup('google.com')
@@ -136,14 +135,15 @@ class API {
     }
   }
 
-  /// Build full URL for weather icon
+  /// Builds the full URL for the weather condition icon.
+  /// Set [big] to true for higher resolution (@2x).
   String weatherIconUrl(String iconCode, {bool big = true}) {
     final size = big ? "@2x" : "";
     return "https://openweathermap.org/img/wn/$iconCode$size.png";
   }
 
 
-  //metodo che non è mai usato, vedo se eliminarlo
+  /*metodo che non è mai usato, vedo se eliminarlo
   /// Extract weather information from a weather response
   Map<String, dynamic> parseWeather(Map<String, dynamic> raw) {
     return {
@@ -152,9 +152,9 @@ class API {
       "description": raw["weather"]?[0]?["description"]?.toString().toLowerCase() ?? "-",
       "icon": raw["weather"]?[0]?["icon"] ?? "01d",
     };
-  }
+  }*/
 
-  /// Extract a single forecast entry
+  /// Parses a single item from the forecast list into a standardized map.
   Map<String, dynamic> parseForecastItem(Map<String, dynamic> raw) {
     return {
       "date": DateTime.parse(raw["dt_txt"]),
@@ -164,12 +164,12 @@ class API {
     };
   }
 
-  /// Convert entire forecast list
+  /// Converts a full list of raw forecast entries into standardized maps.
   List<Map<String, dynamic>> parseForecast(List<Map<String, dynamic>> raw) {
     return raw.map(parseForecastItem).toList();
   }
 
-  // Base map tiles (OpenTopoMap) --> da capire dove metterla
+  /// Returns the OpenTopoMap tile URL template for topographic map rendering.
   String openTopoMapTile() {
     return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
   }
@@ -178,8 +178,7 @@ class API {
     return ['a', 'b', 'c'];
   }
 
-
-
+  /// Fetches mock weather alerts from a demo server for testing purposes.
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
       final res = await http.get(
@@ -205,6 +204,8 @@ class API {
     }
   }
 
+  /// Fetches real-time weather alerts from Weatherbit for the specified location.
+  /// Returns a list of alerts including severity, timing, and description.
   Future<List<Map<String, dynamic>>> weatherbitAlerts(
       double lat,
       double lon,
@@ -244,10 +245,4 @@ class API {
       return [];
     }
   }
-
-  
-
-
 }
-
-

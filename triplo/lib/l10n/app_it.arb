@@ -238,5 +238,8 @@
     "gps_disabled_message": "Il GPS è spento",
     "permission_denied_message": "Non ho i permessi necessari per poter darti le informazioni",
     "open_settings_button": "Apri Impostazioni",
-    "loading_coordinates": "Caricamento coordinate..."
+    "loading_coordinates": "Caricamento coordinate...",
+
+    "no_friends": "Il tuo feed aspetta nuove avventure! Segui altri trekker per vedere i loro ultimi viaggi."
+
 }

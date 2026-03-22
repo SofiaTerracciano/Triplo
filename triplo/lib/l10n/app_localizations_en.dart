@@ -619,4 +619,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loading_coordinates => 'Loading coordinates...';
+
+  @override
+  String get no_friends => 'Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here.';
 }

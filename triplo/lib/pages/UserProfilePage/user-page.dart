@@ -107,7 +107,7 @@ class _UserPageState extends State<UserPage> {
     if (userController.isLoading) { 
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(), // O un logo della tua app
+          child: CircularProgressIndicator(), 
         ),
       );
     }
@@ -115,10 +115,6 @@ class _UserPageState extends State<UserPage> {
     _loadDiaries();
     Color levelColor;
     String levelText;
-
-
-
-
 
     if (userController.isLoading) {
       return const Scaffold(

@@ -237,5 +237,8 @@
     "gps_disabled_message": "GPS is turned off",
     "permission_denied_message": "I don't have the required permissions to provide the information",
     "open_settings_button": "Open Settings",
-    "loading_coordinates": "Loading coordinates..."
+    "loading_coordinates": "Loading coordinates...",
+
+    "no_friends": "Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here."
+
 }
