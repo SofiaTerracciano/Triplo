@@ -7,8 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../model/user.dart';
 
+import '../service/authservice.dart';
 
-import '../service/authservice.dart' ;
 class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -27,7 +27,7 @@ class UserController extends ChangeNotifier {
   Future<void> _init() async {
     _isLoading = true;
     // Non facciamo notifyListeners qui perché il costruttore sta ancora girando
-    
+
     try {
       final user = _auth.currentUser;
       if (user != null) {
@@ -51,22 +51,58 @@ class UserController extends ChangeNotifier {
    * -------------------------------------------------- */
 
   Future<void> register(String email, String password) async {
-    await _authService.register(email, password);
-    _currentUser = _authService.currentUser;
+    _isLoading = true;
     notifyListeners();
+    try {
+      await _authService.register(email, password);
+      _currentUser = _authService.currentUser;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+    /*await _authService.register(email, password);
+    _currentUser = _authService.currentUser;
+    notifyListeners();*/
   }
 
   Future<void> login(String email, String password) async {
     _isLoading = true;
-    await _authService.login(email, password);
-    _currentUser = _authService.currentUser;
     notifyListeners();
+    try {
+      await _authService.login(email, password);
+      _currentUser = _authService.currentUser;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+    /*await _authService.login(email, password);
+    _currentUser = _authService.currentUser;
+    notifyListeners();*/
   }
 
   Future<void> loginWithGoogle() async {
-    await _authService.loginWithGoogle();
-    _currentUser = _authService.currentUser;
+    debugPrint("UserController: loginWithGoogle() start");
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      await _authService.loginWithGoogle();
+      debugPrint("UserController: AuthService.loginWithGoogle() completed");
+
+      _currentUser = _authService.currentUser;
+      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}");
+
+      notifyListeners();
+      debugPrint("UserController: notifyListeners() called");
+    } catch (e, st) {
+      debugPrint("UserController: loginWithGoogle() failed");
+      debugPrint("UserController ERROR: $e");
+      debugPrintStack(stackTrace: st);
+      rethrow;
+    } finally {
+      _isLoading = false; 
+      notifyListeners();
+    }
   }
 
   Future<void> logout() async {
@@ -100,7 +136,7 @@ class UserController extends ChangeNotifier {
       email: data["Email"] ?? "",
       photoProfile: data["Photo_profile"] ?? "",
       birthdate:
-      DateTime.tryParse(data["Birthdate"] ?? "") ?? DateTime(2000, 1, 1),
+          DateTime.tryParse(data["Birthdate"] ?? "") ?? DateTime(2000, 1, 1),
 
       followers: [],
       following: [],
@@ -170,8 +206,6 @@ class UserController extends ChangeNotifier {
     return results;
   }
 
-
-
   /* --------------------------------------------------
    * PROFILE UPDATE
    * -------------------------------------------------- */
@@ -194,7 +228,6 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> updateSurname(String surname) async {
     final uid = _auth.currentUser!.uid;
     await _db.collection("users").doc(uid).update({"Surname": surname});
@@ -205,7 +238,7 @@ class UserController extends ChangeNotifier {
   Future<void> updateBirthdate(DateTime date) async {
     final uid = _auth.currentUser!.uid;
     await _db.collection("users").doc(uid).update({
-      "Birthdate": date.toIso8601String()
+      "Birthdate": date.toIso8601String(),
     });
     _currentUser?.birthdate = date;
     notifyListeners();
@@ -223,9 +256,7 @@ class UserController extends ChangeNotifier {
     await ref.putFile(image);
     final url = await ref.getDownloadURL();
 
-    await _db.collection("users").doc(uid).update({
-      "Photo_profile": url
-    });
+    await _db.collection("users").doc(uid).update({"Photo_profile": url});
 
     _currentUser?.photoProfile = url;
     notifyListeners();
@@ -251,13 +282,12 @@ class UserController extends ChangeNotifier {
 
   bool get isPasswordUser => _authService.isPasswordUser;
 
-
   Future<void> restoreGoogleProfilePhoto() async {
     final user = _auth.currentUser;
     if (user?.photoURL == null) return;
 
     await _db.collection("users").doc(user!.uid).update({
-      "Photo_profile": user.photoURL
+      "Photo_profile": user.photoURL,
     });
 
     _currentUser?.photoProfile = user.photoURL!;
@@ -275,8 +305,10 @@ class UserController extends ChangeNotifier {
     if (difficulty == "Advanced") advanced++;
 
     String level = "Beginner";
-    if (advanced >= 5) level = "Advanced";
-    else if (intermediate >= 5) level = "Intermediate";
+    if (advanced >= 5)
+      level = "Advanced";
+    else if (intermediate >= 5)
+      level = "Intermediate";
 
     final uid = _auth.currentUser!.uid;
 
@@ -292,6 +324,7 @@ class UserController extends ChangeNotifier {
 
     notifyListeners();
   }
+
   // CHECK IF I FOLLOW USER
   Future<bool> isFollowing(String targetUid) async {
     final user = _auth.currentUser;
@@ -313,11 +346,11 @@ class UserController extends ChangeNotifier {
     if (myUid == targetUid) return false;
 
     await _db.collection("users").doc(myUid).update({
-      "Following": FieldValue.arrayUnion([targetUid])
+      "Following": FieldValue.arrayUnion([targetUid]),
     });
 
     await _db.collection("users").doc(targetUid).update({
-      "Followers": FieldValue.arrayUnion([myUid])
+      "Followers": FieldValue.arrayUnion([myUid]),
     });
     return true;
   }
@@ -331,15 +364,13 @@ class UserController extends ChangeNotifier {
     if (myUid == targetUid) return;
 
     await _db.collection("users").doc(myUid).update({
-      "Following": FieldValue.arrayRemove([targetUid])
+      "Following": FieldValue.arrayRemove([targetUid]),
     });
 
     await _db.collection("users").doc(targetUid).update({
-      "Followers": FieldValue.arrayRemove([myUid])
+      "Followers": FieldValue.arrayRemove([myUid]),
     });
   }
-
-
 
   Future<void> tryAutoLogin() async {
     _isLoading = true;
@@ -358,7 +389,6 @@ class UserController extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<void> _ensureUserFirestoreDocs(User user) async {
     final uid = user.uid;
@@ -383,7 +413,6 @@ class UserController extends ChangeNotifier {
     } else {
       username = uid.substring(0, 8);
     }
-
 
     final batch = _db.batch();
 
@@ -421,13 +450,8 @@ class UserController extends ChangeNotifier {
     required String watchId,
     required String token,
   }) async {
-    await _authService.approveWatchPair(
-      watchId: watchId,
-      token: token,
-    );
+    await _authService.approveWatchPair(watchId: watchId, token: token);
   }
-
-
 
   Future<void> changeEmail({
     required String newEmail,
@@ -444,6 +468,4 @@ class UserController extends ChangeNotifier {
     _currentUser = _authService.currentUser;
     notifyListeners();
   }
-
-
 }

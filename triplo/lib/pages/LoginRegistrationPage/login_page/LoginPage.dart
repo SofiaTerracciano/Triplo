@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       debugPrint("Login error: $e\n");
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("$local.login_failed : $e")));
+      ).showSnackBar(SnackBar(content: Text("${local.login_failed} : $e")));
     }
   }
 
@@ -265,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () =>
                       Navigator.pushNamed(context, '/registration'),
                   child: Text(
-                    "$local.no_account_label $local.signup_label",
+                    "${local.no_account_label} ${local.signup_label}",
                     style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
