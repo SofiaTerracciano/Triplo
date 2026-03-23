@@ -11,12 +11,16 @@ import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'API.dart';
+
  /// Controller responsible for managing trekking data, handling 
  /// synchronization with Firestore, image caching, and user favorites.
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+
+  final CollectionReference<Map<String, dynamic>> _weatherNotificationRef = FirebaseFirestore.instance.collection('weather_notification');
   List<Trekking> _trekkings;
   bool _loaded = false;
 
@@ -282,5 +286,117 @@ class TrekkingController extends ChangeNotifier {
       }
     }
     return null;
+  }
+
+
+  Future<void> enableWeatherAlertForTrekking(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _weatherNotificationRef.doc(uid).set({
+      'userId': uid,
+      'trekkingIds': FieldValue.arrayUnion([trekkingId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    notifyListeners();
+  }
+
+
+
+  Future<void> disableWeatherAlertForTrekking(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _weatherNotificationRef.doc(uid).set({
+      'userId': uid,
+      'trekkingIds': FieldValue.arrayRemove([trekkingId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    notifyListeners();
+  }
+
+  Future<bool> isWeatherAlertEnabled(String trekkingId) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return false;
+
+    final snap = await _weatherNotificationRef.doc(uid).get();
+    final ids = List<String>.from(snap.data()?['trekkingIds'] ?? []);
+    return ids.contains(trekkingId);
+  }
+
+
+
+
+  Future<List<String>> getWeatherAlertTrekkingIds() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return [];
+
+    final snap = await _weatherNotificationRef.doc(uid).get();
+    return List<String>.from(snap.data()?['trekkingIds'] ?? []);
+  }
+
+  Future<List<Trekking>> getWeatherAlertTrekkings() async {
+    final ids = await getWeatherAlertTrekkingIds();
+    final trekkings = await Future.wait(ids.map(getTrekkingByIdAsync));
+    return trekkings.whereType<Trekking>().toList();
+  }
+
+  Future<void> updateWeatherNotificationLastCheck() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+
+    await _weatherNotificationRef.doc(uid).set({
+      'userId': uid,
+      'lastCheckAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> checkSubscribedWeatherAlerts(API api) async {
+    debugPrint("checkSubscribedWeatherAlerts: start");
+
+    final trekkings = await getWeatherAlertTrekkings();
+    debugPrint("Subscribed trekkings: ${trekkings.length}");
+
+    for (final trekking in trekkings) {
+      debugPrint("Checking trekking: ${trekking.name} (${trekking.documentId})");
+
+      final target = trekking.starting_point ?? trekking.ending_point;
+      if (target == null) {
+        debugPrint("No coordinates for ${trekking.name}");
+        continue;
+      }
+
+      final real = await api.weatherbitAlerts(
+        target.latitude,
+        target.longitude,
+      );
+
+      final mock = await api.mockAlerts();
+
+      final alerts = [...real, ...mock];
+
+      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}");
+
+      if (alerts.isEmpty) continue;
+
+      final first = alerts.first;
+      final title =
+      (first['event'] ?? first['title'] ?? 'Weather alert').toString();
+
+      debugPrint("Showing notification for ${trekking.name}");
+
+      await notification.showWeatherNotification(
+        id: trekking.documentId.hashCode,
+        title: title,
+        body: 'Alert for ${trekking.name}',
+      );
+
+      debugPrint("Notification requested for ${trekking.name}");
+    }
+
+    debugPrint("checkSubscribedWeatherAlerts: end");
   }
 }

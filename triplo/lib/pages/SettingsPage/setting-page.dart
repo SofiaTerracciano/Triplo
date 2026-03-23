@@ -3,6 +3,7 @@ import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
+import 'package:triplo/pages/SettingsPage/weather_notification_page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../../exception/change_email_exception.dart';
 import '../HomePage/home-page.dart';
@@ -357,6 +358,19 @@ class _SettingPageState extends State<SettingPage> {
               },
               icon: const Icon(Icons.qr_code_scanner),
               label: Text(local.watch_pair_label),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const WeatherAlertSubscriptionPage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.notifications_active),
+              label: Text(local.weather_alerts_label),
             ),
 
             const SizedBox(height: 30),

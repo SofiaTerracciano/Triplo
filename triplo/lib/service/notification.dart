@@ -104,6 +104,21 @@ class NotificationService {
     await _notifications.show(id, title, body, platformDetails,
         payload: payload);
   }
+  Future<void> showWeatherNotification({
+    required int id,
+    required String title,
+    required String body,
+    String payload = 'weather_alert',
+  }) async {
+    await showTrekkingNotification(
+      id: id,
+      title: title,
+      body: body,
+      payload: payload,
+      channelId: 'weather_alerts_channel',
+      channelName: 'Weather Alerts',
+    );
+  }
 }
 
 Map<String, String> getChallengeContent(

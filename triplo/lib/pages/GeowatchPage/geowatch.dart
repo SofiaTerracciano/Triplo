@@ -7,6 +7,7 @@ import 'package:triplo/controller/API.dart';
 
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
 
+import '../../controller/trekking.dart';
 import '../../l10n/app_localizations.dart';
 import 'google_satellite_page.dart';
 
@@ -16,7 +17,18 @@ class GeoWatchPage extends StatefulWidget {
   final LatLng? trailCenter;
 
 
-  const GeoWatchPage({Key? key, this.trailCenter}) : super(key: key);
+
+
+
+  final String? trekkingId;
+  final String? trekkingName;
+
+  const GeoWatchPage({
+    Key? key,
+    this.trailCenter,
+    this.trekkingId,
+    this.trekkingName,
+  }) : super(key: key);
 
   @override
   State<GeoWatchPage> createState() => _GeoWatchPageState();
@@ -26,8 +38,8 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   late API api;
   AppLocalizations get local => AppLocalizations.of(context)!;
   bool _initialized = false;
-
-
+  bool _weatherAlertEnabled = false;
+  bool _loadingAlertState = true;
 
   @override
   void didChangeDependencies() {
@@ -35,7 +47,10 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
     if (!_initialized) {
       api = context.read<API>();
-      _loadAll();
+      _loadAlertState().then((_) {
+        _loadAll();
+      });
+
 
       _timer = Timer.periodic(
         const Duration(minutes: 5),
@@ -127,6 +142,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
         _loading = false;
       });
     }
+    //_loadAlertState();
   }
 
   @override
@@ -155,6 +171,23 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
       appBar: AppBar(
         title: Text(local.weather_title),
         centerTitle: true,
+        actions: [
+          if (widget.trekkingId != null)
+            IconButton(
+              icon: _loadingAlertState
+                  ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+                  : Icon(
+                _weatherAlertEnabled
+                    ? Icons.notifications_active
+                    : Icons.notifications_none,
+              ),
+              onPressed: _loadingAlertState ? null : _toggleWeatherAlert,
+            ),
+        ],
       ),
         extendBodyBehindAppBar: false,
         body: Stack(
@@ -162,7 +195,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
         ListView(
         padding: const EdgeInsets.all(12),
         children: [
-          // ========= HEADER METEO (DETTAGLIO SUBITO) =========
+          // ========= HEADER METEO  =========
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -525,11 +558,72 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   }
 
 
-
   @override
   void dispose() {
     _timer.cancel();
     super.dispose();
+  }
+
+
+
+  Future<void> _loadAlertState() async {
+    if (widget.trekkingId == null) {
+      if (!mounted) return;
+      setState(() {
+        _weatherAlertEnabled = false;
+        _loadingAlertState = false;
+      });
+      return;
+    }
+
+    final trekkingController = context.read<TrekkingController>();
+    final enabled = await trekkingController.isWeatherAlertEnabled(
+      widget.trekkingId!,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _weatherAlertEnabled = enabled;
+      _loadingAlertState = false;
+    });
+  }
+
+  Future<void> _toggleWeatherAlert() async {
+    final trekkingId = widget.trekkingId;
+    if (trekkingId == null) return;
+
+    final trekkingController = context.read<TrekkingController>();
+
+    try {
+      if (_weatherAlertEnabled) {
+        await trekkingController.disableWeatherAlertForTrekking(trekkingId);
+      } else {
+        await trekkingController.enableWeatherAlertForTrekking(trekkingId);
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _weatherAlertEnabled = !_weatherAlertEnabled;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _weatherAlertEnabled
+                ? "Weather notification enabled"
+                : "Weather notification disabled",
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error updating weather notification"),
+        ),
+      );
+    }
   }
 
 }
@@ -598,6 +692,8 @@ class AlertDetailPage extends StatelessWidget {
     required this.headline,
     required this.description,
   });
+
+
 
   @override
   Widget build(BuildContext context) {

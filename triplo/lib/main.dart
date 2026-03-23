@@ -6,7 +6,9 @@ import 'package:triplo/pages/LoginRegistrationPage/forgotten_password_page/forgo
 import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
 import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
+import 'package:triplo/pages/offline_page.dart';
 import 'package:triplo/service/authservice.dart';
+import 'package:triplo/service/backgroundservice.dart';
 import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/internetservice.dart';
 import 'package:triplo/service/memory.dart';
@@ -167,8 +169,9 @@ class MyApp extends StatelessWidget {
 
           return Consumer<Language>(
             builder: (context, lang, child) {
-              return MaterialApp(
-                title: 'Triplo',
+              return BackgroundServiceHost(
+                  child: MaterialApp(
+                  title: 'Triplo',
                 debugShowCheckedModeBanner: false,
                 navigatorKey: navKey,
 
@@ -203,6 +206,7 @@ class MyApp extends StatelessWidget {
                   '/registration': (context) => RegistrationPage(),
                   '/forgotten_password': (context) => ForgottenPasswordPage(),
                   '/login': (context) => LoginPage(),
+                  //'/offline': (context) => OfflinePage(),
                 }
                 
 
@@ -222,12 +226,46 @@ class MyApp extends StatelessWidget {
                   '/offline': (context) => const OfflinePage(),
                   '/navigation': (context) => CompassAltitudePage(),
                 },*/
+              )
               );
             },
           );
         },
       ),
     );
+  }
+}
+
+class BackgroundServiceHost extends StatefulWidget {
+  final Widget child;
+
+  const BackgroundServiceHost({super.key, required this.child});
+
+  @override
+  State<BackgroundServiceHost> createState() => _BackgroundServiceHostState();
+}
+class _BackgroundServiceHostState extends State<BackgroundServiceHost> {
+  BackgroundService? _backgroundService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _backgroundService = BackgroundService(context);
+      _backgroundService!.start();
+    });
+  }
+
+  @override
+  void dispose() {
+    _backgroundService?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
 

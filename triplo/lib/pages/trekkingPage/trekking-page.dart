@@ -572,9 +572,11 @@ class _TrekkingPageState extends State<TrekkingPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              GeoWatchPage(trailCenter: center),
-                        ),
+                          builder: (context) => GeoWatchPage(
+                            trailCenter: center,
+                            trekkingId: trekking.documentId,
+                            trekkingName: trekking.name,
+                          )),
                       );
                     },
 
