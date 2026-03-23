@@ -11,7 +11,7 @@ import '../model/trekking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'API.dart';
+
 
  /// Controller responsible for managing trekking data, handling 
  /// synchronization with Firestore, image caching, and user favorites.
@@ -354,49 +354,5 @@ class TrekkingController extends ChangeNotifier {
     }, SetOptions(merge: true));
   }
 
-  Future<void> checkSubscribedWeatherAlerts(API api) async {
-    debugPrint("checkSubscribedWeatherAlerts: start");
 
-    final trekkings = await getWeatherAlertTrekkings();
-    debugPrint("Subscribed trekkings: ${trekkings.length}");
-
-    for (final trekking in trekkings) {
-      debugPrint("Checking trekking: ${trekking.name} (${trekking.documentId})");
-
-      final target = trekking.starting_point ?? trekking.ending_point;
-      if (target == null) {
-        debugPrint("No coordinates for ${trekking.name}");
-        continue;
-      }
-
-      final real = await api.weatherbitAlerts(
-        target.latitude,
-        target.longitude,
-      );
-
-      final mock = await api.mockAlerts();
-
-      final alerts = [...real, ...mock];
-
-      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}");
-
-      if (alerts.isEmpty) continue;
-
-      final first = alerts.first;
-      final title =
-      (first['event'] ?? first['title'] ?? 'Weather alert').toString();
-
-      debugPrint("Showing notification for ${trekking.name}");
-
-      await notification.showWeatherNotification(
-        id: trekking.documentId.hashCode,
-        title: title,
-        body: 'Alert for ${trekking.name}',
-      );
-
-      debugPrint("Notification requested for ${trekking.name}");
-    }
-
-    debugPrint("checkSubscribedWeatherAlerts: end");
-  }
 }
