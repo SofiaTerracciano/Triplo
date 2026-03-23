@@ -276,23 +276,7 @@ class _SettingPageState extends State<SettingPage> {
 
             //const SizedBox(height: 6),
 
-            if (context.watch<UserController>().isPasswordUser && _emailChangeRequested)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  icon: const Icon(Icons.login),
-                  label: const Text("Sign in again with the new email"),
-                  onPressed: () async {
-                    await context.read<UserController>().logout();
-                    if (!context.mounted) return;
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/login',
-                          (route) => false,
-                    );
-                  },
-                ),
-              ),
+
 
             const Divider(height: 1),
             ListTile(
@@ -521,7 +505,7 @@ class _SettingPageState extends State<SettingPage> {
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, dialogSetState) {
             return AlertDialog(
               title: Text(local.email_label),
               content: Column(
@@ -545,7 +529,7 @@ class _SettingPageState extends State<SettingPage> {
                           obscure ? Icons.visibility : Icons.visibility_off,
                         ),
                         onPressed: () {
-                          setState(() {
+                          dialogSetState(() {
                             obscure = !obscure;
                           });
                         },
@@ -567,7 +551,6 @@ class _SettingPageState extends State<SettingPage> {
                     if (newEmail.isEmpty || currentPassword.isEmpty) {
                       return;
                     }
-
 
                     try {
                       await userController.changeEmail(
