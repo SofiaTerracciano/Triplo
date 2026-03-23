@@ -9,6 +9,7 @@ class OfflinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -23,12 +24,23 @@ class OfflinePage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 local.offline_mode_label,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 local.no_internet,
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/navigation');
+                },
+                icon: const Icon(Icons.explore),
+                label: Text(local.navigation_page_title),
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
 import 'package:triplo/pages/LoginRegistrationPage/forgotten_password_page/forgotten_password_page.dart';
 import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
 import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
@@ -26,7 +27,7 @@ import 'package:triplo/controller/diary.dart';
 import 'package:triplo/controller/API.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
-
+bool _isShowingOfflinePage = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,9 +163,17 @@ class MyApp extends StatelessWidget {
             if (nav == null) return;
 
             // Naviga a /offline solo se perde la connessione
-            if (!internet.isOnline) {
+            if (!internet.isOnline && !_isShowingOfflinePage) {
+              _isShowingOfflinePage = true;
               nav.pushNamedAndRemoveUntil('/offline', (r) => false);
+              return;
             }
+
+            if (internet.isOnline && _isShowingOfflinePage) {
+              _isShowingOfflinePage = false;
+              nav.pushNamedAndRemoveUntil('/user', (r) => false);
+            }
+
           });
 
           return Consumer<Language>(
@@ -206,9 +215,10 @@ class MyApp extends StatelessWidget {
                   '/registration': (context) => RegistrationPage(),
                   '/forgotten_password': (context) => ForgottenPasswordPage(),
                   '/login': (context) => LoginPage(),
-                  //'/offline': (context) => OfflinePage(),
+                  '/offline': (context) => OfflinePage(),
+                  '/navigation': (context) => CompassAltitudePage(),
                 }
-                
+
 
                 /*initialRoute: '/landing_page',
 

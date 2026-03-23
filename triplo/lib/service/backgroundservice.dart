@@ -22,7 +22,7 @@ class BackgroundService with WidgetsBindingObserver {
     _run();
 
     _timer = Timer.periodic(
-      const Duration(minutes: 10),
+      const Duration(minutes: 12),
           (_) => _run(),
     );
   }

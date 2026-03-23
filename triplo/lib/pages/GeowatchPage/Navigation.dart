@@ -14,6 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 class CompassAltitudePage extends StatefulWidget {
   const CompassAltitudePage({super.key});
 
+
   @override
   State<CompassAltitudePage> createState() => _CompassAltitudePageState();
 }
