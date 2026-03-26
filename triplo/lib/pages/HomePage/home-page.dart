@@ -38,9 +38,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     mapController = MapController();
 
-    Future.microtask(() {
+    /*Future.microtask(() {
       context.read<TrekkingController>().loadTrekking();
-    });
+    });*/
   }
 
 

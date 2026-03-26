@@ -51,6 +51,10 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
+
+    Future.microtask(() {
+      context.read<TrekkingController>().loadTrekking();
+    });
   }
 
   Future<void> _loadDiaries() async {
@@ -63,6 +67,7 @@ class _UserPageState extends State<UserPage> {
     await diaryController.loadPrivateDiary(currentUserId);
 
   }
+
   /*
   Future<void> _loadUser() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;

@@ -95,9 +95,11 @@ class _DiaryPageState extends State<DiaryPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ModifyDiaryPage(
-                              trekkingId: trekkingController.getTrekkingId(
-                                diary.trekkigName,
-                              )!,
+                              trekkingId:
+                                  trekkingController.getTrekkingId(
+                                    diary.trekkigName,
+                                  ) ??
+                                  '',
                               diaryId: widget.diaryId,
                             ),
                           ),
