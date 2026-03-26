@@ -1,8 +1,17 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:latlong2/latlong.dart';
 import '/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
+  final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+  StreamSubscription? _subscription;
+  
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
@@ -30,6 +39,29 @@ class NotificationService {
       },
     );
   }
+
+  void startListening({
+      required void Function(LatLng location) onLocationUpdate,
+    }) {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) return;
+
+      _subscription = _firestore
+          .collection('location')
+          .doc(userId)
+          .snapshots()
+          .listen((doc) {
+            if (!doc.exists) return;
+            final lat = (doc['lat'] as num).toDouble();
+            final lng = (doc['lng'] as num).toDouble();
+            onLocationUpdate(LatLng(lat, lng));
+          });
+    }
+
+    void stopListening() {
+      _subscription?.cancel();
+      _subscription = null;
+    }
 
   // Tutta la logica del tap sulla notifica è qui dentro
   void _handleNotificationTap(String payload) {
@@ -120,12 +152,12 @@ class NotificationService {
   }
 
   Future<void> showTrekkingNotification({
-    required int id,
-    required String title,
-    required String body,
-    required String payload,
-    String channelId = 'notifications_channel',
-    String channelName = 'Notifications',
+  required int id,
+  required String title,
+  required String body,
+  required String payload,
+  String channelId = 'notifications_channel',
+  String channelName = 'Notifications',
   }) async {
     final NotificationDetails platformDetails = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -137,8 +169,13 @@ class NotificationService {
       ),
     );
 
-    await _notifications.show(id, title, body, platformDetails,
-        payload: payload);
+    await _notifications.show(
+      id, 
+      title, 
+      body, 
+      platformDetails, 
+      payload: payload,
+    );
   }
 }
 

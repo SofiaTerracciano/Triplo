@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/challenges.dart';
 import '../service/notification.dart';
 import '../service/memory.dart';
 
 /// Controller responsible for managing "Challenges" data.
-/// It handles fetching challenges from Firestore, managing image caching 
+/// It handles fetching challenges from Firestore, managing image caching
 /// for challenge badges/icons, and triggering challenge-related notifications.
 class ChallengesController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -19,10 +20,12 @@ class ChallengesController extends ChangeNotifier {
 
   /// Service used to trigger local push notifications.
   NotificationService notification;
+
   /// Service used for multi-level image caching (RAM and Disk).
   MemoryService memory;
 
-  ChallengesController({required this.notification, required this.memory}) : _challenges = [];
+  ChallengesController({required this.notification, required this.memory})
+    : _challenges = [];
 
   /// Returns the local list of all loaded challenge instances.
   List<Challenges> get allChallenges => _challenges;
@@ -34,9 +37,7 @@ class ChallengesController extends ChangeNotifier {
     _loaded = true;
 
     // Fetch trekking documents from Firestore
-    final snap = await _db
-        .collection('challenges')
-        .get();
+    final snap = await _db.collection('challenges').get();
 
     // Map documents to Trekking objects and store in the list --> this function create a
     // list of istance of trekkning (model)
@@ -99,10 +100,9 @@ class ChallengesController extends ChangeNotifier {
 
       // Download from network and persist in local caches
       debugPrint("Challenge image not in cache, downloading");
-      final file = await memory.cacheImageOnDisk(cacheableUrl); 
+      final file = await memory.cacheImageOnDisk(cacheableUrl);
       memory.saveImageToMemory(imagePath, file);
       return file;
-
     } catch (e) {
       debugPrint("getCachedImage challenge error: $e");
       return null;
@@ -112,16 +112,16 @@ class ChallengesController extends ChangeNotifier {
   /// Triggers a local notification when a new challenge is unlocked or completed.
   /// [challengeType] represents the key used to fetch localized content.
   /// [local] is the [AppLocalizations] instance used to translate the message.
+  /// Triggers a local notification when a new challenge is unlocked or completed.
   void notifyNewChallenge(String challengeType, AppLocalizations local) {
-    // Helper function (external) to get the correct title/body based on the type
-    final content = getChallengeContent(challengeType, local);
-    
-    notification.showTrekkingNotification(
-      id: DateTime.now().millisecond,
-      title: content['title']!,
-      body: content['body']!,
-      payload: challengeType,
-    );
-  }
+  final content = getChallengeContent(challengeType, local);
+
+  notification.showTrekkingNotification(
+    id: DateTime.now().millisecondsSinceEpoch ~/ 1000, 
+    title: content['title'] ?? "Challenge",
+    body: content['body'] ?? "",
+    payload: challengeType,
+  );
+}
 
 }

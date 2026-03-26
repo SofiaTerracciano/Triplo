@@ -8,9 +8,9 @@ class PermissionService {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool alreadyAsked = prefs.getBool('first_time_permissions_asked') ?? false;
 
-  if (!alreadyAsked) {
+  //if (!alreadyAsked) {
     // ASPETTIAMO 3 secondi per stabilizzare la sessione login
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     
     // 1. Chiediamo le Notifiche
     await Permission.notification.request();
@@ -23,11 +23,11 @@ class PermissionService {
     if (status.isGranted) {
       // Nota: su Android questo potrebbe mandare l'utente in una pagina 
       // di impostazioni invece di mostrare un pop-up. 
-
+      await Future.delayed(const Duration(milliseconds: 500));
       await Permission.locationAlways.request();
     }
 
     await prefs.setBool('first_time_permissions_asked', true);
   }
 }
-}
+//}

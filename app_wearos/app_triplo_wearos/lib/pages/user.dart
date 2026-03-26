@@ -19,7 +19,7 @@ class UserPage extends StatelessWidget {
     bool fullWidth = false,
   }) {
     final primaryColor = Theme.of(context).colorScheme.primary;
-    
+
     Widget card = InkWell(
       onTap: onTap,
       child: Card(
@@ -44,8 +44,8 @@ class UserPage extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 9, 
-                  fontWeight: FontWeight.w500
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -54,7 +54,9 @@ class UserPage extends StatelessWidget {
       ),
     );
 
-    return fullWidth ? SizedBox(width: double.infinity, child: card) : Expanded(child: card);
+    return fullWidth
+        ? SizedBox(width: double.infinity, child: card)
+        : Expanded(child: card);
   }
 
   @override
@@ -66,13 +68,10 @@ class UserPage extends StatelessWidget {
 
     final isOwnProfile = uidOverride == null;
     final uid = uidOverride ?? userCtrl.effectiveUid;
+    print(userCtrl.currentUser);
 
     if (uid == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator()
-        )
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return FutureBuilder(
@@ -80,9 +79,7 @@ class UserPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator()
-            )
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -116,16 +113,20 @@ class UserPage extends StatelessWidget {
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.grey[200],
-                      backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                      child: photoUrl.isEmpty ? const Icon(Icons.person, size: 20) : null,
+                      backgroundImage: photoUrl.isNotEmpty
+                          ? NetworkImage(photoUrl)
+                          : null,
+                      child: photoUrl.isEmpty
+                          ? const Icon(Icons.person, size: 20)
+                          : null,
                     ),
                     const SizedBox(height: 4),
                     // Username row
                     Text(
                       user.username,
                       style: const TextStyle(
-                        fontSize: 13, 
-                        fontWeight: FontWeight.bold
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     // Level row
@@ -135,15 +136,15 @@ class UserPage extends StatelessWidget {
                         Text(
                           "${local.level_label}: ",
                           style: const TextStyle(
-                            fontSize: 10, 
-                            color: Colors.grey
+                            fontSize: 10,
+                            color: Colors.grey,
                           ),
                         ),
                         Text(
                           levelName,
                           style: TextStyle(
-                            fontSize: 10, 
-                            fontWeight: FontWeight.bold, 
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                             color: levelColor,
                           ),
                         ),
@@ -166,32 +167,32 @@ class UserPage extends StatelessWidget {
                         return Row(
                           children: [
                             _statButton(
-                              context: context, 
-                              label: local.follower_label, 
+                              context: context,
+                              label: local.follower_label,
                               value: followers.length,
                               onTap: () => Navigator.push(
-                                context, 
+                                context,
                                 MaterialPageRoute(
                                   builder: (_) => UserListPage(
-                                    title: local.follower_label, 
-                                    uids: followers
-                                  )
-                                )
+                                    title: local.follower_label,
+                                    uids: followers,
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 4),
                             _statButton(
-                              context: context, 
-                              label: local.following_label, 
+                              context: context,
+                              label: local.following_label,
                               value: following.length,
                               onTap: () => Navigator.push(
-                                context, 
+                                context,
                                 MaterialPageRoute(
                                   builder: (_) => UserListPage(
-                                    title: local.following_label, 
-                                    uids: following
-                                  )
-                                )
+                                    title: local.following_label,
+                                    uids: following,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -206,8 +207,12 @@ class UserPage extends StatelessWidget {
                   future: diaryCtrl.fetchDiaryById(uid),
                   builder: (context, snapDiaries) {
                     final diaries = snapDiaries.data ?? [];
-                    final publicDiaries = diaries.where((d) => d.isPublic).toList();
-                    final privateDiaries = diaries.where((d) => !d.isPublic).toList();
+                    final publicDiaries = diaries
+                        .where((d) => d.isPublic)
+                        .toList();
+                    final privateDiaries = diaries
+                        .where((d) => !d.isPublic)
+                        .toList();
 
                     if (isOwnProfile) {
                       // If the profile belongs to the current user: I see both Public and Private, in two separate buttons
@@ -218,13 +223,13 @@ class UserPage extends StatelessWidget {
                             label: local.public_botton_label,
                             value: publicDiaries.length,
                             onTap: () => Navigator.push(
-                              context, 
+                              context,
                               MaterialPageRoute(
                                 builder: (_) => DiaryListPage(
-                                  title: local.public_diaries_label, 
-                                  diaries: publicDiaries
-                                )
-                              )
+                                  title: local.public_diaries_label,
+                                  diaries: publicDiaries,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -233,13 +238,13 @@ class UserPage extends StatelessWidget {
                             label: local.private_botton_label,
                             value: privateDiaries.length,
                             onTap: () => Navigator.push(
-                              context, 
+                              context,
                               MaterialPageRoute(
                                 builder: (_) => DiaryListPage(
-                                  title: local.private_diaries_label, 
-                                  diaries: privateDiaries
-                                )
-                              )
+                                  title: local.private_diaries_label,
+                                  diaries: privateDiaries,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -252,12 +257,13 @@ class UserPage extends StatelessWidget {
                         value: publicDiaries.length,
                         fullWidth: true,
                         onTap: () => Navigator.push(
-                          context, MaterialPageRoute(
+                          context,
+                          MaterialPageRoute(
                             builder: (_) => DiaryListPage(
-                              title: local.public_diaries_label, 
-                              diaries: publicDiaries
-                            )
-                          )
+                              title: local.public_diaries_label,
+                              diaries: publicDiaries,
+                            ),
+                          ),
                         ),
                       );
                     }
@@ -267,7 +273,7 @@ class UserPage extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 // Logout only if the profile belongs to the current user
-                if (isOwnProfile)...[
+                if (isOwnProfile) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ElevatedButton(
@@ -278,12 +284,12 @@ class UserPage extends StatelessWidget {
                       ),
                       onPressed: () => userCtrl.logoutWatch(),
                       child: Text(
-                        local.logout_label, 
-                        style: TextStyle(fontSize: 11)
+                        local.logout_label,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
-                ] else 
+                ] else
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ElevatedButton(
@@ -294,12 +300,12 @@ class UserPage extends StatelessWidget {
                       ),
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        local.back_label, 
-                        style: TextStyle(fontSize: 11)
+                        local.back_label,
+                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
-                 
+
                 const SizedBox(height: 12),
               ],
             ),

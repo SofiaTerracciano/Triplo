@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:app_triplo_wearos/service/notification.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,8 +29,10 @@ class API {
   /// Service responsible for managing system permissions.
   late PermissionService permission;
 
+  NotificationService notification; 
+  
   // Constructor to load API keys from .env
-  API({required this.memory, required this.geo}) {
+  API({required this.memory, required this.geo, required this.notification}) {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
 
@@ -65,6 +68,10 @@ class API {
   /// Retrieves the user's current [LatLng] coordinates using the [GeoService].
   Future<LatLng?> userLocation() async {
     return geo.userLocation();
+  }
+
+  void startlisteningLocation(Function(LatLng) onLocationUpdate) {
+    notification.startListening(onLocationUpdate: onLocationUpdate);
   }
 
   /* Fetches current weather data for the specified coordinates.

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/memory.dart';
@@ -237,6 +238,7 @@ class TrekkingController extends ChangeNotifier {
   Future<void> checkArrival(
     String trekkingId,
     double distanceInMeters,
+    Position currPos,
     AppLocalizations local,
   ) async {
     if (distanceInMeters <= 1000) {
@@ -250,6 +252,8 @@ class TrekkingController extends ChangeNotifier {
         channelId: 'arrival_channel',
         channelName: 'Arrivo Trekking',
       );
+
+      geo.uploadLocation(currPos);
     }
   }
 

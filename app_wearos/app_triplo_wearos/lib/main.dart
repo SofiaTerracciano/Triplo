@@ -115,6 +115,7 @@ class TriploWatchApp extends StatelessWidget {
         Provider<API>(create: (context) => API(
           geo: context.read<GeoService>(), 
           memory: context.read<MemoryService>(),
+          notification: context.read<NotificationService>(),
         )),
 
         // TrekkingController con le dipendenze passate correttamente

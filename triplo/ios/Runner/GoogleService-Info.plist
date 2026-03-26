@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>851089216049-la7gcbt66cn74ta2pbo0gf4ndh7v58q1.apps.googleusercontent.com</string>
+	<string>851089216049-1l5j754r01cvq21bf9ve8qpj7brs3tgo.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.851089216049-la7gcbt66cn74ta2pbo0gf4ndh7v58q1</string>
+	<string>com.googleusercontent.apps.851089216049-1l5j754r01cvq21bf9ve8qpj7brs3tgo</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>851089216049-i7jc7mev5tjtblvofkaoa1pamjktd3du.apps.googleusercontent.com</string>
+	<string>851089216049-9qnf7s8lhrkmk285djmc1licjm29bqne.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyCnmnsPHhtxqWMxnZJyM6T-8Kfq4qy_8nw</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.triplo</string>
+	<string>it.maddalena.triplo</string>
 	<key>PROJECT_ID</key>
 	<string>fir-triplo</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:851089216049:ios:fca4162062f3b5a65d7b10</string>
+	<string>1:851089216049:ios:06ed610512fda6545d7b10</string>
 </dict>
 </plist>

@@ -49,7 +49,7 @@ Future<void> main() async {
   final language = Language();
   await language.loadSavedLocale();
 
-  PermissionService.askPermissionsOnce();
+  await PermissionService.askPermissionsOnce();
 
   final notification = NotificationService();
   notification.setNavKey(navKey);

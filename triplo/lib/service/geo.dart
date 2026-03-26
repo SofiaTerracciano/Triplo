@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 
 class GeoService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   Future<LatLng?> userLocation() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
@@ -15,5 +20,18 @@ class GeoService {
       debugPrint("Error getting location: $e");
       return null;
     }
+  }
+
+  Future<void> uploadLocation(Position position) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
+
+    await _firestore
+        .collection('location')
+        .doc(userId)
+        .set({
+      'lat': position.latitude,
+      'lng': position.longitude,
+    });
   }
 }
