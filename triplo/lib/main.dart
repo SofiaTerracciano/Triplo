@@ -41,12 +41,11 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   final memoryService = MemoryService();
   final geoService= GeoService();
   final authService = AuthService();
 
-  final language = Language();
+  final language = Language(memoryService: memoryService);
   await language.loadSavedLocale();
 
   await PermissionService.askPermissionsOnce();

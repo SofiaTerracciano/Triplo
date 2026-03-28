@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService {
+  static const String _kLocaleCodeKey = 'locale_code';
   // Configurazione del CacheManager per il disco
   static final CacheManager _diskCache = CacheManager(
     Config(
@@ -70,5 +72,34 @@ class MemoryService {
   //lnaguage controller gestisce la logica, memory service il salvataggio in memoria
   //è stato rimesso in language controller ma language controller non dovrebbe parlare con shared preferences
 
+  Future<String?> getSavedLocaleCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_kLocaleCodeKey);
+    } catch (e) {
+      debugPrint("Errore recupero lingua salvata: $e");
+      return null;
+    }
+  }
+
+  Future<void> saveLocaleCode(String localeCode) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kLocaleCodeKey, localeCode);
+    } catch (e) {
+      debugPrint("Errore salvataggio lingua: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> clearSavedLocaleCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kLocaleCodeKey);
+    } catch (e) {
+      debugPrint("Errore rimozione lingua salvata: $e");
+      rethrow;
+    }
+  }
 
 }
