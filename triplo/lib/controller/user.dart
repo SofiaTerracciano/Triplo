@@ -14,11 +14,11 @@ class UserController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final AuthService _authService;
 
+
   //UserController(this._authService);
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
-
   UserController(this._authService) {
     // Chiamiamo l'inizializzazione appena il controller nasce
     _init();
@@ -42,7 +42,6 @@ class UserController extends ChangeNotifier {
       notifyListeners();
     }
   }
-
   Users? _currentUser;
   Users? get currentUser => _currentUser;
 

@@ -135,6 +135,7 @@ class API {
     }
   }
 
+
   /// Builds the full URL for the weather condition icon.
   /// Set [big] to true for higher resolution (@2x).
   String weatherIconUrl(String iconCode, {bool big = true}) {

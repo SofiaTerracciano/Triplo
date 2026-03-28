@@ -8,8 +8,8 @@
 
 
 
-\section{Overview}
-\subsection{High-level components}
+\section{Overview} \label{Overview}
+\subsection{High-level components} \label{High-level components}
 
 
 
@@ -20,16 +20,24 @@ The Triplo system is designed according to a modular architecture in which the m
     \label{Overview Diagram}
     \centering
     \includegraphics[width=0.8\linewidth]{./images/Overview.png}
-    \caption{Overview Diagram: Blue lines denote the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines denote the smartwatch application’s connectivity, which is limited to selected Firebase services, Firestore and Storage and specific external services, for example OpenTopoMap.}
+    \caption{Overview Diagram: Blue lines denote the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines denote the smartwatch application’s connectivity, which is limited to selected Firebase services, Firestore and Storage and specific external services, for example OpenTopoMap. The smartphone and smartwatch applications access the network independently, reflecting their ability to operate as standalone clients, while still relying on a shared set of backend services for data and functionality.}
 \end{figure}
 \newpage
 
 
 
 
-The system separates concerns between presentation, application logic, and data management. Both the presentation layer and the core application logic are implemented within the Flutter-based applications. In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources. \\ \\
-The application directly manages user interactions, business logic, and coordination between components. \\
-Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. This design choice shifts part of the traditional server-side responsibilities to the client, which becomes responsible for orchestrating application logic and interactions with backend services.  \\
+\subsection{High level components interaction} \label{High level components interaction}
+\begin{figure}[H]
+    \label{Overview Diagram}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/overview diagram 2.png}
+    \caption{Detailed Overview Diagram}
+\end{figure}
+The system separates concerns between presentation, application logic, and data management by adopting a Model–View–Controller (MVC) architectural pattern. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. \\
+In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources.\\
+User interactions are handled by the View layer, while business logic and coordination between components are delegated to Controllers, which act as the central mediation layer between the user interface and the underlying data models.\\
+Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
 The adoption of Backend-as-a-Service (BaaS) solutions enables the system to replace a traditional custom server-side layer with a more lightweight and scalable architecture. By delegating data management, authentication, and storage to managed services, architectural complexity is reduced by eliminating the need for maintaining a dedicated custom backend infrastructure.
 In addition to Firebase, the system integrates external third-party services (e.g., weather, map, and satellite APIs), which are accessed via RESTful APIs over HTTPS. \\
 This architectural approach emphasizes a client-driven design, reduces backend complexity, and enables scalability by leveraging managed cloud services.
@@ -41,18 +49,18 @@ This architectural approach emphasizes a client-driven design, reduces backend c
 
 
 
-\subsection{High level components interaction}
 
 
 
 
 
 
-The mobile application represents the entry point of the system and runs on the user's device. It is responsible for handling user interaction, application logic, and coordination between components according to an MVC-inspired architecture. \\
-The system relies on different application components to interact with the required services. \\
-In particular, domain controllers, for example the \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, \texttt{ChallengeController} coordinate access to data and backend resources, while specialized components such as the \texttt{APIController} manage communication with external third-party APIs. \\
-Data persistence, authentication, and file storage are handled through Firebase, which is adopted as a Backend-as-a-Service (BaaS) platform. Interaction with Firebase services (Authentication, Cloud Firestore, and Storage) is performed through platform-specific SDKs rather than through explicitly defined REST APIs. \\
-Communication with external third-party services (e.g., weather, map, or satellite APIs) is instead performed using RESTful APIs over HTTPS. \\
+
+%The mobile application represents the entry point of the system and runs on the user's device. It is responsible for handling user interaction, application logic, and coordination between components according to an MVC-inspired architecture. \\
+%The system relies on different application components to interact with the required services. \\
+%In particular, domain controllers, for example the \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, \texttt{ChallengeController} coordinate access to data and backend resources, while specialized components such as the \texttt{APIController} manage communication with external third-party APIs. \\
+%Data persistence, authentication, and file storage are handled through Firebase, which is adopted as a Backend-as-a-Service (BaaS) platform. Interaction with Firebase services (Authentication, Cloud Firestore, and Storage) is performed through platform-specific SDKs rather than through explicitly defined REST APIs. \\
+%Communication with external third-party services (e.g., weather, map, or satellite APIs) is instead performed using RESTful APIs over HTTPS. \\
 This approach removes the need for a dedicated backend gateway or custom server-side components, allowing the application to directly orchestrate interactions with backend services and external resources. \\
 
 
@@ -66,7 +74,38 @@ This approach removes the need for a dedicated backend gateway or custom server-
     \caption{High level component view}
 \end{figure}
 
-\subsection{Mobile Smartphone App component view}
+
+
+
+
+
+
+
+The high-level component diagram provides an overview of the main architectural elements of the system and their interactions. The system is composed of two client applications, namely the smartphone application and the smartwatch application, both relying on a shared set of backend services and external resources. \\
+The graphical user interfaces (GUIs) are represented following the convention adopted in both the \textit{Software Engineering} and \textit{UML Distilled} books quoted in the references. In this context, each GUI represents a group of related pages or a major functional area of the application, rather than a single page. \\
+The diagram highlights the presence of two versions of the application. The smartphone application represents the main client and provides the full set of functionalities. It is implemented using Flutter, which enables cross-platform development and allows the application to run on both Android and iOS devices, as explained in section \ref{Other Design Decisions}. \\
+The smartwatch application represents a lightweight extension of the system and is deployed on Wear OS, as discussed in section \ref{Other Design Decisions} .
+It provides a subset of functionalities adapted to the constraints of wearable devices. \\
+Both applications interact with a common set of backend services and selected external resources. In particular, both the smartphone and smartwatch applications access Firestore for data storage and Firebase Storage for media management, as well as shared external services such as OpenTopoMap for map visualization. However, the smartwatch application is intentionally restricted to a subset of services, reflecting its role as a lightweight client and the constraints of wearable devices. \\
+An architectural difference regards authentication. While the smartphone application directly relies on Firebase Authentication, the smartwatch application does not perform authentication independently. Instead, it adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
+This design choice provides several advantages, detailed in section \ref{Phone Smartwatch Pairing}
+
+
+
+
+
+
+Access to backend resources such as Firestore, Firebase Storage, and selected external services is otherwise shared between the smartphone and smartwatch applications. The diagram explicitly shows which services are accessible from each client, clarifying the distribution of responsibilities. \\
+The system also integrates multiple external services, for example map providers such as OpenTopoMap and Google Satellite View, as well as external authentication providers. Weather alert functionalities rely on both Weatherbit and a Demo Meteo Server. The latter is used exclusively for demonstration purposes, allowing the simulation of weather alerts without depending on real external conditions. \\
+
+The operating system interfaces are modeled as platform components, Smartphone OS and Watch OS. These platforms are not accessed directly by the application; instead, access is mediated through Flutter packages that provide abstractions over native operating system services. The specific packages used to interact with such services are detailed in the diagrams of the smartphone application components, section \ref{Mobile Smartphone App component view} and of the smartwatch application components, section \ref{Mobile Smartwatch App component view}. \\
+The interfaces associated with Firebase services, Firebase Authentication, Firestore, and Firebase Storage are based on the SDKs provided by the Backend-as-a-Service platform. These SDKs abstract the underlying communication mechanisms and offer a structured way to access backend functionalities, as documented in the Firebase official documentation. \\
+In contrast, the remaining external interfaces, such as Weather API, Weather Alert API, Satellite API, are accessed through RESTful communication. In these cases, the application uses HTTP-based requests via Flutter libraries, handling data exchange in JSON format and performing client-side decoding. \\
+The token verification API is not directly managed within the application logic but is represented the complete authentication flow. In particular, when authentication is performed through an external provider, Google, the application obtains an authentication token which is then passed to Firebase Authentication. Firebase subsequently validates this token with the external provider as part of the OAuth2-based authentication process. This additional interaction is abstracted by the SDK but is included in the diagram to provide a more accurate representation of the overall system behavior. \\
+
+
+\subsection{Mobile Smartphone App component view} \label{Mobile Smartphone App component view}
+
 
 
 \begin{figure}[H]
@@ -90,6 +129,65 @@ Therefore, in the proposed architecture:
 \end{itemize}
 
 
+\subsubsection{Smartphone Application External Libraries}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|p{6cm}|l|}
+\hline
+\textbf{Package} & \textbf{Purpose} \\
+\hline
+
+flutter & Core UI toolkit for building cross-platform applications \\
+\hline
+provider & State management and implementation of the Observer pattern  \\
+\hline
+firebase\_core & Initialization of Firebase services \\
+\hline
+firebase\_auth & User authentication management  \\
+\hline
+cloud\_firestore & Firebase cloud database for application data \\
+\hline
+firebase\_storage & Cloud storage for images and media files \\
+\hline
+google\_sign\_in & Google authentication integration \\
+\hline
+flutter\_map & Map rendering using OpenStreetMap tiles  \\
+\hline
+latlong2 & Geographic coordinate utilities \\
+\hline
+geolocator & Device location services \\
+\hline
+geocoding & Address and location conversion \\
+\hline
+flutter\_compass & Compass and orientation data \\
+\hline
+image\_picker & Image selection from device gallery or camera \\
+\hline
+mobile\_scanner & QR code scanning functionality \\
+\hline
+shared\_preferences & Local persistent key-value storage \\
+\hline
+flutter\_local\_notifications & Local notification management \\
+\hline
+permission\_handler & Runtime permission handling \\
+\hline
+flutter\_dotenv & Environment variable management \\
+\hline
+uuid & Unique identifiers\\
+\hline
+intl & Internationalization and localization utilities \\
+\hline
+share\_plus & Content sharing across apps \\
+\hline
+flutter\_cache\_manager & Image and file caching \\
+\hline
+cupertino\_icons & iOS-style icon set \\
+\hline
+
+\end{tabular}
+\caption{Main dependencies used in the smartphone application}
+\end{table}
 
 
 
@@ -97,14 +195,46 @@ Therefore, in the proposed architecture:
 
 
 
+\subsection{Mobile Smartwatch App component view} \label{Mobile Smartwatch App component view}
 
-\subsection{Mobile Smartwatch App component view}
-
-\section{Deployment view}
+\section{Deployment view} \label{Deployment view}
 
 
-\section{Runtime view}
+
+\begin{figure}[H]
+    \label{Deloyment Diagram}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/deploymentdiagram.jpg}
+    \caption{Deplyment Diagram}
+\end{figure}
+
+
+The deployment diagram is consistent with the UML deployment notation described in chapther 8 of the UML Distilled book and on page 52 of the Software Engineering book listed in the references. 
+Physical hardware units are modeled through the \texttt{<<device>>} stereotype, while software platforms and runtime contexts are represented through the \texttt{<<executionEnvironment>>} stereotype. 
+
+The deployed software elements are shown as \texttt{<<artifact>>}. 
+Communication paths are represented by links annotated with the corresponding protocol or interaction type, such as HTTPS, REST/HTTPS, and OAuth/HTTPS.
+
+In particular, the diagram distinguishes the mobile deployment on Android and iOS devices, while the smartwatch deployment is limited to Wear OS. 
+The cloud side is modeled as a device containing different execution environments, namely Firebase and the set of external providers, which host the artifacts used by the applications.
+
+
+
+
+
+
+
+The deployment diagram represents the distribution of the application artifacts across different execution environments. In particular, the smartphone application is deployed as an artifact on both iOS and Android execution environments, while the smartwatch application is deployed separately on a Wear OS execution environment.
+
+Although the smartphone application is shown as deployed on two distinct platforms, it is important to note that it is based on a single shared codebase. The application is developed using Flutter, a cross-platform framework that allows the same source code to be compiled and executed on both iOS and Android devices. As a result, the two deployments correspond to different execution environments of the same application, rather than distinct implementations.
+
+In contrast, the smartwatch application is implemented as a separate artifact. While it shares the same backend services and part of the architectural structure, it is specifically designed for the Wear OS environment and provides a reduced set of functionalities for wearable devices. Therefore, it is represented as a distinct deployment unit in the diagram.
+
+
+
+\section{Runtime view} \label{Runtime view} 
 \subsection{Selected Use Cases}
+
 
 
 
@@ -228,15 +358,97 @@ This preserves device identity while removing user association.
 
 This design cleanly separates device identity from user authentication while minimizing credential exposure on the wearable device.
 
-\section{Component interfaces}
-
-
-\section{Selected architectural styles and patterns}
 
 
 
-\section{Other Design Decisions}
-\subsection{Network Connectivity Requirements and Platform Justification}
+\section{Component interfaces} \label{Component interfaces}
+
+
+\section{Selected architectural styles and patterns} \label{Selected architectural styles and patterns}
+
+
+
+
+
+\subsection{Architectural Patterns: Model--View--Controller with Mediator and Observer}
+
+\begin{figure}[H]
+    \label{Overview Diagram}
+    \centering
+    \includegraphics[width=0.7\linewidth]{./images/modelviewcontroller.png}
+    \caption{Model view controller pattern, adapted from Apple and Oracle documentation}
+\end{figure}
+
+The system adopts the Model--View--Controller (MVC) architectural pattern to separate presentation, application logic, and data management. Within this structure, each role is assigned a specific responsibility in order to improve modularity, maintainability, and clarity of interactions.
+
+The \textbf{Model} represents the knowledge and expertise related to the application domain. It includes the core data structures of the system, such as \texttt{Diary}, \texttt{Trekking}, and \texttt{User}. The Model is independent from the user interface and does not handle user interactions directly.
+
+The \textbf{View} is responsible for rendering the user interface and collecting user input. Its role is limited to presentation and interaction handling, without directly applying business logic or modifying domain data.
+
+The \textbf{Controller} manages the application logic and coordinates the interaction between View and Model. In the adopted variant of MVC, consistent with the interpretation described in both Apple and Oracle documentation, the Controller also plays the role of a \emph{Mediator}. More precisely, the View does not directly manipulate the Model; instead, user actions are forwarded to the Controller, which interprets them, executes the required logic, and updates the corresponding Model data. In this way, the Controller acts as the central coordination point of the interaction, reducing direct dependencies between presentation and domain data.
+
+In addition, the architecture relies on the \textbf{Observer pattern} to keep the user interface consistent with state changes. When the state managed by a Controller is updated, the interested Views are notified through the listener mechanism provided by the Flutter framework, based on ChangeNotifier, integrated via Provider, so that they can refresh their representation accordingly. This notification-based interaction avoids tight coupling and supports consistency across multiple dependent Views.
+
+Therefore, the adopted solution combines the structural organization of MVC with the use of the Mediator pattern in the Controller and the Observer pattern. This combination is particularly suitable for the Flutter-based implementation of the system, where the presentation layer, the application logic, and the domain data remain clearly separated while still cooperating through a well-defined interaction model.
+
+
+
+\section{Other Design Decisions} \label{Other Design Decisions}
+
+\subsection{Flutter as Application Framework} \label{Flutter as Application Framework}
+
+Flutter was selected for the implementation of the client applications because it provides an effective balance between cross-platform development, interface consistency, and maintainability. A primary requirement of the project was the possibility of deploying the smartphone application on both Android and iOS while preserving the same visual structure and interaction style across platforms. In this respect, Flutter offers a significant advantage, since it enables the development of a single shared codebase while also providing a uniform UI across platforms.
+
+Compared with native alternatives such as Kotlin and Swift, Flutter avoids the need to maintain two separate implementations for Android and iOS, thus reducing duplication of development effort and simplifying maintenance. Compared with other cross-platform solutions, the choice of Flutter was particularly suitable for this project because it supports the construction of a coherent and controlled UI layer, which was important for preserving the same application identity and user experience on both mobile platforms.
+
+
+
+
+
+
+\subsection{Firebase as Backend-as-a-Service} \label{Firebase as Backend-as-a-Service}
+
+The adoption of a Backend-as-a-Service solution represents a strategic architectural decision aimed at improving maintainability, scalability, and integration.  \\
+Firebase was adopted as the backend solution to support a scalable and robust system architecture while maintaining a clear separation between client-side logic and backend responsibilities. Rather than introducing a custom server-side layer, the system relies on a Backend-as-a-Service approach, where core functionalities are delegated to managed cloud services.
+
+This choice allows the architecture to focus on the coordination of application logic on the client side, while relying on well-established and production-ready services for critical backend responsibilities such as authentication, data persistence, and media storage, integrating with the client applications through platform-specific SDKs.
+
+From an architectural perspective, this approach improves modularity and reduces system complexity by eliminating the need to design and maintain a dedicated backend infrastructure. This approach presents notable advantages, including scalability, reliability, and security, through managed services that are designed to handle distributed workloads and concurrent access patterns.
+
+Furthermore, the use of Firebase aligns well with the multi-platform nature of the system, as both smartphone and smartwatch applications can interact with the same backend services in a consistent and unified manner. This contributes to maintaining a coherent data model across different devices.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Phone Smartwatch Pairing} \label{Phone Smartwatch Pairing}
+While the smartphone application directly relies on Firebase Authentication, the smartwatch application does not perform authentication independently. Instead, it adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
+This design choice provides several advantages:
+\begin{itemize}
+\item avoids handling user credentials on the smartwatch, reducing the exposure of sensitive data on a constrained and potentially less secure device 
+\item simplifies the user interaction model, eliminating the need for credential input on devices where text entry is inherently limited and less user-friendly
+\item avoids the need to enforce specific authentication methods, such as Google Sign-In, on the smartwatch, allowing the authentication process to remain centralized on the smartphone.
+\end{itemize}
+For these reasons, the interaction is intentionally defined as a pairing process rather than a traditional login, reflecting both its security properties and its role within the overall system architecture. \\
+
+
+
+
+
+
+
+
+\subsection{Network Connectivity Requirements and smartwatch Platform}
 
 The smartwatch application requires reliable access to internet connectivity in order to provide a complete and consistent user experience. 
 In particular, network access is necessary for several core functionalities of the system.

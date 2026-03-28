@@ -18,14 +18,14 @@ class BackgroundService with WidgetsBindingObserver {
   void start() {
     WidgetsBinding.instance.addObserver(this);
     debugPrint("BackgroundService started");
-
     _run();
-
     _timer = Timer.periodic(
       const Duration(minutes: 12),
           (_) => _run(),
     );
   }
+
+
 
   Future<void> _run() async {
     if (_running) return;
