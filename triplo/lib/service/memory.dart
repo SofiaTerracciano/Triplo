@@ -64,4 +64,11 @@ class MemoryService {
   void clearMemoryCache() {
     _memoryCache.clear();
   }
+
+
+  //bisogna rimettere il salvataggio in memoria della lingua con shared preferences
+  //lnaguage controller gestisce la logica, memory service il salvataggio in memoria
+  //è stato rimesso in language controller ma language controller non dovrebbe parlare con shared preferences
+
+
 }

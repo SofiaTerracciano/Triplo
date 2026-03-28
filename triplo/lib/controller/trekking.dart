@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/service/geo.dart';
+//import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
 import '../model/trekking.dart';
@@ -26,12 +26,12 @@ class TrekkingController extends ChangeNotifier {
   bool _loaded = false;
 
   // Services used for geolocation, local storage, and push notifications
-  GeoService geo;
+  //GeoService geo;
   MemoryService memory;
   NotificationService notification;
 
   TrekkingController({
-    required this.geo,
+    //required this.geo,
     required this.memory,
     required this.notification,
     required List<Trekking> trekkings,
@@ -253,8 +253,21 @@ class TrekkingController extends ChangeNotifier {
         channelName: 'Arrivo Trekking',
       );
 
-      geo.uploadLocation(currPos);
+      uploadLocation(currPos);
     }
+  }
+  //messo il metodo qui, i controller parlano con firestore
+  Future<void> uploadLocation(Position position) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
+
+    await _db
+        .collection('location')
+        .doc(userId)
+        .set({
+      'lat': position.latitude,
+      'lng': position.longitude,
+    });
   }
 
   /// Batched version of getCachedImage to handle multiple image paths simultaneously.

@@ -8,7 +8,6 @@ import 'package:latlong2/latlong.dart';
 class GeoService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   Future<LatLng?> userLocation() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
@@ -21,8 +20,9 @@ class GeoService {
       return null;
     }
   }
-
-  Future<void> uploadLocation(Position position) async {
+  //geoservice non dovrebbe parlare con firestore, è servizio per OS
+  //spostato nel controller dei trekking dove questo metodo è usato
+  /*Future<void> uploadLocation(Position position) async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) return;
 
@@ -34,4 +34,6 @@ class GeoService {
       'lng': position.longitude,
     });
   }
+
+   */
 }
