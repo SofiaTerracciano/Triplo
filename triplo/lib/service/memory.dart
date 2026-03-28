@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService {
   static const String _kLocaleCodeKey = 'locale_code';
+  static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
   // Configurazione del CacheManager per il disco
   static final CacheManager _diskCache = CacheManager(
     Config(
@@ -98,6 +99,55 @@ class MemoryService {
       await prefs.remove(_kLocaleCodeKey);
     } catch (e) {
       debugPrint("Errore rimozione lingua salvata: $e");
+      rethrow;
+    }
+  }
+
+
+  Future<Set<String>> getShownWeatherAlertKeys() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = prefs.getStringList(_kShownWeatherAlertsKey) ?? <String>[];
+      return list.toSet();
+    } catch (e) {
+      debugPrint("Errore recupero alert mostrati: $e");
+      return <String>{};
+    }
+  }
+
+  Future<void> saveShownWeatherAlertKeys(Set<String> keys) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_kShownWeatherAlertsKey, keys.toList());
+    } catch (e) {
+      debugPrint("Errore salvataggio alert mostrati: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> addShownWeatherAlertKey(String key) async {
+    final keys = await getShownWeatherAlertKeys();
+    keys.add(key);
+    await saveShownWeatherAlertKeys(keys);
+  }
+
+  Future<bool> hasShownWeatherAlertKey(String key) async {
+    final keys = await getShownWeatherAlertKeys();
+    return keys.contains(key);
+  }
+
+  Future<void> removeShownWeatherAlertKey(String key) async {
+    final keys = await getShownWeatherAlertKeys();
+    keys.remove(key);
+    await saveShownWeatherAlertKeys(keys);
+  }
+
+  Future<void> clearShownWeatherAlertKeys() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kShownWeatherAlertsKey);
+    } catch (e) {
+      debugPrint("Errore rimozione alert mostrati: $e");
       rethrow;
     }
   }

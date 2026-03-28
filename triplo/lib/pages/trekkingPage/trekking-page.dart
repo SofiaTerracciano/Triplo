@@ -588,7 +588,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
                     ),
                   ),
 
-                  const SizedBox(width: 10),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
                 ],
               ),
             ),

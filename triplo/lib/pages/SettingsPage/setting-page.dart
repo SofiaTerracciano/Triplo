@@ -373,7 +373,8 @@ class _SettingPageState extends State<SettingPage> {
               label: Text(local.weather_alerts_label),
             ),
 
-            const SizedBox(height: 30),
+            //messo per non far sovrapporre i bottoni alla navbar di android
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
       ),

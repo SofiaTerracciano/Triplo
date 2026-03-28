@@ -14,6 +14,7 @@ import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/internetservice.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/permission.dart';
+import 'package:workmanager/workmanager.dart';
 import 'controller/challenge.dart';
 import 'firebase_options.dart';
 import '../service/notification.dart';
@@ -41,6 +42,25 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+
+
+  try {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+
+    await Workmanager().registerPeriodicTask(
+      'weather-check-task',
+      weatherCheckTask,
+      frequency: const Duration(minutes: 15),
+    );
+  } catch (e) {
+    debugPrint('Workmanager setup failed: $e');
+  }
+
+
   final memoryService = MemoryService();
   final geoService= GeoService();
   final authService = AuthService();
