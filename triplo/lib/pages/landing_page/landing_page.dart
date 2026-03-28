@@ -8,7 +8,7 @@ import 'package:triplo/service/permission.dart' show PermissionService;
 
 
 
-
+/*
 
 // Import della pagina admin che carica i punti
 import 'package:triplo/update_points.dart';
@@ -126,3 +126,7 @@ class _Landing_PageState extends State<Landing_Page> {
     );
   }
 }
+
+
+
+ */

@@ -36,4 +36,19 @@ class GeoService {
   }
 
    */
+  Future<bool> isLocationServiceEnabled() async {
+    return Geolocator.isLocationServiceEnabled();
+  }
+
+  Stream<Position> getPositionStream() {
+    return Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
+    );
+  }
+
+  Future<bool> openLocationSettingsPage() async {
+    return Geolocator.openLocationSettings();
+  }
 }

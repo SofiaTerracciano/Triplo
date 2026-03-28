@@ -45,10 +45,11 @@ Future<void> main() async {
   final geoService= GeoService();
   final authService = AuthService();
 
+  final permissionService = PermissionService();
   final language = Language(memoryService: memoryService);
   await language.loadSavedLocale();
 
-  await PermissionService.askPermissionsOnce();
+  await permissionService.askPermissionsOnce();
 
   final notification = NotificationService();
   notification.setNavKey(navKey);
@@ -59,6 +60,7 @@ Future<void> main() async {
       memoryService: memoryService,
       geoService: geoService,
       authService: authService,
+      permissionService: permissionService,
       language: language,
       notification: notification,
     ),
@@ -71,12 +73,13 @@ class MyApp extends StatelessWidget {
   final AuthService authService;
   final Language language;
   final NotificationService notification;
-
+  final PermissionService permissionService;
   const MyApp({
     super.key,
     required this.memoryService,
     required this.geoService,
     required this.authService,
+    required this.permissionService,
     required this.language,
     required this.notification,
   });
@@ -113,10 +116,16 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-        ProxyProvider2<GeoService, MemoryService, API>(
-          update: (context, geo, memory, previous) => 
-              API(geo: geo, memory: memory),
+        Provider<PermissionService>.value(value: permissionService),
+        ProxyProvider3<GeoService, MemoryService, PermissionService, API>(
+          update: (context, geo, memory, permission, previous) =>
+              API(
+                geo: geo,
+                memory: memory,
+                permission: permission,
+              ),
         ),
+
         ChangeNotifierProxyProvider<API, InternetService>(
           create: (context) =>
               InternetService(api: context.read<API>())..start(),
@@ -151,10 +160,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
 
-      // ---- FIX: Consumer<InternetService> separato da Consumer<Language> ----
-      // Consumer<InternetService> gestisce la navigazione offline/online
-      // Consumer<Language> aggiorna solo il locale di MaterialApp
-      // In questo modo il cambio lingua NON resetta più lo stack di navigazione
+
       child: Consumer<InternetService>(
         builder: (context, internet, child) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -277,4 +283,5 @@ class _BackgroundServiceHostState extends State<BackgroundServiceHost> {
     return widget.child;
   }
 }
+
 

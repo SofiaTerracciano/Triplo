@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -29,7 +30,7 @@ class API {
   late PermissionService permission;
 
   // Constructor to load API keys from .env
-  API({required this.memory, required this.geo}) {
+  API({required this.memory, required this.geo, required this.permission}) {
 
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
@@ -144,16 +145,6 @@ class API {
   }
 
 
-  /*metodo che non è mai usato, vedo se eliminarlo
-  /// Extract weather information from a weather response
-  Map<String, dynamic> parseWeather(Map<String, dynamic> raw) {
-    return {
-      "place": raw["name"] ?? "Current position",
-      "temp": raw["main"]?["temp"]?.round() ?? "-",
-      "description": raw["weather"]?[0]?["description"]?.toString().toLowerCase() ?? "-",
-      "icon": raw["weather"]?[0]?["icon"] ?? "01d",
-    };
-  }*/
 
   /// Parses a single item from the forecast list into a standardized map.
   Map<String, dynamic> parseForecastItem(Map<String, dynamic> raw) {
@@ -246,4 +237,63 @@ class API {
       return [];
     }
   }
+  Future<NavigationLocationState> loadNavigationLocation() async {
+    final granted = await permission.isLocationGranted();
+
+    if (!granted) {
+      return const NavigationLocationState(
+        altitude: null,
+        position: null,
+        error: "PERMISSION_DENIED",
+        isChecking: false,
+      );
+    }
+
+    final serviceEnabled = await geo.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      return const NavigationLocationState(
+        altitude: null,
+        position: null,
+        error: "GPS_DISABLED",
+        isChecking: false,
+      );
+    }
+
+    return const NavigationLocationState(
+      altitude: null,
+      position: null,
+      error: null,
+      isChecking: false,
+    );
+  }
+
+  Stream<Position> navigationPositionStream() {
+    return geo.getPositionStream();
+  }
+
+  Future<void> openGpsSettings() async {
+    await geo.openLocationSettingsPage();
+  }
+
+  Future<void> openPermissionSettings() async {
+    await permission.openAppSettingsPage();
+  }
+
+
+
+}
+
+class NavigationLocationState {
+  final double? altitude;
+  final Position? position;
+  final String? error;
+  final bool isChecking;
+
+  const NavigationLocationState({
+    required this.altitude,
+    required this.position,
+    required this.error,
+    required this.isChecking,
+  });
 }

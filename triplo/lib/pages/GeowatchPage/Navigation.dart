@@ -3,13 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
+import '../../controller/API.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 
 class CompassAltitudePage extends StatefulWidget {
   const CompassAltitudePage({super.key});
@@ -43,15 +45,17 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
   @override
   void initState() {
     super.initState();
-    // 1. Registra l'observer per sentire quando l'app torna in primo piano
-    WidgetsBinding.instance.addObserver(this); 
-    _initLocation();
+    WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initLocation();
+    });
   }
 
   @override
   void dispose() {
     // 2. Rimuovi l'observer e cancella lo stream per evitare memory leak
-    WidgetsBinding.instance.removeObserver(this); 
+    WidgetsBinding.instance.removeObserver(this);
     _positionSub?.cancel();
     super.dispose();
   }
@@ -100,7 +104,6 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
       ),
     ).listen((position) {
       if (!mounted) return;
-
       setState(() {
         _altitude = position.altitude;
         _position = position;
@@ -109,45 +112,36 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
       });
     });
   }*/
-
   Future<void> _initLocation() async {
-    // Controlliamo lo stato attuale senza mostrare pop-up (gestiti all'avvio dell'app)
-    PermissionStatus status = await Permission.location.status;
+    final api = context.read<API>();
 
-    if (status.isGranted) {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        if (mounted) {
-          setState(() {
-            _error = "GPS_DISABLED";
-            _isChecking = false;
-          });
-        }
-        return;
-      }
+    final state = await api.loadNavigationLocation();
 
-      // Se tutto ok, avviamo il tracciamento
-      _positionSub?.cancel(); // Cancella eventuali stream precedenti
-      _positionSub = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-      ).listen((position) {
-        if (!mounted) return;
-        setState(() {
-          _altitude = position.altitude;
-          _position = position;
-          _error = null;
-          _isChecking = false;
-        });
+    if (!mounted) return;
+
+    if (state.error != null) {
+      await _positionSub?.cancel();
+      setState(() {
+        _altitude = null;
+        _position = null;
+        _error = state.error;
+        _isChecking = state.isChecking;
       });
-    } else {
-      // Se non abbiamo il permesso, mostriamo lo stato di errore
-      if (mounted) {
-        setState(() {
-          _error = "PERMISSION_DENIED";
-          _isChecking = false;
-        });
-      }
+      return;
     }
+
+    await _positionSub?.cancel();
+
+    _positionSub = api.navigationPositionStream().listen((position) {
+      if (!mounted) return;
+
+      setState(() {
+        _altitude = position.altitude;
+        _position = position;
+        _error = null;
+        _isChecking = false;
+      });
+    });
   }
 
   /*@override
@@ -191,9 +185,15 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => errorType == "GPS_DISABLED"
-                ? Geolocator.openLocationSettings()
-                : openAppSettings(),
+            onPressed: () async {
+              final api = context.read<API>();
+
+              if (errorType == "GPS_DISABLED") {
+                await api.openGpsSettings();
+              } else {
+                await api.openPermissionSettings();
+              }
+            },
             child: Text(local.open_settings_button),
           ),
         ],

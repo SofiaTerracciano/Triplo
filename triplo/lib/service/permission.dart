@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PermissionService {
   
   // Funzione unica per gestire la logica "solo la prima volta"
-  static Future<void> askPermissionsOnce() async {
+  Future<void> askPermissionsOnce() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   bool alreadyAsked = prefs.getBool('first_time_permissions_asked') ?? false;
 
@@ -28,6 +28,25 @@ class PermissionService {
     }
 
     await prefs.setBool('first_time_permissions_asked', true);
+  }
+
+
+  Future<PermissionStatus> locationStatus() async {
+    return Permission.location.status;
+  }
+
+  Future<bool> isLocationGranted() async {
+    final status = await Permission.location.status;
+    return status.isGranted;
+  }
+
+  Future<bool> isLocationDenied() async {
+    final status = await Permission.location.status;
+    return status.isDenied || status.isPermanentlyDenied;
+  }
+
+  Future<bool> openAppSettingsPage() async {
+    return openAppSettings();
   }
 }
 //}
