@@ -2,4 +2,260 @@
 
 \begin{document}
 
+
+
+
+\chapter{Functional Requirements}
+
+\subsection{Account and Profile Management}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\item \label{fr-smartphone:register-email}
+The system shall allow users to register by providing email and password
+
+
+\item \label{fr-smartphone:register-external}
+The system shall allow users to register using an external authentication provider
+
+\item \label{fr-smartphone:login-email}
+The system shall allow users to log in using email and password
+
+\item \label{fr-smartphone:login-external}
+The system shall allow users to log in using an external authentication provider
+
+\item \label{fr-smartphone:reset-password}
+The system shall allow users to reset their password
+
+\item \label{fr-smartphone:create-profile}
+When registration is successful, the system shall create a user profile
+
+\item \label{fr-smartphone:default-username}
+When registration is successful, the system shall assign a default username based on the user’s email
+
+\item \label{fr-smartphone:update-username}
+The system shall allow users to update their username
+
+\item \label{fr-smartphone:update-image}
+The system shall allow users to update their profile image
+
+\item \label{fr-smartphone:update-name}
+The system shall allow users to update their name
+
+\item \label{fr-smartphone:update-surname}
+The system shall allow users to update their surname
+
+\item \label{fr-smartphone:update-birthdate}
+The system shall allow users to update their birth date
+
+\item \label{fr-smartphone:update-email}
+When users are registered with email and password, the system shall allow them to update their email address
+
+\item \label{fr-smartphone:restore-image}
+When users are authenticated through an external provider, the system shall allow them to restore their profile image from the provider
+
+\item \label{fr-smartphone:change-language}
+The system shall allow users to change the application language
+
+\item \label{fr-smartphone:pair-watch}
+The system shall allow users to pair a smartwatch with their account
+
+\item \label{fr-smartphone:weather-notifications}
+The system shall allow users to enable weather notifications for selected routes
+
+\end{enumerate}
+
+
+
+\subsection{Home, Routes and Route Details}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\setcounter{enumi}{17}
+
+\item \label{fr-smartphone:display-routes-map}
+The system shall display routes on a map
+
+\item \label{fr-smartphone:classify-routes-difficulty}
+The system shall classify routes according to their difficulty level
+
+\item \label{fr-smartphone:display-routes-color}
+The system shall display routes using different colors based on their difficulty level
+
+\item \label{fr-smartphone:route-details}
+When a user selects a route, the system shall display detailed information about the selected route
+
+\item \label{fr-smartphone:route-info}
+The system shall display route information including starting point, ending point, difficulty level, length, estimated time, and elevation gain
+
+\item \label{fr-smartphone:family-suitability}
+The system shall indicate the suitability of a route for families
+
+\item \label{fr-smartphone:route-description}
+The system shall display a textual description of the route
+
+\item \label{fr-smartphone:refreshment-points}
+The system shall display refreshment points associated with the route
+
+\item \label{fr-smartphone:route-challenges}
+The system shall display challenges associated with the route
+
+\item \label{fr-smartphone:weather-summary}
+The system shall display summary weather information for the selected route
+
+\item \label{fr-smartphone:save-route}
+The system shall allow users to save a route to their profile
+
+\item \label{fr-smartphone:remove-saved-route}
+The system shall allow users to remove a saved route from their profile
+
+\item \label{fr-smartphone:start-navigation}
+The system shall allow users to start a navigation session for a selected route
+
+\item \label{fr-smartphone:suggest-diary}
+When a navigation session ends, the system shall suggest creating a diary entry for the route
+
+\end{enumerate}
+
+
+
+
+\subsection{Diary Management}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\setcounter{enumi}{31}
+
+\item \label{fr-smartphone:create-diary}
+The system shall allow users to create a diary entry associated with a selected route
+
+\item \label{fr-smartphone:diary-date}
+The system shall allow users to specify the date of the activity in a diary entry
+
+\item \label{fr-smartphone:diary-duration}
+The system shall allow users to specify the duration of the activity in a diary entry
+
+\item \label{fr-smartphone:select-participants}
+The system shall allow users to select followed users who participated in the activity
+
+\item \label{fr-smartphone:diary-notes}
+The system shall allow users to add textual notes to a diary entry
+
+\item \label{fr-smartphone:refreshment-stops}
+The system shall allow users to indicate the presence of refreshment stops during the activity
+
+\item \label{fr-smartphone:completed-challenges}
+The system shall allow users to select completed challenges in a diary entry
+
+\item \label{fr-smartphone:diary-mood}
+The system shall allow users to select a mood associated with the activity
+
+\item \label{fr-smartphone:upload-images}
+The system shall allow users to upload images to a diary entry
+
+\item \label{fr-smartphone:diary-visibility}
+The system shall allow users to mark a diary entry as public or private
+
+\item \label{fr-smartphone:save-diary}
+The system shall allow users to save a diary entry
+
+\item \label{fr-smartphone:discard-diary}
+The system shall allow users to discard a diary entry before saving it
+
+\end{enumerate}
+
+\subsection{Search and Challenges}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\setcounter{enumi}{43}
+
+\item \label{fr-smartphone:search-users}
+The system shall allow users to search for other users
+
+\item \label{fr-smartphone:search-routes}
+The system shall allow users to search for routes
+
+\item \label{fr-smartphone:search-results}
+The system shall display search results according to the selected search type
+
+\item \label{fr-smartphone:user-profile-display}
+The system shall display public profile information of searched users
+
+\item \label{fr-smartphone:searched-route-info}
+The system shall display route information for searched routes
+
+\item \label{fr-smartphone:followed-diaries}
+The system shall display diary entries from followed users
+
+\item \label{fr-smartphone:available-challenges}
+The system shall display the available challenges
+
+\item \label{fr-smartphone:challenge-requirements}
+The system shall display the requirements for completing each challenge
+
+\end{enumerate}
+
+
+
+
+
+\subsection{Profile and Social Features}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\setcounter{enumi}{51}
+
+\item \label{fr-smartphone:profile-info}
+The system shall display the user’s profile picture, username, and level
+
+\item \label{fr-smartphone:diary-count}
+The system shall display the number of diary entries created by the user
+
+\item \label{fr-smartphone:follower-count}
+The system shall display the number of followers of the user
+
+\item \label{fr-smartphone:following-count}
+The system shall display the number of followed users
+
+\item \label{fr-smartphone:access-follower-profile}
+The system shall allow users to access the public profile of a follower
+
+\item \label{fr-smartphone:access-following-profile}
+The system shall allow users to access the public profile of a followed user
+
+\item \label{fr-smartphone:share-profile}
+The system shall allow users to share a public link to their profile
+
+\end{enumerate}
+
+
+
+
+
+\subsection{Navigation and Sensor Information}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
+
+\setcounter{enumi}{58}
+
+\item \label{fr-smartphone:compass-info}
+The system shall display compass information
+
+\item \label{fr-smartphone:heading-degrees}
+The system shall display the current heading in degrees
+
+\item \label{fr-smartphone:altitude}
+The system shall display the user’s current altitude
+
+\item \label{fr-smartphone:coordinates}
+The system shall display the user’s current geographic coordinates
+
+\end{enumerate}
+
+
+
+
+
+
 \end{document}
