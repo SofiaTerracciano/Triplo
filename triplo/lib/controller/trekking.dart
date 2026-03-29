@@ -10,7 +10,9 @@ import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+
+import '../service/authservice.dart';
 
 
 
@@ -18,7 +20,8 @@ import 'package:firebase_auth/firebase_auth.dart';
  /// synchronization with Firestore, image caching, and user favorites.
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  AuthService authService;
+
 
 
   final CollectionReference<Map<String, dynamic>> _weatherNotificationRef = FirebaseFirestore.instance.collection('weather_notification');
@@ -30,10 +33,12 @@ class TrekkingController extends ChangeNotifier {
   MemoryService memory;
   NotificationService notification;
 
+  String? get uid => authService.currentUid;
   TrekkingController({
     //required this.geo,
     required this.memory,
     required this.notification,
+    required this.authService,
     required List<Trekking> trekkings,
   }) : _trekkings = trekkings;
 
@@ -159,7 +164,7 @@ class TrekkingController extends ChangeNotifier {
 
   /// Adds a trekking ID to the current user's 'Saved_trekkings' array in Firestore.
   Future<void> addTrekkingToSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
@@ -171,7 +176,7 @@ class TrekkingController extends ChangeNotifier {
 
   /// Removes a trekking ID from the current user's 'Saved_trekkings' array in Firestore.
   Future<void> removeTrekkingFromSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
@@ -183,7 +188,7 @@ class TrekkingController extends ChangeNotifier {
 
   /// Checks if a specific trekking ID exists in the user's favorites list.
   Future<bool> isTrekkingSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return false;
 
     final snap = await _db.collection("users").doc(uid).get();
@@ -258,12 +263,12 @@ class TrekkingController extends ChangeNotifier {
   }
   //messo il metodo qui, i controller parlano con firestore
   Future<void> uploadLocation(Position position) async {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) return;
+
+    if (uid == null) return;
 
     await _db
         .collection('location')
-        .doc(userId)
+        .doc(uid)
         .set({
       'lat': position.latitude,
       'lng': position.longitude,
@@ -307,7 +312,7 @@ class TrekkingController extends ChangeNotifier {
 
 
   Future<void> enableWeatherAlertForTrekking(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({
@@ -322,7 +327,7 @@ class TrekkingController extends ChangeNotifier {
 
 
   Future<void> disableWeatherAlertForTrekking(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({
@@ -335,7 +340,7 @@ class TrekkingController extends ChangeNotifier {
   }
 
   Future<bool> isWeatherAlertEnabled(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return false;
 
     final snap = await _weatherNotificationRef.doc(uid).get();
@@ -347,7 +352,7 @@ class TrekkingController extends ChangeNotifier {
 
 
   Future<List<String>> getWeatherAlertTrekkingIds() async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return [];
 
     final snap = await _weatherNotificationRef.doc(uid).get();
@@ -361,7 +366,7 @@ class TrekkingController extends ChangeNotifier {
   }
 
   Future<void> updateWeatherNotificationLastCheck() async {
-    final uid = _auth.currentUser?.uid;
+
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({

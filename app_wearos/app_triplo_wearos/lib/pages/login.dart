@@ -14,6 +14,7 @@ class LoginPage extends StatelessWidget {
     final userController = context.watch<UserController>();
     final local = AppLocalizations.of(context)!;
 
+
     if (userController.pairedUid != null || userController.currentUser != null) {
       return const UserPage();
     }

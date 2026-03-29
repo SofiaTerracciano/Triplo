@@ -11,9 +11,17 @@ class AuthService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Users? _currentUser;
-
   Users? get currentUser => _currentUser;
 
+  String? get currentUid => _currentUser?.uid ?? _auth.currentUser?.uid;
+
+  bool get isAuthenticated => _auth.currentUser != null;
+
+
+
+
+  String? get currentPhotoUrl => _auth.currentUser?.photoURL;
+  String? get currentEmailFromAuth => _auth.currentUser?.email;
   /* --------------------------------------------------
    * AUTH
    * -------------------------------------------------- */

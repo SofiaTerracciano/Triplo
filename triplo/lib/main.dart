@@ -114,22 +114,22 @@ class MyApp extends StatelessWidget {
         Provider<GeoService>.value(value: geoService),
         ChangeNotifierProvider<AuthService>.value(value: authService),
         Provider<NotificationService>.value(value: notification),
-        ChangeNotifierProxyProvider3<GeoService, MemoryService, NotificationService, TrekkingController>(
+        ChangeNotifierProxyProvider3<AuthService, MemoryService, NotificationService, TrekkingController>(
           create: (context) => TrekkingController(
-            //geo: context.read<GeoService>(),
+            authService: context.read<AuthService>(),
             memory: context.read<MemoryService>(),
             notification: context.read<NotificationService>(),
             trekkings: [],
           ),
-          update: (context, geo, memory, notification, previous) {
+          update: (context, authService, memory, notification, previous) {
             if (previous != null) {
-              //previous.geo = geo;
+              previous.authService = authService;
               previous.memory = memory;
               previous.notification = notification;
               return previous;
             }
             return TrekkingController(
-              //geo: geo,
+              authService: authService,
               memory: memory,
               notification: notification,
               trekkings: [],

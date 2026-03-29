@@ -13,6 +13,8 @@ import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/permission.dart';
 import 'package:triplo/firebase_options.dart';
 
+import 'authservice.dart';
+
 const String weatherCheckTask = 'weatherCheckTask';
 
 class BackgroundService with WidgetsBindingObserver {
@@ -31,6 +33,7 @@ class BackgroundService with WidgetsBindingObserver {
           (_) => _run(),
     );
   }
+
 
   Future<void> _run() async {
     if (_running) return;
@@ -149,7 +152,7 @@ void callbackDispatcher() {
       final memory = MemoryService();
       final geo = GeoService();
       final permission = PermissionService();
-
+      final authService = AuthService();
       final api = API(
         geo: geo,
         memory: memory,
@@ -160,6 +163,7 @@ void callbackDispatcher() {
       await notification.init();
 
       final trekkingController = TrekkingController(
+        authService: authService,
         memory: memory,
         notification: notification,
         trekkings: [],

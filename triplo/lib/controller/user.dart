@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../model/user.dart';
@@ -10,13 +10,15 @@ import '../model/user.dart';
 import '../service/authservice.dart';
 
 class UserController extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final AuthService _authService;
 
 
   //UserController(this._authService);
 
+
+  String? get uid => _authService.currentUid;
   bool _isLoading = true;
   bool get isLoading => _isLoading;
   UserController(this._authService) {
@@ -29,10 +31,10 @@ class UserController extends ChangeNotifier {
     // Non facciamo notifyListeners qui perché il costruttore sta ancora girando
 
     try {
-      final user = _auth.currentUser;
-      if (user != null) {
+      final uid = _authService.currentUid;
+      if (uid != null) {
         // Carica i dati dal DB se l'utente è già loggato
-        await loadUserCore(user.uid);
+        await loadUserCore(uid);
       }
     } catch (e) {
       debugPrint("Errore inizializzazione: $e");
@@ -210,7 +212,8 @@ class UserController extends ChangeNotifier {
    * -------------------------------------------------- */
 
   Future<void> updateUsername(String username) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     await _db.collection("users").doc(uid).update({"Username": username});
     _currentUser?.username = username;
     await _db.collection("users_index").doc(uid).update({
@@ -220,22 +223,31 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
+
+
+
+
   Future<void> updateName(String name) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     await _db.collection("users").doc(uid).update({"Name": name});
     _currentUser?.name = name;
     notifyListeners();
   }
 
+
+
   Future<void> updateSurname(String surname) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     await _db.collection("users").doc(uid).update({"Surname": surname});
     _currentUser?.surname = surname;
     notifyListeners();
   }
 
   Future<void> updateBirthdate(DateTime date) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     await _db.collection("users").doc(uid).update({
       "Birthdate": date.toIso8601String(),
     });
@@ -244,7 +256,9 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> updateProfilePhoto(File image) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+
+    if (uid == null) return;
 
     final ref = FirebaseStorage.instance
         .ref()
@@ -282,14 +296,18 @@ class UserController extends ChangeNotifier {
   bool get isPasswordUser => _authService.isPasswordUser;
 
   Future<void> restoreGoogleProfilePhoto() async {
-    final user = _auth.currentUser;
-    if (user?.photoURL == null) return;
+    final uid = _authService.currentUid;
 
-    await _db.collection("users").doc(user!.uid).update({
-      "Photo_profile": user.photoURL,
+    final photoUrl = _authService.currentPhotoUrl;
+
+    if (uid == null || photoUrl == null || photoUrl.isEmpty) return;
+
+
+    await _db.collection("users").doc(uid).update({
+      "Photo_profile": _authService.currentPhotoUrl,
     });
 
-    _currentUser?.photoProfile = user.photoURL!;
+    _currentUser?.photoProfile = _authService.currentPhotoUrl!;
     notifyListeners();
   }
 
@@ -309,8 +327,8 @@ class UserController extends ChangeNotifier {
     else if (intermediate >= 5)
       level = "Intermediate";
 
-    final uid = _auth.currentUser!.uid;
-
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     await _db.collection("users").doc(uid).update({
       "Intermediate": intermediate,
       "Advanced": advanced,
@@ -326,10 +344,10 @@ class UserController extends ChangeNotifier {
 
   // CHECK IF I FOLLOW USER
   Future<bool> isFollowing(String targetUid) async {
-    final user = _auth.currentUser;
-    if (user == null) return false;
+    final uid = _authService.currentUid;
+    if (uid == null) return false;
 
-    final myUid = user.uid;
+    final myUid = uid;
     final snap = await _db.collection("users").doc(myUid).get();
     final following = List<String>.from(snap.data()?["Following"] ?? []);
 
@@ -338,9 +356,9 @@ class UserController extends ChangeNotifier {
 
   // FOLLOW SYSTEM
   Future<bool> followUser(String targetUid) async {
-    final user = _auth.currentUser;
-    if (user == null) return false;
-    final myUid = user.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return false;
+    final myUid = uid;
 
     if (myUid == targetUid) return false;
 
@@ -355,10 +373,10 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> unfollowUser(String targetUid) async {
-    final user = _auth.currentUser;
-    if (user == null) return;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
 
-    final myUid = user.uid;
+    final myUid = uid;
 
     if (myUid == targetUid) return;
 
@@ -376,10 +394,10 @@ class UserController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = _auth.currentUser;
+      final uid = _authService.currentUid;
 
-      if (user != null) {
-        await loadUserCore(user.uid);
+      if (uid != null) {
+        await loadUserCore(uid);
       } else {
         _currentUser = null;
       }
@@ -389,57 +407,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  Future<void> _ensureUserFirestoreDocs(User user) async {
-    final uid = user.uid;
-
-    final userRef = _db.collection("users").doc(uid);
-    final indexRef = _db.collection("users_index").doc(uid);
-
-    final snap = await userRef.get();
-    if (snap.exists) return;
-
-    // Dati base presi da Google
-    final email = user.email ?? "";
-    final displayName = user.displayName ?? "";
-    final photoUrl = user.photoURL ?? "";
-
-    // Username: prova displayName, altrimenti parte dell'email, altrimenti uid corto
-    String username;
-    if (displayName.trim().isNotEmpty) {
-      username = displayName.trim().split(RegExp(r"\s+")).first;
-    } else if (email.contains("@")) {
-      username = email.split("@")[0];
-    } else {
-      username = uid.substring(0, 8);
-    }
-
-    final batch = _db.batch();
-
-    batch.set(userRef, {
-      "Username": username,
-      "Photo_profile": photoUrl,
-      "Name": displayName,
-      "Surname": "",
-      "Birthdate": DateTime.now().toIso8601String(),
-      "Email": email,
-      "Followers": [],
-      "Following": [],
-      "Public_diary": [],
-      "Private_diary": [],
-      "Saved_trekkings": [],
-      "Level": "Beginner",
-      "Advanced": 0,
-      "Intermediate": 0,
-    });
-
-    batch.set(indexRef, {
-      "uid": uid,
-      "username": username,
-      "normalized": username.toLowerCase(),
-    });
-
-    await batch.commit();
-  }
 
   ({String watchId, String token}) extractWatchPair(String raw) {
     return _authService.extractWatchPair(raw);
