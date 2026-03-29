@@ -5,14 +5,18 @@ import 'package:triplo/model/user.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
+import '../service/authservice.dart';
 /// Controller responsible for managing diary entries, including creation, 
 /// updates, deletions, and synchronization with Firestore and Firebase Storage.
 class DiaryController extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService;
+  String? get uid => _authService.currentUid;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+
 
   List<Diary> _diaries = [];
   bool _loaded = false;
@@ -25,7 +29,7 @@ class DiaryController extends ChangeNotifier {
     _currentUser = user;
   }
 
-  DiaryController();
+  DiaryController(this._authService);
 
   /// Returns the local list of all currently loaded diary entries.
   List<Diary> get allDiaries => _diaries;
@@ -128,7 +132,8 @@ class DiaryController extends ChangeNotifier {
     bool modify,
     String diaryId,
   ) async {
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
     Diary page;
     if (!modify) {
       var newId = Uuid().v4();
@@ -174,7 +179,8 @@ class DiaryController extends ChangeNotifier {
       await _db.collection("diary").doc(page.diaryId).set(page.toMap());
     } else {
       // Logic for MODIFYING an existing diary entry
-      final uid = _auth.currentUser!.uid;
+      final uid = _authService.currentUid;
+      if (uid == null) return;
       page = getDiaryById(diaryId)!;
       final oldIsPublic = page.isPublic;
       page = updateDiary(
@@ -215,7 +221,8 @@ class DiaryController extends ChangeNotifier {
   /// Removes a diary entry from Firestore, Storage, and the user's profile lists.
   Future<void> removeDiary(String diaryId) async {
     final page = getDiaryById(diaryId)!;
-    final uid = _auth.currentUser!.uid;
+    final uid = _authService.currentUid;
+    if (uid == null) return;
 
     await _db.collection("diary").doc(diaryId).delete();
     _diaries.removeWhere((diary) => diary.diaryId == diaryId);

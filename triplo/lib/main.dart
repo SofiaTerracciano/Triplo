@@ -108,11 +108,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DiaryController()),
         ChangeNotifierProvider.value(value: language),
         Provider<MemoryService>.value(value: memoryService),
         Provider<GeoService>.value(value: geoService),
         ChangeNotifierProvider<AuthService>.value(value: authService),
+        ChangeNotifierProxyProvider<AuthService, DiaryController>(
+          create: (context) => DiaryController(context.read<AuthService>()),
+          update: (context, authService, previous) =>
+          previous ?? DiaryController(authService),
+        ),
         Provider<NotificationService>.value(value: notification),
         ChangeNotifierProxyProvider3<AuthService, MemoryService, NotificationService, TrekkingController>(
           create: (context) => TrekkingController(
