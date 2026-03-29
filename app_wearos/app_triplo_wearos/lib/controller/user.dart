@@ -10,151 +10,36 @@ import '../model/diary.dart';
 import '../model/trekking.dart';
 import 'package:uuid/uuid.dart';
 
+import '../service/pairing_service.dart';
 class UserController extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final PairingService _pairingService;
 
   Users? _currentUser;
-
   Users? get currentUser => _currentUser;
 
-  bool get isLoggedIn => _auth.currentUser != null;
+  String? get uid => _pairingService.pairedUid;
 
-  late final StreamSubscription<User?> _authSub;
+  UserController(this._pairingService);
 
-  final _uuid = const Uuid();
 
-  String? _pairId;
 
-  String? get pairId => _pairId;
 
-  bool _pairing = false;
 
-  bool get pairing => _pairing;
 
-  String? _pairingError;
 
-  String? get pairingError => _pairingError;
 
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _pairSub;
-  Timer? _expiryTimer;
-  DateTime? _pairCreatedAtLocal;
 
-  static const Duration _qrTtl = Duration(minutes: 2);
-
-  String? _pairedUid;
-  String? get pairedUid => _pairedUid;
-  String? get effectiveUid {
-    return _pairedUid;
-  }
-
-  //static const _storage = FlutterSecureStorage();
-  //static const _watchIdKey = 'watch_id';
-
-  String? _watchId;
-  String? get watchId => _watchId;
-
-  String? _qrToken;
-  String? get qrToken => _qrToken;
-
-  // stringa pronta da trasformare in QR
-  String? get qrPayload {
-    if (_watchId == null || _qrToken == null) return null;
-    return "triplo://watch-pair/$_watchId?t=$_qrToken";
-  }
-
-  bool get hasValidPairId {
-    if (_pairId == null || _pairCreatedAtLocal == null) {
-      return false;
+  Future<void> loadCurrentPairedUser() async {
+    final uid = _pairingService.pairedUid;
+    if (uid == null) {
+      _currentUser = null;
+      notifyListeners();
+      return;
     }
-
-    return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
-  }
-
-  UserController({required String watchId}) {
-    _watchId = watchId;
-
-    _authSub = _auth.authStateChanges().listen((firebaseUser) async {
-      if (firebaseUser == null) {
-        _currentUser = null;
-        notifyListeners();
-        return;
-      }
-      await loadUserCore(firebaseUser.uid);
-    });
-  }
-
-  @override
-  void dispose() {
-    _expiryTimer?.cancel();
-    _pairSub?.cancel();
-    _authSub.cancel();
-    super.dispose();
-  }
-
-  /* --------------------------------------------------
-   * AUTH
-   * -------------------------------------------------- */
-
-  Future<void> register(String email, String password) async {
-    final cred = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = cred.user!.uid;
-    final username = email.split("@")[0];
-
-    await _db.collection("users").doc(uid).set({
-      "Username": username,
-      "Photo_profile": "",
-      "Name": "",
-      "Surname": "",
-      "Birthdate": DateTime.now().toIso8601String(),
-      "Email": email,
-      "Followers": [],
-      "Following": [],
-      "Public_diary": [],
-      "Private_diary": [],
-      "Saved_trekkings": [],
-      "Level": "Beginner",
-      "Advanced": 0,
-      "Intermediate": 0,
-    });
-
-    await _db.collection("users_index").doc(uid).set({
-      "uid": uid,
-      "username": username,
-      "normalized": username.toLowerCase(),
-    });
 
     await loadUserCore(uid);
   }
-
-  Future<void> login(String email, String password) async {
-    final cred = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    await loadUserCore(cred.user!.uid);
-  }
-
-  Future<void> loginWithCredential(AuthCredential credential) async {
-    final cred = await _auth.signInWithCredential(credential);
-    await loadUserCore(cred.user!.uid);
-  }
-
-  Future<void> logout() async {
-    await _auth.signOut();
-    _currentUser = null;
-    notifyListeners();
-  }
-
-  Future<void> tryAutoLogin() async {
-    final user = _auth.currentUser;
-    if (user != null) await loadUserCore(user.uid);
-  }
-
   /* --------------------------------------------------
    * LOAD CORE USER (lightweight)
    * -------------------------------------------------- */
@@ -243,6 +128,7 @@ class UserController extends ChangeNotifier {
    * TREKKING (optional sul watch)
    * -------------------------------------------------- */
 
+  /*
   Future<Trekking?> getTrekkingById(String id) async {
     final snap = await _db.collection("trekking").doc(id).get();
     if (!snap.exists) return null;
@@ -287,73 +173,12 @@ class UserController extends ChangeNotifier {
     return ids.contains(trekkingId);
   }
 
-  /* --------------------------------------------------
-   * PROFILE UPDATE (optional sul watch)
-   * -------------------------------------------------- */
+   */
 
-  Future<void> updateUsername(String username) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
 
-    await _db.collection("users").doc(uid).update({"Username": username});
-    _currentUser?.username = username;
-    notifyListeners();
-  }
 
-  Future<void> updateName(String name) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
 
-    await _db.collection("users").doc(uid).update({"Name": name});
-    _currentUser?.name = name;
-    notifyListeners();
-  }
-
-  Future<void> updateSurname(String surname) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    await _db.collection("users").doc(uid).update({"Surname": surname});
-    _currentUser?.surname = surname;
-    notifyListeners();
-  }
-
-  Future<void> updateBirthdate(DateTime date) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    await _db.collection("users").doc(uid).update({
-      "Birthdate": date.toIso8601String(),
-    });
-
-    _currentUser?.birthdate = date;
-    notifyListeners();
-  }
-
-  Future<void> updateProfilePhoto(File image) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child("profile_photos")
-        .child(uid)
-        .child("$uid.jpg");
-
-    await ref.putFile(image);
-    final url = await ref.getDownloadURL();
-
-    await _db.collection("users").doc(uid).update({"Photo_profile": url});
-
-    _currentUser?.photoProfile = url;
-    notifyListeners();
-  }
-
-  Future<void> loginWithCustomToken(String token) async {
-    final cred = await _auth.signInWithCustomToken(token);
-    await loadUserCore(cred.user!.uid);
-  }
-
+  /*
   Future<void> startWatchPairing({bool forceNew = false}) async {
     if (_pairing) return;
 
@@ -574,6 +399,8 @@ class UserController extends ChangeNotifier {
     }
   }
 
+
+   */
   Future<List<String>> getFollowerUids(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     final raw = snap.data()?["Followers"] ?? [];

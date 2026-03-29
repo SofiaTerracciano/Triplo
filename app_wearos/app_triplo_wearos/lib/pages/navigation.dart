@@ -60,7 +60,7 @@ class NavigationPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                PairingService(child: const UserPage()),
+                                PairingGateway(child: const UserPage()),
                           ),
                         );
                       },

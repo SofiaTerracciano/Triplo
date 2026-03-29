@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../controller/user.dart';
+import '../service/pairing_service.dart';
 import 'user.dart';
 
 class LoginPage extends StatelessWidget {
@@ -12,16 +13,16 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userController = context.watch<UserController>();
+    final pairing = context.watch<PairingService>();
     final local = AppLocalizations.of(context)!;
 
-
-    if (userController.pairedUid != null || userController.currentUser != null) {
+    if (pairing.pairedUid != null) {
       return const UserPage();
     }
 
-    final payload = userController.qrPayload;
-    final creating = userController.pairing;
-    final error = userController.pairingError;
+    final payload = pairing.qrPayload;
+    final creating = pairing.pairing;
+    final error = pairing.pairingError;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -38,7 +39,7 @@ class LoginPage extends StatelessWidget {
                     children: [
                       Text(
                         local.connect_label,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -90,7 +91,10 @@ class LoginPage extends StatelessWidget {
                           width: 160,
                           child: Text(
                             local.scan_qr_code_label,
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -99,7 +103,10 @@ class LoginPage extends StatelessWidget {
                       ] else ...[
                         Text(
                           local.qr_generated_label,
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 10),
@@ -113,7 +120,7 @@ class LoginPage extends StatelessWidget {
                           onPressed: creating
                               ? null
                               : () => context
-                              .read<UserController>()
+                              .read<PairingService>()
                               .startWatchPairing(forceNew: true),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,

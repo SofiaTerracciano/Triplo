@@ -1,17 +1,277 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../controller/user.dart';
 import '../pages/login.dart';
 
-class PairingService extends StatefulWidget {
-  final Widget child;
-  const PairingService({super.key, required this.child});
+class PairingService extends ChangeNotifier {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final String watchId;
+  final Uuid _uuid = const Uuid();
+
+  static const Duration _qrTtl = Duration(minutes: 2);
+
+  String? _pairId;
+  String? get pairId => _pairId;
+
+  bool _pairing = false;
+  bool get pairing => _pairing;
+
+  String? _pairingError;
+  String? get pairingError => _pairingError;
+
+  String? _pairedUid;
+  String? get pairedUid => _pairedUid;
+  String? get effectiveUid => _pairedUid;
+
+  String? _qrToken;
+  String? get qrToken => _qrToken;
+
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _pairSub;
+  Timer? _expiryTimer;
+  DateTime? _pairCreatedAtLocal;
+
+ PairingService({required this.watchId});
+
+  String? get qrPayload {
+    if (_qrToken == null) return null;
+    return "triplo://watch-pair/$watchId?t=$_qrToken";
+  }
+
+  bool get hasValidPairId {
+    if (_pairId == null || _pairCreatedAtLocal == null) {
+      return false;
+    }
+    return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
+  }
+
+  Future<void> startWatchPairing({bool forceNew = false}) async {
+    if (_pairing) return;
+    if (!forceNew && hasValidPairId) return;
+
+    _pairing = true;
+    _pairingError = null;
+    notifyListeners();
+
+    await _pairSub?.cancel();
+    _pairSub = null;
+
+    _expiryTimer?.cancel();
+    _expiryTimer = null;
+
+    final token = _uuid.v4();
+
+    _pairedUid = null;
+    _qrToken = token;
+    _pairId = token;
+    _pairCreatedAtLocal = DateTime.now();
+    notifyListeners();
+
+    final docRef = _db.collection('watch_pair').doc(watchId);
+
+    try {
+      await docRef.set({
+        'watchId': watchId,
+        'qrToken': token,
+        'status': 'waiting',
+        'platform': 'wearos',
+        'createdAt': FieldValue.serverTimestamp(),
+        'expiresAt': Timestamp.fromDate(DateTime.now().add(_qrTtl)),
+        'uid': null,
+      }, SetOptions(merge: true));
+
+      _expiryTimer = Timer(_qrTtl, () {
+        _pairingError = "QR scaduto, rigenera.";
+        notifyListeners();
+      });
+
+      _pairSub = docRef.snapshots().listen(
+            (doc) {
+          final data = doc.data();
+          if (data == null) return;
+
+          final status = data['status'] as String?;
+          final uid = data['uid'] as String?;
+          final tokenOnDb = data['qrToken'] as String?;
+
+          if (tokenOnDb != _qrToken) return;
+
+          if (status == 'approved' && uid != null && uid.isNotEmpty) {
+            _expiryTimer?.cancel();
+            _pairedUid = uid;
+            notifyListeners();
+          }
+
+          if (status == 'expired') {
+            _pairingError = "QR scaduto, rigenera.";
+            notifyListeners();
+          }
+        },
+        onError: (e) {
+          _pairingError = "Errore listener pairing: $e";
+          notifyListeners();
+        },
+      );
+    } catch (e) {
+      _pairingError = "Errore pairing: $e";
+    } finally {
+      _pairing = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> stopWatchPairing({bool clearId = false}) async {
+    _expiryTimer?.cancel();
+    _expiryTimer = null;
+
+    await _pairSub?.cancel();
+    _pairSub = null;
+
+    if (clearId) {
+      _pairId = null;
+      _pairCreatedAtLocal = null;
+    }
+
+    notifyListeners();
+  }
+
+  Future<bool> restoreWatchPairing() async {
+    _pairingError = null;
+
+    await _pairSub?.cancel();
+    _pairSub = null;
+
+    final docRef = _db.collection('watch_pair').doc(watchId);
+
+    try {
+      final snap = await docRef.get();
+      final data = snap.data();
+
+      if (data != null) {
+        final status = data['status'] as String?;
+        final uid = data['uid'] as String?;
+
+        if (status == 'approved' && uid != null && uid.isNotEmpty) {
+          _pairedUid = uid;
+          notifyListeners();
+
+          _pairSub = docRef.snapshots().listen((doc) {
+            final d = doc.data();
+            if (d == null) return;
+            final st = d['status'] as String?;
+            final u = d['uid'] as String?;
+            if (st == 'approved' && u != null && u.isNotEmpty) {
+              if (_pairedUid != u) {
+                _pairedUid = u;
+                notifyListeners();
+              }
+            }
+            if (st == 'waiting') {
+              if (_pairedUid != null) {
+                _pairedUid = null;
+                notifyListeners();
+              }
+            }
+          });
+
+          return true;
+        }
+      }
+    } catch (e) {
+      debugPrint("restoreWatchPairing get failed: $e");
+    }
+
+    _pairSub = docRef.snapshots().listen(
+          (doc) {
+        final d = doc.data();
+        if (d == null) return;
+        final st = d['status'] as String?;
+        final u = d['uid'] as String?;
+
+        if (st == 'approved' && u != null && u.isNotEmpty) {
+          _pairedUid = u;
+          notifyListeners();
+        }
+
+        if (st == 'waiting' && _pairedUid != null) {
+          _pairedUid = null;
+          notifyListeners();
+        }
+      },
+      onError: (e) {
+        debugPrint("restoreWatchPairing listener error: $e");
+      },
+    );
+
+    return false;
+  }
+
+  Future<void> resetPairingOnLogout({bool regenerateQr = true}) async {
+    final docRef = _db.collection('watch_pair').doc(watchId);
+
+    final newToken = _uuid.v4();
+    final now = DateTime.now();
+
+    try {
+      if (regenerateQr) {
+        await docRef.set({
+          'watchId': watchId,
+          'qrToken': newToken,
+          'status': 'waiting',
+          'platform': 'wearos',
+          'createdAt': FieldValue.serverTimestamp(),
+          'expiresAt': Timestamp.fromDate(now.add(_qrTtl)),
+          'uid': null,
+        }, SetOptions(merge: true));
+
+        _qrToken = newToken;
+        _pairId = newToken;
+        _pairCreatedAtLocal = now;
+      } else {
+        await docRef.set({
+          'status': 'waiting',
+          'uid': null,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      _pairingError = "Errore logout reset: $e";
+      notifyListeners();
+    }
+  }
+  Future<void> logoutWatch() async {
+    _expiryTimer?.cancel();
+    _expiryTimer = null;
+
+    await _pairSub?.cancel();
+    _pairSub = null;
+
+    await resetPairingOnLogout(regenerateQr: true);
+
+    _pairedUid = null;
+    _pairingError = null;
+    notifyListeners();
+  }
 
   @override
-  State<PairingService> createState() => _PairingServiceState();
+  void dispose() {
+    _expiryTimer?.cancel();
+    _pairSub?.cancel();
+    super.dispose();
+  }
 }
 
-class _PairingServiceState extends State<PairingService> {
+class PairingGateway extends StatefulWidget {
+  final Widget child;
+  const PairingGateway({super.key, required this.child});
+
+  @override
+  State<PairingGateway> createState() => _PairingGatewayState();
+}
+
+class _PairingGatewayState extends State<PairingGateway> {
   bool _bootstrapped = false;
 
   @override
@@ -20,18 +280,21 @@ class _PairingServiceState extends State<PairingService> {
 
     // avvio una volta sola, dopo il primo frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final ctrl = context.read<UserController>();
+      final pairing = context.read<PairingService>();
+      final userCtrl = context.read<UserController>();
 
       // evita doppio avvio se per qualche motivo initState viene rieseguito (hot reload ecc.)
       if (_bootstrapped) return;
       _bootstrapped = true;
 
       try {
-        final alreadyPaired = await ctrl.restoreWatchPairing();
+        final alreadyPaired = await pairing.restoreWatchPairing();
         if (!mounted) return;
 
-        if (!alreadyPaired) {
-          await ctrl.startWatchPairing(forceNew: true);
+        if (alreadyPaired) {
+          await userCtrl.loadCurrentPairedUser();
+        } else {
+          await pairing.startWatchPairing(forceNew: true);
         }
       } catch (_) {
         // opzionale: gestisci/logga se vuoi
@@ -41,14 +304,18 @@ class _PairingServiceState extends State<PairingService> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserController>(
-      builder: (context, ctrl, _) {
-        final uid = ctrl.effectiveUid;
-        
-        // se non paired => pagina QR
+    return Consumer2<PairingService, UserController>(
+      builder: (context, pairing, userCtrl, _) {
+        final uid = pairing.effectiveUid;
+
         if (uid == null) return const LoginPage();
 
-        // paired => pagina richiesta
+        if (userCtrl.currentUser == null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<UserController>().loadCurrentPairedUser();
+          });
+        }
+
         return widget.child;
       },
     );

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../controller/user.dart';
 import '../controller/diary.dart';
+import '../service/pairing_service.dart';
+import 'login.dart';
 import 'user_list_page.dart';
 
 class UserPage extends StatelessWidget {
@@ -63,16 +65,23 @@ class UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userCtrl = context.watch<UserController>();
     final diaryCtrl = context.watch<DiaryController>();
+    final pairing = context.watch<PairingService>();
     final local = AppLocalizations.of(context)!;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     final isOwnProfile = uidOverride == null;
-    final uid = uidOverride ?? userCtrl.effectiveUid;
-    print(userCtrl.currentUser);
+    final uid = uidOverride ?? pairing.effectiveUid;
+
+    if (isOwnProfile && uid == null) {
+      return const LoginPage();
+    }
 
     if (uid == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
 
     return FutureBuilder(
       future: userCtrl.getUserById(uid),
@@ -86,7 +95,6 @@ class UserPage extends StatelessWidget {
         final user = snapshot.data!;
         final photoUrl = user.photoProfile ?? "";
 
-        // Determins level name and color based on user.level
         String levelName = "-";
         Color levelColor = Colors.grey;
 
@@ -106,10 +114,8 @@ class UserPage extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               children: [
-                // User info section
                 Column(
                   children: [
-                    // Image profile row
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.grey[200],
@@ -121,7 +127,6 @@ class UserPage extends StatelessWidget {
                           : null,
                     ),
                     const SizedBox(height: 4),
-                    // Username row
                     Text(
                       user.username,
                       style: const TextStyle(
@@ -129,7 +134,6 @@ class UserPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // Level row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -155,7 +159,6 @@ class UserPage extends StatelessWidget {
 
                 const SizedBox(height: 8),
 
-                // Follower and following section
                 FutureBuilder<List<String>>(
                   future: userCtrl.getFollowerUids(uid),
                   builder: (context, snapFol) {
@@ -202,20 +205,14 @@ class UserPage extends StatelessWidget {
                   },
                 ),
 
-                // Diaries secction
                 FutureBuilder<List<Diary>?>(
                   future: diaryCtrl.fetchDiaryById(uid),
                   builder: (context, snapDiaries) {
                     final diaries = snapDiaries.data ?? [];
-                    final publicDiaries = diaries
-                        .where((d) => d.isPublic)
-                        .toList();
-                    final privateDiaries = diaries
-                        .where((d) => !d.isPublic)
-                        .toList();
+                    final publicDiaries = diaries.where((d) => d.isPublic).toList();
+                    final privateDiaries = diaries.where((d) => !d.isPublic).toList();
 
                     if (isOwnProfile) {
-                      // If the profile belongs to the current user: I see both Public and Private, in two separate buttons
                       return Row(
                         children: [
                           _statButton(
@@ -250,7 +247,6 @@ class UserPage extends StatelessWidget {
                         ],
                       );
                     } else {
-                      // If it's NOT my profile: I only see Public
                       return _statButton(
                         context: context,
                         label: local.public_botton_label,
@@ -272,7 +268,6 @@ class UserPage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // Logout only if the profile belongs to the current user
                 if (isOwnProfile) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -282,10 +277,10 @@ class UserPage extends StatelessWidget {
                         foregroundColor: Colors.white,
                         shape: const StadiumBorder(),
                       ),
-                      onPressed: () => userCtrl.logoutWatch(),
+                      onPressed: () => context.read<PairingService>().logoutWatch(),
                       child: Text(
                         local.logout_label,
-                        style: TextStyle(fontSize: 11),
+                        style: const TextStyle(fontSize: 11),
                       ),
                     ),
                   ),
@@ -301,7 +296,7 @@ class UserPage extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         local.back_label,
-                        style: TextStyle(fontSize: 11),
+                        style: const TextStyle(fontSize: 11),
                       ),
                     ),
                   ),

@@ -8,6 +8,7 @@ import 'package:app_triplo_wearos/pages/navigation.dart';
 import 'package:app_triplo_wearos/service/geo.dart';
 import 'package:app_triplo_wearos/service/memory.dart';
 import 'package:app_triplo_wearos/service/notification.dart';
+import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:app_triplo_wearos/service/permission_service.dart';
 import 'package:app_triplo_wearos/service/watch_id_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -109,7 +110,16 @@ class TriploWatchApp extends StatelessWidget {
 
         // 2. Inietta i controller che dipendono dai servizi
         ChangeNotifierProvider(create: (_) => DiaryController()),
-        ChangeNotifierProvider(create: (_) => UserController(watchId: watchId)),
+        ChangeNotifierProvider(
+          create: (_) => PairingService(watchId: watchId),
+        ),
+
+
+        ChangeNotifierProxyProvider<PairingService, UserController>(
+          create: (context) => UserController(context.read<PairingService>()),
+          update: (context, pairingService, previous) =>
+          previous ?? UserController(pairingService),
+        ),
 
         // API (Provider semplice perché non è un ChangeNotifier)
         Provider<API>(create: (context) => API(
@@ -212,7 +222,8 @@ class TriploWatchApp extends StatelessWidget {
               Locale('de'),
               Locale('fr'),
             ],
-            home: NavigationPage(),
+            home: NavigationPage()
+
           );
         },
       ),
