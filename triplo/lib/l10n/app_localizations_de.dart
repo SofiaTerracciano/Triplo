@@ -622,4 +622,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get no_friends => 'Dein Feed wartet auf neue Abenteuer! Folge anderen Trekkern, um ihre neuesten Reisen hier zu sehen.';
+
+  @override
+  String get error_loading_trekkings => 'Fehler beim Laden der abonnierten Routen';
+
+  @override
+  String get no_weather_alerts => 'Keine Routen mit aktiven Wetterwarnungen';
+
+  @override
+  String get weather_alert_removed => 'Wetterwarnung entfernt';
+
+  @override
+  String get open_button => 'Öffnen';
+
+  @override
+  String get remove_button => 'Entfernen';
 }

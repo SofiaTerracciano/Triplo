@@ -243,7 +243,6 @@ class TrekkingController extends ChangeNotifier {
   Future<void> checkArrival(
     String trekkingId,
     double distanceInMeters,
-    Position currPos,
     AppLocalizations local,
   ) async {
     if (distanceInMeters <= 1000) {
@@ -257,23 +256,9 @@ class TrekkingController extends ChangeNotifier {
         channelId: 'arrival_channel',
         channelName: 'Arrivo Trekking',
       );
-
-      uploadLocation(currPos);
     }
   }
-  //messo il metodo qui, i controller parlano con firestore
-  Future<void> uploadLocation(Position position) async {
-
-    if (uid == null) return;
-
-    await _db
-        .collection('location')
-        .doc(uid)
-        .set({
-      'lat': position.latitude,
-      'lng': position.longitude,
-    });
-  }
+ 
 
   /// Batched version of getCachedImage to handle multiple image paths simultaneously.
   Future<List<File>> getCachedImages(List<String> imagePaths) async {

@@ -239,5 +239,11 @@
   "open_settings_button": "Ouvrir les paramètres",
   "loading_coordinates": "Chargement des coordonnées...",
 
-  "no_friends":"Votre fil d'actualité n'attend que l'aventure ! Suivez d'autres randonneurs per découvrir leurs derniers périples ici."
+  "no_friends":"Votre fil d'actualité n'attend que l'aventure ! Suivez d'autres randonneurs per découvrir leurs derniers périples ici.",
+
+  "error_loading_trekkings": "Erreur lors du chargement des parcours souscrits",
+  "no_weather_alerts": "Aucun parcours avec des alertes météo actives",
+  "weather_alert_removed": "Alerte météo supprimée",
+  "open_button": "Ouvrir",
+  "remove_button": "Supprimer"
 }

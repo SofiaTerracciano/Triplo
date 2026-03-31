@@ -134,7 +134,6 @@ class _TrekkingPageState extends State<TrekkingPage> {
   }*/
 
   Future<void> _loadTrailWeatherAfterFetch(Trekking trekking) async {
-    final local = AppLocalizations.of(context)!;
     try {
       // Calcoliamo il centro per la mappa e il punto per il meteo
       if (trekking.starting_point != null && trekking.ending_point != null) {
@@ -180,7 +179,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
     final langIndex = getLanguageSelected(langCode);
 
     final trekkingController = context.watch<TrekkingController>();
-    //final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
+    final trekking = trekkingController.getTrekkingById(widget.trekkingId)!;
 
     final userController = context.watch<UserController>();
 

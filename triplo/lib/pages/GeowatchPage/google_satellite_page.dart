@@ -198,7 +198,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
               });
             }),
 
-            _buildSwitch(local.layer_snow, showWind, (v) {
+            _buildSwitch(local.layer_wind, showWind, (v) {
               setState(() {
                 showWind = v;
                 if (v) _disableOthers("wind");
@@ -219,7 +219,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
               });
             }),
 
-            _buildSwitch(local.layer_temperature, showPressure, (v) {
+            _buildSwitch(local.layer_pressure, showPressure, (v) {
               setState(() {
                 showPressure = v;
                 if (v) _disableOthers("pressure");

@@ -70,9 +70,6 @@ class API {
     return geo.userLocation();
   }
 
-  void startlisteningLocation(Function(LatLng) onLocationUpdate) {
-    notification.startListening(onLocationUpdate: onLocationUpdate);
-  }
 
   /* Fetches current weather data for the specified coordinates.
   /// Uses OpenWeatherMap API with metric units and English language

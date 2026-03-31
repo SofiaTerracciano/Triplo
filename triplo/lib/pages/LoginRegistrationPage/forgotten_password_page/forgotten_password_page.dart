@@ -75,7 +75,7 @@ class ForgottenPasswordPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    "$local.forgot_password_subtitle $local.enter_email_prompt",
+                    "${local.forgot_password_subtitle} \n ${local.enter_email_prompt}",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 16),
                   ),

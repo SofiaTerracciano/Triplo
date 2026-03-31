@@ -622,4 +622,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get no_friends => 'Votre fil d\'actualité n\'attend que l\'aventure ! Suivez d\'autres randonneurs per découvrir leurs derniers périples ici.';
+
+  @override
+  String get error_loading_trekkings => 'Erreur lors du chargement des parcours souscrits';
+
+  @override
+  String get no_weather_alerts => 'Aucun parcours avec des alertes météo actives';
+
+  @override
+  String get weather_alert_removed => 'Alerte météo supprimée';
+
+  @override
+  String get open_button => 'Ouvrir';
+
+  @override
+  String get remove_button => 'Supprimer';
 }

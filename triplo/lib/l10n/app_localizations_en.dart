@@ -622,4 +622,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get no_friends => 'Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here.';
+
+  @override
+  String get error_loading_trekkings => 'Error loading subscribed routes';
+
+  @override
+  String get no_weather_alerts => 'No routes with weather alerts enabled';
+
+  @override
+  String get weather_alert_removed => 'Weather alert removed';
+
+  @override
+  String get open_button => 'Open';
+
+  @override
+  String get remove_button => 'Remove';
 }

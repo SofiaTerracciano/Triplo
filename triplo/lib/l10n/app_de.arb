@@ -239,7 +239,13 @@
   "open_settings_button": "Einstellungen öffnen",
   "loading_coordinates": "Koordinaten werden geladen...",
 
-  "no_friends": "Dein Feed wartet auf neue Abenteuer! Folge anderen Trekkern, um ihre neuesten Reisen hier zu sehen."
+  "no_friends": "Dein Feed wartet auf neue Abenteuer! Folge anderen Trekkern, um ihre neuesten Reisen hier zu sehen.",
+
+  "error_loading_trekkings": "Fehler beim Laden der abonnierten Routen",
+  "no_weather_alerts": "Keine Routen mit aktiven Wetterwarnungen",
+  "weather_alert_removed": "Wetterwarnung entfernt",
+  "open_button": "Öffnen",
+  "remove_button": "Entfernen"
 }
 
 

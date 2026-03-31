@@ -243,6 +243,7 @@ class _DiaryPageState extends State<DiaryPage> {
                       imageScroller(
                         diary.challenges,
                         diaryController.getDownloadUrl,
+                        isBadge: true,
                       ),
                     ],
 
@@ -348,21 +349,25 @@ Widget infoRow(IconData icon, String text) {
 
 Widget imageScroller(
   List<String> images,
-  Future<String?> Function(String) loader,
-) {
+  Future<String?> Function(String) loader, {
+  bool isBadge = false, 
+}) {
+  double height = isBadge ? 60 : 120;
+  double width = isBadge ? 60 : 160;
+
   return SizedBox(
-    height: 120,
+    height: height,
     child: ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: images.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 8),
+      separatorBuilder: (_, __) => const SizedBox(width: 10),
       itemBuilder: (_, i) {
         return FutureBuilder<String?>(
           future: loader(images[i]),
           builder: (_, snap) {
             if (!snap.hasData) {
               return Container(
-                width: 160,
+                width: width,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(12),
@@ -371,7 +376,13 @@ Widget imageScroller(
             }
             return ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(snap.data!, width: 160, fit: BoxFit.cover),
+              child: Image.network(
+                snap.data!,
+                width: width,
+                height: height,
+                // Le sfide devono stare intere (contain), le foto riempiono (cover)
+                fit: isBadge ? BoxFit.contain : BoxFit.cover,
+              ),
             );
           },
         );
