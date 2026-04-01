@@ -10,9 +10,7 @@ import '../service/memory.dart';
 import '../service/geo.dart';
 import '../service/permission.dart';
 
-/// Controller for managing external API integrations.
-/// It handles weather data fetching (OpenWeather, Weatherbit), map tile URLs, 
-/// and connectivity checks.
+
 class ServiceController {
   /// API key for OpenWeather services.
   late final String openWeatherKey;
