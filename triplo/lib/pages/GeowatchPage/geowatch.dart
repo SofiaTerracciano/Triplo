@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 
 import 'package:triplo/widgets_for_pages/mini_map/mini_map.dart';
 
@@ -35,7 +35,7 @@ class GeoWatchPage extends StatefulWidget {
 }
 
 class _GeoWatchPageState extends State<GeoWatchPage> {
-  late API api;
+  late ServiceController api;
   AppLocalizations get local => AppLocalizations.of(context)!;
   bool _initialized = false;
   bool _weatherAlertEnabled = false;
@@ -46,7 +46,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
     super.didChangeDependencies();
 
     if (!_initialized) {
-      api = context.read<API>();
+      api = context.read<ServiceController>();
       _loadAlertState().then((_) {
         _loadAll();
       });

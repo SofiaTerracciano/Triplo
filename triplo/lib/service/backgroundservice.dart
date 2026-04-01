@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/memory.dart';
@@ -43,7 +43,7 @@ class BackgroundService with WidgetsBindingObserver {
       debugPrint("BackgroundService running check");
 
       final trekkingController = context.read<TrekkingController>();
-      final api = context.read<API>();
+      final api = context.read<ServiceController>();
       final notification = context.read<NotificationService>();
       final memory = context.read<MemoryService>();
 
@@ -76,7 +76,7 @@ class BackgroundService with WidgetsBindingObserver {
 class BackgroundServiceLogic {
   static Future<void> run({
     required TrekkingController trekkingController,
-    required API api,
+    required ServiceController api,
     required NotificationService notification,
     required MemoryService memory,
   }) async {
@@ -153,7 +153,7 @@ void callbackDispatcher() {
       final geo = GeoService();
       final permission = PermissionService();
       final authService = AuthService();
-      final api = API(
+      final api = ServiceController(
         geo: geo,
         memory: memory,
         permission: permission,

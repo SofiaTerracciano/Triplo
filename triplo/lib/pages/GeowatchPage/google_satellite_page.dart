@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/widgets_for_pages/weather_legend/weather_layer.dart';
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 
 /// Google Satellite map + optional OpenWeather layers
 
@@ -27,12 +27,12 @@ class GoogleSatellitePage extends StatefulWidget {
 }
 
 class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
-  late API api;
+  late ServiceController api;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    api = context.read<API>();
+    api = context.read<ServiceController>();
   }
 
 

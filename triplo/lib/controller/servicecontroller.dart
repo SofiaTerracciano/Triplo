@@ -13,7 +13,7 @@ import '../service/permission.dart';
 /// Controller for managing external API integrations.
 /// It handles weather data fetching (OpenWeather, Weatherbit), map tile URLs, 
 /// and connectivity checks.
-class API {
+class ServiceController {
   /// API key for OpenWeather services.
   late final String openWeatherKey;
 
@@ -30,7 +30,7 @@ class API {
   late PermissionService permission;
 
   // Constructor to load API keys from .env
-  API({required this.memory, required this.geo, required this.permission}) {
+  ServiceController({required this.memory, required this.geo, required this.permission}) {
 
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";

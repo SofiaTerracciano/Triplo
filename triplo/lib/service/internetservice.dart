@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:triplo/controller/API.dart';
+
+
+import '../controller/servicecontroller.dart';
 
 
 
 class InternetService extends ChangeNotifier {
-  final API api;
+  final ServiceController servicecontroller;
   final Duration checkEvery;
   final Duration offlineThreshold;
 
   InternetService({
-    required this.api,
+    required this.servicecontroller,
     this.checkEvery = const Duration(seconds: 3),
     this.offlineThreshold = const Duration(seconds: 6),
   });
@@ -28,7 +30,7 @@ class InternetService extends ChangeNotifier {
   }
 
   Future<void> _tick() async {
-    final ok = await api.hasInternet();
+    final ok = await servicecontroller.hasInternet();
 
     if (ok) {
       _offlineTimer?.cancel();
@@ -40,7 +42,7 @@ class InternetService extends ChangeNotifier {
     if (_offlineTimer?.isActive == true) return;
 
     _offlineTimer = Timer(offlineThreshold, () async {
-      final stillOk = await api.hasInternet();
+      final stillOk = await servicecontroller.hasInternet();
       if (!stillOk) _setOnline(false);
     });
   }

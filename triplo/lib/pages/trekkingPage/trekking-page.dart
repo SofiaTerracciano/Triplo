@@ -10,7 +10,7 @@ import '../../controller/trekking.dart';
 import '../../controller/user.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/widgets_for_pages/weather/weather.dart';
 import '../GeowatchPage/geowatch.dart';
 
@@ -46,14 +46,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
     color: const Color.fromARGB(255, 0, 0, 0),
   );
 
-  late API api;
+  late ServiceController api;
 
   bool? _isSavedLocal;
   bool _loadingSavedState = true;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    api = context.read<API>();
+    api = context.read<ServiceController>();
   }
 
   Map<String, dynamic>? weather;

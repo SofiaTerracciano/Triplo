@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
-import '../../controller/API.dart';
+import '../../controller/servicecontroller.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
@@ -29,13 +29,11 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
   Position? _position;
   String? _error;
   bool _isChecking = true;
-
   /*@override
   void initState() {
     super.initState();
     _initLocation();
   }*/
-
   static const TextStyle optionStyle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -113,9 +111,9 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
     });
   }*/
   Future<void> _initLocation() async {
-    final api = context.read<API>();
+    final servicecontroller = context.read<ServiceController>();
 
-    final state = await api.loadNavigationLocation();
+    final state = await servicecontroller.loadNavigationLocation();
 
     if (!mounted) return;
 
@@ -132,7 +130,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
 
     await _positionSub?.cancel();
 
-    _positionSub = api.navigationPositionStream().listen((position) {
+    _positionSub = servicecontroller.navigationPositionStream().listen((position) {
       if (!mounted) return;
 
       setState(() {
@@ -186,12 +184,12 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () async {
-              final api = context.read<API>();
+              final servicecontroller = context.read<ServiceController>();
 
               if (errorType == "GPS_DISABLED") {
-                await api.openGpsSettings();
+                await servicecontroller.openGpsSettings();
               } else {
-                await api.openPermissionSettings();
+                await servicecontroller.openPermissionSettings();
               }
             },
             child: Text(local.open_settings_button),

@@ -25,7 +25,7 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
 
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 bool _isShowingOfflinePage = false;
@@ -141,20 +141,20 @@ class MyApp extends StatelessWidget {
           },
         ),
         Provider<PermissionService>.value(value: permissionService),
-        ProxyProvider3<GeoService, MemoryService, PermissionService, API>(
+        ProxyProvider3<GeoService, MemoryService, PermissionService, ServiceController>(
           update: (context, geo, memory, permission, previous) =>
-              API(
+              ServiceController(
                 geo: geo,
                 memory: memory,
                 permission: permission,
               ),
         ),
 
-        ChangeNotifierProxyProvider<API, InternetService>(
+        ChangeNotifierProxyProvider<ServiceController, InternetService>(
           create: (context) =>
-              InternetService(api: context.read<API>())..start(),
+              InternetService(servicecontroller: context.read<ServiceController>())..start(),
           update: (context, api, old) =>
-              old ?? InternetService(api: api)..start(),
+              old ?? InternetService(servicecontroller: api)..start(),
         ),
         ChangeNotifierProxyProvider<AuthService, UserController>(
           create: (context) {

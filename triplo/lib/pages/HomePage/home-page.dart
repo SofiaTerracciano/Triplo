@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triplo/controller/API.dart';
+import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../GeowatchPage/Navigation.dart';
@@ -270,7 +270,7 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
-    final api = context.read<API>();
+    final api = context.read<ServiceController>();
     return Stack(
       children: [
         FlutterMap(
