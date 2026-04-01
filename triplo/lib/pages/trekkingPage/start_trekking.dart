@@ -81,7 +81,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       if (distanceInMeters <= 1000) {
         _hasEndedAutomatically = true;
         // Il controller ora gestisce la logica della notifica
-        trekkingController.checkArrival(widget.trekkingid, distanceInMeters, currentPos, local);
+        trekkingController.checkArrival(widget.trekkingid, distanceInMeters, local);
       }
     }
   }

@@ -28,7 +28,7 @@ class WeatherLayer {
     switch (type) {
       case "precipitation":
         return _buildGradientLegend(
-          "$local.layer_precipitation (mm)",
+          "${local.layer_precipitation} (mm)",
           [
             Color(0xFFE0F7FA), // quasi bianco
             Color(0xFF1976D2), // blu

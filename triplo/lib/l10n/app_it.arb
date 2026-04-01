@@ -240,6 +240,12 @@
     "open_settings_button": "Apri Impostazioni",
     "loading_coordinates": "Caricamento coordinate...",
 
-    "no_friends": "Il tuo feed aspetta nuove avventure! Segui altri trekker per vedere i loro ultimi viaggi."
+    "no_friends": "Il tuo feed aspetta nuove avventure! Segui altri trekker per vedere i loro ultimi viaggi.",
+
+    "error_loading_trekkings": "Errore nel caricamento dei percorsi sottoscritti",
+    "no_weather_alerts": "Nessun percorso con allerte meteo attive",
+    "weather_alert_removed": "Allerta meteo rimossa",
+    "open_button": "Apri",
+    "remove_button": "Rimuovi"
 
 }

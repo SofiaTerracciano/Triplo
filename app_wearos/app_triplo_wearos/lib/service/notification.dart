@@ -8,9 +8,6 @@ import '/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
-  final _firestore = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
-  StreamSubscription? _subscription;
   
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -39,29 +36,6 @@ class NotificationService {
       },
     );
   }
-
-  void startListening({
-      required void Function(LatLng location) onLocationUpdate,
-    }) {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
-
-      _subscription = _firestore
-          .collection('location')
-          .doc(userId)
-          .snapshots()
-          .listen((doc) {
-            if (!doc.exists) return;
-            final lat = (doc['lat'] as num).toDouble();
-            final lng = (doc['lng'] as num).toDouble();
-            onLocationUpdate(LatLng(lat, lng));
-          });
-    }
-
-    void stopListening() {
-      _subscription?.cancel();
-      _subscription = null;
-    }
 
   // Tutta la logica del tap sulla notifica è qui dentro
   void _handleNotificationTap(String payload) {

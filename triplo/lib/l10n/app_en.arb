@@ -239,6 +239,12 @@
     "open_settings_button": "Open Settings",
     "loading_coordinates": "Loading coordinates...",
 
-    "no_friends": "Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here."
+    "no_friends": "Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here.",
+
+    "error_loading_trekkings": "Error loading subscribed routes",
+    "no_weather_alerts": "No routes with weather alerts enabled",
+    "weather_alert_removed": "Weather alert removed",
+    "open_button": "Open",
+    "remove_button": "Remove"
 
 }

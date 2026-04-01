@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/controller/trekking.dart';
@@ -54,7 +53,7 @@ class _WeatherAlertSubscriptionPageState
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  "Error loading subscribed routes",
+                  local.error_loading_trekkings,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -68,7 +67,7 @@ class _WeatherAlertSubscriptionPageState
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  "No routes with weather alerts enabled",
+                  local.no_weather_alerts,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16),
                 ),
@@ -196,7 +195,7 @@ class _WeatherAlertSubscriptionPageState
                                       );
                                     },
                                     icon: const Icon(Icons.open_in_new),
-                                    label: const Text("Open"),
+                                    label: Text(local.open_button),
                                   ),
                                   ElevatedButton.icon(
                                     onPressed: () async {
@@ -208,9 +207,9 @@ class _WeatherAlertSubscriptionPageState
                                       if (!mounted) return;
 
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content: Text(
-                                            "Weather alert removed",
+                                             local.weather_alert_removed,
                                           ),
                                         ),
                                       );
@@ -218,7 +217,7 @@ class _WeatherAlertSubscriptionPageState
                                       setState(_reload);
                                     },
                                     icon: const Icon(Icons.notifications_off),
-                                    label: const Text("Remove"),
+                                    label: Text(local.remove_button),
                                   ),
                                 ],
                               ),

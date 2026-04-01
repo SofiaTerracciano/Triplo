@@ -33,7 +33,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   List<String> _challenges = [];
   StreamSubscription<Position>? _positionStream;
   bool _hasEndedAutomatically = false;
-  API? api;
 
 
   @override
@@ -42,7 +41,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     /*_initNotifications();
     _loadChallenges();
     _start();*/
-    api = context.read<API>();
     WidgetsBinding.instance.addPostFrameCallback((_) async{
       _loadChallenges();
       _start();

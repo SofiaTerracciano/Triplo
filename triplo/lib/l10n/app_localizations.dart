@@ -1330,6 +1330,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your feed is waiting for some adventure! Follow fellow trekkers to see their latest journeys here.'**
   String get no_friends;
+
+  /// No description provided for @error_loading_trekkings.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading subscribed routes'**
+  String get error_loading_trekkings;
+
+  /// No description provided for @no_weather_alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'No routes with weather alerts enabled'**
+  String get no_weather_alerts;
+
+  /// No description provided for @weather_alert_removed.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather alert removed'**
+  String get weather_alert_removed;
+
+  /// No description provided for @open_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open_button;
+
+  /// No description provided for @remove_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove_button;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

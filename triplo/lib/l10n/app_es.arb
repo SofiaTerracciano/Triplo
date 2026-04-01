@@ -239,5 +239,11 @@
   "open_settings_button": "Abrir Configuración",
   "loading_coordinates": "Cargando coordenadas...",
 
-  "no_friends": "¡Tu feed está esperando nuevas aventuras! Sigue a altri senderistas para ver sus últimos viajes aquí."
+  "no_friends": "¡Tu feed está esperando nuevas aventuras! Sigue a altri senderistas para ver sus últimos viajes aquí.",
+
+  "error_loading_trekkings": "Error al cargar las rutas suscritas",
+  "no_weather_alerts": "No hay rutas con alertas meteorológicas activas",
+  "weather_alert_removed": "Alerta meteorológica eliminada",
+  "open_button": "Abrir",
+  "remove_button": "Eliminar"
 }
