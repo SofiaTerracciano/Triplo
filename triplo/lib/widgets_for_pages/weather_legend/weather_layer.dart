@@ -43,7 +43,7 @@ class WeatherLayer {
 
       case "snow":
         return _buildGradientLegend(
-          "$local.layer_snow (mm)",
+          "${local.layer_snow} (mm)",
           [
             Color(0xFFE0F7FA), // quasi bianco
             Color(0xFF81D4FA), // azzurro
@@ -58,7 +58,7 @@ class WeatherLayer {
 
       case "wind":
         return _buildGradientLegend(
-          "$local.layer_wind (m/s)",
+          "${local.layer_wind} (m/s)",
           [
             Color(0xFF0D47A1), // blu scuro
             Color(0xFF1976D2), // blu
@@ -72,7 +72,7 @@ class WeatherLayer {
 
       case "temp":
         return _buildGradientLegend(
-          "$local.layer_temperature (°C)",
+          "${local.layer_temperature} (°C)",
           [
             Color(0xFF0D47A1), // molto freddo
             Color(0xFF1976D2), // freddo
@@ -86,7 +86,7 @@ class WeatherLayer {
 
       case "clouds":
         return _buildGradientLegend(
-          "$local.layer_clouds (%)",
+          "${local.layer_clouds} (%)",
           [
             Color.fromARGB(0, 255, 255, 255),
             Color.fromARGB(80, 255, 255, 255),
@@ -98,7 +98,7 @@ class WeatherLayer {
 
       case "pressure":
         return _buildGradientLegend(
-          "$local.layer_pressure (Pa)",
+          "${local.layer_pressure} (Pa)",
           [
             Color(0xFF2C7BB6),
             Color(0xFFABD9E9),

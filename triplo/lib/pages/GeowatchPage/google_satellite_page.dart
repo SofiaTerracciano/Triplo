@@ -65,6 +65,9 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
               initialZoom: 9,
               maxZoom: 18,
               minZoom: 3,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+              ),
             ),
             children: [
               TileLayer(
