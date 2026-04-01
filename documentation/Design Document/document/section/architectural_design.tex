@@ -103,7 +103,7 @@ The interfaces associated with Firebase services, Firebase Authentication, Fires
 In contrast, the remaining external interfaces, such as Weather API, Weather Alert API, Satellite API, are accessed through RESTful communication. In these cases, the application uses HTTP-based requests via Flutter libraries, handling data exchange in JSON format and performing client-side decoding. \\
 The token verification API is not directly managed within the application logic but is represented the complete authentication flow. In particular, when authentication is performed through an external provider, Google, the application obtains an authentication token which is then passed to Firebase Authentication. Firebase subsequently validates this token with the external provider as part of the OAuth2-based authentication process. This additional interaction is abstracted by the SDK but is included in the diagram to provide a more accurate representation of the overall system behavior. \\
 
-
+\begin{landscape}
 \subsection{Mobile Smartphone App component view} \label{Mobile Smartphone App component view}
 
 
@@ -111,25 +111,32 @@ The token verification API is not directly managed within the application logic 
 \begin{figure}[H]
     \label{Smartphone Application component view}
     \centering
-    \includegraphics[width=\linewidth]{./images/mobile app component diagram 3.png}
+    \includegraphics[width=0.8\linewidth]{./images/mobile app component diagram 3.png}
     \caption{Smartphone Application component view}
 \end{figure}
 
-
+\end{landscape}
 
 Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, and \texttt{ChallengeController}, are responsible for coordinating the application logic related to their respective functional domains. These controllers manage interactions between the View layer and the Model layer, and they also mediate access to backend resources such as Firebase services.
 
-The \texttt{APIController}, instead, has a more specialized role. It is not intended as a gateway to Firebase, but rather as a component dedicated to managing the communication with external third-party services, such as weather, map, satellite, or other external APIs required by the application.
+
+
+
+
+
+
+
+
 
 Therefore, in the proposed architecture:
 \begin{itemize}
     \item domain controllers manage the application use cases and the interaction with Firebase-related resources;
-    \item \texttt{APIController} manages the communication with external non-Firebase services, it is specifically responsible for handling communication with external third-party APIs (e.g., weather, map, or satellite services), which are conceptually distinct from Firebase-managed services. For this reason, the name \texttt{APIController} is preserved for consistency with the existing codebase, while its responsibilities are clearly defined within the architectural description.
+    \item The ServiceController acts as a unified facade aggregating multiple underlying services, including external APIs (weather, maps) and device-level services (location, permissions, navigation)
     \item Firebase is modeled as a set of backend services used by the application, rather than as a custom backend.
 \end{itemize}
 
 
-\subsubsection{Smartphone Application External Libraries}
+\subsection{Smartphone Application External Libraries}
 
 \begin{table}[h]
 \centering
@@ -170,6 +177,8 @@ shared\_preferences & Local persistent key-value storage \\
 \hline
 flutter\_local\_notifications & Local notification management \\
 \hline
+workmanager & Background tasks \\
+\hline
 permission\_handler & Runtime permission handling \\
 \hline
 flutter\_dotenv & Environment variable management \\
@@ -184,7 +193,6 @@ flutter\_cache\_manager & Image and file caching \\
 \hline
 cupertino\_icons & iOS-style icon set \\
 \hline
-
 \end{tabular}
 \caption{Main dependencies used in the smartphone application}
 \end{table}
@@ -207,7 +215,7 @@ cupertino\_icons & iOS-style icon set \\
     \includegraphics[width=0.8\linewidth]{./images/deploymentdiagram.jpg}
     \caption{Deplyment Diagram}
 \end{figure}
-
+ 
 
 The deployment diagram is consistent with the UML deployment notation described in chapther 8 of the UML Distilled book and on page 52 of the Software Engineering book listed in the references. 
 Physical hardware units are modeled through the \texttt{<<device>>} stereotype, while software platforms and runtime contexts are represented through the \texttt{<<executionEnvironment>>} stereotype. 

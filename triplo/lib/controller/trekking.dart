@@ -246,7 +246,7 @@ class TrekkingController extends ChangeNotifier {
     AppLocalizations local,
   ) async {
     if (distanceInMeters <= 1000) {
-      final content = getChallengeContent('end_trekking_arrival', local);
+      final content = notificationcontent('end_trekking_arrival', local);
 
       await notification.showTrekkingNotification(
         id: 999,

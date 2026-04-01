@@ -7,14 +7,12 @@ skinparam rectangle {
   FontColor transparent
 }
 
-
 rectangle  {
 
 
   () HomeGUI
   () SearchGUI
 
-  
   '() RideSummaryReviewGUI
   () LoginRegistrationGUI
   () UserProfileGUI
@@ -25,10 +23,8 @@ rectangle  {
   () DiaryGUI
 }
 
-
 component "Mobile Triplo Application" {
 
-  
   portout p1
   portout p2
   'portout p3
@@ -36,48 +32,26 @@ component "Mobile Triplo Application" {
   portout pgoogleauth
   portout pfirebaseauth
   portout pfirebasefirestore
-
-
   portout pfirebasestorage
 
 'portout p36
 'portout p37
 'portout p38
-
-
-
-
-
-
-
-
-
-
-
- 'portout pe1
-  'portout pe2
-  'portout pOS
-  
-  
-
-
-
-
+'portout pe1
+'portout pe2
+'portout pOS
 'portout pe6
 'portout pe7
 'portout pe8
 
   portin p5
   portin p6
-
-
   portin p7
   portin p8
   portin p9
   portin p10
   portin p11
   portin p12
-
 
   package "View" #476bb5ff{
     [HomePage]
@@ -89,18 +63,11 @@ component "Mobile Triplo Application" {
     [SettingsPage]
     [DiaryPage]
   }
-
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
+ 
   rectangle "provaaa" {
+  
+
+
   package "controller" #aaaaaa {
     'package "base resources controller" as backendcontroller{
     package "domain controller" as domaincontroller{
@@ -111,30 +78,13 @@ component "Mobile Triplo Application" {
     [challengecontroller]
 
     }
-    [APIController]
-
-
+    [servicecontroller]
 
     '}
 
     [languagecontroller]
-
   }
-
-  
-  
 }
-
-
-
-
-
-
-
-
-
-  
-
   'package "Services" {
     '[BackendAPIHandler]
     '[OSAPIHandler]
@@ -144,12 +94,6 @@ component "Mobile Triplo Application" {
     '[WeatherLocalService]
     
   '}
-
-
-
-
-
-
 
 'rectangle "Prova" {
    
@@ -173,8 +117,8 @@ package "OSservice" {
 }
 
 interface geo_i
-APIController --( geo_i
-geo_i -- geoservice
+servicecontroller -[#red,dashed]-( geo_i
+geo_i -[#red,dashed]- geoservice
 
 
 package "lib" {
@@ -186,26 +130,20 @@ package "lib" {
 
     [local notifications] as notifications
     [permission handler] as permission
+    [WorkManager]
   }
 
 interface notification_i
-challengecontroller --( notification_i
-notification_i -- notificationservice
+challengecontroller -[#brown,dashed]-( notification_i
+notification_i -[#brown,dashed]- notificationservice
 
 interface mem_i
-challengecontroller --( mem_i
-mem_i -- memoryservice
+challengecontroller -[#blue,dashed]-( mem_i
+mem_i -[#blue,dashed]- memoryservice
 
-languagecontroller --( mem_i
-
-trekkingController --( notification_i
-trekkingController --( mem_i
-
-
-
-
-
-
+languagecontroller -[#blue,dashed]-( mem_i
+trekkingController -[#brown,dashed]-( notification_i
+trekkingController -[#blue,dashed]-( mem_i
 
 interface sp_i
 memoryservice --( sp_i
@@ -214,13 +152,13 @@ sp_i -- sharedpreferences
 interface cache_i
 memoryservice --( cache_i
 cache_i -- cache
-
-
+interface permission_i
+servicecontroller -[#green,dashed]-( permission_i
+permission_i -[#green,dashed]- permissionservice
 interface gl_i
 geoservice --( gl_i
 
 gl_i -- geolocator
-
 
 interface lnotifications_i
 notificationservice --( lnotifications_i
@@ -229,16 +167,12 @@ lnotifications_i -- notifications
 interface p_i
 permissionservice --( p_i
 
-
-
-
 p_i -- permission
 permissionservice --( sp_i
 
 interface compass_i
 permissionservice --( compass_i
 compass_i -- compass
-
 
 interface dmi
 interface umi
@@ -266,11 +200,11 @@ interface api_i
 
 
 HomePage -down[#green]-( api_i
-api_i -[#green]- APIController
+api_i -[#green]- servicecontroller
 
 
-HomePage -down[#482408]-( trekking_i 
-trekking_i -down[#482408]- trekkingController
+HomePage -down[#red]-( trekking_i 
+trekking_i -down[#red]- trekkingController
 
 LoginRegistrationPage -down[#blue]-( user_i
 user_i -down[#blue]- UserController
@@ -278,77 +212,50 @@ user_i -down[#blue]- UserController
 
 'LoginRegistrationPage -down[#red]-( diary_i
 
-
-
-
-
-diary_i -down[#red]- DiaryController
+diary_i -down[#734014]- DiaryController
 
 
 LoginRegistrationPage -down-( language_i
 language_i -- languagecontroller
 
 UserProfilePage -down[#blue]-( user_i
+UserProfilePage -[#red]-( trekking_i
+UserProfilePage -[#734014]-( diary_i
 
-trekkingPage -[#482408]-( trekking_i 
-trekkingPage -[#blue]-( user_i
+trekkingPage -[#red]-( trekking_i 
+'trekkingPage -[#blue]-( user_i
 trekkingPage -[#green]-( api_i
 trekkingPage --( challenge_i
+
 challenge_i -- challengecontroller
-DiaryPage -[#red]-( diary_i
+
+DiaryPage -[#734014]-( diary_i
 DiaryPage -[#blue]-( user_i
-DiaryPage -[#482408]-( trekking_i 
+DiaryPage -[#red]-( trekking_i 
 
 GeowatchPage -[#green]-( api_i
+GeowatchPage -[#red]-( trekking_i
 
 SettingsPage -[#blue]-( user_i
 SettingsPage --( language_i
+SettingsPage -[#red]-( trekking_i
 
-
-
-
-
-SearchPage -[#red]-( diary_i
+SearchPage -[#734014]-( diary_i
 SearchPage -[#blue]-( user_i
-SearchPage -[#482408]-( trekking_i 
+SearchPage -[#red]-( trekking_i 
 
-
-'languagecontroller -[hidden]right-> APIController
-
-
-
-
-
-
-
-
-
-
-
-
-
+'languagecontroller -[hidden]right-> servicecontroller
 
 lib -- p1
 'lib -[hidden]- Model
 'geolocator -[hidden]up- DiaryModel
-
-
-
-
-
 'challengecontroller -- p3
 'trekkingController --p3
 'UserController -- p3
 'DiaryController -- p3
-
-
-
-
-
 'domaincontroller -- p3
 domaincontroller -- pfirebasefirestore
 domaincontroller -- pfirebasestorage
-
 
 'interface lib_i
 'controller -down-( lib_i
@@ -364,16 +271,32 @@ domaincontroller -- pfirebasestorage
 'internetservice -[hidden]up- authservice
 'OSservice -[hidden]up- internetservice
  interface authservice_i
- UserController --( authservice_i
- authservice_i -- authservice
+ DiaryController -[#7b4342,dashed]-( authservice_i
+ trekkingController -[#7b4342,dashed]-( authservice_i
+ UserController -[#7b4342,dashed]-( authservice_i
+ authservice_i -[#7b4342,dashed]- authservice
  authservice -- pgoogleauth
-authservice -- pfirebaseauth
+ authservice -- pfirebaseauth
+ authservice -- pfirebasefirestore
+
+
+ rectangle "Background" {
+  component "Background_Service"
+  Background_Service --( WorkManager_i
+ WorkManager_i -- WorkManager
+ }
+ Background_Service -[#green]-( api_i
+ Background_Service -[#blue,dashed]-( mem_i
+ Background_Service -[#red]-( trekking_i
+ Background_Service -[#brown,dashed]-( notification_i
+ 
+ 'compass -- WorkManager
 
 'interface lib_i
 'OSservice --( lib_i
 'lib_i -- lib
 'interface osservice_i
-'APIController --( osservice_i
+'servicecontroller --( osservice_i
 'osservice_i -- OSservice
 'languagecontroller --( osservice_i
 'challengecontroller --( osservice_i
@@ -383,7 +306,7 @@ authservice -- pfirebaseauth
 'Model -[hidden] authservice_i
 'UserController --( osservice_i
 'trekkingController --( osservice_i
-APIController -- p2
+servicecontroller -- p2
 'controller --( osservice_i
 'package "Mobile OS" {
 '  [OS_API]
@@ -423,55 +346,6 @@ APIController -- p2
 'Model -[hidden]right- lib_i
 
 'Model -[hidden]right- authservice_i
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 '() "HomeGUI"
 '() "SearchGUI"
 '() "RideSummaryReviewGUI"
@@ -488,25 +362,14 @@ p6 -up- SearchGUI
 'RideSummaryReviewUI -- p7
 'p7 -up- RideSummaryReviewGUI
 
-
-
 UserProfilePage -- p8
 p8 -up- UserProfileGUI
-
-
 
 LoginRegistrationPage -- p12
 p12 -up- LoginRegistrationGUI
 
-
-
-
-
-
 GeowatchPage -- p11
 p11 -up- GeowatchGUI
-
-
 
 SettingsPage -- p9
 p9 -up- SettingsGUI
@@ -516,9 +379,6 @@ p10 -up- trekkingGUI
 
 DiaryPage -- p7
 p7 -up- DiaryGUI
-
-
-
 
 'UserController -down- p2
 ' View → Controller
@@ -534,10 +394,6 @@ p7 -up- DiaryGUI
 '[ReviewController] -down-> [ReviewModel]
 '[UserController] -down-> [UserModel]
 
-
-
-
-
 ' Controller → Backend
 '[BikePathController] -right-> [BackendAPIHandler]
 '[tripController] -right-> [BackendAPIHandler]
@@ -547,169 +403,55 @@ p7 -up- DiaryGUI
 '[tripController] -right-> [OSAPIHandler]
 '[ReviewController] -right-> [OSAPIHandler]
 
-
-
-
 ' Controller → External Auth
 '[UserController] -right-> [ExternalAuthAPIHandler]
-
-
-
 
 '"HomeGUI" -[hidden]-> "SearchGUI"
 '"SearchGUI" -[hidden]-> "RideSummaryReviewGUI"
 '"RideSummaryReviewGUI" -[hidden]-> "LoginRegistrationGUI"
 '"LoginRegistrationGUI" -[hidden]-> "UserProfileGUI"
 
-
-
-
-
-
-
-
-
-
 '"User Interface (External)" -[hidden]-> "Mobile App (Triplo Application)"
-
-
 
 'interface bgwi
 'UserController --( bgwi
 'bgwi -- BackendAPIHandler
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 'interface external_API
 'p2 --( external_API
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 internetservice -[#green]-( api_i
-
-
-
-
-
-
-
-
-
 
 'UserController -- p1
 'UserController -- p36
 'UserController -- p38
-'APIController -- p36
-'APIController -- p37
-'APIController -- p38
-
-
-
-
-
-
+'servicecontroller -- p36
+'servicecontroller -- p37
+'servicecontroller -- p38
 
 'HomeGUI -[hidden]-> SearchGUI
 'SearchGUI -[hidden]-> RideSummaryReviewGUI
 'RideSummaryReviewGUI -[hidden]-> UserProfileGUI
 'UserProfileGUI -[hidden]-> LoginRegistrationGUI
 
-
-'APIController -down- p2
+'servicecontroller -down- p2
 'pe1 -down- OpenTopoMap
 
-'APIController -down- pe2
+'servicecontroller -down- pe2
 'pe2 -down- GSW
 
-'APIController -down- pe3
+'servicecontroller -down- pe3
 'pe3 -down- OpenWeather
 
-
-
-
-'APIController -down- pe6
+'servicecontroller -down- pe6
 'pe6 -down- Weatherbit
 
-'APIController -down- pe7
+'servicecontroller -down- pe7
 'pe7 -down- DemoMeteoServer
 
-
-
-'APIController -down- pe8
+'servicecontroller -down- pe8
 'pe8 -down- GoogleAuth
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 'external_API -- GoogleAuth
-
-
-
-
-
-
-
-
-
-
-
 
 @enduml

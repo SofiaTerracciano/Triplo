@@ -80,7 +80,7 @@ class NotificationService {
     final local = AppLocalizations.of(context);
     if (local == null) return;
 
-    final challengeContent = getChallengeContent(payload, local);
+    final challengeContent = notificationcontent(payload, local);
     final String title = challengeContent['title'] ?? "";
 
     // QUI LA LOGICA RICHIESTA:
@@ -155,7 +155,7 @@ class NotificationService {
   }
 }
 
-Map<String, String> getChallengeContent(
+Map<String, String> notificationcontent(
   String payload,
   AppLocalizations local,
 ) {
@@ -201,6 +201,12 @@ Map<String, String> getChallengeContent(
         'title': local.title_notification_arrival,
         'body': local.body_notification_arrival,
         'alert': local.alert_notification_arrival,
+      };
+    case "weather_alert":
+      return {
+        'title': "Weather alert",
+        'body': "A weather alert has been detected for one of your selected trekkings.",
+        'alert': "A weather alert has been detected for one of your selected trekkings.",
       };
     default:
       return {'title': "", 'body': ""};

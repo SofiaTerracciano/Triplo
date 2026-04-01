@@ -114,7 +114,7 @@ class ChallengesController extends ChangeNotifier {
   /// [local] is the [AppLocalizations] instance used to translate the message.
   /// Triggers a local notification when a new challenge is unlocked or completed.
   void notifyNewChallenge(String challengeType, AppLocalizations local) {
-  final content = getChallengeContent(challengeType, local);
+  final content = notificationcontent(challengeType, local);
 
   notification.showTrekkingNotification(
     id: DateTime.now().millisecondsSinceEpoch ~/ 1000, 
