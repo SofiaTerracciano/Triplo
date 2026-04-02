@@ -59,6 +59,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
       accuracy: LocationAccuracy.best,
       distanceFilter: 0,
       intervalDuration: const Duration(seconds: 1),
+      forceLocationManager: true
     );
 
     _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
@@ -67,7 +68,7 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     });
   }
 
-  void _checkDistance(Position currentPos) {
+  /*void _checkDistance(Position currentPos) {
     if (_hasEndedAutomatically) return;
 
     final trekkingController = context.read<TrekkingController>();
@@ -82,6 +83,34 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
         trekking.points.last.latitude, 
         trekking.points.last.longitude,
       );
+
+      if (distanceInMeters <= 1000) {
+        _hasEndedAutomatically = true;
+        trekkingController.checkArrival(widget.trekkingid, distanceInMeters, local);
+      }
+    }
+  }*/
+
+  void _checkDistance(Position currentPos) {
+    
+    if (_hasEndedAutomatically) {
+      return;
+    }
+
+    final trekkingController = context.read<TrekkingController>();
+    final trekking = trekkingController.getTrekkingById(widget.trekkingid);
+    final local = AppLocalizations.of(context)!;
+
+    if (trekking != null && trekking.points.isNotEmpty) {
+      final lastPoint = trekking.points.last;
+      
+      double distanceInMeters = Geolocator.distanceBetween(
+        currentPos.latitude,
+        currentPos.longitude,
+        lastPoint.latitude, 
+        lastPoint.longitude,
+      );
+
 
       if (distanceInMeters <= 1000) {
         _hasEndedAutomatically = true;
@@ -234,14 +263,14 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
                       SizedBox(
                           height: screenSize * 0.06),
                         //tasto di debug da togliere
-                      ElevatedButton(
+                      /*ElevatedButton(
                           onPressed: () {
                             final trekkingController = context.read<TrekkingController>();
                             final local = AppLocalizations.of(context)!;
                             trekkingController.checkArrival(widget.trekkingid, 500, local);
                           },
                           child: const Text("TEST ARRIVO"),
-                        ),
+                        ),*/
                       GestureDetector(
                         onTap: _stop,
                         child: Container(

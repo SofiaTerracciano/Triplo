@@ -83,10 +83,8 @@ class TrekkingController extends ChangeNotifier {
    // Metodo per gestire l'arrivo
   Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
     // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
-    debugPrint("🔔 checkArrival chiamato — distanza: $distanceInMeters");
     if (distanceInMeters <= 1000) {
       final content = getChallengeContent('end_trekking_arrival', local);
-      debugPrint("📦 title: ${content['title']}, body: ${content['body']}");
 
       await notification.showTrekkingNotification(
         id: 999,
@@ -94,9 +92,8 @@ class TrekkingController extends ChangeNotifier {
         body: content['body']!,
         payload: 'end_trekking_arrival',
         channelId: 'arrival_channel',
-        channelName: 'Arrivo Trekking',
+        channelName: 'Notifications',
       );
-      debugPrint("📨 Notifica inviata");
     }
   }
 
