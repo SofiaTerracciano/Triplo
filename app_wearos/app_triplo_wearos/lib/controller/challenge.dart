@@ -51,7 +51,7 @@ class ChallengesController extends ChangeNotifier {
 
   void notifyNewChallenge(String challengeType, AppLocalizations local) {
     // 1. Recuperiamo i testi localizzati tramite la funzione helper
-    final content = getChallengeContent(challengeType, local);
+    final content = notificationcontent(challengeType, local);
     
     // 2. DELEGHIAMO al servizio notifiche l'invio fisico della notifica
     notification.showTrekkingNotification(

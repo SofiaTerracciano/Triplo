@@ -176,7 +176,14 @@ class ServiceController {
         "?lat=$lat&lon=$lon&key=$weatherbitKey";
 
     try {
-      final res = await http.get(Uri.parse(url));
+      final res = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 6));
+
+      if (res.statusCode == 429) {
+        debugPrint("Weatherbit rate limit reached");
+        return [];
+      }
 
       if (res.statusCode != 200) {
         debugPrint("Weatherbit alerts error ${res.statusCode}");

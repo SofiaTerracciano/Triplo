@@ -410,6 +410,7 @@ After scanning the QR, the authenticated mobile app:
     \end{itemize}
 \end{itemize}
 
+
 \textbf{3. Completion (Watch)}  
 The watch listens to the document in real time.  
 When \texttt{status == "approved"} and \texttt{uid} is set, pairing is considered complete and the watch loads user data using that \texttt{uid}.
@@ -438,6 +439,7 @@ This preserves device identity while removing user association.
 
 \subsection{Security Properties}
 
+
 \begin{itemize}
     \item Only the watch may create/reset pairing in \texttt{waiting} state.
     \item Only authenticated users may approve pairing.
@@ -450,7 +452,60 @@ This design cleanly separates device identity from user authentication while min
 
 
 \section{Component interfaces} \label{Component interfaces}
+\subsection{Component Interfaces Smartphone Application}
+\begin{figure}[H]
+    \label{Interface Diagram Smartphone Application}
+    \centering
+    \includegraphics[width=\linewidth]{./images/interfacediagramsmartphone2.png}
+    \caption{Interface diagram smartphone application}
+\end{figure}
 
+The interfaces shown in Figure~\ref{Interface Diagram Smartphone Application} should not be interpreted as direct one-to-one representations of language-level constructs. 
+Rather, they are used as an architectural abstraction to explicitly model the set of operations that each component exposes to the rest of the system. 
+Figure~\ref{Interface Diagram Smartphone Application} presents the main interfaces exposed by the application components. 
+These interfaces define the contracts through which the different parts of the system interact, making the architecture more modular.
+
+
+The diagram includes a first group of interfaces associated with the core application domains.
+ 
+\texttt{User\_i} defines the operations related to user profile management, following and followers data.\\
+\texttt{Trekking\_i} groups the operations required to retrieve trekking data, search routes, manage saved treks.\\
+\texttt{Diary\_i} exposes the operations related to diary retrieval and visualization.\\
+\texttt{Challenge\_i} provides access to challenge data.\\
+Finally, \texttt{Language\_i} defines the minimal contract required to manage the application locale.\\
+
+A second group of interfaces regards infrastructure and platform interaction. 
+\texttt{Service\_i} acts as the unified access point for a heterogeneous set of services that are not strictly tied to a single domain entity. 
+As shown in the diagram, this interface includes operations for weather retrieval, forecast parsing, weather alerts, navigation-related location handling, access to map tiles, and redirection to system configuration components such as GPS and permission settings. 
+For this reason, \texttt{Service\_i} can be interpreted as a façade-oriented interface, collecting in a single access point the functionalities needed by the UI when interacting with external services and operating-system-level capabilities.
+
+The operating system services are further represented through dedicated interfaces, namely \texttt{Permission\_i}, \texttt{Notification\_i}, \texttt{Memory\_i}, and \texttt{geo\_i}. 
+These interfaces isolate the logic that depends on Flutter packages that communicate with device APIs or with the operating system. 
+This design choice is particularly relevant from a maintenance point of view: if a package or platform-specific integration must be replaced, the impact can be limited to the corresponding service implementation, without requiring modifications in the rest of the application, as explained in section \ref{OSService Package Design}. 
+In this sense, the interfaces shown in Figure~\ref{Interface Diagram Smartphone Application} contribute to preserving a clear separation between application logic and platform-dependent concerns.
+
+More specifically, \texttt{Permission\_i} encapsulates permission requests.\\
+\texttt{geo\_i} abstracts location-service availability and position streaming\\
+\texttt{Notification\_i} defines the operations needed to issue local notifications \\
+ and \texttt{Memory\_i} centralizes local storage concerns, including image caching, saving the preferred locale.
+
+The diagram also contains a set of lightweight model-oriented interfaces, namely \texttt{qi}, \texttt{dmi}, \texttt{expi}, and \texttt{umi}. 
+These define conversion contracts based on \texttt{toMap()} and \texttt{fromMap(...)} operations. 
+Their purpose is to standardize the serialization and deserialization logic used to map application objects to and from Firestore representations. 
+
+In addition to the previously described interfaces, Figure~\ref{Interface Diagram Smartphone Application} also includes the \texttt{authservice\_i} interface, which encapsulates the operations related to user authentication and credential management.
+
+This interface defines a dedicated contract for handling authentication workflows, including registration, login (both with email/password and Google Sign-In), logout, password reset, and automatic session restoration. 
+Furthermore, it includes operations for account-related updates, such as email changes and smartwatch pairing approval.
+
+From an architectural perspective, \texttt{authservice\_i} plays a key role in separating authentication from the higher-level domain logic exposed by \texttt{User\_i}. 
+While \texttt{User\_i} provides user-related functionalities at the application level, \texttt{authservice\_i} is responsible for interacting with the underlying authentication provider (e.g., Firebase Authentication), thus centralizing all authentication-related operations in a single component.
+
+This design choice improves modularity and maintainability, as it prevents other components from directly depending on authentication mechanisms and allows the authentication logic to be modified or extended with minimal impact on the rest of the system.
+
+Overall, the interfaces represented in Figure~\ref{Interface Diagram Smartphone Application} document a design in which each major responsibility is accessed through a clearly delimited contract. 
+This improves readability of the architecture, supports separation of concerns, and makes explicit which services are expected from each component without exposing internal implementation details. 
+For these reasons, the interface view complements the component decomposition by showing not only which elements exist in the system, but also how their responsibilities are formally made available to the rest of the application.
 
 \section{Selected architectural styles and patterns} \label{Selected architectural styles and patterns}
 
@@ -549,7 +604,7 @@ For these reasons, the interaction is intentionally defined as a pairing process
 
 
 \subsection{OSService Package Design}
-
+\label{OSService Package Design}
 As shown in the smartphone component diagram (see Figure~\ref{Mobile Smartphone App component view}), the OSService package has been introduced to isolate all interactions with operating system functionalities and external libraries.
 
 In particular, this package includes the following services:

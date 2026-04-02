@@ -38,6 +38,7 @@ class _GeowatchPageState extends State<GeowatchPage> {
 
       final trekking = trekkingController.getTrekkingById(widget.trekkingId);
       if (trekking == null) {
+        if (!mounted) return;
         setState(() {
           error = "TREKKING_NOT_FOUND";
           loading = false;
@@ -47,6 +48,7 @@ class _GeowatchPageState extends State<GeowatchPage> {
 
       final target = trekking.starting_point ?? trekking.ending_point;
       if (target == null) {
+        if (!mounted) return;
         setState(() {
           error = "NO_LOCATION";
           loading = false;
@@ -68,12 +70,26 @@ class _GeowatchPageState extends State<GeowatchPage> {
         langCode,
       );
 
-      final realAlerts = await serviceController.weatherbitAlerts(
-        target.latitude,
-        target.longitude,
-      );
+      List<Map<String, dynamic>> realAlerts = [];
+      List<Map<String, dynamic>> mockAlerts = [];
 
-      final mockAlerts = await serviceController.mockAlerts();
+      try {
+        realAlerts = await serviceController.weatherbitAlerts(
+          target.latitude,
+          target.longitude,
+        );
+      } catch (_) {}
+
+      try {
+        mockAlerts = await serviceController.mockAlerts();
+      } catch (_) {}
+
+      debugPrint("Weather loaded: ${weatherRes != null}");
+      debugPrint("Forecast loaded: ${forecastRes?.length ?? 0}");
+      debugPrint("Real alerts: ${realAlerts.length}");
+      debugPrint("Mock alerts: ${mockAlerts.length}");
+
+      if (!mounted) return;
 
       setState(() {
         currentWeather = weatherRes;
@@ -84,6 +100,8 @@ class _GeowatchPageState extends State<GeowatchPage> {
         loading = false;
       });
     } catch (e) {
+      debugPrint("Weather page load error: $e");
+      if (!mounted) return;
       setState(() {
         error = e.toString();
         loading = false;

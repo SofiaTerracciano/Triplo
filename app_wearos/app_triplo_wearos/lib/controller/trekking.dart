@@ -84,7 +84,7 @@ class TrekkingController extends ChangeNotifier {
   Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
     // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
     if (distanceInMeters <= 1000) {
-      final content = getChallengeContent('end_trekking_arrival', local);
+      final content = notificationcontent('end_trekking_arrival', local);
 
       await notification.showTrekkingNotification(
         id: 999,

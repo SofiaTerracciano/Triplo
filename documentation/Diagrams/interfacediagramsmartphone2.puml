@@ -21,6 +21,7 @@ class "Service_i"  << (I,#aaaaaa) >> <<interface>> {
   - openPermissionSettings()
   - openTopoMapTile()
   - openTopoMapSubdomains()
+  - hasInternet()
 }
 
 class "Trekking_i" as TrekkingI << (I,#aaaaaa) >> <<interface>> {
@@ -85,5 +86,78 @@ class "Challenge_i" as ChallengeI << (I,#aaaaaa) >> <<interface>> {
   - allChallenges
   - getCachedImage(path)
 }
+
+class "Permission_i" as PermissionI << (I,#aaaaaa) >> <<interface>> {
+  - askPermissionOnce()
+  - locationStatus()
+  - isLocationGranted()
+  - isLocationDenied()
+  - openAppSettingsPage()
+}
+
+class "Notification_i" as NotificationI << (I,#aaaaaa) >> <<interface>> {
+  - showTrekkingNotification(id, title, body, payload, channelId, channelName)
+  - showWeatherNotification(id, title, body, payload)
+  - notificationcontent(payload, local)
+}
+
+class "Memory_i" as MemoryI << (I,#aaaaaa) >> <<interface>> {
+  - getImageFromDisk(url)
+  - cacheImageOnDisk(url) 
+  - getImageFromMemory(key)
+  - saveImageToMemory(key, file)
+  - removeImageFromMemory(key)
+  - clearMemoryCache()
+  - getSavedLocaleCode()
+  - saveLocaleCode(localeCode)
+  - learSavedLocaleCode()
+  - getShownWeatherAlertKeys() 
+  - saveShownWeatherAlertKeys(keys)
+  - addShownWeatherAlertKey(key)
+  - hasShownWeatherAlertKey(key)
+  - removeShownWeatherAlertKey(key)
+  - clearShownWeatherAlertKeys() 
+}
+
+class "geo_i" as geoI << (I,#aaaaaa) >> <<interface>> {
+  - isLocationServiceEnabled()
+  - getPositionStream() 
+  - openLocationSettingsPage()
+}
+
+class "qi" as qI << (I,#aaaaaa) >> <<interface>> {
+  - toMap()
+  - fromMap(map, docId)
+}
+
+class "dmi" as dmI << (I,#aaaaaa) >> <<interface>> {
+  - toMap()
+  - fromMap(map, diaryId)
+}
+
+class "expi" as expI << (I,#aaaaaa) >> <<interface>> {
+  - toMap()
+  - fromMap(map, docId)
+}
+
+class "umi" as umI << (I,#aaaaaa) >> <<interface>> {
+  - toMap()
+  - fromMap(map, uId)
+}
+
+class "authservice_i" as authserviceI << (I,#aaaaaa) >> <<interface>> {
+  - register(email, password)
+  - login(email, password) 
+  - loginWithGoogle() 
+  - logout()
+  - endPasswordReset(email)
+  - requestPasswordReset()
+  - loadUserCore(uid)
+  - tryAutoLogin()
+  - approveWatchPair(watchId, token)
+  - changeEmail(newEmail, currentPasssword)
+  - refreshEmailFromAuth() 
+}
+
 
 @enduml
