@@ -117,6 +117,84 @@ The token verification API is not directly managed within the application logic 
 
 \end{landscape}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{View Components}
+
+The UI of the application is organized into components that group together multiple views related to the same functionality, rather than representing isolated pages. This choice reflects how users interact with the system, as each View component encapsulates a complete feature.
+
+The \texttt{GeoWatch Page component} includes all functionalities related to navigation and environmental awareness during a trekking activity. It is responsible for presenting weather information along the route, weather alerts, and a satellite map with meteorological layers. It also provides navigation support through compass heading, altitude, and user position.
+
+The \texttt{Home Page component} represents the main map-based point of the application. It displays trekking routes on an OpenTopoMap layer and allows users to explore available paths geographically.
+
+The \texttt{Trekking Page component} provides detailed information about a selected route, including a description and photos. It also allows users to access the component that handles the creation of a diary associated with the route and to save the route to their profile, the \texttt{Diary Page component}.
+
+The \texttt{Diary Page component} handles the creation and modification of diary entries related to trekking experiences, including notes, images, and activity-related data.
+
+The \texttt{User Profile Page component} is responsible for displaying user information, including saved trekkings, diary related, follower and following users' data.
+
+The \texttt{Settings Page component} allows users to manage application and account settings, including profile information, security options such as password updates, smartwatch pairing, and weather notification preferences.
+
+The \texttt{LoginRegistration Page component} manages login and registration workflows. It supports authentication via email and password, performs simple format validation operations, supports Google authentication, and password recovery.
+
+The \texttt{Search Page component} enables users to search for other users and access their public profiles or to search for a trekking by its name.
+
+\subsubsection{Controller components}
+
+The controller package coordinates the application logic and mediates interactions between UI components, models, and backend services.
+
+Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController},\\ and \texttt{ChallengeController}, are responsible for handling use cases specific to their domain. They orchestrate data flow between the UI and Firebase services.
+
+The \texttt{ServiceController} acts as a unified facade for functionalities that do not belong to an application domain defined in the model, such as access to external APIs and operating system services, reducing coupling between UI components and low-level implementations.
+
+The \texttt{LanguageController} is responsible for managing localization and language-related logic.
+
+\subsubsection{OSService Package components}
+
+The OSService package contains services that directly interact with Flutter libraries responsible to communicate with system APIs and services managed by the operating system.
+
+These include components such as \texttt{GeoService}, \texttt{PermissionService}, \texttt{MemoryService}, and \texttt{NotificationService}, each encapsulating a specific interaction with the operating system, such as location access, permission handling, local storage, and notifications.
+
+This package isolates dependencies on external libraries and platform APIs. If a library needs to be replaced or updated, the changes are confined to the corresponding service, without affecting the rest of the application.
+
+\subsubsection{Internet Service}
+
+The \texttt{InternetService} is responsible for monitoring network connectivity. It periodically relies on the ServiceController to attempt connections to external endpoints (e.g., Google services). Based on the outcome, the application switches between offline and online modes, ensuring consistent behavior in varying network conditions.
+
+\subsubsection{Background Service}
+
+The \texttt{BackgroundService} enables the execution of tasks even when the application is not actively open, depending on operating system constraints.
+
+It is used to perform periodic operations such as checking weather conditions and generating notifications. These tasks are scheduled through the mechanisms WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed based on system availability.
+
+\subsubsection{AuthService}
+
+The AuthService is responsible not only for authentication but also for managing the smartwatch pairing process.
+
+It handles user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
+
+\subsubsection{Backend and External Services}
+
+The application relies on Firebase as a Backend-as-a-Service, including Authentication, Firestore, and Storage.
+
+External services are used for specific functionalities, such as OpenTopoMap for map visualization, OpenWeather and Weatherbit for weather data and alerts, and Google services for authentication and connectivity verification.
+
+\subsubsection{Architectural Summary}
+
+The architecture is organized in packages that separate concerns clearly. Domain controllers manage application logic and backend interaction, the ServiceController provides a unified access point to external and system services, and OSService components encapsulate platform dependencies. This structure improves modularity, maintainability, and adaptability of the system.
+
 Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, and \texttt{ChallengeController}, are responsible for coordinating the application logic related to their respective functional domains. These controllers manage interactions between the View layer and the Model layer, and they also mediate access to backend resources such as Firebase services.
 
 
@@ -136,7 +214,8 @@ Therefore, in the proposed architecture:
 \end{itemize}
 
 
-\subsection{Smartphone Application External Libraries}
+
+\paragraph{Smartphone Application External Libraries}
 
 \begin{table}[h]
 \centering
@@ -231,11 +310,9 @@ The cloud side is modeled as a device containing different execution environment
 
 
 
-
 The deployment diagram represents the distribution of the application artifacts across different execution environments. In particular, the smartphone application is deployed as an artifact on both iOS and Android execution environments, while the smartwatch application is deployed separately on a Wear OS execution environment.
 
 Although the smartphone application is shown as deployed on two distinct platforms, it is important to note that it is based on a single shared codebase. The application is developed using Flutter, a cross-platform framework that allows the same source code to be compiled and executed on both iOS and Android devices. As a result, the two deployments correspond to different execution environments of the same application, rather than distinct implementations.
-
 In contrast, the smartwatch application is implemented as a separate artifact. While it shares the same backend services and part of the architectural structure, it is specifically designed for the Wear OS environment and provides a reduced set of functionalities for wearable devices. Therefore, it is represented as a distinct deployment unit in the diagram.
 
 
@@ -248,6 +325,9 @@ In contrast, the smartwatch application is implemented as a separate artifact. W
 
 The identified use cases provide an abstract representation of the interactions between the user and the system. They have been selected to capture the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
 These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. 
+
+
+
 \begin{itemize}
     \item Add Diary Page
     \item Explore trekkings on Map
@@ -401,6 +481,16 @@ Therefore, the adopted solution combines the structural organization of MVC with
 
 
 
+\subsection{ServiceController as a Facade}
+
+The ServiceController is designed following the Facade pattern.
+
+It provides a unified interface that aggregates multiple underlying services, including external APIs and OS-level services. Instead of interacting directly with heterogeneous components, UI components and controllers rely on a single access point.
+
+This design reduces coupling and simplifies the interaction model of the system. It also improves readability and consistency, as all non-domain-specific functionalities are accessed through a centralized component.
+
+Furthermore, the facade allows internal changes to the underlying services without impacting the rest of the application, thus increasing flexibility and maintainability.
+
 \section{Other Design Decisions} \label{Other Design Decisions}
 
 \subsection{Flutter as Application Framework} \label{Flutter as Application Framework}
@@ -439,13 +529,14 @@ Furthermore, the use of Firebase aligns well with the multi-platform nature of t
 
 
 
+
+
 \subsection{Phone Smartwatch Pairing} \label{Phone Smartwatch Pairing}
 While the smartphone application directly relies on Firebase Authentication, the smartwatch application does not perform authentication independently. Instead, it adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
 This design choice provides several advantages:
 \begin{itemize}
-\item avoids handling user credentials on the smartwatch, reducing the exposure of sensitive data on a constrained and potentially less secure device 
+\item avoids handling user credentials on the smartwatch or to enforce specific authentication methods, such as Google Sign-In, reducing the exposure of sensitive data on a constrained and potentially less secure device 
 \item simplifies the user interaction model, eliminating the need for credential input on devices where text entry is inherently limited and less user-friendly
-\item avoids the need to enforce specific authentication methods, such as Google Sign-In, on the smartwatch, allowing the authentication process to remain centralized on the smartphone.
 \end{itemize}
 For these reasons, the interaction is intentionally defined as a pairing process rather than a traditional login, reflecting both its security properties and its role within the overall system architecture. \\
 
@@ -454,6 +545,28 @@ For these reasons, the interaction is intentionally defined as a pairing process
 
 
 
+
+
+
+\subsection{OSService Package Design}
+
+As shown in the smartphone component diagram (see Figure~\ref{Mobile Smartphone App component view}), the OSService package has been introduced to isolate all interactions with operating system functionalities and external libraries.
+
+In particular, this package includes the following services:
+\begin{itemize}
+    \item \texttt{PermissionService}, responsible for handling runtime permissions;
+    \item \texttt{GeoService}, responsible for accessing device location;
+    \item \texttt{MemoryService}, responsible for local storage and caching;
+    \item \texttt{NotificationService}, responsible for managing local notifications;
+\end{itemize}
+
+Each service encapsulates the interaction with specific Flutter packages and platform APIs, such as geolocation, local storage, or notification systems. These dependencies correspond to external libraries (e.g., packages available on \textit{pub.dev}) that internally communicate with the underlying operating system.
+
+This design ensures that the rest of the application does not directly depend on platform-specific APIs or external libraries. Instead, all such dependencies are confined within the OSService package.
+
+The main motivation behind this decision is maintainability. If a library or underlying implementation needs to be replaced, only the corresponding service must be modified, without requiring changes in the rest of the system. This significantly reduces the impact of technological changes.
+
+%Moreover, this approach improves testability, as services can be mocked or replaced during testing without affecting higher-level components.
 
 
 \subsection{Network Connectivity Requirements and smartwatch Platform}
