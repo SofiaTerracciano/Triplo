@@ -198,6 +198,12 @@ Map<String, String> getChallengeContent(
         'body': local.body_notification_arrival,
         'alert': local.alert_notification_arrival
       };
+    case "weather_alert":
+      return {
+        'title': "Weather alert",
+        'body': "A weather alert has been detected for one of your selected trekkings.",
+        'alert': "A weather alert has been detected for one of your selected trekkings.",
+      };
     default:
       return {'title': "", 'body': ""};
   }

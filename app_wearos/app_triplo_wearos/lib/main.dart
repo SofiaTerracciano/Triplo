@@ -130,7 +130,7 @@ class TriploWatchApp extends StatelessWidget {
         Provider<ServiceController>(create: (context) => ServiceController(
           geo: context.read<GeoService>(), 
           memory: context.read<MemoryService>(),
-          notification: context.read<NotificationService>(),
+          //notification: context.read<NotificationService>(),
         )),
 
         // TrekkingController con le dipendenze passate correttamente

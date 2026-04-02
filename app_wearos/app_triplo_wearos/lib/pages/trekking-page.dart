@@ -7,6 +7,8 @@ import 'package:app_triplo_wearos/pages/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'geowatch.dart';
+
 class TrekkingPage extends StatelessWidget {
   final String trekkingId;
 
@@ -265,7 +267,7 @@ class TrekkingPage extends StatelessWidget {
             () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => HomePage(), // da mettere pagina weather
+                  builder: (_) => GeowatchPage(trekkingId: trekking.documentId)
               ),
             ),
           ),
