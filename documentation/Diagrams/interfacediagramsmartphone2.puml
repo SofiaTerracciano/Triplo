@@ -1,0 +1,89 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundcorner 12
+
+hide empty members
+
+class "Service_i"  << (I,#aaaaaa) >> <<interface>> {
+  - userLocation()
+  - weather(lat, lon, langCode)
+  - forecast(lat, lon, langCode)
+  - parseForecast(rawForecast)
+  - weatherbitAlerts(lat, lon)
+  - mockAlerts()
+  - weatherIconUrl(icon)
+  - resolveLayer(layer)
+  - loadNavigationLocation()
+  - navigationPositionStream()
+  - openGpsSettings()
+  - openPermissionSettings()
+  - openTopoMapTile()
+  - openTopoMapSubdomains()
+}
+
+class "Trekking_i" as TrekkingI << (I,#aaaaaa) >> <<interface>> {
+  - allTrekkings
+  - isWeatherAlertEnabled(trekkingId)
+  - searchTrekking(query)
+  - getTrekkingId(trekkingName)
+  - getWeatherAlertTrekkings()
+  - disableWeatherAlertForTrekking(trekkingId)
+  - getCachedImage(path)
+  - getTrekkingById(trekkingId)
+  - getTrekkingByIdAsync(trekkingId)
+  - checkArrival(trekkingId, distanceInMeters, currentPos, local)
+  - addTrekkingToSaved(trekkingId)
+  - removeTrekkingFromSaved(trekkingId)
+  - getCachedImages(challengeIds)
+  - isTrekkingSaved(trekkingId)
+  - getSavedTrekkings(userId)
+}
+
+class "User_i" as UserI << (I,#aaaaaa) >> <<interface>> {
+  - login(email, password)
+  - loginWithGoogle()
+  - register(email, password)
+  - sendPasswordReset(email)
+  - requestPasswordReset()
+  - logout()
+  - searchUsers(query)
+  - getUserById(userId)
+  - getFollowers(userId)
+  - getFollowing(userId)
+  - updateUsername()
+  - updateName()
+  - updateSurname()
+  - updateBirthdate(date)
+  - updateProfilePhoto(file)
+  - changeEmail(newEmail, currentPassword)
+  - extractWatchPair(raw)
+  - approveWatchPair(watchId, token)
+  - currentUser
+  - isGoogleUser
+  - isPasswordUser
+  - isLoading
+}
+
+class "Language_i" as LanguageI << (I,#aaaaaa) >> <<interface>> {
+  - locale
+  - setLocale(locale)
+}
+
+class "Diary_i" as DiaryI << (I,#aaaaaa) >> <<interface>> {
+  - getRandomPublicDiariesFromFollowing(followingIds, limit)
+  - getDownloadUrlChild(path)
+  - loadPublicDiary(userId)
+  - loadPrivateDiary(userId)
+  - getPublicDiaries(userId)
+  - fetchDiaryById(diaryId)
+}
+
+class "Challenge_i" as ChallengeI << (I,#aaaaaa) >> <<interface>> {
+  - loadChallenges()
+  - allChallenges
+  - getCachedImage(path)
+}
+
+@enduml
