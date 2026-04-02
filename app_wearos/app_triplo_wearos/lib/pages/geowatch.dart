@@ -68,17 +68,19 @@ class _GeowatchPageState extends State<GeowatchPage> {
         langCode,
       );
 
-      final alertsRes = await serviceController.weatherbitAlerts(
+      final realAlerts = await serviceController.weatherbitAlerts(
         target.latitude,
         target.longitude,
       );
+
+      final mockAlerts = await serviceController.mockAlerts();
 
       setState(() {
         currentWeather = weatherRes;
         forecast = forecastRes != null
             ? serviceController.parseForecast(forecastRes)
             : [];
-        alerts = alertsRes;
+        alerts = [...realAlerts, ...mockAlerts];
         loading = false;
       });
     } catch (e) {
