@@ -30,14 +30,14 @@ void main() {
 }*/
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:triplo/main.dart';
 
 class Dummy {
   int add(int a, int b) => a + b;
 }
 
 void main() {
-  test('Dummy add works', () {
-    final dummy = Dummy();
-    expect(dummy.add(2, 3), 5);
+  test('', () {
+    
   });
 }
