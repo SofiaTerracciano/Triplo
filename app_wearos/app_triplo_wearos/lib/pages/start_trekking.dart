@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:app_triplo_wearos/controller/API.dart';
+
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/end_trekking.dart';

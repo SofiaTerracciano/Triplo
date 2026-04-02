@@ -1,7 +1,8 @@
-import 'package:app_triplo_wearos/controller/API.dart';
+
 import 'package:app_triplo_wearos/controller/challenge.dart';
 import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/controller/language.dart';
+import 'package:app_triplo_wearos/controller/servicecontroller.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/navigation.dart';
@@ -126,7 +127,7 @@ class TriploWatchApp extends StatelessWidget {
         ),
 
         // API (Provider semplice perché non è un ChangeNotifier)
-        Provider<API>(create: (context) => API(
+        Provider<ServiceController>(create: (context) => ServiceController(
           geo: context.read<GeoService>(), 
           memory: context.read<MemoryService>(),
           notification: context.read<NotificationService>(),

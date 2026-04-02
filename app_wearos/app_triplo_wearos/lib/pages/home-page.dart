@@ -1,4 +1,4 @@
-import 'package:app_triplo_wearos/controller/API.dart';
+
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/pages/trekking-page.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +6,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
 import 'package:provider/provider.dart';
+
+import '../controller/servicecontroller.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -42,10 +44,11 @@ class _HomePageState extends State<HomePage> {
     await context.read<TrekkingController>().loadTrekking();
   }
 
+
   @override
   Widget build(BuildContext context) {
     final trekkingController = context.watch<TrekkingController>();
-    final api = context.watch<API>();
+    final servicecontroller = context.watch<ServiceController>();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -63,8 +66,8 @@ class _HomePageState extends State<HomePage> {
             ),
             children: [
               TileLayer(
-                urlTemplate: api.openTopoMapTile(),
-                subdomains: api.openTopoMapSubdomains(),
+                urlTemplate: servicecontroller.openTopoMapTile(),
+                subdomains: servicecontroller.openTopoMapSubdomains(),
               ),
 
               // Show polylines only if zoom is sufficient

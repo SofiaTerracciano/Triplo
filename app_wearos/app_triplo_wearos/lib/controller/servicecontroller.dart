@@ -10,10 +10,8 @@ import '../service/geo.dart';
 import '../service/permission_service.dart';
 import '../service/memory.dart';
 
-/// Controller for managing external API integrations.
-/// This class handles interactions with OpenWeather and Weatherbit for weather 
-/// data, manages map tiles, and provides utility methods for network safety.
-class API {
+
+class ServiceController {
   /// The API key for OpenWeatherMap services.
   late final String openWeatherKey;
 
@@ -32,7 +30,7 @@ class API {
   NotificationService notification; 
   
   // Constructor to load API keys from .env
-  API({required this.memory, required this.geo, required this.notification}) {
+  ServiceController({required this.memory, required this.geo, required this.notification}) {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
 
