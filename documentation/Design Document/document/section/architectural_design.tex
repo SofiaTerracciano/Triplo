@@ -624,6 +624,55 @@ The main motivation behind this decision is maintainability. If a library or und
 %Moreover, this approach improves testability, as services can be mocked or replaced during testing without affecting higher-level components.
 
 
+
+
+
+
+
+\subsection{Use of External Service Providers}
+\label{Use od External Service Providers}
+
+The application relies on a set of external service providers to implement functionalities related to weather information and map visualization, which are required by several functional requirements of the system. 
+In particular, these providers support the fulfillment of requirements related to the visualization of weather conditions associated with trekking routes, the detection of weather alerts, and the display of geographical information on maps.
+
+From an architectural perspective, the \texttt{Service\_i} interface acts as the main entry point for all operations involving third-party providers. 
+It exposes methods such as \texttt{weather()}, \texttt{forecast()}, \texttt{weatherbitAlerts()}, and map-related operations like \texttt{openTopoMapTile()}.
+
+This design follows a facade-oriented approach: a single interface lets other components access the required functionalities. 
+As a result, other components interact only with abstract operations, without depending on the specific provider for the data.
+This approach improves modularity and ensures that changes in external services can be handled locally within the service layer, without affecting the rest of the application.
+Regarding weather data, two different providers have been adopted based on their respective strengths. 
+Standard weather information and forecasts are obtained through OpenWeather, accessed via the \texttt{weather()} and \texttt{forecast()} methods. 
+These operations are used to satisfy the functional requirements related to the visualization of current weather conditions and short-term forecasts for trekking locations.
+
+Conversely, weather alerts are handled through Weatherbit, accessed via the \texttt{weatherbitAlerts()} operation. 
+This choice is motivated by the availability and reliability of alert-specific data provided by Weatherbit, which are essential to fulfill the functional requirements related to user notification of critical weather conditions. 
+
+
+Map visualization is supported through external tile providers, such as OpenTopoMap, accessed via dedicated operations in \texttt{Service\_i}. 
+These functionalities are required to satisfy the functional requirements related to the visualization of trekking routes and geographical context. 
+Delegating this responsibility to external providers avoids the need to manage map data internally and significantly reduces system complexity.
+
+
+
+
+
+
+
+Alternative solutions were considered during the design phase. 
+A first option consisted in adopting a single weather provider for both standard weather data and alerts. 
+However, this approach was discarded due to limitations in the quality, availability, or completeness of alert data offered by individual providers. 
+In particular, while OpenWeather provides reliable general weather information, its alert coverage is not always sufficient for the requirements of the application.
+
+
+
+
+The chosen solution, based on multiple providers integrated through a unified interface, such as \texttt{Service\_i}, represents a trade-off between flexibility and architectural simplicity. 
+It allows the system to leverage the strengths of different providers while keeping responsibilities well separated and interactions with higher level components stable.
+
+Overall, the use of external service providers, combined with the abstraction introduced by the \texttt{Service\_i} interface, enables the system to satisfy the relevant functional requirements while preserving modularity, maintainability, and extensibility of the architecture.
+
+
 \subsection{Network Connectivity Requirements and smartwatch Platform}
 
 The smartwatch application requires reliable access to internet connectivity in order to provide a complete and consistent user experience. 

@@ -44,6 +44,7 @@ class UserController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Users? _currentUser;
   Users? get currentUser => _currentUser;
 
