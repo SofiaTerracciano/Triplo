@@ -72,7 +72,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
             children: [
               TileLayer(
                 tileProvider: CancellableNetworkTileProvider(),
-                urlTemplate: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                urlTemplate: api.googleSatelliteTile(),
                 userAgentPackageName: 'com.example.triplo',
               ),
 
@@ -157,10 +157,13 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
           // Legend
           if (legendWidget != null)
             Positioned(
-              bottom: 8,
               left: 8,
               right: 8,
-              child: legendWidget,
+              bottom: 0,
+              child: SafeArea(
+                minimum: const EdgeInsets.only(bottom: 8),
+                child: legendWidget,
+              ),
             ),
         ],
       ),

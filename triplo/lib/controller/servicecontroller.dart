@@ -279,7 +279,9 @@ class ServiceController {
   }
 
 
-
+  String googleSatelliteTile() {
+    return "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}";
+  }
 }
 
 class NavigationLocationState {

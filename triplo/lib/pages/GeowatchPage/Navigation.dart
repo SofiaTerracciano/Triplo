@@ -345,6 +345,8 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
                                   ),
                                 ),
                               ),
+                              //messo per non far sovrapporre i bottoni alla navbar di android
+                              SizedBox(height: MediaQuery.of(context).padding.bottom + 36),
                             ],
                           ),
                         ),
