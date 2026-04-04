@@ -15,6 +15,22 @@ class MemoryService {
     ),
   );
 
+  static final CacheManager _weatherAlertCache = CacheManager(
+    Config(
+      'triploWeatherAlertCache',
+      stalePeriod: const Duration(days: 1),
+      maxNrOfCacheObjects: 500,
+    ),
+  );
+
+
+
+
+
+
+  String _alertKeyToCacheKey(String key) => 'weather_alert_$key';
+
+
   // Cache in memoria (RAM)
   final Map<String, File> _memoryCache = {};
 
@@ -118,14 +134,29 @@ class MemoryService {
   }
 
   Future<void> addShownWeatherAlertKey(String key) async {
-    final keys = await getShownWeatherAlertKeys();
-    keys.add(key);
-    await saveShownWeatherAlertKeys(keys);
+    try {
+      final cacheKey = _alertKeyToCacheKey(key);
+      await _weatherAlertCache.putFile(
+        cacheKey,
+        Uint8List(0), // file vuoto serve solo come flag
+        key: cacheKey,
+        maxAge: const Duration(days: 1),
+      );
+    } catch (e) {
+      debugPrint("Errore salvataggio alert mostrato: $e");
+    }
   }
 
   Future<bool> hasShownWeatherAlertKey(String key) async {
-    final keys = await getShownWeatherAlertKeys();
-    return keys.contains(key);
+    try {
+      final cacheKey = _alertKeyToCacheKey(key);
+      final fileInfo = await _weatherAlertCache.getFileFromCache(cacheKey);
+
+      return fileInfo != null;
+    } catch (e) {
+      debugPrint("Errore controllo alert mostrato: $e");
+      return false;
+    }
   }
 
 
