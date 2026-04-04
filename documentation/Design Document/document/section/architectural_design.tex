@@ -349,16 +349,42 @@ These set of use cases is representative of the main system capabilities and sup
 
 \subsection{Add Diary Page use case sequence diagram}
 The most important part of the \textit{Add Diary Page} sequence diagram is the save phase, where the data entered by the user is stored in the system.
-
 When the user presses the save button, the \texttt{DiaryPage} starts the process by showing a loading page and then it formats the date, computing the duration from hours and minutes. If the user has selected photos, the page calls the \texttt{DiaryController} to upload them to \texttt{FirebaseStorage}. The controller uploads each image and returns a list of paths, which will be stored in the diary instance.
-
-After this step, the \texttt{DiaryPage} calls the \texttt{addDiary(...)} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{DiaryModel} object.
-
+After this step, the \texttt{DiaryPage} calls the \texttt{addDiary()} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{DiaryModel} object.
 Before saving the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is necessary because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists.
-
 Once converted, the map is stored in the \texttt{diary} collection in Firestore. At the same time, the controller updates the user document, adding the diary identifier to either the public or private diary list, depending on the selected visibility.
-
 Finally, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation.
+
+\subsection{Explore Trekkings on Map Sequence Diagram}
+
+The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. In particular, the page retrieves the tile URL template and the corresponding subdomains used by the map provider.
+Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are then rendered differently depending on the zoom level and the rendering logic uses the trekking information, such as route points, starting point, and difficulty level, in order to determine the visual representation.
+The diagram also highlights the dynamic behavior of the map during user interaction. When the user drags or zooms the map, the page updates the current zoom and center, and checks whether the visible area is still inside the bounds. If the user moves outside the expected area, a recenter button is shown.
+Finally, when the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is displayed.
+
+
+
+
+
+
+\subsection{View Trekking Information Sequence Diagram Description}
+
+The sequence diagram for the \textit{View Trekking Information} use case describes how the system presents the details of a selected trekking. The interaction starts when the user opens the \texttt{trekkingPage}. The page initializes its internal state and verifies which user is authenticated through the \texttt{UserController}. 
+The trekking data is then retrieved through the \texttt{trekkingController}. In particular, the controller attempts to search in its local collection.
+After the trekking has been obtained, the page checks whether the route is already saved by the current user.
+The page also requests weather information near the trail through the \texttt{servicecontroller}. 
+A further part of the interaction regards the trekking images, such as the map photo, the ending point photo, and the challenge images. In the main sequence diagram, this step is represented at a high level through calls from the \texttt{trekkingPage} to the \texttt{trekkingController}. The detailed behavior of the cache mechanism used for image retrieval is described separately in Section~\ref{Image caching}, in order to keep the main diagram focused on the overall interaction flow.
+Finally, the page allows the user to perform additional actions related to the trekking. The route can be saved or removed from the saved list, a diary entry can be created through the \texttt{DiaryPage}, and the user can navigate to other trekking-related views such as the route details page or the geowatch and map page. In this way, the \texttt{trekkingPage} acts as the central entry point for the main information and actions associated with a trekking.
+
+\subsubsection{Image Caching for Trekking Images Sequence Diagram}
+
+This sequence diagram illustrates, through a representative example, how the image caching mechanism is implemented within the application. Its purpose is not to introduce a new use case, but rather to clarify the internal behavior of image retrieval, which is abstracted in the main sequence diagram describing the trekking visualization flow.
+The process starts when the \texttt{trekkingPage} requests an image through the \texttt{trekkingController}. The controller delegates the retrieval to the \texttt{memoryservice}, which implements a multi-level caching strategy.
+First, the system attempts to retrieve the image from the in-memory RAM cache, using a \texttt{Map<String, File>} structure. If the image is found, it is immediately returned to the page, ensuring minimal latency.
+If the image is not available in memory, the system checks the disk cache through the \texttt{CacheManager}. This involves interacting with the underlying operating system to load a previously stored file. If the image is found on disk, it is reinserted into the in-memory cache and returned to the UI, improving performance for subsequent accesses.
+If the image is not available in either RAM or disk cache, the system performs a download from \texttt{FirebaseStorage}. In the case of paths expressed using the \texttt{gs://} protocol, the controller first resolves them into a downloadable URL. The image is then downloaded, stored on disk, and finally cached in memory before being returned to the page.
+The same logic is applied in a batched manner when multiple images, for example trekking challenges, are requested. In this case, the controller iterates over all image paths and applies the same caching strategy to each element.
+
 
 
 

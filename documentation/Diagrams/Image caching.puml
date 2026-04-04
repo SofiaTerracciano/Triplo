@@ -1,0 +1,97 @@
+@startuml
+title Image caching for trekking images sequence diagram
+actor User
+participant trekkingPage as "<color:white>trekkingPage</color>" #darkgreen
+participant trekkingController as "<color:white>trekkingController</color>" #151b8e
+participant memoryservice as "<color:white>memoryservice</color>" #151b8e
+participant cachemanager
+participant OperatingSystem
+database FirebaseStorage
+    
+
+
+
+
+
+
+
+
+
+    trekkingPage -> trekkingController : getCachedImage(imagePath)
+    trekkingController -> memoryservice : getImageFromMemory(imagePath)
+    memoryservice -> memoryservice : _memoryCache[key]
+    note right of memoryservice
+    Attempts to load the image from RAM through the Map<String,File> memorycache in memoryservice
+    end note
+    memoryservice --> trekkingController : File? / null
+    alt Image found in RAM
+        trekkingController --> trekkingPage : File
+    else Image not found in RAM, but saved in cache 
+        alt imagePath starts with "gs://"
+            trekkingController -> FirebaseStorage : refFromURL(imagePath).getDownloadURL()
+            FirebaseStorage --> trekkingController : download URL
+            trekkingController -> trekkingController : cacheableUrl = download URL
+        else imagePath already cacheable
+            trekkingController -> trekkingController : cacheableUrl = imagePath
+        end
+        trekkingController -> memoryservice : getImageFromDisk(cacheableUrl)
+        trekkingController -> memoryservice : saveImageToMemory(imagePath, file)
+        note right of memoryservice
+        Saves the image in RAM memory through a Map<String, File> in memory service
+        end note
+        memoryservice --> trekkingController : File
+        trekkingController --> trekkingPage : File
+      else Image not found in cache
+     
+   
+    
+    
+ 
+    
+    
+    
+    
+    
+
+
+
+
+
+   trekkingController -> memoryservice : getImageFromDisk(cacheableUrl)
+   memoryservice -> cachemanager : getFileFromCache(url)
+        
+        
+       cachemanager -> OperatingSystem : load image from cache url
+    
+    OperatingSystem --> cachemanager : File? / null
+    cachemanager --> memoryservice : File? / null
+        memoryservice --> trekkingController : File? / null
+    trekkingController -> memoryservice : cacheImageOnDisk(cacheableUrl)
+    memoryservice -> FirebaseStorage : download file (getSingleFile / HTTP)
+    FirebaseStorage --> memoryservice : File
+    memoryservice --> trekkingController : File
+
+    trekkingController -> memoryservice : saveImageToMemory(imagePath, file)
+    note right of memoryservice
+     Saves the image in RAM memory through a Map<String, File> in memory service
+    end note
+    trekkingController --> trekkingPage : File
+    end
+
+
+    trekkingPage -> trekkingController : getCachedImages(imagePaths)
+
+    
+    
+    
+    
+    
+    
+    
+    loop for each image path
+        trekkingController -> trekkingController : getCachedImage(path)
+        ref over trekkingController, memoryservice, cachemanager, OperatingSystem, FirebaseStorage: Image caching for challenge images
+    end
+
+    trekkingController --> trekkingPage : List<File>
+

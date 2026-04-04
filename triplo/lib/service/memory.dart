@@ -43,7 +43,9 @@ class MemoryService {
 
   // RAM memory
 
-  /// Recupera dalla memoria. Se il file fisico è stato eliminato, pulisce la mappa.
+
+
+  /// Recupera dalla memoria RAM. Se il file fisico è stato eliminato, pulisce la mappa.
   Future<File?> getImageFromMemory(String key) async {
     final file = _memoryCache[key];
     if (file == null) return null;
@@ -69,9 +71,9 @@ class MemoryService {
   }
 
 
-  //bisogna rimettere il salvataggio in memoria della lingua con shared preferences
-  //lnaguage controller gestisce la logica, memory service il salvataggio in memoria
-  //è stato rimesso in language controller ma language controller non dovrebbe parlare con shared preferences
+
+
+
 
   Future<String?> getSavedLocaleCode() async {
     try {
@@ -89,16 +91,6 @@ class MemoryService {
       await prefs.setString(_kLocaleCodeKey, localeCode);
     } catch (e) {
       debugPrint("Errore salvataggio lingua: $e");
-      rethrow;
-    }
-  }
-
-  Future<void> clearSavedLocaleCode() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_kLocaleCodeKey);
-    } catch (e) {
-      debugPrint("Errore rimozione lingua salvata: $e");
       rethrow;
     }
   }
@@ -136,20 +128,5 @@ class MemoryService {
     return keys.contains(key);
   }
 
-  Future<void> removeShownWeatherAlertKey(String key) async {
-    final keys = await getShownWeatherAlertKeys();
-    keys.remove(key);
-    await saveShownWeatherAlertKeys(keys);
-  }
-
-  Future<void> clearShownWeatherAlertKeys() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_kShownWeatherAlertsKey);
-    } catch (e) {
-      debugPrint("Errore rimozione alert mostrati: $e");
-      rethrow;
-    }
-  }
 
 }

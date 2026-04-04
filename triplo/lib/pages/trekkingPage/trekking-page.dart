@@ -153,12 +153,12 @@ class _TrekkingPageState extends State<TrekkingPage> {
       final langCode = Localizations.localeOf(context).languageCode;
 
       final w = await api.weather(trail.latitude, trail.longitude, langCode);
-      final f = await api.forecast(trail.latitude, trail.longitude, langCode);
+      //final f = await api.forecast(trail.latitude, trail.longitude, langCode);
 
       if (!mounted) return;
       setState(() {
         weather = w;
-        forecast = f ?? [];
+        //forecast = f ?? [];
         loadingWeather = false;
         weatherError = null;
       });
@@ -213,6 +213,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
         ),
       );
     }
+
 
     return FutureBuilder<Trekking?>(
       future: trekkingController.getTrekkingByIdAsync(widget.trekkingId),

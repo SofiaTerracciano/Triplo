@@ -2,22 +2,25 @@
 title Add Diary Page Sequence Diagram
 
 actor User
-participant DiaryPage #darkgreen-white
+participant DiaryPage as "<color:white>DiaryPage</color>" #darkgreen
 participant LoadingPage
-participant UserPage #darkgreen-white
-participant trekkingcontroller as trekkingcontroller #blue-white
-participant UserController as usercontroller #blue-white
-participant DiaryController as diarycontroller #blue-white
+participant UserPage as "<color:white>UserPage</color>" #darkgreen
+participant trekkingcontroller as "<color:white>trekkingcontroller</color>" #151b8e
+participant UserController as "<color:white>UserController</color>"#151b8e
+participant DiaryController as "<color:white>DiaryController</color>" #151b8e
 participant AuthService as "<color:white>AuthService</color>" #000000
-participant DiaryModel as "<color:white>DiaryModel</color>" #151b8e
+participant DiaryModel as "<color:white>DiaryModel</color>" #378641
 database FirebaseFirestore
 database FirebaseStorage
 
 
 
-DiaryPage -> usercontroller : getFollowing(userController.currentUser!.uid)
-usercontroller -> FirebaseFirestore : collection("users").doc(uid).get()
-usercontroller -> usercontroller : List<String>.from(snap.data()?["Following"] ?? [])
+DiaryPage -> UserController : getFollowing(UserController.currentUser!.uid)
+
+
+UserController -> FirebaseFirestore : collection("users").doc(uid).get()
+FirebaseFirestore --> UserController : Document snapshot
+UserController -> UserController : List<String>.from(snap.data()?["Following"] ?? [])
 
 
 
@@ -27,7 +30,11 @@ usercontroller -> usercontroller : List<String>.from(snap.data()?["Following"] ?
 
 
 
-usercontroller --> DiaryPage : List<Users>
+
+
+
+
+UserController --> DiaryPage : List<Users>
 
 
 opt Modify Date
@@ -152,34 +159,34 @@ opt Save diary
    
 
     opt Upload selected images
-        DiaryPage -> diarycontroller : uploadDiaryImages(_images)
+        DiaryPage -> DiaryController : uploadDiaryImages(_images)
 
         loop for each selected image
-            diarycontroller -> diarycontroller : Check file extension
-            diarycontroller -> FirebaseStorage : ref().child(path).putFile(image)
-            FirebaseStorage --> diarycontroller : Upload completed
-            diarycontroller -> diarycontroller : paths.add(path)
+            DiaryController -> DiaryController : Check file extension
+            DiaryController -> FirebaseStorage : ref().child(path).putFile(image)
+            FirebaseStorage --> DiaryController : Upload completed
+            DiaryController -> DiaryController : paths.add(path)
         end
 
-        diarycontroller --> DiaryPage : List<String> photos
+        DiaryController --> DiaryPage : List<String> photos
     end
 
     
     
 
-    DiaryPage -> diarycontroller : diaryController.currentUser = currentUser
+    DiaryPage -> DiaryController : DiaryController.currentUser = currentUser
 
-    DiaryPage -> diarycontroller : addDiary(trekking.name, isPublic, date,\nduration.toDouble(), friends, photos,\nchallenges, _refreshmentController.text,\nmoods, _notesController.text, false, "")
+    DiaryPage -> DiaryController : addDiary(trekking.name, isPublic, date,\nduration.toDouble(), friends, photos,\nchallenges, _refreshmentController.text,\nmoods, _notesController.text, false, "")
 
-    diarycontroller -> AuthService : currentUid
-    AuthService --> diarycontroller : uid
+    DiaryController -> AuthService : currentUid
+    AuthService --> DiaryController : uid
 
-    diarycontroller -> diarycontroller : Generate diaryId with Uuid().v4()
+    DiaryController -> DiaryController : Generate diaryId with Uuid().v4()
 
-    diarycontroller -> FirebaseFirestore : collection("diary").doc(newId).get()
-    FirebaseFirestore --> diarycontroller : Document snapshot
+    DiaryController -> FirebaseFirestore : collection("diary").doc(newId).get()
+    FirebaseFirestore --> DiaryController : Document snapshot
 
-    diarycontroller -> DiaryModel : Create Diary instance
+    DiaryController -> DiaryModel : Create Diary instance
     note right of DiaryModel
     Diary(
       diaryId: newId,
@@ -197,32 +204,32 @@ opt Save diary
     )
     end note
 
-    diarycontroller -> diarycontroller : _diaries.add(page)
+    DiaryController -> DiaryController : _diaries.add(page)
 
     alt Diary is public
-        diarycontroller -> FirebaseFirestore : collection("users").doc(uid).update(\n"Public_diary": FieldValue.arrayUnion([page.diaryId]))
-        FirebaseFirestore --> diarycontroller : Update completed
-        diarycontroller -> diarycontroller : _currentUser!.publicDiaryPages.add(page)
+        DiaryController -> FirebaseFirestore : collection("users").doc(uid).update(\n"Public_diary": FieldValue.arrayUnion([page.diaryId]))
+        FirebaseFirestore --> DiaryController : Update completed
+        DiaryController -> DiaryController : _currentUser!.publicDiaryPages.add(page)
     else Diary is private
-        diarycontroller -> FirebaseFirestore : collection("users").doc(uid).update(\n"Private_diary": FieldValue.arrayUnion([page.diaryId]))
-        FirebaseFirestore --> diarycontroller : Update completed
-        diarycontroller -> diarycontroller : _currentUser!.privateDiaryPages.add(page)
+        DiaryController -> FirebaseFirestore : collection("users").doc(uid).update(\n"Private_diary": FieldValue.arrayUnion([page.diaryId]))
+        FirebaseFirestore --> DiaryController : Update completed
+        DiaryController -> DiaryController : _currentUser!.privateDiaryPages.add(page)
     end
 
-    diarycontroller -> DiaryModel : toMap()
-    DiaryModel --> diarycontroller : Map<String, dynamic>
+    DiaryController -> DiaryModel : toMap()
+    DiaryModel --> DiaryController : Map<String, dynamic>
 
-    diarycontroller -> FirebaseFirestore : collection("diary").doc(page.diaryId).set(page.toMap())
-    FirebaseFirestore --> diarycontroller : Save completed
+    DiaryController -> FirebaseFirestore : collection("diary").doc(page.diaryId).set(page.toMap())
+    FirebaseFirestore --> DiaryController : Save completed
 
-    diarycontroller --> DiaryPage : addDiary completed
+    DiaryController --> DiaryPage : addDiary completed
 
-    DiaryPage -> usercontroller : updateUserLevel(trekking.difficulty_level)
-    usercontroller -> AuthService : currentUid
-    AuthService --> usercontroller : uid
-    usercontroller -> FirebaseFirestore : collection("users").doc(uid).update(...)
-    FirebaseFirestore --> usercontroller : Update completed
-    usercontroller --> DiaryPage : Update completed
+    DiaryPage -> UserController : updateUserLevel(trekking.difficulty_level)
+    UserController -> AuthService : currentUid
+    AuthService --> UserController : uid
+    UserController -> FirebaseFirestore : collection("users").doc(uid).update(...)
+    FirebaseFirestore --> UserController : Update completed
+    UserController --> DiaryPage : Update completed
 
     DiaryPage -> UserPage : Navigator.pushReplacement(context, UserPage)
     UserPage --> User : Show updated user page

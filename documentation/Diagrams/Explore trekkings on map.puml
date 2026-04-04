@@ -1,0 +1,129 @@
+@startuml
+title Explore Trekkings on Map Sequence Diagram
+
+actor User
+participant HomePage as "<color:white>HomePage</color>" #darkgreen
+participant trekkingPage as "<color:white>trekkingPage</color>" #darkgreen
+participant servicecontroller as "<color:white>servicecontroller</color>" #151b8e
+participant trekkingController as "<color:white>trekkingController</color>" #151b8e
+participant trekkingModel as "<color:white>trekkingModel</color>" #378641
+
+    User -> HomePage : drawer \n Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()),);\n Open Home Page
+    HomePage -> HomePage : MapController()
+
+
+
+
+
+ 
+ 
+ note right of servicecontroller
+ Build map view
+ end note
+    
+    HomePage -> servicecontroller : openTopoMapTile()
+    servicecontroller --> HomePage : tile URL
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+HomePage -> servicecontroller : openTopoMapSubdomains()
+    servicecontroller --> HomePage : subdomains
+
+note right of servicecontroller 
+Subdomains are different server endpoints used to download map tiles faster and distribute the load
+end note
+
+
+
+
+
+    HomePage -> trekkingController : allTrekkings
+    trekkingController --> HomePage : List<trekkingModel>
+    
+    
+    note right of trekkingController
+    The list of trekkings in the trekkingcontroller 
+    is loaded with the data from Firestore when the user logs in and the user page is loaded
+    end note
+
+
+
+
+
+opt User interacts with map (zoom / drag)
+    User -> HomePage : Zoom / drag map
+
+    HomePage -> HomePage : mapEventStream.listen(event)
+
+    alt MapEventMove or MapEventMoveEnd
+        HomePage -> HomePage : currentZoom = mapController.zoom
+        else
+        HomePage -> HomePage : currentCenter = mapController.center
+        else
+        HomePage -> HomePage : showRecenter = !bounds.contains(currentCenter)
+    end
+    
+    opt Out of bounds
+        HomePage --> User : Show recenter button
+        User -> HomePage : Press recenter button
+        HomePage -> HomePage : mapController.move(initialCenter, 12)
+        HomePage -> HomePage : setState(() => showRecenter = false)
+    end
+end
+
+
+
+note right of HomePage
+Render trekking routes on map
+end note
+
+    alt Zoom >= 12
+    
+        HomePage -> HomePage : getPolylines()
+
+        loop for each trekking
+            HomePage -> trekkingModel : points
+            trekkingModel --> HomePage : List<LatLng>
+            HomePage -> trekkingModel : difficulty_level
+            trekkingModel --> HomePage : difficulty
+            HomePage -> HomePage : difficultyToColor(difficulty)
+        end
+
+        HomePage --> User : Show tappable polylines
+    else Zoom < 12
+        HomePage -> HomePage : getMarkers()
+
+        loop for each trekking
+            HomePage -> trekkingModel : starting_point
+            trekkingModel --> HomePage : LatLng
+            HomePage -> trekkingModel : difficulty_level
+            trekkingModel --> HomePage : difficulty
+            HomePage -> HomePage : difficultyToColor(difficulty)
+        end
+
+        HomePage --> User : Show trekking markers
+    end
+
+
+
+alt Select trekking from polyline
+    User -> HomePage : Tap polyline
+    HomePage -> trekkingPage : Navigator.push(trekkingId)
+    trekkingPage --> User : Show trekking details
+
+
+else Select trekking from marker
+    User -> HomePage : Tap marker
+    HomePage -> trekkingPage : Navigator.push(trekkingId)
+    trekkingPage --> User : Show trekking details
+end
+
+@enduml

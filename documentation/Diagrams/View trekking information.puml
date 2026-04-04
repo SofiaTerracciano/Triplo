@@ -1,0 +1,120 @@
+@startuml
+title View Trekking Information Sequence Diagram
+
+actor User
+participant trekkingPage as "<color:white>trekkingPage</color>" #darkgreen
+participant DiaryPage as "<color:white>DiaryPage</color>" #darkgreen
+participant GeowatchPage as "<color:white>GeowatchPage</color>" #darkgreen
+participant trekkingController as "<color:white>trekkingController</color>" #151b8e
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant servicecontroller as "<color:white>servicecontroller</color>" #151b8e
+'participant trekkingModel as "<color:white>trekkingModel</color>" #378641
+participant AuthService as "<color:white>AuthService</color>" #000000
+
+participant OpenWeather
+    User -> trekkingPage : Open trekking page(trekkingId)
+
+
+
+    trekkingPage -> UserController : currentUser
+    UserController -> AuthService : currentUser
+    AuthService --> UserController : User
+    UserController --> trekkingPage : User 
+
+   trekkingPage -> trekkingController : getTrekkingById(trekkingId)
+
+
+
+
+
+
+
+
+    note right of trekkingController
+    The list of trekkings in the trekkingcontroller 
+    is loaded with the data from Firestore when the user logs in and the user page is loaded
+    end note
+    trekkingController --> trekkingPage : trekking
+    
+
+
+
+
+
+
+    trekkingPage -> trekkingController : isTrekkingSaved(trekkingId)
+    trekkingController --> trekkingPage : boolean
+   
+    trekkingPage -> trekkingPage : setState(_isSavedLocal, _loadingSavedState)
+    trekkingPage -> servicecontroller : weather(lat, lon, langCode)
+    servicecontroller -> OpenWeather : http (lat, lon, langcode)
+    
+    OpenWeather --> servicecontroller : JSON data
+    servicecontroller -> servicecontroller : jsonDecode(response)
+    servicecontroller --> trekkingPage : weather data
+    trekkingPage -> trekkingPage : setState(weather, loadingWeather)
+
+
+
+    
+   
+   
+   
+   
+    trekkingPage -> trekkingController : getCachedImage(mapPhoto)
+    
+ref over trekkingPage, DiaryPage, GeowatchPage, trekkingController: "Image caching"
+    trekkingController --> trekkingPage : File
+    trekkingPage -> trekkingController : getCachedImage(endingPointPhoto)
+ref over trekkingPage, DiaryPage, GeowatchPage, trekkingController: "Image caching"
+    trekkingController --> trekkingPage : File
+
+
+
+    trekkingPage -> trekkingController : getCachedImages(challenges)
+    ref over trekkingPage, DiaryPage, GeowatchPage, trekkingController: "Image caching"
+    trekkingController --> trekkingPage : List<File>
+
+
+    trekkingPage -> trekkingPage : Read trekking.name
+    trekkingPage -> trekkingPage : Read trekking.info[langIndex]
+    trekkingPage -> trekkingPage : Read trekking.description[langIndex]
+    trekkingPage -> trekkingPage : Read trekking.difficulty_level
+    trekkingPage -> trekkingPage : Read trekking.distance
+    trekkingPage -> trekkingPage : Read trekking.estimated_time
+    trekkingPage -> trekkingPage : Read trekking.elevation_gain,\nupGain, downGain
+
+
+
+opt Save or unsave trekking
+    User -> trekkingPage : Press bookmark button
+
+    alt Trekking already saved
+        trekkingPage -> trekkingController : removeTrekkingFromSaved(trekkingId)
+        trekkingController --> trekkingPage : completed
+    else Trekking not saved
+        trekkingPage -> trekkingController : addTrekkingToSaved(trekkingId)
+        trekkingController --> trekkingPage : completed
+    end
+
+    trekkingPage -> trekkingPage : setState(_isSavedLocal)
+end
+
+opt Open Add Diary Page
+    User -> trekkingPage : Press add button
+    trekkingPage -> DiaryPage : Navigator.push(trekkingId)
+    DiaryPage --> User : Show add diary page
+end
+
+opt Open navigation details
+    User -> trekkingPage : Press play button
+    trekkingPage -> trekkingPage : Navigator.push(trekkingId, trailCenter)
+    trekkingPage --> User : Show trekking navigation page
+end
+
+opt Open weather details
+    User -> trekkingPage : Tap weather widget
+    trekkingPage -> GeowatchPage : Navigator.push(trekkingId, trailCenter)
+    GeowatchPage --> User : Show weather and map page
+end
+@enduml
