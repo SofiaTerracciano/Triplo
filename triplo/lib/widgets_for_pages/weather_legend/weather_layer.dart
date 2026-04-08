@@ -9,15 +9,14 @@ import 'package:triplo/l10n/app_localizations.dart' show AppLocalizations;
 /// using `WeatherLayer.build("layerType", apiKey)` and it automatically returns the correct TileLayer.
 class WeatherLayer {
   /// Builds a TileLayer for the given weather type.
-  static TileLayer build(String layerType, String apiKey) {
+
+
+  static TileLayer build(String url) {
     return TileLayer(
-      // The layerType defines which OpenWeather map to use
-
       tileProvider: CancellableNetworkTileProvider(),
-      urlTemplate:
-      "https://tile.openweathermap.org/map/$layerType/{z}/{x}/{y}.png?appid=$apiKey",
-
-      userAgentPackageName: 'com.example.triplo',
+      urlTemplate: url,
+      subdomains: const [],
+      userAgentPackageName: 'com.example.triplo2',
     );
   }
 

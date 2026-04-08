@@ -23,10 +23,17 @@ class InternetService extends ChangeNotifier {
   Timer? _pollTimer;
   Timer? _offlineTimer;
 
+
+
+
+
+
+
+
   void start() {
     _pollTimer?.cancel();
     _pollTimer = Timer.periodic(checkEvery, (_) => _tick());
-    _tick(); // check immediato
+    _tick();
   }
 
   Future<void> _tick() async {

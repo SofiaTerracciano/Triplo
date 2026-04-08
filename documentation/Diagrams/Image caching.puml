@@ -35,13 +35,7 @@ database FirebaseStorage
             trekkingController -> trekkingController : cacheableUrl = imagePath
         end
         trekkingController -> memoryservice : getImageFromDisk(cacheableUrl)
-        trekkingController -> memoryservice : saveImageToMemory(imagePath, file)
-        note right of memoryservice
-        Saves the image in RAM memory through a Map<String, File> in memory service
-        end note
-        memoryservice --> trekkingController : File
-        trekkingController --> trekkingPage : File
-      else Image not found in cache
+      
      
    
     
@@ -57,15 +51,28 @@ database FirebaseStorage
 
 
 
+
+  memoryservice -> cachemanager : getFileFromCache(url)
+         cachemanager -> OperatingSystem : load image from cache url
+        OperatingSystem -->cachemanager : File
+        cachemanager --> memoryservice : File
+        memoryservice --> trekkingController : File
+        trekkingController -> memoryservice : saveImageToMemory(imagePath, file)
+        note right of memoryservice
+        Saves the image in RAM memory through a Map<String, File> in memory service
+        end note
+        
+        trekkingController --> trekkingPage : File
+      else Image not found in cache
    trekkingController -> memoryservice : getImageFromDisk(cacheableUrl)
    memoryservice -> cachemanager : getFileFromCache(url)
-        
+    
         
        cachemanager -> OperatingSystem : load image from cache url
     
-    OperatingSystem --> cachemanager : File? / null
-    cachemanager --> memoryservice : File? / null
-        memoryservice --> trekkingController : File? / null
+    OperatingSystem --> cachemanager : Exception
+    cachemanager --> memoryservice : Exception
+        memoryservice --> trekkingController : Exception
     trekkingController -> memoryservice : cacheImageOnDisk(cacheableUrl)
     memoryservice -> FirebaseStorage : download file (getSingleFile / HTTP)
     FirebaseStorage --> memoryservice : File
@@ -95,3 +102,4 @@ database FirebaseStorage
 
     trekkingController --> trekkingPage : List<File>
 
+@enduml

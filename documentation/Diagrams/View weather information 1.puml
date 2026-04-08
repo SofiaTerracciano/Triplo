@@ -1,0 +1,137 @@
+@startuml
+title View Weather Information 1 Sequence Diagram
+
+actor User
+participant TrekkingPage as "<color:white>TrekkingPage</color>" #darkgreen
+participant Geowatch as "<color:white>Geowatch</color>" #darkgreen
+participant ServiceController as "<color:white>ServiceController</color>" #151b8e
+participant TrekkingController as "<color:white>TrekkingController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+
+participant OpenWeather
+participant Weatherbit
+database FirebaseFirestore
+
+
+
+User -> TrekkingPage : Tap weather section
+TrekkingPage -> Geowatch : Navigator.push()
+Geowatch --> User : Show weather UI
+
+
+
+
+Geowatch -> Geowatch : api = context.read<ServiceController>()
+
+Geowatch -> Geowatch : _loadAlertState()
+
+Geowatch -> TrekkingController : isWeatherAlertEnabled(trekkingId)
+TrekkingController -> AuthService : currentUid
+AuthService --> TrekkingController : uid
+TrekkingController -> FirebaseFirestore : weather_notification.doc(uid).get()
+
+
+
+
+
+FirebaseFirestore --> TrekkingController : Document snapshot
+TrekkingController -> TrekkingController : ids = List<String>.from(snap.data()?['trekkingIds'] ?? [])
+TrekkingController -> TrekkingController : ids.contains(trekkingId)
+
+TrekkingController --> Geowatch : bool
+Geowatch -> Geowatch : _loadAll()
+
+loop Every 5 minutes
+    Geowatch -> Geowatch : _loadAll()
+end
+
+
+
+opt Determine target location
+    alt Use trail weather
+        Geowatch -> Geowatch : target = trailCenter
+    else Use user location
+        Geowatch -> ServiceController : userLocation()
+        ServiceController --> Geowatch : LatLng
+    end
+end
+
+Geowatch -> ServiceController : weather(lat, lon, lang)
+ServiceController -> OpenWeather : HTTP GET /weather
+OpenWeather --> ServiceController : JSON weather
+ServiceController -> ServiceController : jsonDecode(response)
+ServiceController --> Geowatch : Map<String, dynamic>
+
+Geowatch -> ServiceController : forecast(lat, lon, lang)
+ServiceController -> OpenWeather : HTTP GET /forecast
+OpenWeather --> ServiceController : JSON forecast
+ServiceController -> ServiceController : jsonDecode(response)
+ServiceController --> Geowatch : List<Map<String, dynamic>>
+
+Geowatch -> ServiceController : parseForecast(rawForecast)
+
+loop for each forecast item
+    ServiceController -> ServiceController : parseForecastItem(rawItem)
+end
+
+ServiceController --> Geowatch : List<Map<String, dynamic>>
+
+
+
+Geowatch -> ServiceController : weatherbitAlerts(lat, lon)
+ServiceController -> Weatherbit : HTTP GET /alerts
+Weatherbit --> ServiceController : JSON alerts
+ServiceController --> Geowatch : List<Map<String, dynamic>>
+
+Geowatch -> ServiceController : mockAlerts()
+ServiceController --> Geowatch : List<Map<String, dynamic>>
+
+Geowatch -> Geowatch : setState(_alerts = [...real, ...mock])
+
+
+
+opt User toggles notification
+    User -> Geowatch : Tap notification icon
+
+    alt Enable alert
+        Geowatch -> TrekkingController : enableWeatherAlertForTrekking(id)
+        TrekkingController -> AuthService : currentUid
+        AuthService --> TrekkingController : uid
+        TrekkingController -> FirebaseFirestore : weather_notification.doc(uid).set(\nuserId, trekkingIds=arrayUnion(id), updatedAt)
+        FirebaseFirestore --> TrekkingController : Update completed
+        TrekkingController -> TrekkingController : notifyListeners()
+        TrekkingController --> Geowatch : completed
+        Geowatch-> Geowatch : setState(() { _weatherAlertEnabled = !_weatherAlertEnabled;});
+    else Disable alert
+        Geowatch -> TrekkingController : disableWeatherAlertForTrekking(id)
+        TrekkingController -> AuthService : currentUid
+        AuthService --> TrekkingController : uid
+        TrekkingController -> FirebaseFirestore : weather_notification.doc(uid).set(\nuserId, trekkingIds=arrayRemove(id), updatedAt)
+        FirebaseFirestore --> TrekkingController : Update completed
+       
+       
+        TrekkingController -> TrekkingController : notifyListeners()
+       
+        TrekkingController --> Geowatch : completed
+
+
+    Geowatch-> Geowatch : setState(() { _weatherAlertEnabled = !_weatherAlertEnabled;});
+    end
+end
+
+
+
+User -> Geowatch : Tap "Open satellite map"
+Geowatch -> Geowatch : Navigator.push(GoogleSatellitePage)
+
+
+
+
+
+
+
+
+
+
+
+@enduml

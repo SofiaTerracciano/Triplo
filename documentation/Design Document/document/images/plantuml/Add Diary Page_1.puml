@@ -1,0 +1,142 @@
+@startuml
+title Add Diary Page Sequence Diagram
+
+actor User
+participant DiaryPage as "<color:white>DiaryPage</color>" #darkgreen
+participant LoadingPage
+participant UserPage as "<color:white>UserPage</color>" #darkgreen
+participant trekkingcontroller as "<color:white>trekkingcontroller</color>" #151b8e
+participant UserController as "<color:white>UserController</color>"#151b8e
+participant DiaryController as "<color:white>DiaryController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant DiaryModel as "<color:white>DiaryModel</color>" #378641
+database FirebaseFirestore
+database FirebaseStorage
+
+
+
+DiaryPage -> UserController : getFollowing(UserController.currentUser!.uid)
+
+
+UserController -> FirebaseFirestore : collection("users").doc(uid).get()
+FirebaseFirestore --> UserController : Document snapshot
+UserController -> UserController : List<String>.from(snap.data()?["Following"] ?? [])
+
+
+
+
+
+
+
+
+
+
+
+
+
+UserController --> DiaryPage : List<Users>
+
+
+opt Modify Date
+    opt Modify Day
+        User -> DiaryPage : Open Day Field
+        DiaryPage --> User : Row dropdown
+        User -> DiaryPage : Select Day Field
+        DiaryPage -> DiaryPage : setState(() => selectedDay = v)
+    end
+
+    opt Modify Month
+        User -> DiaryPage : Open Month Field
+        DiaryPage --> User : Row dropdown
+        User -> DiaryPage : Select Month Field
+        DiaryPage -> DiaryPage : setState(() => selectedMonth = v)
+    end
+
+    opt Modify Year
+        User -> DiaryPage : Open Year Field
+        DiaryPage --> User : Row dropdown
+        User -> DiaryPage : Select Year Field
+        DiaryPage -> DiaryPage : setState(() => selectedYear = v)
+    end
+end
+
+opt Modify Duration
+    opt Modify Hours
+        User -> DiaryPage : Open Hours Field
+        DiaryPage --> User : Row dropdown
+        User -> DiaryPage : Select Hours Field
+        DiaryPage -> DiaryPage : setState(() => selectedHours = v)
+    end
+
+    opt Modify Minutes
+        User -> DiaryPage : Open Minutes Field
+        DiaryPage --> User : Row dropdown
+        User -> DiaryPage : Select Minutes Field
+        DiaryPage -> DiaryPage : setState(() => selectedMinutes = v)
+    end
+end
+
+opt Select friends
+    User -> DiaryPage : Open friends field
+    DiaryPage --> User : Show following users
+    User -> DiaryPage : Select or remove friend
+    DiaryPage -> DiaryPage : setState(() { selected ? friends.remove(u.uid) : friends.add(u.uid); })
+end
+
+opt Add notes
+    User -> DiaryPage : Writes notes
+    DiaryPage -> DiaryPage : TextField(TextEditingController: _notesController)
+end
+
+opt Refreshment input
+    User -> DiaryPage : Uses ChoiceChip
+    DiaryPage -> DiaryPage : onSelected: (_) => setState(() => usedRefreshment = true/false)
+
+    opt Refreshment used
+        User -> DiaryPage : Writes refreshment point
+        DiaryPage -> DiaryPage : TextField(TextEditingController: _refreshmentController)
+    end
+end
+
+opt Challenges selector
+    User -> DiaryPage : Open challenges field
+    DiaryPage -> trekkingcontroller : trekkingController.getDownloadUrl(challenge)
+    trekkingcontroller --> DiaryPage : challenge image URL
+    User -> DiaryPage : Select or remove challenge
+    DiaryPage -> DiaryPage : setState(() {\nselected ? challenges.remove(c) : challenges.add(c);\n})
+end
+
+opt Mood selector
+    User -> DiaryPage : Open mood field
+    DiaryPage --> User : ListTile list
+    User -> DiaryPage : Select mood
+    DiaryPage -> DiaryPage : setState(() { selected ? moods.remove(emoji) : moods.add(emoji); })
+end
+
+opt Add photos
+    User -> DiaryPage : Press add photo button
+    DiaryPage -> DiaryPage : _pickImages()
+    DiaryPage --> User : Open image picker
+    User -> DiaryPage : Select photos
+    DiaryPage -> DiaryPage : setState(() {\n_images.clear();\n_images.addAll(picked.map((x) => File(x.path)));\n})
+end
+
+opt Remove selected photo
+    User -> DiaryPage : Press remove photo button
+    DiaryPage -> DiaryPage : setState(() => _images.removeAt(i))
+end
+
+opt Set diary visibility
+    opt Set public diary
+        User -> DiaryPage : Press Public button
+        DiaryPage -> DiaryPage : setState(() => isPublic = true)
+    end
+
+    opt Set private diary
+        User -> DiaryPage : Press Private button
+        DiaryPage -> DiaryPage : setState(() => isPublic = false)
+    end
+end
+
+@enduml
+

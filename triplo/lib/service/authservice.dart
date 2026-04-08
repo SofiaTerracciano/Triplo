@@ -131,7 +131,7 @@ class AuthService extends ChangeNotifier {
       await googleSignIn.signOut();
       debugPrint("AuthService: signOut completed");
 
-      // Per ora toglierei disconnect, per non complicare il test
+
       // try {
       //   debugPrint("AuthService: calling googleSignIn.disconnect()");
       //   await googleSignIn.disconnect();

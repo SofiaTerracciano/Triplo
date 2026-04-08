@@ -1,0 +1,56 @@
+@startuml
+title Search Users Sequence Diagram
+
+actor User
+
+participant SearchPage as "<color:white>SearchPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+database FirebaseFirestore
+
+
+
+User -> SearchPage : Type query
+
+SearchPage -> SearchPage : _runSearch(query)
+
+SearchPage -> UserController : searchUsers(query)
+
+
+
+UserController -> FirebaseFirestore : users_index.where(normalized >= q).get()
+
+FirebaseFirestore --> UserController : snapshot matching documents (uid list)
+
+
+
+
+
+
+
+loop for each result, method getUserById(d["uid"])
+    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).get()
+    FirebaseFirestore --> UserController : snapshot user data
+    UserController -> UserController : results.add(user)
+end
+
+UserController --> SearchPage : List<Users>
+SearchPage -> SearchPage : update _userResults
+
+SearchPage -> SearchPage : setState(_isSearching = false)
+
+SearchPage --> User : Show updated list
+
+
+
+
+
+opt Navigation
+User -> SearchPage : Tap user
+
+SearchPage -> SearchPage : Navigator.push(UserPagePublic)
+end
+
+
+
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+title Google Satellite Page Sequence Diagram 
+
+actor User
+
+participant Geowatch as "<color:white>Geowatch</color>" #darkgreen
+participant ServiceController as "<color:white>ServiceController</color>" #151b8e
+participant OpenWeather
+
+
+
+User -> Geowatch : Tap "Open satellite map"
+Geowatch -> Geowatch : Navigator.push()
+Geowatch --> User : Show map UI
+Geowatch -> ServiceController : googleSatelliteTile()
+ServiceController --> Geowatch : tile URL
+
+note right of Geowatch
+The base map is rendered using a tile URL.
+The map component loads tiles
+based on zoom and position.
+end note
+
+
+
+
+
+
+
+
+loop for each visible tile
+        Geowatch -> OpenWeather : HTTP GET /map/{layer}/{z}/{x}/{y}
+        OpenWeather --> Geowatch : PNG tile
+    end
+opt User enables weather layer
+    User -> Geowatch : Toggle layer
+    Geowatch -> ServiceController : weatherTileFromId(layerId)
+    ServiceController -> ServiceController : resolveLayer(layerId)
+    ServiceController -> ServiceController : build URL template
+    ServiceController --> Geowatch : URL template
+    note right of Geowatch
+    The map internally uses the URL template
+    to load tiles from OpenWeather.
+    end note
+end
+
+
+
+
+
+
+
+
+
+
+loop for each visible tile
+        Geowatch -> OpenWeather : HTTP GET /map/{layer}/{z}/{x}/{y}
+        OpenWeather --> Geowatch : PNG tile
+    end
+
+opt User zooms map
+    User -> Geowatch : Pinch zoom / buttons
+    Geowatch -> Geowatch : mapController.move()
+    Geowatch -> OpenWeather : Load new tiles
+    OpenWeather --> Geowatch : PNG tiles
+end
+
+@enduml

@@ -1,0 +1,112 @@
+@startuml
+title Add Diary Page Sequence Diagram
+
+actor User
+participant DiaryPage as "<color:white>DiaryPage</color>" #darkgreen
+participant LoadingPage
+participant UserPage as "<color:white>UserPage</color>" #darkgreen
+participant trekkingcontroller as "<color:white>trekkingcontroller</color>" #151b8e
+participant UserController as "<color:white>UserController</color>"#151b8e
+participant DiaryController as "<color:white>DiaryController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant DiaryModel as "<color:white>DiaryModel</color>" #378641
+database FirebaseFirestore
+database FirebaseStorage
+
+opt Save diary
+    User -> DiaryPage : Press Save button
+    DiaryPage -> LoadingPage : Navigator.push(context, LoadingPage)s3
+    LoadingPage --> User : Show loading page
+    DiaryPage -> DiaryPage : Build date string
+    
+    
+    
+    
+    
+    
+
+    DiaryPage -> DiaryPage : Compute duration
+    
+   
+    
+   
+
+    opt Upload selected images
+        DiaryPage -> DiaryController : uploadDiaryImages(_images)
+
+        loop for each selected image
+            DiaryController -> DiaryController : Check file extension
+            DiaryController -> FirebaseStorage : ref().child(path).putFile(image)
+            FirebaseStorage --> DiaryController : Upload completed
+            DiaryController -> DiaryController : paths.add(path)
+        end
+
+        DiaryController --> DiaryPage : List<String> photos
+    end
+
+    
+    
+
+    DiaryPage -> DiaryController : DiaryController.currentUser = currentUser
+
+    DiaryPage -> DiaryController : addDiary(trekking.name, isPublic, date,\nduration.toDouble(), friends, photos,\nchallenges, _refreshmentController.text,\nmoods, _notesController.text, false, "")
+
+    DiaryController -> AuthService : currentUid
+    AuthService --> DiaryController : uid
+
+    DiaryController -> DiaryController : Generate diaryId with Uuid().v4()
+
+    DiaryController -> FirebaseFirestore : collection("diary").doc(newId).get()
+    FirebaseFirestore --> DiaryController : Document snapshot
+
+    DiaryController -> DiaryModel : Create Diary instance
+    note right of DiaryModel
+    Diary(
+      diaryId: newId,
+      userId: uid,
+      trekkigName: title,
+      date: date,
+      duration: duration,
+      friends: friends,
+      photos: photos,
+      challenges: challenges,
+      refreshmentPoint: refreshmentPoint,
+      mood: mood,
+      notes: notes,
+      isPublic: isPublic
+    )
+    end note
+
+    DiaryController -> DiaryController : _diaries.add(page)
+
+    alt Diary is public
+        DiaryController -> FirebaseFirestore : collection("users").doc(uid).update(\n"Public_diary": FieldValue.arrayUnion([page.diaryId]))
+        FirebaseFirestore --> DiaryController : Update completed
+        DiaryController -> DiaryController : _currentUser!.publicDiaryPages.add(page)
+    else Diary is private
+        DiaryController -> FirebaseFirestore : collection("users").doc(uid).update(\n"Private_diary": FieldValue.arrayUnion([page.diaryId]))
+        FirebaseFirestore --> DiaryController : Update completed
+        DiaryController -> DiaryController : _currentUser!.privateDiaryPages.add(page)
+    end
+
+    DiaryController -> DiaryModel : toMap()
+    DiaryModel --> DiaryController : Map<String, dynamic>
+
+    DiaryController -> FirebaseFirestore : collection("diary").doc(page.diaryId).set(page.toMap())
+    FirebaseFirestore --> DiaryController : Save completed
+
+    DiaryController --> DiaryPage : addDiary completed
+
+    DiaryPage -> UserController : updateUserLevel(trekking.difficulty_level)
+    UserController -> AuthService : currentUid
+    AuthService --> UserController : uid
+    UserController -> FirebaseFirestore : collection("users").doc(uid).update(...)
+    FirebaseFirestore --> UserController : Update completed
+    UserController --> DiaryPage : Update completed
+
+    DiaryPage -> UserPage : Navigator.pushReplacement(context, UserPage)
+    UserPage --> User : Show updated user page
+end
+
+
+@enduml

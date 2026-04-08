@@ -282,6 +282,40 @@ class ServiceController {
   String googleSatelliteTile() {
     return "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}";
   }
+
+
+
+
+
+
+
+
+  String weatherTileFromId(String id) {
+    final layer = resolveLayer(id);
+    if (layer == null) {
+      throw ArgumentError("Invalid weather layer id: $id");
+    }
+    return weatherTile(layer);
+  }
+
+  String legendTypeFromId(String id) {
+    switch (id) {
+      case "precip":
+        return "precipitation";
+      case "snow":
+        return "snow";
+      case "wind":
+        return "wind";
+      case "clouds":
+        return "clouds";
+      case "temp":
+        return "temp";
+      case "pressure":
+        return "pressure";
+      default:
+        throw ArgumentError("Invalid legend layer id: $id");
+    }
+  }
 }
 
 class NavigationLocationState {

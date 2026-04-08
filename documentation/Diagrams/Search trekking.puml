@@ -1,0 +1,63 @@
+@startuml
+title Search Trekking Sequence Diagram
+
+actor User
+
+participant SearchPage as "<color:white>SearchPage</color>" #darkgreen
+participant TrekkingController as "<color:white>TrekkingController</color>" #151b8e
+participant trekkingModel as "<color:white>trekkingModel</color>" #378641
+database FirebaseFirestore
+
+
+
+User -> SearchPage : Type query
+
+SearchPage -> SearchPage : _runSearch(query)
+
+SearchPage -> TrekkingController : searchTrekking(query)
+
+
+
+TrekkingController -> FirebaseFirestore : trekking_index.where(Normalized >= q).get()
+
+FirebaseFirestore --> TrekkingController : snapshot matching documents (trekkingIds)
+
+
+
+
+
+loop for each result, trekkingId = d["Trekking_id"]
+
+    TrekkingController -> TrekkingController : getTrekkingById(trekkingId)
+
+    alt trekking found in local list
+        TrekkingController -> TrekkingController : results.add(trekking)
+    else trekking not found
+        TrekkingController -> FirebaseFirestore : _db.collection("trekking").doc(trekkingId).get()
+        FirebaseFirestore --> TrekkingController : snapshot trekking data
+        TrekkingController -> trekkingModel : Trekking.fromMap()
+        trekkingModel --> TrekkingController: trekking
+        TrekkingController -> TrekkingController : results.add(trekking)
+    end
+
+end
+
+
+TrekkingController --> SearchPage : List<Trekking>
+
+SearchPage -> SearchPage : update _trekkingResults
+
+SearchPage -> SearchPage : setState(_isSearching = false)
+
+SearchPage --> User : Show updated list
+
+
+
+
+opt Navigation
+User -> SearchPage : Tap trekking
+
+SearchPage -> SearchPage : Navigator.push(TrekkingPage)
+end
+
+@enduml

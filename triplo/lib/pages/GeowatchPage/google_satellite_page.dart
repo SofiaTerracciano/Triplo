@@ -103,12 +103,12 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
                 ],
               ),
 
-              if (showPrecip) WeatherLayer.build(api.resolveLayer('precip')!, api.openWeatherKey),
-              if (showSnow) WeatherLayer.build(api.resolveLayer('snow')!, api.openWeatherKey),
-              if (showWind) WeatherLayer.build(api.resolveLayer('wind')!, api.openWeatherKey),
-              if (showClouds) WeatherLayer.build(api.resolveLayer('clouds')!, api.openWeatherKey),
-              if (showTemp) WeatherLayer.build(api.resolveLayer('temp')!, api.openWeatherKey),
-              if (showPressure) WeatherLayer.build(api.resolveLayer('pressure')!, api.openWeatherKey),
+              if (showPrecip) WeatherLayer.build(api.weatherTileFromId('precip')),
+              if (showSnow) WeatherLayer.build(api.weatherTileFromId('snow')),
+              if (showWind) WeatherLayer.build(api.weatherTileFromId('wind')),
+              if (showClouds) WeatherLayer.build(api.weatherTileFromId('clouds')),
+              if (showTemp) WeatherLayer.build(api.weatherTileFromId('temp')),
+              if (showPressure) WeatherLayer.build(api.weatherTileFromId('pressure')),
             ],
           ),
 
