@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -50,5 +51,13 @@ class GeoService {
 
   Future<bool> openLocationSettingsPage() async {
     return Geolocator.openLocationSettings();
+  }
+
+  Stream<double?> compassStream() {
+    final stream = FlutterCompass.events;
+    if (stream == null) {
+      return Stream<double?>.value(null);
+    }
+    return stream.map((event) => event.heading);
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_compass/flutter_compass.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
@@ -68,6 +68,9 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
       _initLocation();
     }
   }
+
+
+
 
   /*Future<void> _initLocation() async {
     await PermissionService.askPermissionsOnce();
@@ -203,7 +206,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
     final primary = Theme.of(context).colorScheme.primary;
-
+    final servicecontroller = context.read<ServiceController>();
     return Scaffold(
       appBar: AppBar(
         title: Text(local.navigation_page_title),
@@ -215,15 +218,15 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
               ? _buildErrorState(_error!, local)
               : ScrollConfiguration(
                   behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
-                  child: StreamBuilder<CompassEvent>(
-                    stream: FlutterCompass.events,
+                  child: StreamBuilder<double?>(
+                    stream: servicecontroller.compassStream(),
                     builder: (context, snapshot) {
 
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final heading = snapshot.data!.heading ?? 0;
+                      final heading = snapshot.data! ?? 0;
                       final direction = _direction(heading);
                       final primary = Theme.of(context).colorScheme.primary;
 

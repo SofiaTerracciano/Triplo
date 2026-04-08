@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
@@ -315,6 +316,11 @@ class ServiceController {
       default:
         throw ArgumentError("Invalid legend layer id: $id");
     }
+  }
+
+
+  Stream<double?> compassStream() {
+    return geo.compassStream();
   }
 }
 
