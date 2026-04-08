@@ -588,6 +588,55 @@ When the user selects a trekking, the application navigates to the corresponding
     \includegraphics[width=\linewidth]{./images/Search trekking.png}
 \end{figure}
 
+
+\subsection{View Compass and Altitude Information Sequence Diagram}
+
+The \texttt{Geowatch} component is responsible for displaying compass, altitude, and current position information. This functionality is implemented through the interaction between the page, the \texttt{servicecontroller}, the \texttt{geoservice}, and the \texttt{permissionservice}.
+
+When the navigation page is opened, the initialization starts in \texttt{initState()}, where the page registers itself as an app lifecycle observer and schedules the execution of \texttt{\_initLocation()}. The observer is used to detect when the application returns to the foreground, for example after the user has changed GPS or permission settings.
+
+The method \texttt{\_initLocation()} delegates the preliminary checks to the \texttt{servicecontroller} through \texttt{loadNavigationLocation()}. This method verifies whether the location permission has been granted and whether the GPS service is enabled. If one of these conditions is not satisfied, the page enters an error state and shows a dedicated message to the user.
+
+If permission is denied, the returned state contains the error \texttt{PERMISSION\_DENIED}. If the GPS service is disabled, the returned state contains the error \texttt{GPS\_DISABLED}. In both cases, the page updates its local state through \texttt{setState()} and displays an error instead of the navigation information.
+
+Only when both checks are successful does the page subscribe to the position stream. The stream is obtained through the \texttt{servicecontroller}, which delegates the request to the \texttt{geoservice}. Every new \texttt{Position} object received from the stream is used to update altitude, latitude, longitude.
+
+The compass information is handled through a separated stream. In the architecture, the UI does not access the \texttt{FlutterCompass} library. Instead, it requests the compass stream through the \texttt{servicecontroller}, which delegates the operation to the \texttt{geoservice}. The UI then receives heading values and converts them into cardinal directions through the helper method \texttt{\_direction()}.
+
+When an error state is shown, the page also provides a button that helps the user solve the problem. If the GPS is disabled, the button invokes \texttt{openGpsSettings()}, which is delegated through the \texttt{servicecontroller} to the \texttt{geoservice}. If the problem is related to permissions, the page instead invokes \texttt{openPermissionSettings()}, which is delegated to the \texttt{permissionservice}. In this way, the UI does not directly interact with operating system APIs.
+
+The diagram also includes the handling of lifecycle changes. When the app returns to the foreground, it handles the app state change through method \texttt{didChangeAppLifecycleState()}. The page sets the checking state again and re-runs \texttt{\_initLocation()}. This is useful, for example, when the user comes back from the system settings after enabling GPS or granting permissions.
+
+Finally, when the page is closed, the observer and the active position stream subscription are disposed through the \texttt{dispose()} method. This avoids unnecessary updates when the page is no longer visible.
+
+\subsubsection{Application Lifecycle in Flutter}
+
+The \textbf{application lifecycle in Flutter} refers to the sequence of states an app goes through during its execution, such as \textit{resumed}, \textit{inactive}, \textit{paused}, and \textit{detached} and the mechanisms provided to handle transitions between these states.
+
+Flutter provides a platform-independent abstraction of the lifecycle through the \texttt{AppLifecycleState} enum. Developers can monitor these changes by implementing the \texttt{WidgetsBindingObserver}, which allows the application to listen for lifecycle updates.
+
+In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState state)} is overridden to react to state transitions, enabling behaviors such as pausing tasks, saving data, or managing background operations when the app moves between foreground and background.
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Difference between permission denied and GPS disabled}
+The two error conditions shown in the diagram represent different problems.
+
+The \texttt{PERMISSION\_DENIED} state means that the application is not allowed to access the device location. In this case, the problem is related to the application permission, so the user must enable the permission from the app settings.
+
+The \texttt{GPS\_DISABLED} state means that the application has permission to access location, but the location service of the device is currently turned off. In this case, the problem is not related to the app permission, but to the system location service, so the user must enable GPS from the device settings.
+
+For this reason, the page provides two different actions: opening the application settings in the case of denied permission, and opening the location settings in the case of disabled GPS.
+
 \subsection{Watch--Phone Pairing Mechanism}
 
 \subsubsection{Overview}

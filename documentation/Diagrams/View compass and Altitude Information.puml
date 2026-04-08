@@ -1,0 +1,89 @@
+@startuml
+title View Compass and Altitude Information Sequence Diagram
+
+actor User
+
+participant Geowatch as "<color:white>Geowatch</color>" #darkgreen
+participant servicecontroller as "<color:white>servicecontroller</color>" #151b8e
+participant geoservice as "<color:white>geoservice</color>" #151b8e
+participant permissionservice as "<color:white>permissionservice</color>" #151b8e
+
+User -> Geowatch : Open navigation page
+Geowatch -> Geowatch : initState()
+Geowatch -> Geowatch : addObserver(this)
+
+Geowatch -> Geowatch : _initLocation()
+Geowatch -> servicecontroller : loadNavigationLocation()
+
+servicecontroller -> permissionservice : isLocationGranted()
+permissionservice --> servicecontroller : bool
+
+alt Permission denied
+    servicecontroller --> Geowatch : NavigationLocationState(error = "PERMISSION_DENIED")
+    Geowatch -> Geowatch : setState(_error, _isChecking,\n_altitude = null, _position = null)
+    Geowatch --> User : Show permission error state
+
+    opt User presses open settings button
+        User -> Geowatch : Tap open settings
+        Geowatch -> servicecontroller : openPermissionSettings()
+        servicecontroller -> permissionservice : openAppSettingsPage()
+        permissionservice --> servicecontroller : completed
+        servicecontroller --> Geowatch : completed
+    end
+
+else Permission granted
+    servicecontroller -> geoservice : isLocationServiceEnabled()
+    geoservice --> servicecontroller : bool
+
+    alt GPS disabled
+        servicecontroller --> Geowatch : NavigationLocationState(error = "GPS_DISABLED")
+        Geowatch -> Geowatch : setState(_error, _isChecking,\n_altitude = null, _position = null)
+        Geowatch --> User : Show GPS disabled error state
+
+        opt User presses open settings button
+            User -> Geowatch : Tap open settings
+            Geowatch -> servicecontroller : openGpsSettings()
+            servicecontroller -> geoservice : openLocationSettingsPage()
+            geoservice --> servicecontroller : completed
+            servicecontroller --> Geowatch : completed
+        end
+
+    else GPS enabled
+        servicecontroller --> Geowatch : NavigationLocationState(error = null)
+        Geowatch -> Geowatch : dispose _positionSub
+        Geowatch -> servicecontroller : navigationPositionStream()
+        servicecontroller -> geoservice : getPositionStream()
+        geoservice --> servicecontroller : Stream<Position>
+        servicecontroller --> Geowatch : Stream<Position>
+
+        loop for each position update
+            geoservice --> Geowatch : Position
+            Geowatch -> Geowatch : setState(_altitude, _position,\n_error = null, _isChecking = false)
+            Geowatch --> User : Show altitude and coordinates
+        end
+
+        Geowatch -> servicecontroller : compassStream()
+        servicecontroller -> geoservice : compassStream()
+        geoservice --> servicecontroller : Stream<double?>
+        servicecontroller --> Geowatch : Stream<double?>
+
+        loop for each heading update
+            Geowatch -> Geowatch : _direction(heading)
+            Geowatch --> User : Show compass heading and direction
+        end
+    end
+end
+
+opt App returns to foreground
+    Geowatch -> Geowatch : didChangeAppLifecycleState(resumed)
+    Geowatch -> Geowatch : setState(_isChecking = true)
+    Geowatch -> Geowatch : _initLocation()
+end
+
+opt Page closed
+    Geowatch -> Geowatch : dispose()
+    
+    
+end
+
+@enduml
