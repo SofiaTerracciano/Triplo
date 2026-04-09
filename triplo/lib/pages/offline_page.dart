@@ -12,40 +12,43 @@ class OfflinePage extends StatelessWidget {
 
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'images/offline_mode.png',
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                local.offline_mode_label,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+        child: SingleChildScrollView( // Aggiungi questo
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              
+              children: [
+                Image.asset(
+                  'images/offline_mode.png',
+                  fit: BoxFit.contain,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                local.no_internet,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/navigation');
-                },
-                icon: const Icon(Icons.explore),
-                label: Text(local.navigation_page_title),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  local.offline_mode_label,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  local.no_internet,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/navigation');
+                  },
+                  icon: const Icon(Icons.explore),
+                  label: Text(local.navigation_page_title),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+      )
     );
   }
 }
