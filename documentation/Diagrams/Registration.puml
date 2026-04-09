@@ -1,0 +1,46 @@
+@startuml
+title Registration Sequence Diagram
+
+actor User
+
+participant RegistrationPage as "<color:white>RegistrationPage</color>" #darkgreen
+participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant Users as "<color:white>User Model</color>" #378641
+collections FirebaseAuth
+database FirebaseFirestore
+
+User -> RegistrationPage : Press register button
+
+RegistrationPage -> RegistrationPage : _register()
+
+alt Invalid input
+    RegistrationPage --> User : Show SnackBar(error)
+else Valid input
+
+    RegistrationPage -> UserController : register(email, password)
+    UserController -> AuthService : register(email, password)
+
+    AuthService -> FirebaseAuth : createUserWithEmailAndPassword()
+    FirebaseAuth --> AuthService : UserCredential
+
+    AuthService -> FirebaseFirestore :_db.collection("users").doc(uid).set(user data)
+    AuthService -> FirebaseFirestore : set _db.collection("users_index").doc(uid).set(uid, username)
+    AuthService -> FirebaseFirestore : _db.collection("users").doc(uid).get()
+    FirebaseFirestore --> AuthService : snap
+    AuthService -> Users : new User()
+    Users --> AuthService : User
+    AuthService -> AuthService : _currentUser = User
+    AuthService --> UserController : completed
+    UserController -> AuthService : _authService.currentUser
+    AuthService --> UserController : currentUser
+    UserController -> UserController : _currentUser = _authService.currentUser
+    UserController --> RegistrationPage : completed
+    RegistrationPage -> SettingPage : Navigator.pushReplacement(SettingPage)
+    SettingPage --> User : Show settings page
+    opt Modify Profile Information
+    ref over User, RegistrationPage, SettingPage: Update Profile Information
+    end
+end
+@enduml
