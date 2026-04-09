@@ -703,6 +703,17 @@ This design combines a lightweight preload of trekking data with lazy loading of
 
 
 
+\subsection{Registration Sequence Diagram}
+
+The registration functionality is handled by the \texttt{RegistrationPage}, which delegates the creation of the new account to the \texttt{UserController} and the \texttt{AuthService}.
+When the user presses the register button, the page executes the method \texttt{\_register(context)}. The method first validates the input fields. If one or more fields are empty, the UI shows a \texttt{SnackBar} requesting the user to fill all fields. If the password and confirmation password do not match, another \texttt{SnackBar} is shown.
+If the data is valid, the page activates the loading state and calls \texttt{userController.register(email, password)}. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which creates the account in Firebase Authentication through \texttt{createUserWithEmailAndPassword()}.
+After the account is successfully created, the \texttt{AuthService} derives a default username from the email prefix and creates the corresponding Firestore documents in the \texttt{users} and \texttt{users\_index} collections. The first document stores the full user profile data, while the second supports search functionality through a normalized username representation.
+Once the Firestore documents have been created, the \texttt{AuthService} loads the newly created user profile through \texttt{loadUserCore(uid)}. The resulting user object is returned to the \texttt{UserController}, which updates its internal state.
+Finally, the \texttt{RegistrationPage} shows a success message and navigates to the \texttt{SettingPage}. The loading indicator is then disabled.
+It is important to note that, in the current implementation, the registration page only supports the traditional email/password flow. Google-based account creation is not handled by the registration page itself, but is implicitly managed during the first successful Google login through the creation of the Firestore profile documents.
+
+
 
 \subsection{Watch--Phone Pairing Mechanism}
 
