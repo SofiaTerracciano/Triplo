@@ -388,8 +388,8 @@ class _UserPageState extends State<UserPage> {
                             final trekking = trekkings[index];
                             return ListTile(
                               title: Text(trekking.name),
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => TrekkingPage(
@@ -397,12 +397,15 @@ class _UserPageState extends State<UserPage> {
                                     ),
                                   ),
                                 );
+
+                                if (!mounted) return;
+                                setState(() {});
                               },
                             );
                           },
                         );
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
