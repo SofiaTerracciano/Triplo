@@ -33,7 +33,7 @@ class DiaryController extends ChangeNotifier {
 
   /// Returns the local list of all currently loaded diary entries.
   List<Diary> get allDiaries => _diaries;
-
+/* non sono usati
   /// Fetches public diaries for a specific [userId] from Firestore.
   /// Prevents duplicate loading using the [_loaded] flag.
   Future<void> loadPublicDiary(String userId) async {
@@ -79,6 +79,8 @@ class DiaryController extends ChangeNotifier {
 
     notifyListeners();
   }
+
+ */
 
   /// Updates the local [Diary] object properties.
   /// This is used as a helper before committing changes to the database.
