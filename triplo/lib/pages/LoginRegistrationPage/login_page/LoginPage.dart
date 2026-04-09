@@ -87,9 +87,9 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(local.login_success)));
+      //ScaffoldMessenger.of(
+      //  context,
+      //).showSnackBar(SnackBar(content: Text(local.login_success)));
     } catch (e) {
       debugPrint("Login error: $e\n");
       ScaffoldMessenger.of(
