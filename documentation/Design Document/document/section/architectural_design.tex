@@ -683,6 +683,25 @@ The Google login flow first forces a sign-out from the previous Google session a
 
 If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed, and the page navigates to the \texttt{UserPage}.
 
+\subsubsection{User Page Sequence Diagram}
+
+The UserPage can be opened either as the landing page after a successful login or through the normal application navigation. Once the page is displayed, it retrieves the current authenticated user from the UserController.
+
+During initialization, the page schedules the invocation of \texttt{loadTrekking()} through \texttt{Future.microtask()}, instead of calling it directly inside \texttt{initState()}. This choice postpones the trekking load operation until the initialization phase is completed, keeping the widget initialization lighter.
+Although trekking loading is not strictly part of the core profile information, this preload can still be justified for the following reasons
+\begin{itemize}
+    \item the UserPage is often the first page shown after login, so loading trekking data here can anticipate work that will likely be needed shortly afterward by pages such as the HomePage, TrekkingPage, SearchPage, and the saved trekking tab itself
+    \item the UserPage allows navigation toward saved trekkings and trekking detail pages, so having the trekking cache already populated may reduce subsequent loading work
+    \item \texttt{loadTrekking()} acts as a warm-up step for the controller-side cache, because it populates the local \texttt{\_trekkings} list and makes data immediately available for methods such as \texttt{getTrekkingById()}, \texttt{getTrekkingId()}, using Firestore only as secondary solution
+\end{itemize}
+The main profile information shown in the page is obtained from the current user already available in the UserController. Additional information is retrieved lazily through \texttt{FutureBuilder}. This applies to followers, following users, diary counters, public diaries, private diaries, and saved trekkings.
+For followers and following, the UserController first retrieves the current user document from Firestore in order to obtain the identifiers stored in the \texttt{Followers} and \texttt{Following} fields. Then, for each identifier, the controller invokes \texttt{getUserById()}, which retrieves the corresponding Firestore document and builds a \texttt{Users} object through \texttt{Users.fromMap()}.
+The total diary count is computed through the helper method \texttt{\_loadAllDiaries(context, uid)} defined in the UserPage. This method invokes both \texttt{getPublicDiaries(uid)} and \texttt{getPrivateDiaries(uid)} from the DiaryController, then merges the two returned lists into a single collection. 
+For the diary tabs, the DiaryController queries Firestore and converts each result document into a \texttt{Diary} object through \texttt{Diary.fromMap()}.
+For the saved trekking tab, the TrekkingController first retrieves the current user document to obtain the identifiers stored in \texttt{Saved\_trekkings}. Then, for each identifier, it loads the corresponding trekking document and converts it into a \texttt{Trekking} object through \texttt{Trekking.fromMap()}.
+This design combines a lightweight preload of trekking data with lazy loading of profile-related collections, keeping the UserPage responsive while still preparing application data that is likely to be useful immediately after login.
+
+
 
 
 \subsection{Watch--Phone Pairing Mechanism}
