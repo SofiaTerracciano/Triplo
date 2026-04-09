@@ -1,30 +1,23 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-//import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
-
-
 import '../service/authservice.dart';
 
-
-
- /// Controller responsible for managing trekking data, handling 
- /// synchronization with Firestore, image caching, and user favorites.
+/// Controller responsible for managing trekking data, handling
+/// synchronization with Firestore, image caching, and user favorites.
 class TrekkingController extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
   AuthService authService;
 
-
-
-  final CollectionReference<Map<String, dynamic>> _weatherNotificationRef = FirebaseFirestore.instance.collection('weather_notification');
+  final CollectionReference<Map<String, dynamic>> _weatherNotificationRef =
+      FirebaseFirestore.instance.collection('weather_notification');
   List<Trekking> _trekkings;
   bool _loaded = false;
 
@@ -40,7 +33,18 @@ class TrekkingController extends ChangeNotifier {
     required this.notification,
     required this.authService,
     required List<Trekking> trekkings,
-  }) : _trekkings = trekkings;
+  }) : _db = FirebaseFirestore.instance,
+       _trekkings = trekkings;
+
+  // Costruttore per i test
+  TrekkingController.withDb({
+    required this.memory,
+    required this.notification,
+    required this.authService,
+    required List<Trekking> trekkings,
+    required FirebaseFirestore db,
+  }) : _db = db,
+       _trekkings = trekkings;
 
   /// Returns the local list of all loaded trekking instances.
   List<Trekking> get allTrekkings => _trekkings;
@@ -164,7 +168,6 @@ class TrekkingController extends ChangeNotifier {
 
   /// Adds a trekking ID to the current user's 'Saved_trekkings' array in Firestore.
   Future<void> addTrekkingToSaved(String trekkingId) async {
-
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
@@ -176,7 +179,6 @@ class TrekkingController extends ChangeNotifier {
 
   /// Removes a trekking ID from the current user's 'Saved_trekkings' array in Firestore.
   Future<void> removeTrekkingFromSaved(String trekkingId) async {
-
     if (uid == null) return;
 
     await _db.collection("users").doc(uid).update({
@@ -188,7 +190,6 @@ class TrekkingController extends ChangeNotifier {
 
   /// Checks if a specific trekking ID exists in the user's favorites list.
   Future<bool> isTrekkingSaved(String trekkingId) async {
-
     if (uid == null) return false;
 
     final snap = await _db.collection("users").doc(uid).get();
@@ -258,7 +259,6 @@ class TrekkingController extends ChangeNotifier {
       );
     }
   }
- 
 
   /// Batched version of getCachedImage to handle multiple image paths simultaneously.
   Future<List<File>> getCachedImages(List<String> imagePaths) async {
@@ -269,8 +269,8 @@ class TrekkingController extends ChangeNotifier {
     return files.whereType<File>().toList();
   }
 
-  /// Retrieves a specific trekking item. 
-  /// It checks the local cache first; if missing, it fetches it from Firestore 
+  /// Retrieves a specific trekking item.
+  /// It checks the local cache first; if missing, it fetches it from Firestore
   /// and updates the local list for future use.
   Future<Trekking?> getTrekkingByIdAsync(String trekkingId) async {
     // Search on local list
@@ -295,9 +295,7 @@ class TrekkingController extends ChangeNotifier {
     return null;
   }
 
-
   Future<void> enableWeatherAlertForTrekking(String trekkingId) async {
-
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({
@@ -309,10 +307,7 @@ class TrekkingController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   Future<void> disableWeatherAlertForTrekking(String trekkingId) async {
-
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({
@@ -325,7 +320,6 @@ class TrekkingController extends ChangeNotifier {
   }
 
   Future<bool> isWeatherAlertEnabled(String trekkingId) async {
-
     if (uid == null) return false;
 
     final snap = await _weatherNotificationRef.doc(uid).get();
@@ -333,11 +327,7 @@ class TrekkingController extends ChangeNotifier {
     return ids.contains(trekkingId);
   }
 
-
-
-
   Future<List<String>> getWeatherAlertTrekkingIds() async {
-
     if (uid == null) return [];
 
     final snap = await _weatherNotificationRef.doc(uid).get();
@@ -351,7 +341,6 @@ class TrekkingController extends ChangeNotifier {
   }
 
   Future<void> updateWeatherNotificationLastCheck() async {
-
     if (uid == null) return;
 
     await _weatherNotificationRef.doc(uid).set({
@@ -360,6 +349,4 @@ class TrekkingController extends ChangeNotifier {
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }
-
-
 }

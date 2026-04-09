@@ -11,7 +11,8 @@ import '../service/authservice.dart';
 
 class UserController extends ChangeNotifier {
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
   final AuthService _authService;
 
 
@@ -21,8 +22,13 @@ class UserController extends ChangeNotifier {
   String? get uid => _authService.currentUid;
   bool _isLoading = true;
   bool get isLoading => _isLoading;
-  UserController(this._authService) {
-    // Chiamiamo l'inizializzazione appena il controller nasce
+  UserController(this._authService)
+      : _db = FirebaseFirestore.instance {
+    _init();
+  }
+
+  // Costruttore per i test
+  UserController.withDb(this._authService, this._db) {
     _init();
   }
 

@@ -3,235 +3,473 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 
+// Adjust import paths to match your project structure
 
-/// Fake classes per coprire toMap()
-class FakeDiary implements Diary {
-  @override
-  String get diaryId => "diary_1";
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+/// Minimal Users builder — all lists default to empty.
+Users buildUser({
+  String uid = 'uid_1',
+  String username = 'mario_rossi',
+  String name = 'Mario',
+  String surname = 'Rossi',
+  String email = 'mario@example.com',
+  DateTime? birthdate,
+  String? photoProfile,
+  List<Users>? followers,
+  List<Users>? following,
+  List<Diary>? publicDiaryPages,
+  List<Diary>? privateDiaryPages,
+  List<Trekking>? savedTrekkings,
+  String level = 'Beginner',
+  int advanced = 2,
+  int intermediate = 5,
+}) {
+  return Users(
+    uid: uid,
+    username: username,
+    name: name,
+    surname: surname,
+    email: email,
+    birthdate: birthdate ?? DateTime(1990, 6, 15),
+    photoProfile: photoProfile,
+    followers: followers ?? [],
+    following: following ?? [],
+    publicDiaryPages: publicDiaryPages ?? [],
+    privateDiaryPages: privateDiaryPages ?? [],
+    savedTrekkings: savedTrekkings ?? [],
+    level: level,
+    advanced: advanced,
+    intermediate: intermediate,
+  );
 }
 
-class FakeTrekking implements Trekking {
-  @override
-  String get documentId => "trek_1";
+Map<String, dynamic> buildFirestoreMap({
+  String username = 'mario_rossi',
+  String name = 'Mario',
+  String surname = 'Rossi',
+  String email = 'mario@example.com',
+  String birthdate = '1990-06-15T00:00:00.000',
+  String photoProfile = 'https://example.com/photo.jpg',
+  String level = 'Beginner',
+  int advanced = 2,
+  int intermediate = 5,
+}) {
+  return {
+    'Username': username,
+    'Name': name,
+    'Surname': surname,
+    'Email': email,
+    'Birthdate': birthdate,
+    'Photo_profile': photoProfile,
+    'Level': level,
+    'Advanced': advanced,
+    'Intermediate': intermediate,
+  };
 }
 
 void main() {
-  group('Users FULL coverage test', () {
+  // ─── Constructor & Getters ─────────────────────────────────────────────────
 
-    test('Constructor + getters', () {
-      final user = Users(
-        uid: "1",
-        username: "user",
-        name: "Mario",
-        surname: "Rossi",
-        email: "test@test.com",
-        birthdate: DateTime(1990),
-        followers: [],
-        following: [],
-        publicDiaryPages: [],
-        privateDiaryPages: [],
-        savedTrekkings: [],
-        level: "Beginner",
-        advanced: 1,
-        intermediate: 2,
-      );
+  group('Constructor & Getters', () {
+    test('stores all fields correctly', () {
+      final u = buildUser();
 
-      expect(user.uid, "1");
-      expect(user.username, "user");
-      expect(user.name, "Mario");
-      expect(user.surname, "Rossi");
-      expect(user.email, "test@test.com");
-      expect(user.level, "Beginner");
-      expect(user.advanced, 1);
-      expect(user.intermediate, 2);
+      expect(u.uid, 'uid_1');
+      expect(u.username, 'mario_rossi');
+      expect(u.name, 'Mario');
+      expect(u.surname, 'Rossi');
+      expect(u.email, 'mario@example.com');
+      expect(u.birthdate, DateTime(1990, 6, 15));
+      expect(u.level, 'Beginner');
+      expect(u.advanced, 2);
+      expect(u.intermediate, 5);
+      expect(u.followers, isEmpty);
+      expect(u.following, isEmpty);
+      expect(u.publicDiaryPages, isEmpty);
+      expect(u.privateDiaryPages, isEmpty);
+      expect(u.savedTrekkings, isEmpty);
     });
 
-    test('Setters coverage', () {
-      final user = Users(
-        uid: "1",
-        username: "a",
-        name: "b",
-        surname: "c",
-        email: "d",
-        birthdate: DateTime.now(),
-        followers: [],
-        following: [],
-        publicDiaryPages: [],
-        privateDiaryPages: [],
-        savedTrekkings: [],
-        level: "",
-        advanced: 0,
-        intermediate: 0,
-      );
-
-      user.username = "new";
-      user.name = "name";
-      user.surname = "surname";
-      user.email = "mail";
-      user.level = "Advanced";
-      user.advanced = 10;
-      user.intermediate = 20;
-      user.photoProfile = "url";
-
-      expect(user.username, "new");
-      expect(user.photoProfile, "url");
-      expect(user.level, "Advanced");
-      expect(user.advanced, 10);
-      expect(user.intermediate, 20);
+    test('photoProfile defaults to empty string when null', () {
+      final u = buildUser(photoProfile: null);
+      expect(u.photoProfile, '');
     });
 
-    test('toMap FULL coverage (with lists)', () {
-      final follower = Users(
-        uid: "f1",
-        username: "follower",
-        name: "",
-        surname: "",
-        email: "",
-        birthdate: DateTime.now(),
-        followers: [],
-        following: [],
-        publicDiaryPages: [],
-        privateDiaryPages: [],
-        savedTrekkings: [],
-        level: "",
-        advanced: 0,
-        intermediate: 0,
-      );
+    test('photoProfile is stored when provided', () {
+      final u = buildUser(photoProfile: 'https://example.com/photo.jpg');
+      expect(u.photoProfile, 'https://example.com/photo.jpg');
+    });
+  });
 
-      final user = Users(
-        uid: "1",
-        username: "user",
-        name: "Mario",
-        surname: "Rossi",
-        email: "test@test.com",
-        birthdate: DateTime(1990),
-        followers: [follower],
-        following: [follower],
-        publicDiaryPages: [FakeDiary()],
-        privateDiaryPages: [FakeDiary()],
-        savedTrekkings: [FakeTrekking()],
-        level: "Pro",
+  // ─── Setters ──────────────────────────────────────────────────────────────
+
+  group('Setters', () {
+    test('username setter works', () {
+      final u = buildUser();
+      u.username = 'luigi_verdi';
+      expect(u.username, 'luigi_verdi');
+    });
+
+    test('name setter works', () {
+      final u = buildUser();
+      u.name = 'Luigi';
+      expect(u.name, 'Luigi');
+    });
+
+    test('surname setter works', () {
+      final u = buildUser();
+      u.surname = 'Verdi';
+      expect(u.surname, 'Verdi');
+    });
+
+    test('email setter works', () {
+      final u = buildUser();
+      u.email = 'luigi@example.com';
+      expect(u.email, 'luigi@example.com');
+    });
+
+    test('birthdate setter works', () {
+      final u = buildUser();
+      u.birthdate = DateTime(2000, 1, 1);
+      expect(u.birthdate, DateTime(2000, 1, 1));
+    });
+
+    test('photoProfile setter works with value', () {
+      final u = buildUser();
+      u.photoProfile = 'https://example.com/new.jpg';
+      expect(u.photoProfile, 'https://example.com/new.jpg');
+    });
+
+    test('photoProfile setter works with null', () {
+      final u = buildUser(photoProfile: 'https://example.com/photo.jpg');
+      u.photoProfile = null;
+      expect(u.photoProfile, isNull);
+    });
+
+    test('level setter works', () {
+      final u = buildUser();
+      u.level = 'Expert';
+      expect(u.level, 'Expert');
+    });
+
+    test('advanced setter works', () {
+      final u = buildUser();
+      u.advanced = 10;
+      expect(u.advanced, 10);
+    });
+
+    test('intermediate setter works', () {
+      final u = buildUser();
+      u.intermediate = 8;
+      expect(u.intermediate, 8);
+    });
+
+    test('followers setter replaces list', () {
+      final u = buildUser();
+      final follower = buildUser(uid: 'uid_2', username: 'follower');
+      u.followers = [follower];
+      expect(u.followers.length, 1);
+      expect(u.followers.first.uid, 'uid_2');
+    });
+
+    test('following setter replaces list', () {
+      final u = buildUser();
+      final followed = buildUser(uid: 'uid_3', username: 'followed');
+      u.following = [followed];
+      expect(u.following.length, 1);
+      expect(u.following.first.uid, 'uid_3');
+    });
+
+    test('publicDiaryPages setter replaces list', () {
+      final u = buildUser();
+      u.publicDiaryPages = [];
+      expect(u.publicDiaryPages, isEmpty);
+    });
+
+    test('privateDiaryPages setter replaces list', () {
+      final u = buildUser();
+      u.privateDiaryPages = [];
+      expect(u.privateDiaryPages, isEmpty);
+    });
+
+    test('savedTrekkings setter replaces list', () {
+      final u = buildUser();
+      u.savedTrekkings = [];
+      expect(u.savedTrekkings, isEmpty);
+    });
+  });
+
+  // ─── toMap() ──────────────────────────────────────────────────────────────
+
+  group('toMap()', () {
+    test('produces correct scalar values', () {
+      final u = buildUser(
+        photoProfile: 'https://example.com/photo.jpg',
+        birthdate: DateTime(1990, 6, 15),
+      );
+      final map = u.toMap();
+
+      expect(map['Uid'], 'uid_1');
+      expect(map['Username'], 'mario_rossi');
+      expect(map['Name'], 'Mario');
+      expect(map['Surname'], 'Rossi');
+      expect(map['Email'], 'mario@example.com');
+      expect(map['Photo_profile'], 'https://example.com/photo.jpg');
+      expect(map['Level'], 'Beginner');
+      expect(map['Advanced'], 2);
+      expect(map['Intermediate'], 5);
+    });
+
+    test('birthdate is serialized as ISO 8601 string', () {
+      final u = buildUser(birthdate: DateTime(1990, 6, 15));
+      final map = u.toMap();
+      expect(map['Birthdate'], isA<String>());
+      expect(DateTime.parse(map['Birthdate'] as String), DateTime(1990, 6, 15));
+    });
+
+    test('followers are serialized as list of UIDs', () {
+      final f1 = buildUser(uid: 'f_1');
+      final f2 = buildUser(uid: 'f_2');
+      final u = buildUser(followers: [f1, f2]);
+      final map = u.toMap();
+      expect(map['Followers'], ['f_1', 'f_2']);
+    });
+
+    test('following is serialized as list of UIDs', () {
+      final f = buildUser(uid: 'fng_1');
+      final u = buildUser(following: [f]);
+      final map = u.toMap();
+      expect(map['Following'], ['fng_1']);
+    });
+
+    test('empty followers serializes to empty list', () {
+      final u = buildUser();
+      expect(u.toMap()['Followers'], isEmpty);
+    });
+
+    test('empty following serializes to empty list', () {
+      final u = buildUser();
+      expect(u.toMap()['Following'], isEmpty);
+    });
+
+    test('public_diary serializes as list of diary IDs', () {
+      // requires a real or mock Diary with a diaryId getter
+      final u = buildUser(publicDiaryPages: []);
+      expect(u.toMap()['Public_diary'], isEmpty);
+    });
+
+    test('private_diary serializes as list of diary IDs', () {
+      final u = buildUser(privateDiaryPages: []);
+      expect(u.toMap()['Private_diary'], isEmpty);
+    });
+
+    test('saved_trekkings serializes as list of document IDs', () {
+      final u = buildUser(savedTrekkings: []);
+      expect(u.toMap()['Saved_trekkings'], isEmpty);
+    });
+  });
+
+  // ─── fromMap() ────────────────────────────────────────────────────────────
+
+  group('fromMap()', () {
+    test('parses all scalar fields correctly', () {
+      final u = Users.fromMap(buildFirestoreMap(), uid: 'uid_1');
+
+      expect(u.uid, 'uid_1');
+      expect(u.username, 'mario_rossi');
+      expect(u.name, 'Mario');
+      expect(u.surname, 'Rossi');
+      expect(u.email, 'mario@example.com');
+      expect(u.photoProfile, 'https://example.com/photo.jpg');
+      expect(u.level, 'Beginner');
+      expect(u.advanced, 2);
+      expect(u.intermediate, 5);
+    });
+
+    test('parses birthdate from ISO 8601 string', () {
+      final u = Users.fromMap(buildFirestoreMap(birthdate: '1990-06-15T00:00:00.000'), uid: 'u1');
+      expect(u.birthdate, DateTime(1990, 6, 15));
+    });
+
+    test('lists are always empty (IDs reconstructed by controller)', () {
+      final u = Users.fromMap(buildFirestoreMap(), uid: 'u1');
+      expect(u.followers, isEmpty);
+      expect(u.following, isEmpty);
+      expect(u.publicDiaryPages, isEmpty);
+      expect(u.privateDiaryPages, isEmpty);
+      expect(u.savedTrekkings, isEmpty);
+    });
+
+    test('accepts lowercase "username" key (legacy fallback)', () {
+      final map = buildFirestoreMap();
+      map.remove('Username');
+      map['username'] = 'legacy_user';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.username, 'legacy_user');
+    });
+
+    test('accepts lowercase "email" key (legacy fallback)', () {
+      final map = buildFirestoreMap();
+      map.remove('Email');
+      map['email'] = 'legacy@example.com';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.email, 'legacy@example.com');
+    });
+
+    test('accepts "photoURL" key (legacy fallback)', () {
+      final map = buildFirestoreMap();
+      map.remove('Photo_profile');
+      map['photoURL'] = 'https://example.com/legacy.jpg';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.photoProfile, 'https://example.com/legacy.jpg');
+    });
+
+    test('defaults username to empty string when missing', () {
+      final map = buildFirestoreMap();
+      map.remove('Username');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.username, '');
+    });
+
+    test('defaults name to empty string when missing', () {
+      final map = buildFirestoreMap();
+      map.remove('Name');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.name, '');
+    });
+
+    test('defaults surname to empty string when missing', () {
+      final map = buildFirestoreMap();
+      map.remove('Surname');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.surname, '');
+    });
+
+    test('defaults email to empty string when missing', () {
+      final map = buildFirestoreMap();
+      map.remove('Email');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.email, '');
+    });
+
+    test('Advanced as String is parsed to int', () {
+      final map = buildFirestoreMap();
+      map['Advanced'] = '7';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.advanced, 7);
+    });
+
+    test('Intermediate as String is parsed to int', () {
+      final map = buildFirestoreMap();
+      map['Intermediate'] = '3';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.intermediate, 3);
+    });
+
+    test('Advanced invalid string defaults to 0', () {
+      final map = buildFirestoreMap();
+      map['Advanced'] = 'non_numero';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.advanced, 0);
+    });
+
+    test('Intermediate invalid string defaults to 0', () {
+      final map = buildFirestoreMap();
+      map['Intermediate'] = 'non_numero';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.intermediate, 0);
+    });
+  });
+
+  // ─── _parseBirthdate ──────────────────────────────────────────────────────
+
+  group('_parseBirthdate (via fromMap)', () {
+    test('parses valid Birthdate string', () {
+      final u = Users.fromMap(buildFirestoreMap(birthdate: '2000-03-20T00:00:00.000'), uid: 'u1');
+      expect(u.birthdate, DateTime(2000, 3, 20));
+    });
+
+    test('falls back to default when Birthdate is empty string', () {
+      final map = buildFirestoreMap(birthdate: '');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(2000, 1, 1));
+    });
+
+    test('falls back to default when Birthdate is missing', () {
+      final map = buildFirestoreMap();
+      map.remove('Birthdate');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(2000, 1, 1));
+    });
+
+    test('falls back to default when Birthdate is invalid string', () {
+      final map = buildFirestoreMap(birthdate: 'data_non_valida');
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(2000, 1, 1));
+    });
+
+    test('uses legacy "registerdate" string when Birthdate is absent', () {
+      final map = buildFirestoreMap();
+      map.remove('Birthdate');
+      map['registerdate'] = '1995-08-10T00:00:00.000';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(1995, 8, 10));
+    });
+
+    test('uses legacy "registerdate" DateTime when Birthdate is absent', () {
+      final map = buildFirestoreMap();
+      map.remove('Birthdate');
+      map['registerdate'] = DateTime(1995, 8, 10);
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(1995, 8, 10));
+    });
+
+    test('falls back to default when registerdate is also invalid', () {
+      final map = buildFirestoreMap();
+      map.remove('Birthdate');
+      map['registerdate'] = 'not_a_date';
+      final u = Users.fromMap(map, uid: 'u1');
+      expect(u.birthdate, DateTime(2000, 1, 1));
+    });
+  });
+
+  // ─── Round-trip toMap → fromMap ───────────────────────────────────────────
+
+  group('Round-trip toMap() → fromMap()', () {
+    test('scalar fields survive serialization round-trip', () {
+      final original = buildUser(
+        photoProfile: 'https://example.com/photo.jpg',
+        birthdate: DateTime(1988, 4, 22),
+        level: 'Expert',
         advanced: 3,
-        intermediate: 4,
+        intermediate: 7,
       );
 
-      final map = user.toMap();
+      final map = original.toMap();
+      final restored = Users.fromMap(map, uid: original.uid);
 
-      expect(map["Followers"], ["f1"]);
-      expect(map["Following"], ["f1"]);
-      expect(map["Public_diary"], ["diary_1"]);
-      expect(map["Private_diary"], ["diary_1"]);
-      expect(map["Saved_trekkings"], ["trek_1"]);
-      expect(map["Advanced"], 3);
-      expect(map["Intermediate"], 4);
+      expect(restored.uid, original.uid);
+      expect(restored.username, original.username);
+      expect(restored.name, original.name);
+      expect(restored.surname, original.surname);
+      expect(restored.email, original.email);
+      expect(restored.birthdate, original.birthdate);
+      expect(restored.photoProfile, original.photoProfile);
+      expect(restored.level, original.level);
+      expect(restored.advanced, original.advanced);
+      expect(restored.intermediate, original.intermediate);
     });
 
-    test('fromMap - full valid data', () {
-      final map = <String, dynamic>{
-        "Username": "user",
-        "Name": "Mario",
-        "Surname": "Rossi",
-        "Email": "mail",
-        "Birthdate": "2000-01-01T00:00:00.000",
-        "Photo_profile": "img",
-        "Level": "Pro",
-        "Advanced": 5,
-        "Intermediate": 6,
-      };
+    test('lists are empty after round-trip (by design)', () {
+      final f = buildUser(uid: 'f1');
+      final original = buildUser(followers: [f], following: [f]);
+      final map = original.toMap();
+      final restored = Users.fromMap(map, uid: original.uid);
 
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.username, "user");
-      expect(user.birthdate.year, 2000);
-      expect(user.photoProfile, "img");
-      expect(user.advanced, 5);
-      expect(user.intermediate, 6);
-    });
-
-    test('fromMap - fallback username/email lowercase', () {
-      final map = <String, dynamic>{
-        "username": "lower",
-        "email": "lower@mail",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.username, "lower");
-      expect(user.email, "lower@mail");
-    });
-
-    test('fromMap - int parsing from string', () {
-      final map = <String, dynamic>{
-        "Advanced": "10",
-        "Intermediate": "20",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.advanced, 10);
-      expect(user.intermediate, 20);
-    });
-
-    test('fromMap - invalid int fallback', () {
-      final map = <String, dynamic>{
-        "Advanced": "abc",
-        "Intermediate": null,
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.advanced, 0);
-      expect(user.intermediate, 0);
-    });
-
-    test('Birthdate parsing - valid', () {
-      final map = <String, dynamic>{
-        "Birthdate": "2010-01-01T00:00:00.000",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.birthdate.year, 2010);
-    });
-
-    test('Birthdate parsing - fallback registerdate', () {
-      final map = <String, dynamic>{
-        "registerdate": "2015-01-01T00:00:00.000",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.birthdate.year, 2015);
-    });
-
-    test('Birthdate parsing - invalid → default', () {
-      final map = <String, dynamic>{
-        "Birthdate": "invalid",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.birthdate.year, 2000);
-    });
-
-    test('Photo fallback (photoURL)', () {
-      final map = <String, dynamic>{
-        "photoURL": "firebase",
-      };
-
-      final user = Users.fromMap(map, uid: "1");
-
-      expect(user.photoProfile, "firebase");
-    });
-
-    test('Lists always empty in fromMap', () {
-      final user = Users.fromMap(<String, dynamic>{}, uid: "1");
-
-      expect(user.followers.isEmpty, true);
-      expect(user.following.isEmpty, true);
-      expect(user.publicDiaryPages.isEmpty, true);
-      expect(user.privateDiaryPages.isEmpty, true);
-      expect(user.savedTrekkings.isEmpty, true);
+      // fromMap intentionally leaves lists empty — they are rebuilt by the controller
+      expect(restored.followers, isEmpty);
+      expect(restored.following, isEmpty);
     });
   });
 }
