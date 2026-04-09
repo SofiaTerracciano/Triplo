@@ -637,6 +637,54 @@ The \texttt{GPS\_DISABLED} state means that the application has permission to ac
 
 For this reason, the page provides two different actions: opening the application settings in the case of denied permission, and opening the location settings in the case of disabled GPS.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Login Sequence Diagram}
+
+The login process supports two authentication mechanisms: email/password and Google sign-in. These are modeled as alternative flows within the same sequence diagram.
+\paragraph{Email and password login}
+When the user presses the login button, the page executes the method \texttt{\_loginEmailPwd(context)}. The method first validates that both email and password are not empty. If one of the two fields is missing, the page shows an error message through a \texttt{SnackBar}.
+
+If the input is valid, the page invokes \texttt{userController.login(email, password)}. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which uses Firebase Authentication to authenticate the user through \texttt{signInWithEmailAndPassword()}.
+
+Firebase Authentication is used exclusively to verify user identity and retrieve a unique user identifier (UID). The method \texttt{signInWithEmailAndPassword()} returns a \texttt{UserCredential} object, which contains the authenticated Firebase user. 
+After authentication, the system invokes \texttt{loadUserCore()}, which retrieves the user document from Firestore:
+
+\begin{itemize}
+\item Username
+\item Email
+\item Profile data
+\item Level and statistics
+\end{itemize}
+
+This method intentionally avoids loading relational or large data such as followers, following, or diaries. This design prevents blocking the UI during login and improves perceived performance.
+
+Instead, additional data is loaded lazily in the UserPage using \texttt{FutureBuilder}, enabling asynchronous and incremental UI updates.
+
+After successful login, the application navigates to the UserPage, whose loading behavior is described in a separate sequence diagram.
+
+\paragraph{Google login}
+When the user presses the Google Sign-In button, the page executes \texttt{\_loginGoogle(context)}. The request is delegated to \texttt{userController.loginWithGoogle()}, which calls the corresponding method in the \texttt{AuthService}.
+
+The Google login flow first forces a sign-out from the previous Google session and then opens the Google account interface. If the user does not select a profile, the flow terminates with an error message shown in the UI.
+
+If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed, and the page navigates to the \texttt{UserPage}.
+
+
+
 \subsection{Watch--Phone Pairing Mechanism}
 
 \subsubsection{Overview}
@@ -644,7 +692,6 @@ For this reason, the page provides two different actions: opening the applicatio
 The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore.
 
 \subsubsection{Device Identity}
-
 Each watch generates (or restores) a persistent \texttt{watchId}, stored securely on-device.  
 A corresponding document exists in:
 
