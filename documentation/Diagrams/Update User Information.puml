@@ -118,6 +118,33 @@ opt Update profile photo
     SettingPage --> User : Show updated profile image
 end
 
+
+
+opt Restore Google profile photo if a Google user has modified the picture
+    User -> SettingPage : Tap restore Google photo
+    SettingPage -> UserController : restoreGoogleProfilePhoto()
+
+    UserController -> AuthService : currentUid
+    AuthService --> UserController : uid
+
+    UserController -> AuthService : currentPhotoUrl
+    AuthService --> UserController : photoUrl
+
+    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Photo_profile": _authService.currentPhotoUrl})
+    FirebaseFirestore --> UserController : completed
+    note right of FirebaseFirestore
+        Firebase Auth stores the photoURL of the Google profile in the user profile after login.
+    end note
+
+
+
+
+
+    UserController -> UserController : _currentUser?.photoProfile = _authService.currentPhotoUrl
+    UserController --> SettingPage : completed
+    SettingPage --> User : Show restored Google photo
+end
+
 opt Update email for password user
     User -> SettingPage : Tap edit email
     SettingPage -> SettingPage : _showChangeEmailDialog()
@@ -136,19 +163,38 @@ opt Update email for password user
 
     AuthService -> FirebaseAuth : user.verifyBeforeUpdateEmail(newEmail)
     FirebaseAuth --> AuthService : verification email sent
-
+alt
     AuthService --> UserController : completed
     UserController --> SettingPage : completed
 
     SettingPage -> SettingPage : setState(_emailChangeRequested = true)
     SettingPage --> User : Show confirmation SnackBar
-end
 
 
-opt Email update error
+
+else Email update error
     AuthService --> UserController : ChangeEmailException(code)
     UserController --> SettingPage : ChangeEmailException(code)
     SettingPage --> User : Show error SnackBar
+end
+end
+opt Password reset request
+    User -> SettingPage : Tap send password reset
+    SettingPage -> UserController : requestPasswordReset()
+    UserController -> AuthService : requestPasswordReset()
+
+    AuthService -> FirebaseAuth : _auth.sendPasswordResetEmail(email: _currentUser!.email)
+    FirebaseAuth --> AuthService : completed
+
+    AuthService --> UserController : completed
+    UserController --> SettingPage : completed
+    SettingPage --> User : Show SnackBar(password reset sent)
+end
+
+
+opt Change language
+    User -> SettingPage : Tap language field
+    ref over SettingPage : Language preference
 end
 
 @enduml
