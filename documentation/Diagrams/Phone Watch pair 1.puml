@@ -1,0 +1,110 @@
+@startuml
+title Phone-side smartwatch pairing
+
+actor User
+
+participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+database FirebaseAuth
+database FirebaseFirestore
+
+User -> SettingPage : open watch pairing scanner
+SettingPage -> SettingPage : build()
+
+note right of SettingPage
+The QR detection callback is handled inside
+the SettingPage component.
+
+The _handled flag prevents duplicated processing
+of the same QR detection.
+end note
+
+User -> SettingPage : scan QR code
+SettingPage -> SettingPage : onDetect(capture)
+
+alt _handled == true
+    SettingPage -> SettingPage : return
+else _handled == false
+    SettingPage -> SettingPage : read capture.barcodes
+    alt no barcode or raw is null/blank
+        SettingPage -> SettingPage : return
+    else raw QR payload available
+        SettingPage -> SettingPage : _handled = true
+        SettingPage -> UserController : extractWatchPair(raw)
+        UserController -> AuthService : extractWatchPair(raw)
+        AuthService -> AuthService : Uri.tryParse(raw.trim())
+        alt invalid triplo URI or missing watchId/token
+            AuthService --> UserController : throw FormatException
+            UserController --> SettingPage : throw FormatException
+            SettingPage -> SettingPage : setState(_error = invalid QR)
+            SettingPage -> SettingPage : _handled = false
+        else valid triplo://watch-pair/<watchId>?t=<token>
+            AuthService --> UserController : (watchId, token)
+            UserController --> SettingPage : (watchId, token)
+
+            SettingPage -> User : show confirmation dialog with watchId
+
+            
+            
+            
+            
+            
+            
+            
+            alt user does not confirm
+                User --> SettingPage : false
+                SettingPage -> SettingPage : _handled = false
+            else user confirms
+                User --> SettingPage : true
+
+                SettingPage -> UserController : approveWatchPair(watchId, token)
+                UserController -> AuthService : approveWatchPair(watchId, token)
+
+                AuthService -> FirebaseAuth : currentUser
+                FirebaseAuth --> AuthService : user
+
+                
+                    AuthService -> FirebaseFirestore : runTransaction()
+                    AuthService -> FirebaseFirestore : tx.get(collection("watch_pair").doc(watchId))
+                    FirebaseFirestore --> AuthService : snap
+
+                    alt snap does not exist
+                        AuthService --> UserController : throw Exception("watch_pair not found")
+                        UserController --> SettingPage : throw Exception
+                        SettingPage -> SettingPage : setState(_error = approval failed)
+                        SettingPage -> SettingPage : _handled = false
+                    else snap exists
+                        AuthService -> AuthService : read status, qrToken, expiresAt from snap.data()
+
+                        alt status != "waiting"
+                            AuthService --> UserController : throw Exception("QR non in waiting")
+                            UserController --> SettingPage : throw Exception
+                            SettingPage -> SettingPage : setState(_error = approval failed)
+                            SettingPage -> SettingPage : _handled = false
+                        else qrToken != token
+                            AuthService --> UserController : throw Exception("Token non valido / QR rigenerato")
+                            UserController --> SettingPage : throw Exception
+                            SettingPage -> SettingPage : setState(_error = approval failed)
+                            SettingPage -> SettingPage : _handled = false
+                        else expiresAt is null or expired
+                            AuthService --> UserController : throw Exception("QR scaduto")
+                            UserController --> SettingPage : throw Exception
+                            SettingPage -> SettingPage : setState(_error = approval failed)
+                            SettingPage -> SettingPage : _handled = false
+                        else pair request valid
+                            AuthService -> FirebaseFirestore : tx.update(ref, {"status":"approved","uid":user.uid})
+                            FirebaseFirestore --> AuthService : transaction committed
+                            AuthService --> UserController : success
+                           
+                            UserController --> SettingPage : success
+                        end
+                    
+                end
+            end
+        
+        end
+    end
+end
+
+@enduml

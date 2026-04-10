@@ -253,6 +253,7 @@ class PairingService extends ChangeNotifier {
     _pairedUid = null;
     _pairingError = null;
     notifyListeners();
+    await restoreWatchPairing();
   }
 
   @override
