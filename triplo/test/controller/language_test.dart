@@ -6,7 +6,6 @@ import 'package:mockito/mockito.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/service/memory.dart';
 import 'language_test.mocks.dart';
-import 'trekking_test.mocks.dart' hide MockMemoryService;
 
 @GenerateMocks([MemoryService])
 
