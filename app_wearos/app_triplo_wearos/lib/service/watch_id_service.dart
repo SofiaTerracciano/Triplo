@@ -10,18 +10,18 @@ class WatchIdService {
   static const _uuid = Uuid();
 
   static Future<String> getOrCreateWatchId() async {
-    // 1) locale
+
     final local = await _storage.read(key: _watchIdKey);
     if (local != null && local.isNotEmpty) {
 
 
       debugPrint("WatchIdService: usando watchId locale=$local");
-      // prova a “ensure” su Firestore senza bloccare startup
+
       unawaited(_ensureWatchDoc(local));
       return local;
     }
 
-    // 2) prova Firestore con timeout
+
     try {
       final watchId = await _createWatchDocOnFirestore()
           .timeout(const Duration(seconds: 4));
@@ -31,7 +31,7 @@ class WatchIdService {
       debugPrint("WatchIdService: Firestore non disponibile ($e). Uso UUID locale.");
       final fallback = _uuid.v4();
       await _storage.write(key: _watchIdKey, value: fallback);
-      // anche qui: prova a creare doc in background (non blocca)
+
       unawaited(_ensureWatchDoc(fallback));
       return fallback;
     }
@@ -56,14 +56,14 @@ class WatchIdService {
 
       final snap = await ref.get();
       if (!snap.exists) {
-        // CREATE: rispetta la tua rule create (3 campi)
+
         await ref.set({
           'platform': 'wearos',
           'createdAt': FieldValue.serverTimestamp(),
           'lastSeenAt': FieldValue.serverTimestamp(),
         });
       } else {
-        // UPDATE: rispetta la tua rule update (solo lastSeenAt)
+
         await ref.update({
           'lastSeenAt': FieldValue.serverTimestamp(),
         });
