@@ -279,12 +279,12 @@ class _PairingGatewayState extends State<PairingGateway> {
   void initState() {
     super.initState();
 
-    // avvio una volta sola, dopo il primo frame
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final pairing = context.read<PairingService>();
       final userCtrl = context.read<UserController>();
 
-      // evita doppio avvio se per qualche motivo initState viene rieseguito (hot reload ecc.)
+
       if (_bootstrapped) return;
       _bootstrapped = true;
 
@@ -298,7 +298,7 @@ class _PairingGatewayState extends State<PairingGateway> {
           await pairing.startWatchPairing(forceNew: true);
         }
       } catch (_) {
-        // opzionale: gestisci/logga se vuoi
+
       }
     });
   }

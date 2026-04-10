@@ -1,0 +1,207 @@
+@startuml
+title Update User Information Sequence Diagram
+
+actor User
+
+participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant Users as "<color:white>User Model</color>" #378641
+collections FirebaseAuth
+database FirebaseFirestore
+database FirebaseStorage
+
+note right of User
+continued
+end note
+
+'User -> SettingPage : Open settings page
+'SettingPage -> SettingPage : initState()
+
+
+'opt Refresh email from authentication provider
+'    SettingPage -> UserController : refreshEmailFromAuth()
+'    UserController -> AuthService : refreshEmailFromAuth()
+
+'    AuthService -> FirebaseAuth : _auth.currentUser
+'    FirebaseAuth --> AuthService : user
+
+'    AuthService -> FirebaseAuth : user.reload()
+'    FirebaseAuth --> AuthService : completed
+
+'    AuthService -> FirebaseAuth : refreshedUser.getIdToken(true)
+'    FirebaseAuth --> AuthService : refreshed token
+
+'    AuthService -> FirebaseFirestore : _db.collection("users").doc(refreshedUser.uid).update({"Email": refreshedEmail})
+'    FirebaseFirestore --> AuthService : completed
+
+'    AuthService -> FirebaseFirestore : _db.collection("users").doc(refreshedUser.uid).get()
+'    FirebaseFirestore --> AuthService : snap
+'    AuthService -> Users : Users()
+'    Users --> AuthService : _currentUser
+
+'    AuthService --> UserController : completed
+'    UserController -> UserController : _currentUser = _authService.currentUser
+'    UserController --> SettingPage : completed
+'end
+
+'opt Update username
+'    User -> SettingPage : Tap edit username
+'    SettingPage -> SettingPage : _editField()
+'    User -> SettingPage : Enter new username
+'    SettingPage -> UserController : updateUsername(username)
+
+'    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Username": username})
+'    FirebaseFirestore --> UserController : completed
+
+'    UserController -> FirebaseFirestore : _db.collection("users_index").doc(uid).update({"username": username, "normalized": username.toLowerCase()})
+'    FirebaseFirestore --> UserController : completed
+
+'    UserController -> UserController : _currentUser?.username = username
+'    UserController --> SettingPage : completed
+'    SettingPage --> User : Show updated username
+'end
+
+'opt Update name
+'    User -> SettingPage : Tap edit name
+'    SettingPage -> SettingPage : _editField()
+'    User -> SettingPage : Enter new name
+'   SettingPage -> UserController : updateName(name)
+
+'    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Name": name})
+'    FirebaseFirestore --> UserController : completed
+'    UserController -> UserController : _currentUser?.name = name
+'    UserController --> SettingPage : completed
+'    SettingPage --> User : Show updated name
+'end
+
+'opt Update surname
+'    User -> SettingPage : Tap edit surname
+'    SettingPage -> SettingPage : _editField()
+'    User -> SettingPage : Enter new surname
+'    SettingPage -> UserController : updateSurname(surname)
+
+'    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Surname": surname})
+'    FirebaseFirestore --> UserController : completed
+'    UserController -> UserController : _currentUser?.surname = surname
+'    UserController --> SettingPage : completed
+'    SettingPage --> User : Show updated surname
+'end
+
+'opt Update birthdate
+'    User -> SettingPage : Tap birthdate field
+'    SettingPage -> SettingPage : _pickBirthdate(initial)
+'    User -> SettingPage : Select date
+'    SettingPage -> UserController : updateBirthdate(picked)
+'
+'    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Birthdate": date.toIso8601String()})
+'    FirebaseFirestore --> UserController : completed
+'    UserController -> UserController : _currentUser?.birthdate = date
+'    UserController --> SettingPage : completed
+'    SettingPage --> User : Show updated birthdate
+'nd
+
+
+
+opt Update profile photo
+    User -> SettingPage : Tap edit profile image
+    SettingPage -> SettingPage : _pickProfileImage()
+    SettingPage --> User : Open image picker
+    User -> SettingPage : Select image
+    SettingPage -> UserController : updateProfilePhoto(File)
+
+    UserController -> FirebaseStorage : ref().child("profile_photos").child(uid).child("$uid.jpg").putFile(image)
+    FirebaseStorage --> UserController : completed
+
+    UserController -> FirebaseStorage : ref.getDownloadURL()
+    FirebaseStorage --> UserController : url
+
+    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Photo_profile": url})
+    FirebaseFirestore --> UserController : completed
+
+    UserController -> UserController : _currentUser?.photoProfile = url
+    UserController --> SettingPage : completed
+    SettingPage --> User : Show updated profile image
+end
+
+
+
+opt Restore Google profile photo if a Google user has modified the picture
+    User -> SettingPage : Tap restore Google photo
+    SettingPage -> UserController : restoreGoogleProfilePhoto()
+
+    UserController -> AuthService : currentUid
+    AuthService --> UserController : uid
+
+    UserController -> AuthService : currentPhotoUrl
+    AuthService --> UserController : photoUrl
+
+    UserController -> FirebaseFirestore : _db.collection("users").doc(uid).update({"Photo_profile": _authService.currentPhotoUrl})
+    FirebaseFirestore --> UserController : completed
+    note right of FirebaseFirestore
+        Firebase Auth stores the photoURL of the 
+        Google profile in the user profile after login.
+    end note
+
+
+
+
+
+    UserController -> UserController : _currentUser?.photoProfile = _authService.currentPhotoUrl
+    UserController --> SettingPage : completed
+    SettingPage --> User : Show restored Google photo
+end
+
+opt Update email for password user
+    User -> SettingPage : Tap edit email
+    SettingPage -> SettingPage : _showChangeEmailDialog()
+    User -> SettingPage : Enter new email and current password
+    SettingPage -> UserController : changeEmail(newEmail, currentPassword)
+    UserController -> AuthService : changeEmail(newEmail, currentPassword)
+
+    AuthService -> FirebaseAuth : _auth.currentUser
+    FirebaseAuth --> AuthService : user
+
+    AuthService -> FirebaseAuth : EmailAuthProvider.credential(email, currentPassword)
+    FirebaseAuth --> AuthService : credential
+
+    AuthService -> FirebaseAuth : user.reauthenticateWithCredential(credential)
+    FirebaseAuth --> AuthService : completed
+
+    AuthService -> FirebaseAuth : user.verifyBeforeUpdateEmail(newEmail)
+    FirebaseAuth --> AuthService : verification email sent
+alt
+    AuthService --> UserController : completed
+    UserController --> SettingPage : completed
+
+    SettingPage -> SettingPage : setState(_emailChangeRequested = true)
+    SettingPage --> User : Show confirmation SnackBar
+
+
+
+else Email update error
+    AuthService --> UserController : ChangeEmailException(code)
+    UserController --> SettingPage : ChangeEmailException(code)
+    SettingPage --> User : Show error SnackBar
+end
+end
+opt Password reset request
+    User -> SettingPage : Tap send password reset
+    SettingPage -> UserController : requestPasswordReset()
+    UserController -> AuthService : requestPasswordReset()
+
+    AuthService -> FirebaseAuth : _auth.sendPasswordResetEmail(email: _currentUser!.email)
+    FirebaseAuth --> AuthService : completed
+
+    AuthService --> UserController : completed
+    UserController --> SettingPage : completed
+    SettingPage --> User : Show SnackBar(password reset sent)
+end
+
+
+opt Change language
+    User -> SettingPage : Tap language field
+    ref over SettingPage : Language preference
+end
+
+@enduml

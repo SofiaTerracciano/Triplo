@@ -1,0 +1,44 @@
+@startuml
+title language Preference Sequence Diagram
+
+actor User
+
+participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+'participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+participant Language as "<color:white>Language Controller</color>" #151b8e
+participant MemoryService as "<color:white>MemoryService</color>" #151b8e
+participant SharedPreferences
+participant OperatingSystem
+User -> SettingPage : Tap language field
+SettingPage -> SettingPage : showDialog()
+
+SettingPage --> User : Show available languages
+User -> SettingPage : Select locale
+
+
+SettingPage -> Language : setLocale(locale)
+
+alt Selected locale is already active
+    Language --> SettingPage : return
+else New locale selected
+    Language -> Language : _locale = locale
+    Language -> Language : notifyListeners()
+    
+    
+    
+    
+    Language -> MemoryService : saveLocaleCode(locale.languageCode)
+    MemoryService -> SharedPreferences : prefs.setString(_kLocaleCodeKey, localeCode)
+    SharedPreferences -> OperatingSystem : save locale 
+    OperatingSystem --> SharedPreferences : completed
+    SharedPreferences --> MemoryService : completed
+    MemoryService --> Language : completed
+    Language --> SettingPage : completed
+
+
+
+end
+
+
+SettingPage --> User : Show updated language
+@enduml

@@ -1,0 +1,87 @@
+@startuml
+title Login Sequence Diagram
+
+actor User
+
+participant LoginPage as "<color:white>LoginPage</color>" #darkgreen
+participant UserPage as "<color:white>UserPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant GoogleAuthInterface
+participant GoogleAuth
+collections FirebaseAuth
+database FirebaseFirestore
+
+
+'AuthService -> GoogleAuth : signIn()
+'GoogleAuth --> GoogleAuthInterface : googleUsers available for login
+
+note right of User
+... continued ...
+end note
+
+
+    alt no google user selected by the user
+        AuthService --> UserController : exception
+        UserController --> LoginPage : exception
+        LoginPage --> User : Show SnackBar(google_login_failed)
+
+    else Google user selected
+        GoogleAuthInterface -> GoogleAuth : selected profile
+        GoogleAuth --> AuthService : accessToken, idToken
+
+        AuthService -> FirebaseAuth : signInWithCredential(credential)
+        FirebaseAuth --> AuthService : UserCredential
+
+        note right of AuthService
+         _ensureUserFirestoreDocs(user)
+         end note
+        AuthService -> AuthService : userRef = _db.collection("users").doc(uid)
+        AuthService -> AuthService : indexRef = _db.collection("users_index").doc(uid)
+        AuthService -> FirebaseFirestore : userRef.get()
+        FirebaseFirestore --> AuthService : snap
+
+        alt snap.exists
+            AuthService -> AuthService : return
+        else Firestore profile does not exist
+            AuthService -> FirebaseFirestore : batch.set(userRef, {user data})
+            AuthService -> FirebaseFirestore : batch.set(indexRef, {uid and username})
+            AuthService -> FirebaseFirestore : batch.commit()
+            FirebaseFirestore --> AuthService : completed
+        end
+
+        note right of AuthService
+         loadUserCore(user.uid)
+         end note
+        AuthService -> FirebaseFirestore : _db.collection("users").doc(uid).get()
+        FirebaseFirestore --> AuthService : snap
+
+        AuthService -> AuthService : _currentUser = new User instance with snap data
+
+        AuthService --> UserController : completed
+        
+        
+        
+        UserController -> AuthService : _authService.currentUser
+        AuthService --> UserController : currentUser
+        UserController -> UserController : _currentUser = _authService.currentUser
+        
+        
+        
+        UserController --> LoginPage : completed
+
+        LoginPage -> UserPage : Navigator.pushReplacement(UserPage)
+
+        ref over UserPage, UserController : Load User Profile
+        UserPage --> User : Show user page
+    
+    
+
+
+
+    
+    
+    
+    end
+'end
+@enduml

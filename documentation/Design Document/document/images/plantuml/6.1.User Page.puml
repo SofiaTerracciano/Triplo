@@ -1,0 +1,80 @@
+@startuml
+title User Page Sequence Diagram
+
+actor User
+
+participant UserPage as "<color:white>UserPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant DiaryController as "<color:white>DiaryController</color>" #151b8e
+participant TrekkingController as "<color:white>TrekkingController</color>" #151b8e
+participant Users as "<color:white>User Model</color>" #378641
+participant Diary as "<color:white>Diary Model</color>" #378641
+participant Trekking as "<color:white>Trekking Model</color>" #378641
+database FirebaseFirestore
+
+alt UserPage opened after login
+    User -> UserPage : Login flow opens UserPage
+else UserPage opened from app navigation
+    User -> UserPage : Open profile page
+end
+
+UserPage -> UserController : userController.currentUser
+UserController --> UserPage : currentUser
+
+UserPage -> UserPage : initState()
+UserPage -> UserPage : Future.microtask(() => loadTrekking())
+
+UserPage -> TrekkingController : loadTrekking()
+TrekkingController -> FirebaseFirestore : _db.collection("trekking").get()
+FirebaseFirestore --> TrekkingController : snap
+loop for each trekking document
+    TrekkingController -> Trekking : Trekking.fromMap(doc.data(), docId: doc.id)
+    Trekking --> TrekkingController : Trekking
+end
+TrekkingController -> TrekkingController : _trekkings = toList()
+TrekkingController --> UserPage : completed
+
+
+note right of UserPage
+Followers, following, diary counters,
+and tab contents are loaded lazily
+through FutureBuilder.
+
+loadTrekking() acts as a preload step:
+it warms up the trekking cache after login,
+so later pages may reuse already loaded data.
+end note
+
+UserPage -> UserController : getFollowers(currentUser.uid)
+UserController -> FirebaseFirestore : _db.collection("users").doc(uid).get()
+FirebaseFirestore --> UserController : snap
+
+loop for each follower id, getUserById method
+    UserController -> FirebaseFirestore : _db.collection("users").doc(id).get()
+    FirebaseFirestore --> UserController : snap
+    UserController -> Users : Users.fromMap(snap.data()!, uid: id)
+    Users --> UserController : User
+end
+
+UserController --> UserPage : List<Users>
+UserPage -> UserPage : length
+UserPage --> User : Show followers count
+
+UserPage -> UserController : getFollowing(currentUser.uid)
+UserController -> FirebaseFirestore : _db.collection("users").doc(uid).get()
+FirebaseFirestore --> UserController : snap
+
+loop for each following id, getUserById method
+    UserController -> FirebaseFirestore : _db.collection("users").doc(id).get()
+    FirebaseFirestore --> UserController : snap
+    UserController -> Users : Users.fromMap(snap.data()!, uid: id)
+    Users --> UserController : User
+end
+
+UserController --> UserPage : List<Users>
+UserPage -> UserPage : length
+UserPage --> User : Show following count
+
+note right of User
+continues
+end note

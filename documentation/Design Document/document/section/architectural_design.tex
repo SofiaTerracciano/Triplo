@@ -421,6 +421,15 @@ The main logic is handled by the method \texttt{\_loadAll()}, which is responsib
     \item retrieves weather alerts.
 \end{itemize}
 The method is invoked:
+
+
+
+
+
+
+
+
+
 \begin{itemize}
     \item once during initialization,
     \item periodically through a timer (every 5 minutes),
@@ -434,17 +443,21 @@ The method \texttt{\_loadAlertState()} is responsible for retrieving the current
 The result determines the state of the notification icon in the UI.
 The method \texttt{weather(lat, lon, lang)} performs an HTTP request to the OpenWeather API. The JSON response is decoded into a \texttt{Map<String, dynamic>} and sent over to the UI.
 The method \texttt{forecast(lat, lon, lang)} retrieves raw forecast data from OpenWeather. Since the response contains multiple time-based entries, a parsing phase is required.
-
-
 This parsing is handled by the following methods in the \texttt{ServiceController}:
+
+
+
+
+
+
+
+
+
+
 \begin{itemize}
     \item \texttt{parseForecastItem(raw)}: converts a single raw JSON entry into a simplified structure (date, temperature, icon, description),
     \item \texttt{parseForecast(rawList)}: applies the transformation to all entries.
 \end{itemize}
-
-
-
-
 
 
 Weather alerts are obtained from two sources:
@@ -702,6 +715,42 @@ For the saved trekking tab, the TrekkingController first retrieves the current u
 This design combines a lightweight preload of trekking data with lazy loading of profile-related collections, keeping the UserPage responsive while still preparing application data that is likely to be useful immediately after login.
 
 
+\label{Login Sequence Diagram 1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/2.1.Login.png}
+\end{figure}
+
+
+
+
+
+
+
+\label{Login Sequence Diagram 2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/2.2.Login.png}
+\end{figure}
+
+
+
+\label{User Page Sequence Diagram 1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/6.1.User Page.png}
+\end{figure}
+
+
+
+
+
+\label{Login Sequence Diagram 2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/2.2.Login.png}
+\end{figure}
+
 
 \subsection{Registration Sequence Diagram}
 
@@ -714,6 +763,12 @@ Finally, the \texttt{RegistrationPage} shows a success message and navigates to 
 It is important to note that, in the current implementation, the registration page only supports the traditional email/password flow. Google-based account creation is not handled by the registration page itself, but is implicitly managed during the first successful Google login through the creation of the Firestore profile documents.
 
 
+
+\label{Registration Sequence Diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/4.Registration.png}
+\end{figure}
 
 
 \subsection{Update User Information Sequence Diagram}
@@ -730,9 +785,20 @@ The profile image update uses the image picker to let the user select a file fro
 
 The email update is more complex because it involves Firebase Authentication. This operation is available only for password-based accounts, since Google profiles are managed by the external auth provider GoogleAuth. The page opens a dedicated dialog where the user enters the new email and the current password. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which first reauthenticates the current user through \texttt{reauthenticateWithCredential()} because, according to Firebase documentation, some security sensitive actions such as setting a new email address require that the user has recently signed in, then invokes \texttt{verifyBeforeUpdateEmail(newEmail)}. Firebase Authentication sends a verification link to the new email address. If the request succeeds, the page records that an email change has been requested and informs the user through a confirmation message. If Firebase returns an error, the exception is shown through a \texttt{SnackBar}.
 
+\label{Update User Information Sequence Diagram 1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/5.1.Update User Information.png}
+\end{figure}
+\label{Update User Information Sequence Diagram 2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/5.2.Update User Information.png}
+\end{figure}
 
 
-\subsection{Change Language Sequence Diagram}
+
+\subsubsection{Change Language Sequence Diagram}
 
 The language change process is handled by the \texttt{Language} controller, and saving the preference on the phone memory is delegated to the \texttt{MemoryService}.
 When the user selects the language field in the SettingPage, the application opens a dialog that displays the list of available locales. Once the user chooses a language, the dialog invokes \texttt{setLocale(locale)} on the Language controller.
@@ -742,7 +808,11 @@ The MemoryService stores the selected language code locally using shared prefere
 
 
 
-
+\label{change language preference sequence diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/language preference.png}
+\end{figure}
 
 
 

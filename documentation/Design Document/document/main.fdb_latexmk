@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1775084081.73168 "main.bcf" "main.bbl" "main" 1775856270.73318 0
+["biber main"] 1775084081.73168 "main.bcf" "main.bbl" "main" 1775863254.31222 0
   "bibliography.bib" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "main.bcf" 1775856270 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
+  "main.bcf" 1775863254 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1775856267.43343 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1775856270.73424 0
+["pdflatex"] 1775863251.09346 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1775863254.31283 0
   "./images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "./images/Triplo_def.png" 1772414897 268677 fbcafbec72f91089e48b32c1a1f9f222 ""
   "C:/Users/giuli/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1771289980 83609 ebbc432e6cbbb238d39535255db2c8bd ""
@@ -350,6 +350,12 @@
   "C:/Users/giuli/AppData/Local/Programs/MiKTeX/tex/latex/xstring/xstring.sty" 1693735632 123 a302f2c651a95033260db60e51527ae8 ""
   "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
   "glossary.tex" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
+  "images/2.1.Login.png" 1775858752 91039 949fab687c0ccca6e5d45857cac0cc6a ""
+  "images/2.2.Login.png" 1775858830 104306 accad9db93949b8eef27ef2fe9cb0540 ""
+  "images/4.Registration.png" 1775861627 80512 490ea4880c99aa34bd79c67bd2b99aed ""
+  "images/5.1.Update User Information.png" 1775861711 184787 30ec862a6eb7ee50c5eff7eed4ca68ce ""
+  "images/5.2.Update User Information.png" 1775861802 188709 87fa95d557eae51c0c30fac4bb59a145 ""
+  "images/6.1.User Page.png" 1775861911 122724 3cf272d4c528a190d47d69bafe510b5b ""
   "images/Add Diary Page_1.png" 1775611048 232182 1ed401bc16d8f75b3cb22aa49586b591 ""
   "images/Add Diary Page_2.png" 1775611048 176852 7f9fb7707772f5f3a5c18c6025d6c52a ""
   "images/Explore trekkings on map.png" 1775611048 147308 4149cd6edeb435fd6b959f5ca8f2d9c6 ""
@@ -365,16 +371,17 @@
   "images/deploymentdiagram.jpg" 1774659434 120502 48238555d2fc8ec3255b6292b3b6b814 ""
   "images/high level component diagram 3.png" 1775834496 50092 cb81d071018c76a51a110bd1aa47ebad ""
   "images/interfacediagramsmartphone2.png" 1775173084 78213 8922193d1d802419a1963a559fcc3419 ""
+  "images/language preference.png" 1775858660 32160 79628443f69b58b391bd099607957f02 ""
   "images/mobile app component diagram 3.png" 1775173084 282595 a8be66468c85fb4c168748500fc77b87 ""
   "images/modelviewcontroller.png" 1774659434 91218 98a47e45cc5252b886a66841de591173 ""
   "images/overview diagram 2.png" 1775173084 1664701 50b8b6a4223be0cf677499de807e8729 ""
-  "main.aux" 1775856270 29547 2e10deaba27d78f33962ca315c56ec5c "pdflatex"
+  "main.aux" 1775863254 30262 1a73d1c009550d5bdb48d3e721443a12 "pdflatex"
   "main.bbl" 1775084179 486 ee04f40f768daeed26442158e95aba61 "biber main"
-  "main.run.xml" 1775856270 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
+  "main.run.xml" 1775863254 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
   "main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
-  "main.toc" 1775856270 6669 adec38bbbe92404d20df980f18737807 "pdflatex"
+  "main.toc" 1775863254 6652 bc6ef57bcfa1ff4ac43c0cae6f0cd37c "pdflatex"
   "preamble.sty" 1771292682 25286 6754b688c001e6e75b4838b421f3b4d9 ""
-  "section/architectural_design.tex" 1775856266 82133 a47ab4d5e73f6bca277aa6efb2d28d36 ""
+  "section/architectural_design.tex" 1775863247 83491 16ef601b5ce8fbb87cb22eb93dfb12a0 ""
   "section/effort_spent.tex" 1771292682 94 08ce874b714f77532f8163eb8296a33b ""
   "section/implementation_integration_testplan.tex" 1771292682 92 0b4e32052489de59e7c4f65a448bb4ad ""
   "section/introduction.tex" 1775854769 4434 9ddc8d81d07a412414078146099367b0 ""
