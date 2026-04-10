@@ -201,8 +201,10 @@ interface WatchOSAPI
 
 
 
-SmartphoneApp -left-( PhoneOSAPI
-PhoneOSAPI -left- SmartphoneOS
+SmartphoneApp --( PhoneOSAPI
+PhoneOSAPI -- SmartphoneOS
 WatchApp -right-( WatchOSAPI
+WatchApp --( WeatherAPI
+WatchApp --( WeatherAlertAPI
 WatchOSAPI -right- WatchOS
 @enduml

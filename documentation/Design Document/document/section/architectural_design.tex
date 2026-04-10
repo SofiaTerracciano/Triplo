@@ -715,6 +715,32 @@ It is important to note that, in the current implementation, the registration pa
 
 
 
+
+\subsection{Update User Information Sequence Diagram}
+
+The update of user information is handled by the \texttt{SettingPage}, which allows the user to modify several profile attributes such as username, name, surname, birthdate, profile image, and email. The page delegates saving user information to the \texttt{UserController}, which is responsible for uploading the local user state to Firestore.
+
+When the page is opened, it executes an initialization step by invoking \texttt{refreshEmailFromAuth()}, in order to check that the email stored in Firestore is aligned with the current value available in Firebase Authentication. Infact, if the user has requested to change its email and has verified the new one by clicking the link in the mail inbox, Firebase Auth may have registered that the user is associated to a new email, so this reference shall be updated also in the Firestore user record.  The \texttt{AuthService} first reloads the authenticated Firebase user, loads the updated email, updates the Firestore user document, and finally rebuilds the local \texttt{User} through the method \texttt{loadUserCore()}.
+
+The update of textual profile fields, such as username, name, and surname, follows a common pattern. The UI opens a dialog through \texttt{\_editField()}, the user enters a new value, and the page delegates the save to Firestore operation to the \texttt{UserController}. The controller then updates the Firestore document and synchronizes the corresponding field inside the local \texttt{\_currentUser} object. The username update also requires an update of the \texttt{users\_index} collection, so that the user remains searchable through the normalized username.
+
+The birthdate update is handled similarly, but the input is collected through \texttt{showDatePicker()} instead of a text dialog. Once the user selects a date, the \texttt{UserController} updates Firestore and updates the local model field.
+
+The profile image update uses the image picker to let the user select a file from the gallery. The \texttt{UserController} uploads the file to Firebase Storage, obtains the public download URL, stores that URL inside the Firestore user document, and updates the local \texttt{\_currentUser.photoProfile} field. In this way, the UI can show the new profile image after the operation completes.
+
+The email update is more complex because it involves Firebase Authentication. This operation is available only for password-based accounts, since Google profiles are managed by the external auth provider GoogleAuth. The page opens a dedicated dialog where the user enters the new email and the current password. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which first reauthenticates the current user through \texttt{reauthenticateWithCredential()} because, according to Firebase documentation, some security sensitive actions such as setting a new email address require that the user has recently signed in, then invokes \texttt{verifyBeforeUpdateEmail(newEmail)}. Firebase Authentication sends a verification link to the new email address. If the request succeeds, the page records that an email change has been requested and informs the user through a confirmation message. If Firebase returns an error, the exception is shown through a \texttt{SnackBar}.
+
+
+
+\subsection{Change Language Sequence Diagram}
+
+The language change process is handled by the \texttt{Language} controller, and saving the preference on the phone memory is delegated to the \texttt{MemoryService}.
+When the user selects the language field in the SettingPage, the application opens a dialog that displays the list of available locales. Once the user chooses a language, the dialog invokes \texttt{setLocale(locale)} on the Language controller.
+The controller first checks if the selected locale is already active. If so, no further action is needed. Otherwise, it updates the internal \texttt{\_locale} field, calls \texttt{notifyListeners()}, and then delegates the saving the preference to the \texttt{MemoryService} through \texttt{saveLocaleCode(locale.languageCode)}.
+The MemoryService stores the selected language code locally using shared preferences. This allows the application to restore the previously selected language when it is reopened, using the method \texttt{loadSavedLocale()}.
+
+
+
 \subsection{Watch--Phone Pairing Mechanism}
 
 \subsubsection{Overview}
@@ -732,7 +758,6 @@ watch/{watchId}
 The \texttt{watchId} uniquely identifies the physical device and is never deleted during logout.
 
 \subsubsection{Pairing Flow}
-
 
 \textbf{1. Initialization (Watch)}  
 The watch generates a random UUID (\texttt{qrToken}) and writes:

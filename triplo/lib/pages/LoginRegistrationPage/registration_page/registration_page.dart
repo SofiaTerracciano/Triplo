@@ -80,7 +80,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$local.registration_failed $e")),
+        SnackBar(content: Text("${local.registration_failed} $e")),
       );
     } finally {
       setState(() => _isLoading = false);
