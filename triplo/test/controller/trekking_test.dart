@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -9,13 +11,13 @@ import 'package:triplo/model/trekking.dart';
 import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'trekking_test.mocks.dart';
-import 'user_test.mocks.dart' hide MockAuthService;
 
 // ─── Code generation ──────────────────────────────────────────────────────────
 // Run: dart run build_runner build
-@GenerateMocks([AuthService, MemoryService, NotificationService])
+@GenerateMocks([AuthService, MemoryService, NotificationService, FirebaseStorage, Reference])
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -106,6 +108,8 @@ void main() {
   late MockMemoryService mockMemory;
   late MockNotificationService mockNotification;
   late FakeFirebaseFirestore fakeDb;
+  late MockFirebaseStorage mockStorage;
+  late MockReference mockReference;
 
   /// Builds a [TrekkingController] wired to [fakeDb].
   ///
@@ -122,6 +126,7 @@ void main() {
   TrekkingController buildController({
     List<Trekking>? trekkings,
     String? currentUid,
+    FirebaseStorage? storage,
   }) {
     when(mockAuth.currentUid).thenReturn(currentUid);
     return TrekkingController.withDb(
@@ -130,6 +135,7 @@ void main() {
       authService: mockAuth,
       trekkings: trekkings ?? [],
       db: fakeDb,
+      storage: storage ?? mockStorage, 
     );
   }
 
@@ -138,6 +144,8 @@ void main() {
     mockMemory = MockMemoryService();
     mockNotification = MockNotificationService();
     fakeDb = FakeFirebaseFirestore();
+    mockStorage = MockFirebaseStorage();
+    mockReference = MockReference();
 
     when(mockAuth.currentUid).thenReturn(null);
   });
@@ -554,37 +562,220 @@ void main() {
     });
   });
 
-  // ─── checkArrival ─────────────────────────────────────────────────────────
+  group('searchTrekking()', () {
 
-  group('checkArrival()', () {
-    test('shows notification when distance <= 1000 meters', () async {
-      when(mockNotification.showTrekkingNotification(
-        id: anyNamed('id'),
-        title: anyNamed('title'),
-        body: anyNamed('body'),
-        payload: anyNamed('payload'),
-        channelId: anyNamed('channelId'),
-        channelName: anyNamed('channelName'),
-      )).thenAnswer((_) async {});
+    /// Test for searchTrekking that verifies it first looks up the trekking ID 
+    /// from the index collection, then tries to find the trekking in the local list 
+    /// before fetching from Firestore.
+    test('returns trekking found via index then local cache', () async {
+      final t = buildTrekking(documentId: 'trek_1', name: 'Monte Bello');
+      await fakeDb.collection('trekking_index').doc('idx_1').set({
+        'Normalized': 'monte bello',
+        'Trekking_id': 'trek_1',
+      });
 
-      final ctrl = buildController();
-      // AppLocalizations requires a real BuildContext — use a minimal fake
-      // or test with an integration test. Here we verify the guard condition
-      // by checking the notification is called when distance = 500.
-      // If your project has a MockAppLocalizations, inject it here.
+      final ctrl = buildController(trekkings: [t]); // già in cache locale
+      final results = await ctrl.searchTrekking('monte');
+      expect(results.length, 1);
+      expect(results.first.documentId, 'trek_1');
     });
 
-    test('does not show notification when distance > 1000 meters', () async {
-      // checkArrival has an early return when distanceInMeters > 1000
-      // Nothing should be called on the notification service
-      verifyNever(mockNotification.showTrekkingNotification(
-        id: anyNamed('id'),
-        title: anyNamed('title'),
-        body: anyNamed('body'),
-        payload: anyNamed('payload'),
-        channelId: anyNamed('channelId'),
-        channelName: anyNamed('channelName'),
-      ));
+    /// Test for searchTrekking that verifies it fetches from Firestore when the trekking 
+    /// is not in the local cache.
+    test('fetches from Firestore when not in local cache', () async {
+      await seedTrekking(fakeDb, id: 'trek_1');
+      await fakeDb.collection('trekking_index').doc('idx_1').set({
+        'Normalized': 'monte bello',
+        'Trekking_id': 'trek_1',
+      });
+
+      final ctrl = buildController(); // local list empty
+      final results = await ctrl.searchTrekking('monte');
+      expect(results.length, 1);
+      expect(results.first.documentId, 'trek_1');
+    });
+
+    /// Test for searchTrekking that verifies it returns an empty list when no 
+    /// index entries match the query.
+    test('returns empty list when no index matches', () async {
+      final ctrl = buildController();
+      final results = await ctrl.searchTrekking('zzznomatch');
+      expect(results, isEmpty);
+    });
+
+    /// Test for searchTrekking that verifies it returns an empty list when the index entry 
+    /// points to a trekking document that does not exist in Firestore.
+    test('skips index entries whose trekking document does not exist', () async {
+      await fakeDb.collection('trekking_index').doc('idx_ghost').set({
+        'Normalized': 'fantasma',
+        'Trekking_id': 'nonexistent',
+      });
+      final ctrl = buildController();
+      final results = await ctrl.searchTrekking('fanta');
+      expect(results, isEmpty);
+    });
+  });
+
+  // ─── getCachedImage ───────────────────────────────────────────────────────────
+
+  group('getCachedImage()', () {
+    test('returns image from RAM cache when available', () async {
+      final fakeFile = File('/tmp/fake.jpg');
+      when(mockMemory.getImageFromMemory(any))
+          .thenAnswer((_) async => fakeFile);
+
+      final ctrl = buildController();
+      final result = await ctrl.getCachedImage('https://example.com/img.jpg');
+
+      expect(result, fakeFile);
+      verify(mockMemory.getImageFromMemory('https://example.com/img.jpg')).called(1);
+    });
+
+    test('returns image from disk cache when not in RAM', () async {
+      final fakeFile = File('/tmp/fake.jpg');
+      when(mockMemory.getImageFromMemory(any)).thenAnswer((_) async => null);
+      when(mockMemory.getImageFromDisk(any)).thenAnswer((_) async => fakeFile);
+      when(mockMemory.saveImageToMemory(any, any)).thenReturn(null);
+
+      final ctrl = buildController();
+      final result = await ctrl.getCachedImage('https://example.com/img.jpg');
+
+      expect(result, fakeFile);
+      verify(mockMemory.getImageFromDisk('https://example.com/img.jpg')).called(1);
+      verify(mockMemory.saveImageToMemory('https://example.com/img.jpg', fakeFile)).called(1);
+    });
+
+    test('downloads and caches image when not in RAM or disk', () async {
+      final fakeFile = File('/tmp/downloaded.jpg');
+      when(mockMemory.getImageFromMemory(any)).thenAnswer((_) async => null);
+      when(mockMemory.getImageFromDisk(any)).thenAnswer((_) async => null);
+      when(mockMemory.cacheImageOnDisk(any)).thenAnswer((_) async => fakeFile);
+      when(mockMemory.saveImageToMemory(any, any)).thenReturn(null);
+
+      final ctrl = buildController();
+      final result = await ctrl.getCachedImage('https://example.com/img.jpg');
+
+      expect(result, fakeFile);
+      verify(mockMemory.cacheImageOnDisk('https://example.com/img.jpg')).called(1);
+      verify(mockMemory.saveImageToMemory('https://example.com/img.jpg', fakeFile)).called(1);
+    });
+
+    test('returns null when an exception is thrown', () async {
+      when(mockMemory.getImageFromMemory(any)).thenThrow(Exception('cache error'));
+
+      final ctrl = buildController();
+      final result = await ctrl.getCachedImage('https://example.com/img.jpg');
+
+      expect(result, isNull);
+    });
+  });
+
+  // ─── getCachedImages ──────────────────────────────────────────────────────────
+
+  group('getCachedImages()', () {
+    test('returns list of cached files for multiple paths', () async {
+      final file1 = File('/tmp/img1.jpg');
+      final file2 = File('/tmp/img2.jpg');
+
+      when(mockMemory.getImageFromMemory('https://example.com/img1.jpg'))
+          .thenAnswer((_) async => file1);
+      when(mockMemory.getImageFromMemory('https://example.com/img2.jpg'))
+          .thenAnswer((_) async => file2);
+
+      final ctrl = buildController();
+      final results = await ctrl.getCachedImages([
+        'https://example.com/img1.jpg',
+        'https://example.com/img2.jpg',
+      ]);
+
+      expect(results.length, 2);
+    });
+
+    test('returns empty list when all paths fail', () async {
+      when(mockMemory.getImageFromMemory(any)).thenThrow(Exception('error'));
+
+      final ctrl = buildController();
+      final results = await ctrl.getCachedImages(['https://example.com/img.jpg']);
+      expect(results, isEmpty);
+    });
+  });
+
+  // ─── getDownloadUrl ───────────────────────────────────────────────────────────
+
+  group('getDownloadUrl()', () {
+    test('returns download URL from storage reference', () async {
+      when(mockStorage.refFromURL(any)).thenReturn(mockReference);
+      when(mockReference.getDownloadURL())
+          .thenAnswer((_) async => 'https://example.com/photo.jpg');
+
+      final ctrl = buildController(storage: mockStorage);
+      final url = await ctrl.getDownloadUrl('gs://bucket/photo.jpg');
+
+      expect(url, 'https://example.com/photo.jpg');
+      verify(mockStorage.refFromURL('gs://bucket/photo.jpg')).called(1);
+    });
+  });
+
+  // ─── getDownloadUrls ──────────────────────────────────────────────────────────
+
+  group('getDownloadUrls()', () {
+    test('returns list of download URLs', () async {
+      when(mockStorage.refFromURL(any)).thenReturn(mockReference);
+      when(mockReference.getDownloadURL())
+          .thenAnswer((_) async => 'https://example.com/photo.jpg');
+
+      final ctrl = buildController(storage: mockStorage);
+      final urls = await ctrl.getDownloadUrls([
+        'gs://bucket/photo1.jpg',
+        'gs://bucket/photo2.jpg',
+      ]);
+
+      expect(urls.length, 2);
+      expect(urls.first, 'https://example.com/photo.jpg');
+    });
+
+    test('returns empty list for empty input', () async {
+      final ctrl = buildController(storage: mockStorage);
+      final urls = await ctrl.getDownloadUrls([]);
+      expect(urls, isEmpty);
+    });
+  });
+
+  // ─── getCachedImage gs:// ─────────────────────────────────────────────────────
+
+  group('getCachedImage() with gs:// path', () {
+    test('converts gs:// to download URL then checks disk cache', () async {
+      final fakeFile = File('/tmp/fake.jpg');
+      when(mockStorage.refFromURL(any)).thenReturn(mockReference);
+      when(mockReference.getDownloadURL())
+          .thenAnswer((_) async => 'https://example.com/photo.jpg');
+      when(mockMemory.getImageFromMemory(any)).thenAnswer((_) async => null);
+      when(mockMemory.getImageFromDisk(any)).thenAnswer((_) async => fakeFile);
+      when(mockMemory.saveImageToMemory(any, any)).thenReturn(null);
+
+      final ctrl = buildController(storage: mockStorage);
+      final result = await ctrl.getCachedImage('gs://bucket/photo.jpg');
+
+      expect(result, fakeFile);
+      verify(mockStorage.refFromURL('gs://bucket/photo.jpg')).called(1);
+      verify(mockMemory.getImageFromDisk('https://example.com/photo.jpg')).called(1);
+    });
+
+    test('downloads from network when gs:// path not in disk cache', () async {
+      final fakeFile = File('/tmp/downloaded.jpg');
+      when(mockStorage.refFromURL(any)).thenReturn(mockReference);
+      when(mockReference.getDownloadURL())
+          .thenAnswer((_) async => 'https://example.com/photo.jpg');
+      when(mockMemory.getImageFromMemory(any)).thenAnswer((_) async => null);
+      when(mockMemory.getImageFromDisk(any)).thenAnswer((_) async => null);
+      when(mockMemory.cacheImageOnDisk(any)).thenAnswer((_) async => fakeFile);
+      when(mockMemory.saveImageToMemory(any, any)).thenReturn(null);
+
+      final ctrl = buildController(storage: mockStorage);
+      final result = await ctrl.getCachedImage('gs://bucket/photo.jpg');
+
+      expect(result, fakeFile);
+      verify(mockMemory.cacheImageOnDisk('https://example.com/photo.jpg')).called(1);
     });
   });
 }

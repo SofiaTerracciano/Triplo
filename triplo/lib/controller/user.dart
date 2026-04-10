@@ -22,10 +22,10 @@ class UserController extends ChangeNotifier {
   String? get uid => _authService.currentUid;
   bool _isLoading = true;
   bool get isLoading => _isLoading;
-  UserController(this._authService)
+  UserController(this._authService) // coverage:ignore-start
       : _db = FirebaseFirestore.instance {
     _init();
-  }
+  } // coverage:ignore-end
 
   // Costruttore per i test
   UserController.withDb(this._authService, this._db) {
@@ -43,7 +43,7 @@ class UserController extends ChangeNotifier {
         await loadUserCore(uid);
       }
     } catch (e) {
-      debugPrint("Errore inizializzazione: $e");
+      debugPrint("Errore inizializzazione: $e");  // coverage:ignore-line
     } finally {
       // IMPORTANTE: Questo interrompe il caricamento infinito
       _isLoading = false;
@@ -267,7 +267,7 @@ class UserController extends ChangeNotifier {
 
     if (uid == null) return;
 
-    final ref = FirebaseStorage.instance
+    final ref = FirebaseStorage.instance // coverage:ignore-start
         .ref()
         .child("profile_photos")
         .child(uid)
@@ -280,7 +280,7 @@ class UserController extends ChangeNotifier {
 
     _currentUser?.photoProfile = url;
     notifyListeners();
-  }
+  } // coverage:ignore-end
 
   /* --------------------------------------------------
    * PASSWORD

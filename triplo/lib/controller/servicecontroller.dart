@@ -28,8 +28,10 @@ class ServiceController {
   /// Service for managing system permissions.
   late PermissionService permission;
 
+  final http.Client client;
+
   // Constructor to load API keys from .env
-  ServiceController({required this.memory, required this.geo, required this.permission}) {
+  ServiceController({required this.memory, required this.geo, required this.permission}) : client = http.Client(){ // coverage:ignore-start
 
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
@@ -40,6 +42,17 @@ class ServiceController {
     if (weatherbitKey.isEmpty) {
       debugPrint("WARNING: WEATHERBIT_API_KEY missing");
     }
+  } // coverage:ignore-end
+
+  // Constructor for testing 
+  ServiceController.test({
+    required this.memory,
+    required this.geo,
+    required this.permission,
+    required this.client,
+  }) {
+    openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
+    weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
   }
 
   /// Builds an OpenWeather tile URL for FlutterMap layers (e.g., precipitation, wind).
@@ -76,17 +89,17 @@ class ServiceController {
         "&appid=$openWeatherKey&units=metric&lang=$lang";
 
     try {
-      final res = await http
+      final res = await client
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 6));
 
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
       }
-      debugPrint("Weather error: HTTP ${res.statusCode}");
+      debugPrint("Weather error: HTTP ${res.statusCode}"); // coverage:ignore-line
       return null;
     } catch (e) {
-      debugPrint("Weather request failed: $e");
+      debugPrint("Weather request failed: $e"); // coverage:ignore-line
       return null;
     }
   }
@@ -102,7 +115,7 @@ class ServiceController {
         "&appid=$openWeatherKey&units=metric&lang=$lang";
 
     try {
-      final res = await http
+      final res = await client
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 6));
 
@@ -116,19 +129,29 @@ class ServiceController {
         ];
       }
 
-      debugPrint("Forecast error: HTTP ${res.statusCode}");
+      debugPrint("Forecast error: HTTP ${res.statusCode}"); // coverage:ignore-line
       return null;
     } catch (e) {
-      debugPrint("Forecast request failed: $e");
+      debugPrint("Forecast request failed: $e"); // coverage:ignore-line
       return null;
     }
   }
 
   /// Performs a low-level check for internet connectivity by looking up google.com.
-  Future<bool> hasInternet() async {
+  /*Future<bool> hasInternet() async {
     try {
       final result = await InternetAddress.lookup('google.com')
           .timeout(const Duration(seconds: 3));
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }*/
+  Future<bool> hasInternet([Future<List<InternetAddress>> Function(String)? lookup]) async {
+    try {
+      final result = await (lookup ?? InternetAddress.lookup)('google.com')
+          .timeout(const Duration(seconds: 3));
+
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } catch (_) {
       return false;
@@ -172,7 +195,7 @@ class ServiceController {
   /// Fetches mock weather alerts from a demo server for testing purposes.
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
-      final res = await http.get(
+      final res = await client.get(
         Uri.parse("https://meteodemoserver.onrender.com/alerts"),
       );
 
@@ -190,7 +213,7 @@ class ServiceController {
 
       return [];
     } catch (e) {
-      debugPrint("Mock alerts error $e");
+      debugPrint("Mock alerts error $e"); // coverage:ignore-line
       return [];
     }
   }
@@ -209,17 +232,22 @@ class ServiceController {
         "?lat=$lat&lon=$lon&key=$weatherbitKey";
 
     try {
-      final res = await http.get(Uri.parse(url));
+      final res = await client.get(Uri.parse(url));
 
       if (res.statusCode != 200) {
-        debugPrint("Weatherbit alerts error ${res.statusCode}");
+        debugPrint("Weatherbit alerts error ${res.statusCode}"); // coverage:ignore-line
         return [];
       }
 
       final data = jsonDecode(res.body);
-      final List alerts = data["alerts"] ?? [];
 
-      return alerts.map<Map<String, dynamic>>((a) {
+      final alertsRaw = data["alerts"];
+
+      if (alertsRaw is! List) return [];
+
+      return alertsRaw.map<Map<String, dynamic>>((a) {
+        if (a is! Map<String, dynamic>) return {};
+
         return {
           "event": a["title"] ?? "Weather Alert",
           "severity": (a["severity"] ?? "Unknown").toString(),
@@ -229,13 +257,14 @@ class ServiceController {
           "end": a["expires_local"],
           "source": "weatherbit",
         };
-      }).toList();
+      }).where((e) => e.isNotEmpty).toList();
 
     } catch (e) {
-      debugPrint("Weatherbit alerts exception $e");
+      debugPrint("Weatherbit alerts exception $e"); // coverage:ignore-line
       return [];
     }
   }
+
   Future<NavigationLocationState> loadNavigationLocation() async {
     final granted = await permission.isLocationGranted();
 

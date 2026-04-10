@@ -84,24 +84,6 @@ class MockDiaryController extends _i1.Mock implements _i6.DiaryController {
           as bool);
 
   @override
-  _i8.Future<void> loadPublicDiary(String? userId) =>
-      (super.noSuchMethod(
-            Invocation.method(#loadPublicDiary, [userId]),
-            returnValue: _i8.Future<void>.value(),
-            returnValueForMissingStub: _i8.Future<void>.value(),
-          )
-          as _i8.Future<void>);
-
-  @override
-  _i8.Future<void> loadPrivateDiary(String? userId) =>
-      (super.noSuchMethod(
-            Invocation.method(#loadPrivateDiary, [userId]),
-            returnValue: _i8.Future<void>.value(),
-            returnValueForMissingStub: _i8.Future<void>.value(),
-          )
-          as _i8.Future<void>);
-
-  @override
   _i2.Diary updateDiary(
     _i2.Diary? page,
     bool? isPublic,

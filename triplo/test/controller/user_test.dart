@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -729,6 +731,75 @@ void main() {
 
       verify(mockAuth.refreshEmailFromAuth()).called(1);
       expect(ctrl.currentUser, isNotNull);
+    });
+  });
+
+  // ─── searchUsers ──────────────────────────────────────────────────────────────
+
+  group('searchUsers()', () {
+    test('returns matching users from users_index', () async {
+      // Semina un documento nell'indice di ricerca
+      await fakeDb.collection('users_index').doc('uid_1').set({
+        'uid': 'uid_1',
+        'username': 'mario_rossi',
+        'normalized': 'mario_rossi',
+      });
+      await seedUser(fakeDb, uid: 'uid_1');
+
+      final ctrl = await buildController();
+      final results = await ctrl.searchUsers('mario');
+
+      expect(results, isNotEmpty);
+      expect(results.first.uid, 'uid_1');
+    });
+
+    test('returns empty list when no match in users_index', () async {
+      final ctrl = await buildController();
+      final results = await ctrl.searchUsers('zzznomatch');
+      expect(results, isEmpty);
+    });
+
+    test('skips index entries whose user document does not exist', () async {
+      // Indice punta a un uid che non esiste nella collection users
+      await fakeDb.collection('users_index').doc('ghost').set({
+        'uid': 'uid_ghost',
+        'username': 'ghost',
+        'normalized': 'ghost',
+      });
+
+      final ctrl = await buildController();
+      final results = await ctrl.searchUsers('ghost');
+      expect(results, isEmpty);
+    });
+  });
+
+  // ─── approveWatchPair ─────────────────────────────────────────────────────────
+
+  group('approveWatchPair()', () {
+    test('delegates to authService with correct parameters', () async {
+      when(mockAuth.approveWatchPair(
+        watchId: anyNamed('watchId'),
+        token: anyNamed('token'),
+      )).thenAnswer((_) async {});
+
+      final ctrl = await buildController();
+      await ctrl.approveWatchPair(watchId: 'watch_42', token: 'tok_xyz');
+
+      verify(mockAuth.approveWatchPair(
+        watchId: 'watch_42',
+        token: 'tok_xyz',
+      )).called(1);
+    });
+  });
+
+  // ─── updateProfilePhoto (guard path) ─────────────────────────────────────────
+
+  group('updateProfilePhoto()', () {
+    test('does nothing when uid is null', () async {
+      when(mockAuth.currentUid).thenReturn(null);
+      final ctrl = await buildController();
+      // Non lancia nonostante uid sia null — copre il guard iniziale
+      await ctrl.updateProfilePhoto(File('/tmp/fake.jpg'));
     });
   });
 }

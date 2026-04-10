@@ -13,7 +13,9 @@ import '../service/memory.dart';
 /// It handles fetching challenges from Firestore, managing image caching
 /// for challenge badges/icons, and triggering challenge-related notifications.
 class ChallengesController extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
+  final FirebaseStorage storage;
 
   List<Challenges> _challenges;
   bool _loaded = false;
@@ -24,8 +26,24 @@ class ChallengesController extends ChangeNotifier {
   /// Service used for multi-level image caching (RAM and Disk).
   MemoryService memory;
 
-  ChallengesController({required this.notification, required this.memory})
-    : _challenges = [];
+  ChallengesController({ // coverage:ignore-start
+    required this.notification,
+    required this.memory,
+  })
+    : _challenges = [],
+      _db = FirebaseFirestore.instance,
+      storage = FirebaseStorage.instance; // coverage:ignore-end
+
+  // Constructor for testing
+  ChallengesController.test({
+    required this.notification,
+    required this.memory,
+    required FirebaseFirestore db,
+    required FirebaseStorage storage,
+  })
+    : _challenges = [],
+      _db = db,
+      storage = storage;
 
   /// Returns the local list of all loaded challenge instances.
   List<Challenges> get allChallenges => _challenges;
@@ -63,7 +81,7 @@ class ChallengesController extends ChangeNotifier {
 
   /// Fetches the public download URL for a challenge image given its Firebase Storage path.
   Future<String> getDownloadUrl(String path) async {
-    Reference ref = FirebaseStorage.instance.refFromURL(path);
+    Reference ref = storage.refFromURL(path);
     return await ref.getDownloadURL();
   }
 
@@ -72,13 +90,13 @@ class ChallengesController extends ChangeNotifier {
   /// 2. If missing, checks the local device disk.
   /// 3. If still missing, downloads the image from Firebase Storage and updates both caches.
   Future<File?> getCachedImage(String imagePath) async {
-    debugPrint("getCachedImage challenge -> $imagePath");
+    debugPrint("getCachedImage challenge -> $imagePath"); // coverage:ignore-line
 
     try {
       // Attempt to retrieve from RAM
       final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
-        debugPrint("Challenge image found in RAM cache");
+        debugPrint("Challenge image found in RAM cache"); // coverage:ignore-line
         return inMemory;
       }
 
@@ -86,25 +104,25 @@ class ChallengesController extends ChangeNotifier {
 
       // Convert gs:// protocol to a downloadable HTTPS URL if necessary
       if (imagePath.startsWith("gs://")) {
-        final ref = FirebaseStorage.instance.refFromURL(imagePath);
+        final ref = storage.refFromURL(imagePath);
         cacheableUrl = await ref.getDownloadURL();
       }
 
       // Attempt to retrieve from local disk storage
       final cached = await memory.getImageFromDisk(cacheableUrl);
       if (cached != null) {
-        debugPrint("Challenge image found in disk cache");
+        debugPrint("Challenge image found in disk cache"); // coverage:ignore-line
         memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
       // Download from network and persist in local caches
-      debugPrint("Challenge image not in cache, downloading");
+      debugPrint("Challenge image not in cache, downloading"); // coverage:ignore-line
       final file = await memory.cacheImageOnDisk(cacheableUrl);
       memory.saveImageToMemory(imagePath, file);
       return file;
     } catch (e) {
-      debugPrint("getCachedImage challenge error: $e");
+      debugPrint("getCachedImage challenge error: $e"); // coverage:ignore-line
       return null;
     }
   }

@@ -14,7 +14,14 @@ import '../service/authservice.dart';
 class DiaryController extends ChangeNotifier {
   final AuthService _authService;
   String? get uid => _authService.currentUid;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  final FirebaseFirestore _db;
+
+  DiaryController(
+    this._authService, {FirebaseFirestore? firestore}
+  ): _db = firestore ?? FirebaseFirestore.instance;
+
 
 
 
@@ -28,8 +35,6 @@ class DiaryController extends ChangeNotifier {
   set currentUser(Users user) {
     _currentUser = user;
   }
-
-  DiaryController(this._authService);
 
   /// Returns the local list of all currently loaded diary entries.
   List<Diary> get allDiaries => _diaries;

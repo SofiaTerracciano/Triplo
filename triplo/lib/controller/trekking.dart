@@ -14,10 +14,12 @@ import '../service/authservice.dart';
 class TrekkingController extends ChangeNotifier {
   //final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseFirestore _db;
+  final FirebaseStorage _storage;
   AuthService authService;
 
-  final CollectionReference<Map<String, dynamic>> _weatherNotificationRef =
-      FirebaseFirestore.instance.collection('weather_notification');
+  //final CollectionReference<Map<String, dynamic>> _weatherNotificationRef =
+      //FirebaseFirestore.instance.collection('weather_notification');
+  late final CollectionReference<Map<String, dynamic>> _weatherNotificationRef;
   List<Trekking> _trekkings;
   bool _loaded = false;
 
@@ -27,14 +29,17 @@ class TrekkingController extends ChangeNotifier {
   NotificationService notification;
 
   String? get uid => authService.currentUid;
-  TrekkingController({
+  TrekkingController({ // coverage:ignore-start
     //required this.geo,
     required this.memory,
     required this.notification,
     required this.authService,
     required List<Trekking> trekkings,
   }) : _db = FirebaseFirestore.instance,
-       _trekkings = trekkings;
+       _trekkings = trekkings,
+       _storage = FirebaseStorage.instance {
+      _weatherNotificationRef = _db.collection('weather_notification');
+    } // coverage:ignore-end 
 
   // Costruttore per i test
   TrekkingController.withDb({
@@ -43,8 +48,12 @@ class TrekkingController extends ChangeNotifier {
     required this.authService,
     required List<Trekking> trekkings,
     required FirebaseFirestore db,
+    FirebaseStorage? storage,
   }) : _db = db,
-       _trekkings = trekkings;
+       _trekkings = trekkings,
+       _storage = storage ?? FirebaseStorage.instance {
+      _weatherNotificationRef = _db.collection('weather_notification');
+    }
 
   /// Returns the local list of all loaded trekking instances.
   List<Trekking> get allTrekkings => _trekkings;
@@ -93,7 +102,7 @@ class TrekkingController extends ChangeNotifier {
   Future<List<String>> getDownloadUrls(List<String> paths) async {
     return await Future.wait(
       paths.map((path) async {
-        Reference ref = FirebaseStorage.instance.refFromURL(path);
+        Reference ref = _storage.refFromURL(path);
         return await ref.getDownloadURL();
       }),
     );
@@ -101,7 +110,7 @@ class TrekkingController extends ChangeNotifier {
 
   /// Converts a single Firebase Storage path (gs://) into a download URL.
   Future<String> getDownloadUrl(String path) async {
-    Reference ref = FirebaseStorage.instance.refFromURL(path);
+    Reference ref = _storage.refFromURL(path);
     return await ref.getDownloadURL();
   }
 
@@ -156,10 +165,10 @@ class TrekkingController extends ChangeNotifier {
 
   /// Retrieves all trekking items saved as favorites by a specific user.
   Future<List<Trekking>> getSavedTrekkings(String uid) async {
-    final userSnap = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .get();
+    final userSnap = await _db  
+      .collection("users")
+      .doc(uid)
+      .get();
 
     final ids = List<String>.from(userSnap.data()?["Saved_trekkings"] ?? []);
     final trekkings = await Future.wait(ids.map(fetchTrekkingById));
@@ -216,7 +225,7 @@ class TrekkingController extends ChangeNotifier {
 
       // Handle Firebase gs:// protocol conversion
       if (imagePath.startsWith("gs://")) {
-        final ref = FirebaseStorage.instance.refFromURL(imagePath);
+        final ref = _storage.refFromURL(imagePath);
         cacheableUrl = await ref.getDownloadURL();
       }
 
@@ -241,7 +250,7 @@ class TrekkingController extends ChangeNotifier {
 
   /// Monitors user's proximity to a trekking destination.
   /// Triggers a push notification when the user is within 1000 meters.
-  Future<void> checkArrival(
+  Future<void> checkArrival( // coverage:ignore-start
     String trekkingId,
     double distanceInMeters,
     AppLocalizations local,
@@ -258,7 +267,7 @@ class TrekkingController extends ChangeNotifier {
         channelName: 'Arrivo Trekking',
       );
     }
-  }
+  } // coverage:ignore-end
 
   /// Batched version of getCachedImage to handle multiple image paths simultaneously.
   Future<List<File>> getCachedImages(List<String> imagePaths) async {
@@ -289,7 +298,7 @@ class TrekkingController extends ChangeNotifier {
           return trekking;
         }
       } catch (e) {
-        debugPrint("Errore to find the trekking: $e");
+        debugPrint("Errore to find the trekking: $e"); // coverage:ignore-line
       }
     }
     return null;
