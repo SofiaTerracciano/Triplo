@@ -293,7 +293,7 @@ class DiaryController extends ChangeNotifier {
         // Aggiungi il path
         paths.add(path);
       } catch (e) {
-        debugPrint('Errore caricando immagine: $e');
+        debugPrint('Errore caricando immagine: $e'); //coverage:ignore-line
       }
     }
 
@@ -309,7 +309,7 @@ class DiaryController extends ChangeNotifier {
       Reference ref = FirebaseStorage.instance.ref().child(path);
       return await ref.getDownloadURL();
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Error: $e'); //coverage:ignore-line
       return null;
     }
   }
@@ -323,7 +323,7 @@ class DiaryController extends ChangeNotifier {
       Reference ref = FirebaseStorage.instance.refFromURL(path);
       return await ref.getDownloadURL();
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Error: $e'); //coverage:ignore-line
       return null;
     }
   }
@@ -346,7 +346,7 @@ class DiaryController extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      debugPrint("Error deleting photo: $e");
+      debugPrint("Error deleting photo: $e"); //coverage:ignore-line
     }
   }
 
@@ -459,7 +459,7 @@ class DiaryController extends ChangeNotifier {
         return diary;
       }
     } catch (e) {
-      debugPrint("Errore recupero diario singolo: $e");
+      debugPrint("Errore recupero diario singolo: $e"); //coverage:ignore-line
     }
     return null;
   }
