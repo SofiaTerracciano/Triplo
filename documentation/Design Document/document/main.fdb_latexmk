@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 0 "main.bcf" "main.bbl" "main" 1775939007.20261 -1
+["biber main"] 1775940432.31535 "main.bcf" "main.bbl" "main" 1775942754.46474 0
   "bibliography.bib" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "main.bcf" 1775939006 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
+  "main.bcf" 1775942754 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1775939003.90624 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1775939007.20319 0
+["pdflatex"] 1775942751.16115 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1775942754.46542 0
   "./images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "./images/Triplo_def.png" 1772414897 268677 fbcafbec72f91089e48b32c1a1f9f222 ""
   "C:/Users/giuli/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1771289980 83609 ebbc432e6cbbb238d39535255db2c8bd ""
@@ -356,11 +356,15 @@
   "images/5.1.Update User Information.png" 1775868403 184787 30ec862a6eb7ee50c5eff7eed4ca68ce ""
   "images/5.2.Update User Information.png" 1775868403 186259 41411dfc579dfdc6f67658ce4effba71 ""
   "images/6.1.User Page.png" 1775868403 122724 3cf272d4c528a190d47d69bafe510b5b ""
+  "images/7.View compass and Altitude Information.png" 1775868403 80064 b74f4b78a4436a467cd1722bb58326ec ""
   "images/Add Diary Page_1.png" 1775611048 232182 1ed401bc16d8f75b3cb22aa49586b591 ""
   "images/Add Diary Page_2.png" 1775611048 176852 7f9fb7707772f5f3a5c18c6025d6c52a ""
   "images/Explore trekkings on map.png" 1775611048 147308 4149cd6edeb435fd6b959f5ca8f2d9c6 ""
   "images/Image caching.png" 1775611048 115609 c214ccd63aa74459176565d1c771ed25 ""
   "images/Overview.png" 1775173084 1618330 90df30103678dcbaabaa37f98da8e964 ""
+  "images/Phone Watch pair 1.png" 1775868403 167940 9eaba75bcdb434fc7d74b0db8aa3181b ""
+  "images/Phone Watch pair 2.png" 1775868403 96809 bcb11c59ced6ba4f212571f00aad1741 ""
+  "images/Phone Watch pair 3.png" 1775939738 258473 daf06cdc170889e4685211e0fab913cf ""
   "images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "images/Search Users.png" 1775611048 28494 b93af309ce5987b4268c3e676a847b43 ""
   "images/Search trekking.png" 1775611048 63370 4fc4ee68e7a45e572e8c3ebbfc6d1a82 ""
@@ -375,17 +379,17 @@
   "images/mobile app component diagram 3.png" 1775173084 282595 a8be66468c85fb4c168748500fc77b87 ""
   "images/modelviewcontroller.png" 1774659434 91218 98a47e45cc5252b886a66841de591173 ""
   "images/overview diagram 2.png" 1775173084 1664701 50b8b6a4223be0cf677499de807e8729 ""
-  "main.aux" 1775939006 38066 3555bcc3b35735fcdca3bd78d1dc37c7 "pdflatex"
-  "main.bbl" 1775084179 486 ee04f40f768daeed26442158e95aba61 "biber main"
-  "main.run.xml" 1775939006 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
+  "main.aux" 1775942754 38545 bbafaf11cb3aee8943ad843e0923c16e "pdflatex"
+  "main.bbl" 1775940470 486 ee04f40f768daeed26442158e95aba61 "biber main"
+  "main.run.xml" 1775942754 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
   "main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
-  "main.toc" 1775939006 8027 c41b4744b3b57473b70fa41de7d34ee6 "pdflatex"
+  "main.toc" 1775942754 8218 f8d0b57d9b83a40601b8d0b6a2c25fb9 "pdflatex"
   "preamble.sty" 1771292682 25286 6754b688c001e6e75b4838b421f3b4d9 ""
-  "section/architectural_design.tex" 1775939003 90286 fc66274b7de2bdfae839713ad8346ef2 ""
+  "section/architectural_design.tex" 1775942747 91355 d15ebc3a1e08c7cf948f506c16b884b6 ""
   "section/effort_spent.tex" 1771292682 94 08ce874b714f77532f8163eb8296a33b ""
   "section/implementation_integration_testplan.tex" 1771292682 92 0b4e32052489de59e7c4f65a448bb4ad ""
   "section/introduction.tex" 1775868403 4434 9ddc8d81d07a412414078146099367b0 ""
-  "section/requirements_traceability.tex" 1775915581 16373 ab33131be7593e785d26c8e8246fcf5f ""
+  "section/requirements_traceability.tex" 1775940030 17098 074e928d510947527aaeaa94ce0f3e3d ""
   "section/user_interface_design.tex" 1771292682 92 0b4e32052489de59e7c4f65a448bb4ad ""
   "title.tex" 1774659434 1545 ceaed732ef7268a05a2500332f62d784 ""
   (generated)
