@@ -820,50 +820,37 @@ The MemoryService stores the selected language code locally using shared prefere
 
 
 
+\subsection{High level description of the pairing mechanism}
 
 
-\subsection{Phone-side smartwatch pairing approval from the SettingPage component}
 
-Figure~\ref{Phone Side Smartwatch Pairing Sequence Diagram} illustrates the phone-side portion of the smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component. 
 
-The interaction starts when the user opens the pairing section and scans the QR code on the smartwatch. Once a QR code is detected, the page extracts the raw payload and checks if that code has already been processed. This behaviour is handled by the boolean flag \texttt{\_handled}. 
-This flag is used to not allow repeated processing of the same scanner detection while the page is still active.
-If a valid raw payload is available, \texttt{SettingPage} delegates the parsing step to \texttt{UserController.extractWatchPair()}, which delegates the actual logic of the phone side pairing process to \texttt{AuthService.extractWatchPair()}. This service parses the scanned URI and verifies that it matches the following structure: \\
-
-\texttt{triplo://watch-pair/<watchId>?t=<token>}\\ 
-
-The service also validates the presence of both the smartwatch identifier and the temporary QR token in the URI payload. If the payload is malformed, the page shows an error message and enables a new scan by resetting \texttt{\_handled}.
-
-If the QR payload is valid, the page shows a confirmation dialog to the user. If the user does not confirm the operation, the page allows the next scan. If the user confirms, the page invokes \texttt{UserController.approveWatchPair()}, which forwards the request to \texttt{AuthService.approveWatchPair()}.
-
-The actual approval is performed inside \texttt{AuthService}, since this step depends on the currently authenticated phone user and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}. The transaction reads the document snapshot, denoted as \texttt{snap}, and validates the pairing request by checking four conditions: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code, and the expiration timestamp must still be valid.
-
-Only if all these conditions hold, the transaction updates the pairing document by setting \texttt{status = approved} and by storing the UID of the authenticated phone user. From an architectural perspective, the transaction is important because it makes validation and approval atomic. This reduces the risk of inconsistent state transitions. The page itself does not directly interact with Firestore or Firebase Authentication; it only reacts to success or failure by updating local UI state. 
-
-\subsection{description}
 
 
 The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore.
 
 \subsubsection{Device Identity}
-Each watch generates (or restores) a persistent \texttt{watchId}, stored securely on-device.  
-A corresponding document exists in:
-
+Each watch either makes or restores from memory a \texttt{watchId}, stored securely on-device.  
+A corresponding document exists in Firestore:
 \begin{verbatim}
 watch/{watchId}
 \end{verbatim}
-
 The \texttt{watchId} uniquely identifies the physical device and is never deleted during logout.
-
 \subsubsection{Pairing Flow}
-
 \textbf{1. Initialization (Watch)}  
-The watch generates a random UUID (\texttt{qrToken}) and writes:
+The watch provides a new random UUID (\texttt{qrToken}) and writes:
+
+
+
+
+
+
+
+
 
 \begin{verbatim}
 watch_pair/{watchId}
 \end{verbatim}
-
 with:
 \begin{itemize}
     \item \texttt{status = "waiting"}
@@ -871,9 +858,9 @@ with:
     \item \texttt{qrToken}
     \item \texttt{createdAt}, \texttt{expiresAt}
 \end{itemize}
-
 A QR code encoding \texttt{watchId} and \texttt{qrToken} is displayed.
-
+URI format: \\
+\texttt{triplo://watch-pair/<watchId>?t=<token>}\\ 
 \textbf{2. Approval (Phone)}  
 After scanning the QR, the authenticated mobile app:
 \begin{itemize}
@@ -884,47 +871,65 @@ After scanning the QR, the authenticated mobile app:
         \item \texttt{uid = request.auth.uid}
     \end{itemize}
 \end{itemize}
-
-
 \textbf{3. Completion (Watch)}  
 The watch listens to the document in real time.  
 When \texttt{status == "approved"} and \texttt{uid} is set, pairing is considered complete and the watch loads user data using that \texttt{uid}.
-
 \subsubsection{Session Restoration}
-
 On startup, the watch checks:
-
-
 \begin{verbatim}
 watch_pair/{watchId}
 \end{verbatim}
-
-If the document is already approved, the session is restored automatically.
-
-\subsection{Logout}
-
+If the document is already approved, the session is restored.
+\subsubsection{Logout}
 Logout does not delete the device identity. Instead, the watch resets:
-
 \begin{itemize}
     \item \texttt{status = "waiting"}
     \item \texttt{uid = null}
 \end{itemize}
-
 This preserves device identity while removing user association.
-
-\subsection{Security Properties}
-
-
+\subsubsection{Security Properties}
 \begin{itemize}
-    \item Only the watch may create/reset pairing in \texttt{waiting} state.
+    %\item Only the watch may create/reset pairing in \texttt{waiting} state.
     \item Only authenticated users may approve pairing.
     \item QR tokens are random and time-limited.
 \end{itemize}
-
 This design cleanly separates device identity from user authentication while minimizing credential exposure on the wearable device.
 
+\subsection{Phone-side smartwatch pairing approval from the SettingPage component}
+Figure~\ref{Phone Side Smartwatch Pairing Sequence Diagram} illustrates the phone-side portion of the smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component.  \\
+The interaction starts when the user opens the pairing section and scans the QR code on the smartwatch. Once a QR code is detected, the page extracts the raw payload and checks if that code has already been processed. This behaviour is handled by the boolean flag \texttt{\_handled}. \\
+This flag is used to not allow repeated processing of the same scanner detection while the page is still active. \\
+If a valid raw payload is available, \texttt{SettingPage} delegates the parsing step to \texttt{UserController.extractWatchPair()}, which delegates the actual logic of the phone side pairing process to \texttt{AuthService.extractWatchPair()}. This service parses the scanned URI and verifies that it matches the following structure: \\
+\texttt{triplo://watch-pair/<watchId>?t=<token>}\\ 
+The service also validates the presence of both the smartwatch identifier and the temporary QR token in the URI payload. If the payload is malformed, the page shows an error message and enables a new scan by resetting \texttt{\_handled}. \\
+If the QR payload is valid, the page shows a confirmation dialog to the user. If the user does not confirm the operation, the page allows the next scan. If the user confirms, the page invokes \texttt{UserController.approveWatchPair()}, which forwards the request to \texttt{AuthService.approveWatchPair()}. \\
+The actual approval is performed inside \texttt{AuthService}, since this step depends on the currently authenticated phone user and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}. The transaction reads the document snapshot, denoted as \texttt{snap}, and validates the pairing request by checking four conditions: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code, and the expiration timestamp must still be valid. \\
+Only if all these conditions hold, the transaction updates the pairing document by setting \texttt{status = approved} and by storing the UID of the authenticated phone user. From an architectural perspective, the transaction is important because it makes validation and approval atomic. This reduces the risk of inconsistent state transitions. The page itself does not directly interact with Firestore or Firebase Authentication; it only reacts to success or failure by updating local UI state. \\
+
+\subsection{Watch-side access to the user area through the pairing flow}
+Figure~\ref{Watch side Pairing Sequence Diagram} describes how the smartwatch application grants access to the user area through the pairing mechanism. In the watch app implementation, the user does not open a pairing screen, the interaction starts from \texttt{NavigationPage}: when the user taps the \texttt{User} button, the application performs a \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. \\
+
+\subsubsection{Pairing Gateway}
+
+From an architectural perspective, \texttt{PairingGateway} should not be interpreted as an autonomous functional component, it is considered part of the PairingService and its role is to decide whether the watch should render the QR-based pairing screen or the actual \texttt{UserPage}. \\
+The pairing bootstrap starts in the state of \texttt{PairingGateway}, which is the widget pushed when the user opens the user area from \texttt{NavigationPage}. Its responsibility is not to implement the pairing itself, but to bootstrap the pairing state and decide which page should be rendered, either the \texttt{LoginPage} or \texttt{UserPage}. \\
 
 
+
+\subsubsection{Restoring the session if the user has already paired the watch}
+The pairing logic relies on two complementary mechanisms. First, \texttt{PairingService.restoreWatchPairing()} performs a read of the Firestore document \texttt{watch\_pair/<watchId>} in order to determine the current pairing state. Second, the service installs a real-time subscription through \texttt{docRef.snapshots().listen()}, so that later updates to the same Firestore document, such as approval from the phone or a reset to the \texttt{waiting} state, are seen by the watch without requiring to implement a more complicated ping-like mechanism to listen to updates of the document on Firestore. \\
+If the pairing document is already in \texttt{approved} state and contains a non-empty UID, \texttt{PairingService} stores that UID in its internal variable \texttt{\_pairedUid} and calls \texttt{notifyListeners()}. In this context, the listeners are the Flutter widgets that observe \texttt{PairingService} through Provider, notably \texttt{PairingGateway}. \\
+At this point, \texttt{PairingGateway} requests \texttt{UserController.loadCurrentPairedUser()}. This step is necessary because the pairing service only knows which user UID is associated with the watch, but it does not load the complete user profile. The actual profile loading is delegated to \texttt{UserController}, which reads the corresponding document from the \texttt{User} collection by calling \texttt{loadUserCore(uid)}. The returned Firestore snapshot, denoted as \texttt{snap}, is converted into a \texttt{User} domain object through \texttt{Users.fromMap()} and stored in \texttt{UserController} as \texttt{\_currentUser}. When \texttt{loadUserCore()} completes, \texttt{UserController} also calls \texttt{notifyListeners()}. \\
+Here again, the listeners are the widgets that observe \texttt{UserController} through Provider and the \texttt{PairingGateway} is a listener. \\
+Then the UI is rebuilt because the \texttt{PairingGateway} returns the widget child that was set by the \texttt{Navigation Page} through \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. The \texttt{UserPage} is then able to see that a paired UID is available. \\
+In this sense, the pairing service is responsible for determining whether the watch is associated with a user, whereas the user controller is responsible for loading the actual user data needed by \texttt{UserPage}. \\
+
+\subsubsection{Pair the watch if the user has not paired it}
+If no approved pairing is found, the \texttt{PairingService} starts a new pairing cycle through \texttt{PairingService.startWatchPairing()}. In this branch, the service makes a new QR token, stores it in local state, writes the Firestore document \texttt{watch\_pair/<watchId>} with status \texttt{waiting}, a null UID, an expiration timestamp, and a new token, and then installs a snapshot listener on that document. A local expiration timer is also started. The \texttt{PairingService} then renders \texttt{LoginPage}, which reads the QR payload exposed by \texttt{PairingService} and displays it to the user. The \texttt{LoginPage} is only the visual pairing screen, it does not control the pairing itself. \\
+The most relevant transition regards the phone approving the QR code. This operation updates the Firestore document \texttt{watch\_pair/<watchId>} by setting its status to \texttt{approved} and assigning the corresponding user UID. The update is received by the active snapshot listener previously installed by \texttt{PairingService.startWatchPairing()} through \texttt{docRef.snapshots().listen()}. \\
+Inside the listener, the service reads the updated document and retrieves the fields \texttt{status}, \texttt{uid}, and \texttt{qrToken}. At this point, the service compares the token stored in Firestore with the locally active token (\texttt{\_qrToken}). This comparison is performed inside the listener itself through the instruction \texttt{if (tokenOnDb != \_qrToken) return;} and ensures that only updates referring to the currently displayed QR code are accepted. If the tokens do not match, the update is ignored, in order not to approve stale QR codes. \\
+If the token matches and the status is \texttt{approved}, \texttt{PairingService} stores the paired UID in \texttt{\_pairedUid}, stops the expiration timer, and calls \texttt{notifyListeners()}. This notification is sent over to the \texttt{PairingGateway}, that rebuilds the UI. The \texttt{PairingGateway} reacts to the new state by invoking \texttt{UserController.loadCurrentPairedUser()}, which loads the corresponding user document from Firestore and reconstructs the \texttt{Users} model. As a result, the UI transitions from the pairing screen to \texttt{UserPage}. \\
+The logout and re-pairing flow clarifies an additional architectural point. When the user logs out from the smartwatch user page, \texttt{PairingService.logoutWatch()} clears the active timer, stops the current Firestore pairing subscription, resets the pairing document by making a new QR token and restoring the \texttt{waiting} state, and clears the locally paired UID. However, the reset of the backend document alone is not sufficient, the observation of the pairing document must be reinstalled through a new call to \texttt{restoreWatchPairing()}. This step is crucial because otherwise the watch could display a new QR code while failing to display the UserPage correctly after the first approval performed by the phone. \\
 
 \section{Component interfaces} \label{Component interfaces}
 \subsection{Component Interfaces Smartphone Application}

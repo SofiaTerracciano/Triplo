@@ -4,7 +4,7 @@ title Watch-side pairing
 actor User
 
 participant NavigationPage as "<color:white>NavigationPage</color>" #darkgreen
-participant UserArea as "<color:white>Pairing/User Area</color>" #darkgreen
+participant UserArea as "<color:white>Pairing Gateway</color>" #000000
 participant LoginPage as "<color:white>LoginPage</color>" #darkgreen
 participant UserPage as "<color:white>UserPage</color>" #darkgreen
 participant WatchIdService as "<color:white>WatchIdService</color>" #000000
@@ -14,8 +14,8 @@ participant Users as "<color:white>User Model</color>" #378641
 database FlutterSecureStorage
 database FirebaseFirestore
 
+
 note right of UserArea
-This participant represents the UI flow created by
 PairingGateway(child: UserPage()).
 PairingGateway is not as a separate architectural
 component from PairingService, but its bootstrap and routing logic are
@@ -25,16 +25,6 @@ end note
 
 User -> NavigationPage : tap User button
 NavigationPage -> UserArea : Navigator.push(PairingGateway(UserPage()))
-
-UserArea -> UserArea : initState()
-UserArea -> UserArea : addPostFrameCallback()
-
-note right of UserArea
-After the route is built, the pairing bootstrap starts.
-This callback is used to run restoreWatchPairing() and,
-if needed, startWatchPairing(), both of which may update
-provider state and change the rendered page immediately.
-end note
 
 UserArea -> PairingService : restoreWatchPairing()
 PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).get()
@@ -70,7 +60,7 @@ else pairing not approved
     PairingService -> PairingService : _pairId = token
     PairingService -> PairingService : _pairCreatedAtLocal = now
 
-    PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).set({... status="waiting", qrToken=token, uid=null ...}, merge)
+    PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).set({status="waiting", qrToken=token, uid=null})
     FirebaseFirestore --> PairingService : write completed
 
     PairingService -> PairingService : start expiry timer
@@ -79,17 +69,18 @@ else pairing not approved
     PairingService --> UserArea : QR state ready
 
     UserArea -> LoginPage : build pairing screen
-    LoginPage -> LoginPage : read pairing.qrPayload
+    LoginPage -> PairingService : pairing.qrPayload
+    PairingService --> LoginPage : qrPayload
     LoginPage --> User : show QR code
 end
-
-
-
+note left of FirebaseFirestore
+Phone approves the QR code and pairs the watch
+end note
 FirebaseFirestore -> PairingService : snapshot update(status="approved", uid, qrToken)
 PairingService -> PairingService : compare tokenOnDb with _qrToken
 
 alt token matches active QR and status == "approved"
-    PairingService -> PairingService : cancel expiry timer
+    PairingService -> PairingService : stop expiry timer
     PairingService -> PairingService : _pairedUid = uid
     PairingService --> UserArea : notifyListeners()
 
@@ -107,16 +98,16 @@ else token mismatch or invalid state
     PairingService --> UserArea : ignore update / keep current UI
 end
 
-opt Re-pairing after logout on the smartwatch
+opt logout on the smartwatch
     User -> UserPage : logout
     UserPage -> PairingService : logoutWatch()
 
-    PairingService -> PairingService : cancel expiry timer
-    PairingService -> PairingService : cancel pairing subscription
+    PairingService -> PairingService : stop expiry timer
+    PairingService -> PairingService : stop pairing subscription
     PairingService -> PairingService : resetPairingOnLogout(regenerateQr = true)
 
     PairingService -> PairingService : generate new QR token
-    PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).set({status="waiting", qrToken=newToken, uid=null ...}, merge)
+    PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).set({status="waiting", qrToken=newToken, uid=null})
     FirebaseFirestore --> PairingService : write completed
 
     PairingService -> PairingService : _pairedUid = null
@@ -126,31 +117,20 @@ opt Re-pairing after logout on the smartwatch
     UserPage -> PairingService : restoreWatchPairing()
     PairingService -> FirebaseFirestore : collection("watch_pair").doc(watchId).get()
     FirebaseFirestore --> PairingService : snap
-    PairingService -> FirebaseFirestore : docRef.snapshots().listen(...)
+    PairingService -> FirebaseFirestore : docRef.snapshots().listen()
     FirebaseFirestore --> PairingService : subscription installed
     PairingService --> UserPage : waiting state restored
 
     UserPage -> LoginPage : build pairing screen
-    LoginPage --> User : show regenerated QR
+    LoginPage --> User : show new QR
 
-    FirebaseFirestore -> PairingService : snapshot update(status="approved", uid, qrToken=newToken)
-    PairingService -> PairingService : compare tokenOnDb with _qrToken
+    
 
-    alt token matches regenerated QR
-        PairingService -> PairingService : _pairedUid = uid
-        PairingService --> UserArea : notifyListeners()
 
-        UserArea -> UserController : loadCurrentPairedUser()
-        UserController -> FirebaseFirestore : collection("users").doc(uid).get()
-        FirebaseFirestore --> UserController : snap
-        UserController -> Users : Users.fromMap(snap.data()!, uid: uid)
-        Users --> UserController : Users
-        UserController -> UserController : _currentUser = Users
-        UserController --> UserArea : success
 
-        UserArea -> UserPage : rebuild child page
-        UserPage --> User : show paired user profile again
-    end
+
+
+
 end
 
 @enduml

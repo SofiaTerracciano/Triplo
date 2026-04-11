@@ -40,6 +40,7 @@ class UserController extends ChangeNotifier {
 
     await loadUserCore(uid);
   }
+
   /* --------------------------------------------------
    * LOAD CORE USER (lightweight)
    * -------------------------------------------------- */

@@ -84,7 +84,7 @@ class PairingService extends ChangeNotifier {
       }, SetOptions(merge: true));
 
       _expiryTimer = Timer(_qrTtl, () {
-        _pairingError = "QR scaduto, rigenera.";
+        _pairingError = "Expired QR code";
         notifyListeners();
       });
 
@@ -97,6 +97,8 @@ class PairingService extends ChangeNotifier {
           final uid = data['uid'] as String?;
           final tokenOnDb = data['qrToken'] as String?;
 
+
+          //checks the token in order to not approve stale qr codes
           if (tokenOnDb != _qrToken) return;
 
           if (status == 'approved' && uid != null && uid.isNotEmpty) {
@@ -106,23 +108,23 @@ class PairingService extends ChangeNotifier {
           }
 
           if (status == 'expired') {
-            _pairingError = "QR scaduto, rigenera.";
+            _pairingError = "Expired QR code";
             notifyListeners();
           }
         },
         onError: (e) {
-          _pairingError = "Errore listener pairing: $e";
+          _pairingError = "Pairing listener error: $e";
           notifyListeners();
         },
       );
     } catch (e) {
-      _pairingError = "Errore pairing: $e";
+      _pairingError = "Pairing Error $e";
     } finally {
       _pairing = false;
       notifyListeners();
     }
   }
-
+  /*
   Future<void> stopWatchPairing({bool clearId = false}) async {
     _expiryTimer?.cancel();
     _expiryTimer = null;
@@ -137,7 +139,7 @@ class PairingService extends ChangeNotifier {
 
     notifyListeners();
   }
-
+*/
   Future<bool> restoreWatchPairing() async {
     _pairingError = null;
 
@@ -305,10 +307,10 @@ class _PairingGatewayState extends State<PairingGateway> {
 
   @override
   Widget build(BuildContext context) {
+    //Pairing Gateway listens to PairingService and usercontroller
     return Consumer2<PairingService, UserController>(
       builder: (context, pairing, userCtrl, _) {
         final uid = pairing.effectiveUid;
-
         if (uid == null) return const LoginPage();
 
         if (userCtrl.currentUser == null) {
