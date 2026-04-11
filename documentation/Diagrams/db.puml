@@ -1,0 +1,143 @@
+@startuml
+title Database Structure
+
+'skinparam classAttributeIconSize 0
+'skinparam shadowing false
+'skinparam linetype ortho
+'skinparam roundcorner 12
+hide empty members
+
+class "User" << (E,yellow)>>  {
+  +uid : UUID
+  --
+  Birthdate : string
+  Email : string
+  Followers : array
+  Following : array
+  Name : string
+  Photo_profile : string
+  Private_diary : array
+  Public_diary : array
+  Saved_trekkings : array
+  Surname : string
+  Username : string
+}
+
+class "UserIndex" << (E,yellow)>>  {
+  +uid : UUID
+  --
+  normalized : string
+  user_uid : string
+  username : string
+}
+
+class "Diary" << (E,#FF0099)>>{
+  +uid : UUID
+  --
+  challenges : array
+  date : string
+  duration : double
+  Friends : array
+  Is_public : boolean
+  Mood : array
+  Notes : string
+  Photos : array
+  Refreshment_Point : string
+  Trekking_name : string
+  UserId : string
+}
+
+class "Challenge" << (E,pink)>>{
+  +uid : UUID
+  --
+  description : array
+  photo : string
+  title : array
+}
+
+class "Trekking" << (E,lightblue)>>{
+  +uid : UUID
+  --
+  challenges : array
+  description : array
+  Difficulty_level : string
+  Distance : int64
+  Down_gain : boolean
+  Elevation_gain : int64
+  Ending_point_name : string
+  Estimated_time : int64
+  Family_friendly : boolean
+  Info : array
+  Map_photo : string
+  Name : string
+  Photo_ending_point : string
+  Picnic_area : boolean
+  Points : array
+  Refreshment_point : string
+  Starting_point_name : string
+  Up_gain : boolean
+}
+
+class "TrekkingIndex" << (E,lightblue)>> {
+  +uid : UUID
+  --
+  Normalized : string
+  Trekking_id : string
+  Trekking_name : string
+}
+
+class "Watch" << (E,lightgreen)>> {
+  +uid : UUID
+  --
+  createdAt : timestamp
+  lastSeenAt : timestamp
+  platform : string
+}
+
+class "WatchPair" << (E,lightgreen)>> {
+  +uid : UUID
+  --
+  createdAt : timestamp
+  expiresAt : timestamp
+  platform : string
+  qrToken : string
+  status : string
+  watch_uid : string
+  watch_id : string
+}
+
+class "WeatherNotification" << (E,orange)>> {
+  +uid : UUID
+  --
+  trekkingIds : array
+  updatedAt : timestamp
+  userId : string
+}
+
+' =========================
+' RELAZIONI DIRETTE
+' =========================
+
+User "1 " -- "0..N " Diary : writes >
+User "1 " -- "1 " UserIndex : indexed by >
+Trekking "1" -- "1 " TrekkingIndex : indexed by >
+
+User "1 " -- "0..N   " WeatherNotification : checks >
+
+Watch "1 " -- "0..N " WatchPair : device <
+User "1 " -- "0..N " WatchPair : pairs >
+
+' =========================
+' RELAZIONI LOGICHE (ARRAY)
+' =========================
+
+Diary "0..N " -- "0..N " Challenge : includes >
+Trekking "0..N " -- "0..N " Challenge : has >
+
+User "0..N " -- "0..N " Trekking : saves >
+Diary "0..N " -- "0..N " User : friends >
+User "0..N " -- "0..N " User : follows >
+
+WeatherNotification "0..N " -- "0..N " Trekking : path >
+
+@enduml
