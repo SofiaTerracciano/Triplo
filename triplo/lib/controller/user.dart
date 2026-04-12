@@ -89,22 +89,22 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> loginWithGoogle() async {
-    debugPrint("UserController: loginWithGoogle() start");
+    debugPrint("UserController: loginWithGoogle() start");  //coverage:ignore-line
     _isLoading = true;
     notifyListeners();
 
     try {
       await _authService.loginWithGoogle();
-      debugPrint("UserController: AuthService.loginWithGoogle() completed");
+      debugPrint("UserController: AuthService.loginWithGoogle() completed"); //coverage:ignore-line
 
       _currentUser = _authService.currentUser;
-      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}");
+      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}"); //coverage:ignore-line
 
       notifyListeners();
-      debugPrint("UserController: notifyListeners() called");
+      debugPrint("UserController: notifyListeners() called"); //coverage:ignore-line
     } catch (e, st) {
-      debugPrint("UserController: loginWithGoogle() failed");
-      debugPrint("UserController ERROR: $e");
+      debugPrint("UserController: loginWithGoogle() failed"); //coverage:ignore-line
+      debugPrint("UserController ERROR: $e"); //coverage:ignore-line
       debugPrintStack(stackTrace: st);
       rethrow;
     } finally {

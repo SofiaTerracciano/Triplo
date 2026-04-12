@@ -283,6 +283,24 @@ cupertino\_icons & iOS-style icon set \\
 \newpage
 \subsection{Mobile Smartwatch App component view} \label{Mobile Smartwatch App component view}
 \newpage
+
+
+
+
+
+
+\section{Firebase BaaS Management}
+\label{Firebase BaaS Management}
+Immagine Database \\
+
+The database adopted for the Triplo application is based on a NoSQL approach using Firebase Firestore. Unlike traditional relational databases, Firestore stores data as collections of JSON-like documents, where each document can contain nested structures and arrays. \\
+For documentation purposes, the database structure has been represented using a diagram similar to a relational schema. This representation has been introduced for clarity and readability, allowing an easier understanding of entities and their relationships, even though the underlying data model is document-oriented rather than relational. \\
+The main collections include user, diary, trekking, challenge, and auxiliary collections such as user\_index and trekking\_index, which are used to support efficient search operations. Additional collections such as watch, watch\_pair, and weather\_notification handle device pairing and notification functionalities. \\
+From an infrastructure perspective, the Firestore database is deployed in the \textit{europe-west 8} region, while Firebase Storage is currently hosted in the United States. This configuration may introduce additional latency when retrieving large media assets such as images. A potential improvement would be to migrate storage resources to a European region, which is supported by Firebase through paid plans, in order to reduce latency and improve performance. \\
+To mitigate latency issues, especially for images retrieved from Firebase Storage, a caching strategy has been adopted. Some images are locally cached on the device, reducing repeated network requests and improving user experience. This design decision is further discussed in Section~\ref{Image cache design decision}. \\
+
+\newpage
+
 \begin{landscape}
 \section{Deployment view} \label{Deployment view}
 
@@ -318,43 +336,101 @@ In contrast, the smartwatch application is implemented as a separate artifact. W
 \newpage
 
 \section{Runtime view} \label{Runtime view} 
-\subsection{Selected Use Cases}
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 The identified use cases provide an abstract representation of the interactions between the user and the system. They have been selected to capture the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
-These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. 
+These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. \\
+The reported use cases are twelve in total. Some of them include sub-diagrams to represent important phases of the respective use case or to provide a more detailed view of key processes. Although these sub-diagrams are not always strictly use cases, they are intended as supporting diagrams to improve the clarity of the system’s runtime behavior within the documentation
+\begin{enumerate}
+    \item Add Diary Page - Section \ref{Add Diary Page use case sequence diagram}
+    \item Explore trekkings on Map - Section \ref{Explore Trekkings on Map Sequence Diagram}
+    \item View trekking information -Section \ref{View Trekking Information Sequence Diagram}
+        \begin{itemize}
+        \item Image caching for trekking images
+        \end{itemize}
+    \item View weather information - Section \ref{View Weather Information Sequence Diagram}
+        \begin{itemize}
+        \item View Satellite Weather Information
+        \end{itemize}
+    \item Search Users - Section \ref{Search Users Sequence Diagram}
+    \item Search trekking - Section \ref{Search trekkings Sequence Diagram}
+    \item View compass and altitude information - Section \ref{View compass and altitude information sequence diagram}
+    \item Login - Section \ref{Login Sequence Diagram 2}
+    \item View User Information - Section \ref{View user information Sequence Diagram 1}
+    \item Register - Section \ref{Registration Sequence Diagram}
+    \item Update User Information - Section \ref{Update User Information Sequence Diagram 2}
+    \begin{itemize}
+        \item change language
+    \end{itemize}
+    \item Phone Watch Pair - Section \ref{Phone watch pair sequence diagram 3}
+    \begin{itemize}
+    \item Phone-side Smartwatch Pairing
+    \item Watch bootstrap
+    \item Watch-side Smartwatch Pairing
+    \end{itemize} 
+\end{enumerate}
+
+
+\clearpage
+\begin{table}[p]
+\centering
+\begin{tabular}{|c|c|p{6cm}|}
+\hline
+\textbf{Use Case} & \textbf{Device} & \textbf{Notes} \\
+\hline
+Login / Register & Smartphone & Full authentication flow managed on smartphone \\
+\hline
+Explore Trekkings on Map & Smartphone Smartwatch & Smartphone used as reference for sequence diagram \\
+\hline
+View Trekking Information & Smartphone Smartwatch & Smartphone used as reference for sequence diagram \\
+\hline
+View Weather Information & Smartphone Smartwatch & Smartphone used as reference for sequence diagram \\
+\hline
+Add Diary Page & Smartphone &  \\
+\hline
+Search Users / Trekking & Smartphone & Search functionalities handled on smartphone \\
+\hline
+View Compass and Altitude Information & Smartphone & \\
+\hline
+Phone Watch Pair & Smartphone Smartwatch & Process modelled with phone-side and watch-side sequence diagrams \\
+\hline
+View User Information & Smartphone Smartwatch & Smartphone used as reference for sequence diagram \\
+\hline
+Update User Information & Smartphone & Profile management handled on smartphone \\
+\hline
+\end{tabular}
+\caption{Comparison of use cases between smartphone and smartwatch}
+\label{tab:usecase-comparison}
+\end{table}
 
 
 
-\begin{itemize}
-    \item Add Diary Page
-    \item Explore trekkings on Map
-    \item View trekking information
-    \item View weather information
-    \item Search Users
-    \item Search trekking
-    \item View compass and altitude information
-    \item Login
-    \item Register
-    \item View User Information
-    \item Pair Smartwatch
-    \item Update User Profile
-\end{itemize}
+%\textbf{Note:} The smartphone application has been used as the reference model for defining functionalities. The smartwatch application mostly follows a very similar process.
 
 
-
+\clearpage
 \newpage
 
 \subsection{Add Diary Page use case sequence diagram} 
 \label{Add Diary Page use case sequence diagram}
 The most important part of the \textit{Add Diary Page} sequence diagram is the save phase, where the data entered by the user is stored in the system.
-When the user presses the save button, the \texttt{DiaryPage} starts the process by showing a loading page and then it formats the date, computing the duration from hours and minutes. If the user has selected photos, the page calls the \texttt{DiaryController} to upload them to \texttt{FirebaseStorage}. The controller uploads each image and returns a list of paths, which will be stored in the diary instance.
-After this step, the \texttt{DiaryPage} calls the \texttt{addDiary()} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{DiaryModel} object.
-Before saving the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is necessary because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists.
-Once converted, the map is stored in the \texttt{diary} collection in Firestore. At the same time, the controller updates the user document, adding the diary identifier to either the public or private diary list, depending on the selected visibility.
-Finally, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation. 
+When the user presses the save button, the \texttt{DiaryPage} starts the process by showing a loading page and then it formats the date, computing the duration from hours and minutes. If the user has selected photos, the page calls the \texttt{DiaryController} to upload them to \texttt{FirebaseStorage}. The controller uploads each image and returns a list of paths, which will be stored in the diary instance. \\
+After this step, the \texttt{DiaryPage} calls the \texttt{addDiary()} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{Diary} object. \\
+Before saving the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is necessary because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists. \\
+Once converted, the map is stored in the \texttt{diary} collection in Firestore. At the same time, the controller updates the user document, adding the diary identifier to either the public or private diary list, depending on the selected visibility. \\
+Finally, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation.  \\
 
 
 \newpage
@@ -386,29 +462,29 @@ Finally, when the user selects a trekking, the system navigates from the \texttt
 
 \newpage
 \subsection{View Trekking Information Sequence Diagram}
-The sequence diagram for the \textit{View Trekking Information} use case describes how the system presents the details of a selected trekking. The interaction starts when the user opens the \texttt{trekkingPage}. The page initializes its internal state and verifies which user is authenticated through the \texttt{UserController}. 
-The trekking data is then retrieved through the \texttt{trekkingController}. In particular, the controller attempts to search in its local collection.
-After the trekking has been obtained, the page checks whether the route is already saved by the current user.
-The page also requests weather information near the trail through the \texttt{servicecontroller}. 
-A further part of the interaction regards the trekking images, such as the map photo, the ending point photo, and the challenge images. In the main sequence diagram, this step is represented at a high level through calls from the \texttt{trekkingPage} to the \texttt{trekkingController}. The detailed behavior of the cache mechanism used for image retrieval is described separately in a separate diagram, in order to keep the main diagram focused on the overall interaction flow.
-Finally, the page allows the user to perform additional actions related to the trekking. The route can be saved or removed from the saved list, a diary entry can be created through the \texttt{DiaryPage}, and the user can navigate to other trekking-related views such as the route details page or the geowatch and map page. In this way, the \texttt{trekkingPage} acts as the central entry point for the main information and actions associated with a trekking. 
+The sequence diagram for the \textit{View Trekking Information} use case describes how the system presents the details of a selected trekking. The interaction starts when the user opens the \texttt{trekkingPage}. The page initializes its internal state and verifies which user is authenticated through the \texttt{UserController}. \\
+The trekking data is then retrieved through the \texttt{trekkingController}. In particular, the controller attempts to search in its local collection. \\
+After the trekking has been obtained, the page checks whether the route is already saved by the current user. \\
+The page also requests weather information near the trail through the \texttt{servicecontroller}.  \\
+A further part of the interaction regards the trekking images, such as the map photo, the ending point photo, and the challenge images. In the main sequence diagram, this step is represented at a high level through calls from the \texttt{trekkingPage} to the \texttt{trekkingController}. The detailed behavior of the cache mechanism used for image retrieval is described separately in a separate diagram, in order to keep the main diagram focused on the overall interaction flow. \\
+Finally, the page allows the user to perform additional actions related to the trekking. The route can be saved or removed from the saved list, a diary entry can be created through the \texttt{DiaryPage}, and the user can navigate to other trekking-related views such as the route details page or the geowatch and map page. In this way, the \texttt{trekkingPage} acts as the central entry point for the main information and actions associated with a trekking.  \\
+
+
+
+\subsubsection{Image Caching for Trekking Images Sequence Diagram}
+\label{Image Caching for Trekking Images Sequence Diagram}
+This sequence diagram illustrates, through a representative example, how the image caching mechanism is implemented within the application. Its purpose is not to introduce a new use case, but rather to clarify the internal behavior of image retrieval, which is abstracted in the main sequence diagram describing the trekking visualization flow. \\
+The process starts when the \texttt{trekkingPage} requests an image through the \texttt{trekkingController}. The controller delegates the retrieval to the \texttt{memoryservice}, which implements a multi-level caching strategy. \\
+First, the system attempts to retrieve the image from the in-memory RAM cache, using a \texttt{Map<String, File>} structure. If the image is found, it is immediately returned to the page, ensuring minimal latency. \\
+If the image is not available in memory, the system checks the disk cache through the \texttt{CacheManager}. This involves interacting with the underlying operating system to load a previously stored file. If the image is found on disk, it is reinserted into the in-memory cache and returned to the UI, improving performance for subsequent accesses. \\
+If the image is not available in either RAM or disk cache, the system performs a download from \texttt{FirebaseStorage}. In the case of paths expressed using the \texttt{gs://} protocol, the controller first resolves them into a downloadable URL. The image is then downloaded, stored on disk, and finally cached in memory before being returned to the page. \\
+The same logic is applied in a batched manner when multiple images, for example trekking challenges, are requested. In this case, the controller iterates over all image paths and applies the same caching strategy to each element. \\
 \newpage
 \label{View Trekking Information Sequence Diagram}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{./images/View trekking information.png}
 \end{figure}
-
-\newpage
-\subsubsection{Image Caching for Trekking Images Sequence Diagram}
-\label{Image Caching for Trekking Images Sequence Diagram}
-This sequence diagram illustrates, through a representative example, how the image caching mechanism is implemented within the application. Its purpose is not to introduce a new use case, but rather to clarify the internal behavior of image retrieval, which is abstracted in the main sequence diagram describing the trekking visualization flow.
-The process starts when the \texttt{trekkingPage} requests an image through the \texttt{trekkingController}. The controller delegates the retrieval to the \texttt{memoryservice}, which implements a multi-level caching strategy.
-First, the system attempts to retrieve the image from the in-memory RAM cache, using a \texttt{Map<String, File>} structure. If the image is found, it is immediately returned to the page, ensuring minimal latency.
-If the image is not available in memory, the system checks the disk cache through the \texttt{CacheManager}. This involves interacting with the underlying operating system to load a previously stored file. If the image is found on disk, it is reinserted into the in-memory cache and returned to the UI, improving performance for subsequent accesses.
-If the image is not available in either RAM or disk cache, the system performs a download from \texttt{FirebaseStorage}. In the case of paths expressed using the \texttt{gs://} protocol, the controller first resolves them into a downloadable URL. The image is then downloaded, stored on disk, and finally cached in memory before being returned to the page.
-The same logic is applied in a batched manner when multiple images, for example trekking challenges, are requested. In this case, the controller iterates over all image paths and applies the same caching strategy to each element.
-\newpage
 \label{Image caching for trekking images Sequence Diagram}
 \begin{figure}[H]
     \centering
@@ -536,19 +612,22 @@ as the application logic does not manage these requests.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{./images/View weather information 1.png}
+    \caption{View Weather Information sequence diagram}
 \end{figure}
 
 
 \label{View Weather Information Sequence Diagram 2}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./images/View weather information 2.png}
+    \includegraphics[width=0.8\linewidth]{./images/View weather information 2.png}
+    \caption{View Satellite Weather Information sequence diagram}
 \end{figure}
 
 
 
 
 
+\newpage
 \subsection{Search Users Sequence Diagram}
 
 The SearchPage component is responsible for handling user search interactions. The UI elements belong to the SearchPage component and communicate with the UserController.
@@ -602,40 +681,30 @@ Once the results are collected, they are returned to the SearchPage, which updat
 %As in the user search, this mechanism does not rely on \texttt{FutureBuilder}, but instead uses explicit state management.
 
 When the user selects a trekking, the application navigates to the corresponding TrekkingPage.
-\newpage
+
 \label{Search trekkings Sequence Diagram}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./images/Search trekking.png}
+    \includegraphics[width=0.8\linewidth]{./images/Search trekking.png}
 \end{figure}
 
 \newpage
 \subsection{View Compass and Altitude Information Sequence Diagram}
 
 The \texttt{Geowatch} component is responsible for displaying compass, altitude, and current position information. This functionality is implemented through the interaction between the page, the \texttt{servicecontroller}, the \texttt{geoservice}, and the \texttt{permissionservice}.
-
 When the navigation page is opened, the initialization starts in \texttt{initState()}, where the page registers itself as an app lifecycle observer and schedules the execution of \texttt{\_initLocation()}. The observer is used to detect when the application returns to the foreground, for example after the user has changed GPS or permission settings.
-
-The method \texttt{\_initLocation()} delegates the preliminary checks to the \texttt{servicecontroller} through \texttt{loadNavigationLocation()}. This method verifies whether the location permission has been granted and whether the GPS service is enabled. If one of these conditions is not satisfied, the page enters an error state and shows a dedicated message to the user.
-
+The method \texttt{\_initLocation()} delegates the preliminary checks to the \texttt{servicecontroller} through \\ \texttt{loadNavigationLocation()}. This method verifies whether the location permission has been granted and whether the GPS service is enabled. If one of these conditions is not satisfied, the page enters an error state and shows a dedicated message to the user.
 If permission is denied, the returned state contains the error \texttt{PERMISSION\_DENIED}. If the GPS service is disabled, the returned state contains the error \texttt{GPS\_DISABLED}. In both cases, the page updates its local state through \texttt{setState()} and displays an error instead of the navigation information.
-
 Only when both checks are successful does the page subscribe to the position stream. The stream is obtained through the \texttt{servicecontroller}, which delegates the request to the \texttt{geoservice}. Every new \texttt{Position} object received from the stream is used to update altitude, latitude, longitude.
-
 The compass information is handled through a separated stream. In the architecture, the UI does not access the \texttt{FlutterCompass} library. Instead, it requests the compass stream through the \texttt{servicecontroller}, which delegates the operation to the \texttt{geoservice}. The UI then receives heading values and converts them into cardinal directions through the helper method \texttt{\_direction()}.
-
 When an error state is shown, the page also provides a button that helps the user solve the problem. If the GPS is disabled, the button invokes \texttt{openGpsSettings()}, which is delegated through the \texttt{servicecontroller} to the \texttt{geoservice}. If the problem is related to permissions, the page instead invokes \texttt{openPermissionSettings()}, which is delegated to the \texttt{permissionservice}. In this way, the UI does not directly interact with operating system APIs.
-
 The diagram also includes the handling of lifecycle changes. When the app returns to the foreground, it handles the app state change through method \texttt{didChangeAppLifecycleState()}. The page sets the checking state again and re-runs \texttt{\_initLocation()}. This is useful, for example, when the user comes back from the system settings after enabling GPS or granting permissions.
-
 Finally, when the page is closed, the observer and the active position stream subscription are disposed through the \texttt{dispose()} method. This avoids unnecessary updates when the page is no longer visible.
 
 \subsubsection{Application Lifecycle in Flutter}
 
 The \textbf{application lifecycle in Flutter} refers to the sequence of states an app goes through during its execution, such as \textit{resumed}, \textit{inactive}, \textit{paused}, and \textit{detached} and the mechanisms provided to handle transitions between these states.
-
 Flutter provides a platform-independent abstraction of the lifecycle through the \texttt{AppLifecycleState} enum. Developers can monitor these changes by implementing the \texttt{WidgetsBindingObserver}, which allows the application to listen for lifecycle updates.
-
 In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState state)} is overridden to react to state transitions, enabling behaviors such as pausing tasks, saving data, or managing background operations when the app moves between foreground and background.
 
 
@@ -651,11 +720,8 @@ In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState s
 
 \subsubsection{Difference between permission denied and GPS disabled}
 The two error conditions shown in the diagram represent different problems.
-
 The \texttt{PERMISSION\_DENIED} state means that the application is not allowed to access the device location. In this case, the problem is related to the application permission, so the user must enable the permission from the app settings.
-
 The \texttt{GPS\_DISABLED} state means that the application has permission to access location, but the location service of the device is currently turned off. In this case, the problem is not related to the app permission, but to the system location service, so the user must enable GPS from the device settings.
-
 For this reason, the page provides two different actions: opening the application settings in the case of denied permission, and opening the location settings in the case of disabled GPS.
 
 
@@ -672,7 +738,7 @@ For this reason, the page provides two different actions: opening the applicatio
 \label{View compass and altitude information sequence diagram}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./images/7.View compass and Altitude Information.png}
+    \includegraphics[width=0.8\linewidth]{./images/7.View compass and Altitude Information.png}
 \end{figure}
 
 
@@ -707,14 +773,12 @@ When the user presses the Google Sign-In button, the page executes \texttt{\_log
 The Google login flow first forces a sign-out from the previous Google session and then opens the Google account interface. If the user does not select a profile, the flow terminates with an error message shown in the UI.
 
 If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed, and the page navigates to the \texttt{UserPage}.
-
+\newpage
 \label{Login Sequence Diagram 1}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{./images/2.1.Login.png}
 \end{figure}
-
-
 
 
 
@@ -802,7 +866,7 @@ The email update is more complex because it involves Firebase Authentication. Th
 \label{Update User Information Sequence Diagram 1}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./images/5.1.Update User Information.png}
+    \includegraphics[width=0.8\linewidth]{./images/5.1.Update User Information.png}
 \end{figure}
 \label{Update User Information Sequence Diagram 2}
 \begin{figure}[H]
@@ -855,7 +919,7 @@ The MemoryService stores the selected language code locally using shared prefere
 \newpage
 \subsection{Phone Watch Pair}
 \subsubsection{High level description of the pairing mechanism}
-The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore.
+The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
 
 \subsubsection{Device Identity}
 Each watch either makes or restores from memory a \texttt{watchId}, stored securely on-device.  
@@ -901,6 +965,9 @@ After scanning the QR, the authenticated mobile app:
     \end{itemize}
 \end{itemize}
 
+
+
+
 \textbf{3. Completion (Watch)}  
 The watch listens to the document in real time.  
 When \texttt{status == "approved"} and \texttt{uid} is set, pairing is considered complete and the watch loads user data using that \texttt{uid}.
@@ -928,7 +995,7 @@ This design cleanly separates device identity from user authentication while min
 
 \newpage
 \subsubsection{Phone-side smartwatch pairing approval from the SettingPage component}
-Figure~\ref{Phone Side Smartwatch Pairing Sequence Diagram} illustrates the phone-side portion of the smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component.  \\
+Figure~\ref{Phone watch pair sequence diagram 1} illustrates the phone-side portion of the smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component.  \\
 The interaction starts when the user opens the pairing section and scans the QR code on the smartwatch. Once a QR code is detected, the page extracts the raw payload and checks if that code has already been processed. This behaviour is handled by the boolean flag \texttt{\_handled}. \\
 This flag is used to not allow repeated processing of the same scanner detection while the page is still active. \\
 If a valid raw payload is available, \texttt{SettingPage} delegates the parsing step to \texttt{UserController.extractWatchPair()}, which delegates the actual logic of the phone side pairing process to \texttt{AuthService.extractWatchPair()}. This service parses the scanned URI and verifies that it matches the following structure: \\
@@ -947,7 +1014,7 @@ Only if all these conditions hold, the transaction updates the pairing document 
 
 \newpage
 \subsubsection{Watch-side access to the user area through the pairing flow}
-Figure~\ref{Watch side Pairing Sequence Diagram} describes how the smartwatch application grants access to the user area through the pairing mechanism. In the watch app implementation, the user does not open a pairing screen, the interaction starts from \texttt{NavigationPage}: when the user taps the \texttt{User} button, the application performs a \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. \\
+Figure~\ref{Phone watch pair sequence diagram 3} describes how the smartwatch application grants access to the user area through the pairing mechanism. In the watch app implementation, the user does not open a pairing screen, the interaction starts from \texttt{NavigationPage}: when the user taps the \texttt{User} button, the application performs a \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. \\
 
 \subsubsection{Pairing Gateway}
 From an architectural perspective, \texttt{PairingGateway} should not be interpreted as an autonomous functional component, it is considered part of the PairingService and its role is to decide whether the watch should render the QR-based pairing screen or the actual \texttt{UserPage}. \\
@@ -972,17 +1039,20 @@ The logout and re-pairing flow clarifies an additional architectural point. When
 \label{Phone watch pair sequence diagram 1}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{./images/Phone Watch pair 1.png}
+    \includegraphics[width=0.92\linewidth]{./images/Phone Watch pair 1.png}
+    \caption{Phone-side smartwatch pairing sequence diagram}
 \end{figure}
 \label{Phone watch pair sequence diagram 2}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{./images/Phone Watch pair 2.png}
+    \caption{Watch bootstrap sequence diagram}
 \end{figure}
 \label{Phone watch pair sequence diagram 3}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{./images/Phone Watch pair 3.png}
+    \caption{Watch-side smartwatch pairing sequence diagram}
 \end{figure}
 \newpage
 \section{Component interfaces} \label{Component interfaces}
@@ -1167,7 +1237,7 @@ The main motivation behind this decision is maintainability. If a library or und
 
 
 
-
+\newpage
 \subsection{Use of External Service Providers}
 \label{Use od External Service Providers}
 
@@ -1212,6 +1282,24 @@ It allows the system to leverage the strengths of different providers while keep
 Overall, the use of external service providers, combined with the abstraction introduced by the \texttt{Service\_i} interface, enables the system to satisfy the relevant functional requirements while preserving modularity, maintainability, and extensibility of the architecture.
 
 
+
+
+
+
+\newpage
+\subsection{Madonna di Campiglio as Application Area}
+\label{Mappa lte}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/mappa lte.png}
+    \caption{eNodeB LTE Radio Sites in the area, courtesy of lteitaly.it}
+\end{figure}
+The application has been evaluated for the area of \textit{Madonna di Campiglio}. This location was selected due to its relatively good LTE network coverage compared to other mountainous regions.
+
+Reliable connectivity is an important factor for an application that relies on external services such as weather APIs and cloud storage. The chosen area provides a realistic but favorable scenario, allowing the system to be tested under conditions that are representative of real trekking environments while still ensuring acceptable performance.
+
+
+\newpage
 \subsection{Network Connectivity Requirements and smartwatch Platform}
 
 The smartwatch application requires reliable access to internet connectivity in order to provide a complete and consistent user experience. 
@@ -1232,6 +1320,18 @@ Wear OS supports multiple network communication modes, including:
 
 This flexibility ensures that the application can operate under different conditions, ranging from smartphone-assisted usage to fully autonomous scenarios. 
 In particular, the availability of LTE-enabled devices makes Wear OS especially suitable for outdoor and trekking contexts, where the user may not always have access to their smartphone.
+
+
+
+\subsection{Image cache strategy}
+\label{Image cache design decision}
+A caching mechanism has been introduced to reduce latency in loading images from Firebase Storage. Since images represent one of the most bandwidth-intensive resources in the application, caching them locally significantly improves performance and responsiveness.
+
+This decision is particularly relevant given the geographical separation between the database and storage services, as discussed in Section \ref{Firebase BaaS Management}. By minimizing repeated downloads, the caching layer reduces both latency and network usage.
+
+\subsection{Firebase BaaS and GDPR compliance}
+From a data protection perspective, Firebase can be made compliant with GDPR regulations by offering secure data handling, encryption in transit and at rest, and configurable security rules. These features are important because they allow to enforce access control policies and protect user data, ensuring that personal information is handled according to European data protection standards.
+If the application is distributed commercially or made publicly available, users must be clearly informed about data processing practices through a privacy policy, and explicit consent may be required, especially when analytics services are involved or data is transferred and stored outside of the EU.
 
 
 

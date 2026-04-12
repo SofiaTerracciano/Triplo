@@ -27,13 +27,13 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    debugPrint(".env file not found — continuing without it.");
+    debugPrint(".env file not found — continuing without it."); //coverage:ignore-line
   }
 
   try {
       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     } catch (e) {
-      debugPrint("Firebase init failed (GMS non disponibile su emulatore x86): $e");
+      debugPrint("Firebase init failed (GMS non disponibile su emulatore x86): $e"); //coverage:ignore-line
 }
 
   final watchId = await WatchIdService.getOrCreateWatchId();

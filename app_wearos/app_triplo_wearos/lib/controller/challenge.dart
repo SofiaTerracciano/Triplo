@@ -14,13 +14,13 @@ class ChallengesController extends ChangeNotifier {
   ChallengesController({required this.notification, required this.memory});
 
   Future<File?> getCachedImage(String imagePath) async {
-    debugPrint("getCachedImage challenge -> $imagePath");
+    debugPrint("getCachedImage challenge -> $imagePath"); //coverage:ignore-line
 
     try {
       // 1. RAM Cache (Corretto)
       final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
-        debugPrint("Challenge image found in RAM cache");
+        debugPrint("Challenge image found in RAM cache"); //coverage:ignore-line
         return inMemory;
       }
 
@@ -33,18 +33,18 @@ class ChallengesController extends ChangeNotifier {
 
       final cached = await memory.getImageFromDisk(cacheableUrl);
       if (cached != null) {
-        debugPrint("Challenge image found in disk cache");
+        debugPrint("Challenge image found in disk cache"); //coverage:ignore-line
         memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
-      debugPrint("Challenge image not in cache, downloading");
+      debugPrint("Challenge image not in cache, downloading"); //coverage:ignore-line
       final file = await memory.cacheImageOnDisk(cacheableUrl); 
       memory.saveImageToMemory(imagePath, file);
       return file;
 
     } catch (e) {
-      debugPrint("getCachedImage challenge error: $e");
+      debugPrint("getCachedImage challenge error: $e"); //coverage:ignore-line
       return null;
     }
   }

@@ -36,10 +36,10 @@ class ServiceController {
     weatherbitKey = dotenv.env['WEATHERBIT_API_KEY'] ?? "";
 
     if (openWeatherKey.isEmpty) {
-      debugPrint("WARNING: OPENWEATHER_API_KEY missing");
+      debugPrint("WARNING: OPENWEATHER_API_KEY missing"); //coverage:ignore-line
     }
     if (weatherbitKey.isEmpty) {
-      debugPrint("WARNING: WEATHERBIT_API_KEY missing");
+      debugPrint("WARNING: WEATHERBIT_API_KEY missing"); //coverage:ignore-line
     }
   }
 
@@ -71,10 +71,10 @@ class ServiceController {
         return jsonDecode(res.body);
       }
 
-      debugPrint("Weather error: HTTP ${res.statusCode}");
+      debugPrint("Weather error: HTTP ${res.statusCode}"); //coverage:ignore-line
       return null;
     } catch (e) {
-      debugPrint("Weather request failed: $e");
+      debugPrint("Weather request failed: $e"); //coverage:ignore-line
       return null;
     }
   }
@@ -104,10 +104,10 @@ class ServiceController {
         ];
       }
 
-      debugPrint("Forecast error: HTTP ${res.statusCode}");
+      debugPrint("Forecast error: HTTP ${res.statusCode}"); //coverage:ignore-line
       return null;
     } catch (e) {
-      debugPrint("Forecast request failed: $e");
+      debugPrint("Forecast request failed: $e"); //coverage:ignore-line
       return null;
     }
   }
@@ -160,7 +160,7 @@ class ServiceController {
 
       return [];
     } catch (e) {
-      debugPrint("Mock alerts error $e");
+      debugPrint("Mock alerts error $e");  //coverage:ignore-line
       return [];
     }
   }
@@ -181,12 +181,12 @@ class ServiceController {
           .timeout(const Duration(seconds: 6));
 
       if (res.statusCode == 429) {
-        debugPrint("Weatherbit rate limit reached");
+        debugPrint("Weatherbit rate limit reached"); //coverage:ignore-line
         return [];
       }
 
       if (res.statusCode != 200) {
-        debugPrint("Weatherbit alerts error ${res.statusCode}");
+        debugPrint("Weatherbit alerts error ${res.statusCode}"); //coverage:ignore-line
         return [];
       }
 
@@ -205,7 +205,7 @@ class ServiceController {
         };
       }).toList();
     } catch (e) {
-      debugPrint("Weatherbit alerts exception $e");
+      debugPrint("Weatherbit alerts exception $e"); //coverage:ignore-line
       return [];
     }
   }

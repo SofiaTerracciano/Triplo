@@ -15,7 +15,7 @@ class WatchIdService {
     if (local != null && local.isNotEmpty) {
 
 
-      debugPrint("WatchIdService: usando watchId locale=$local");
+      debugPrint("WatchIdService: usando watchId locale=$local"); //coverage:ignore-line
 
       unawaited(_ensureWatchDoc(local));
       return local;
@@ -28,7 +28,7 @@ class WatchIdService {
       await _storage.write(key: _watchIdKey, value: watchId);
       return watchId;
     } catch (e) {
-      debugPrint("WatchIdService: Firestore non disponibile ($e). Uso UUID locale.");
+      debugPrint("WatchIdService: Firestore non disponibile ($e). Uso UUID locale."); //coverage:ignore-line
       final fallback = _uuid.v4();
       await _storage.write(key: _watchIdKey, value: fallback);
 
@@ -39,13 +39,13 @@ class WatchIdService {
 
   static Future<String> _createWatchDocOnFirestore() async {
     final db = FirebaseFirestore.instance;
-    debugPrint("WatchIdService: creo doc su /watch ...");
+    debugPrint("WatchIdService: creo doc su /watch ..."); //coverage:ignore-line
     final ref = await db.collection('watch').add({
       'platform': 'wearos',
       'createdAt': FieldValue.serverTimestamp(),
       'lastSeenAt': FieldValue.serverTimestamp(),
     });
-    debugPrint("WatchIdService: creato watchId=${ref.id}");
+    debugPrint("WatchIdService: creato watchId=${ref.id}"); //coverage:ignore-line
     return ref.id;
   }
 
@@ -69,7 +69,7 @@ class WatchIdService {
         });
       }
     } catch (e) {
-      debugPrint("WatchIdService ensureWatchDoc failed: $e");
+      debugPrint("WatchIdService ensureWatchDoc failed: $e"); //coverage:ignore-line
     }
   }
 }

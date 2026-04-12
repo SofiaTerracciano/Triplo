@@ -211,13 +211,13 @@ class TrekkingController extends ChangeNotifier {
   /// 2. Checks Disk (Local file storage).
   ///3. Downloads from Storage/Network if not found locally.
   Future<File?> getCachedImage(String imagePath) async {
-    debugPrint("getCachedImage -> $imagePath");
+    debugPrint("getCachedImage -> $imagePath"); // coverage:ignore-line
 
     try {
       // Search in RAM
       final inMemory = await memory.getImageFromMemory(imagePath);
       if (inMemory != null) {
-        debugPrint("Image found in RAM cache");
+        debugPrint("Image found in RAM cache"); // coverage:ignore-line
         return inMemory;
       }
 
@@ -232,18 +232,18 @@ class TrekkingController extends ChangeNotifier {
       // Search in local disk storage
       final cached = await memory.getImageFromDisk(cacheableUrl);
       if (cached != null) {
-        debugPrint("Image found in disk cache");
+        debugPrint("Image found in disk cache"); // coverage:ignore-line
         memory.saveImageToMemory(imagePath, cached);
         return cached;
       }
 
       // Download and save to disk/memory caches
-      debugPrint("Image not in cache, downloading");
+      debugPrint("Image not in cache, downloading"); // coverage:ignore-line
       final file = await memory.cacheImageOnDisk(cacheableUrl);
       memory.saveImageToMemory(imagePath, file);
       return file;
     } catch (e) {
-      debugPrint("getCachedImage error: $e");
+      debugPrint("getCachedImage error: $e"); // coverage:ignore-line
       return null;
     }
   }

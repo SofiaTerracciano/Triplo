@@ -19,8 +19,8 @@ class GeoService {
 
       return LatLng(pos.latitude, pos.longitude);
     } catch (e) {
-      debugPrint("Error getting location (probabilmente permessi mancanti o timeout): $e");
-      return null;
+      debugPrint("Error getting location (probabilmente permessi mancanti o timeout): $e"); //coverage:ignore-line
+      return null; 
     }
   }
 }

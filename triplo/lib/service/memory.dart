@@ -42,7 +42,7 @@ class MemoryService {
       final fileInfo = await _diskCache.getFileFromCache(url);
       return fileInfo?.file;
     } catch (e) {
-      debugPrint("Errore recupero disco: $e");
+      debugPrint("Errore recupero disco: $e"); //coverage:ignore-line
       return null;
     }
   }
@@ -52,7 +52,7 @@ class MemoryService {
     try {
       return await _diskCache.getSingleFile(url);
     } catch (e) {
-      debugPrint("Errore salvataggio disco: $e");
+      debugPrint("Errore salvataggio disco: $e"); //coverage:ignore-line
       rethrow;
     }
   }
@@ -96,7 +96,7 @@ class MemoryService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(_kLocaleCodeKey);
     } catch (e) {
-      debugPrint("Errore recupero lingua salvata: $e");
+      debugPrint("Errore recupero lingua salvata: $e"); //coverage:ignore-line
       return null;
     }
   }
@@ -106,8 +106,8 @@ class MemoryService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_kLocaleCodeKey, localeCode);
     } catch (e) {
-      debugPrint("Errore salvataggio lingua: $e");
-      rethrow;
+      debugPrint("Errore salvataggio lingua: $e"); //coverage:ignore-line
+      rethrow; 
     }
   }
 
@@ -118,7 +118,7 @@ class MemoryService {
       final list = prefs.getStringList(_kShownWeatherAlertsKey) ?? <String>[];
       return list.toSet();
     } catch (e) {
-      debugPrint("Errore recupero alert mostrati: $e");
+      debugPrint("Errore recupero alert mostrati: $e"); //coverage:ignore-line
       return <String>{};
     }
   }
@@ -128,7 +128,7 @@ class MemoryService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_kShownWeatherAlertsKey, keys.toList());
     } catch (e) {
-      debugPrint("Errore salvataggio alert mostrati: $e");
+      debugPrint("Errore salvataggio alert mostrati: $e"); //coverage:ignore-line
       rethrow;
     }
   }
@@ -143,7 +143,7 @@ class MemoryService {
         maxAge: const Duration(days: 1),
       );
     } catch (e) {
-      debugPrint("Errore salvataggio alert mostrato: $e");
+      debugPrint("Errore salvataggio alert mostrato: $e"); //coverage:ignore-line
     }
   }
 
@@ -154,7 +154,7 @@ class MemoryService {
 
       return fileInfo != null;
     } catch (e) {
-      debugPrint("Errore controllo alert mostrato: $e");
+      debugPrint("Errore controllo alert mostrato: $e"); //coverage:ignore-line
       return false;
     }
   }
