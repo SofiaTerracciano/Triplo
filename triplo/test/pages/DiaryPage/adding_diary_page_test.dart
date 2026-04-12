@@ -6,9 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:latlong2/latlong.dart';
-
 import 'package:triplo/l10n/app_localizations.dart';
-import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/controller/diary.dart';
@@ -17,7 +15,6 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/pages/DiaryPage/adding-diary-page.dart';
 import 'package:triplo/service/authservice.dart';
 
-// Riusa i mock generati dal file change_diary_page_test.dart
 import 'change_diary_page_test.mocks.dart';
 import 'diary_page_test.mocks.dart'
     hide MockTrekkingController, MockUserController;
@@ -67,8 +64,6 @@ void main() {
       when(mockUserController.updateUserLevel(any)).thenAnswer((_) async => {});
     });
 
-    // ── helpers locali ──────────────────────────────────────────────────────
-
     Widget buildPage({String trekkingId = 'trek1'}) => MultiProvider(
       providers: [
         ChangeNotifierProvider<DiaryController>.value(value: diaryController),
@@ -89,7 +84,6 @@ void main() {
       ),
     );
 
-    // Helper per i test del bottone Salva che evita di montare UserPage
     Widget buildPageForSave(MockDiaryController mockDiary) => MultiProvider(
       providers: [
         ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
@@ -105,7 +99,6 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        // Intercetta la navigazione a UserPage con una pagina stub
         onGenerateRoute: (settings) {
           return MaterialPageRoute(
             builder: (_) => const Scaffold(body: Text('stub_page')),
@@ -121,22 +114,17 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Sostituisce la route con un widget vuoto → chiama dispose()
       await tester.pumpWidget(
         const MaterialApp(home: Scaffold(body: Text('empty'))),
       );
       await tester.pumpAndSettle();
 
-      // Se dispose ha fatto leak o doppio dispose, il test sarebbe già fallito
       expect(find.text('empty'), findsOneWidget);
     });
-
-    // ── CASO !snapshot.hasData ───────────────────────────────────────────────────
 
     testWidgets('mostra messaggio errore se getFollowing restituisce null', (
       tester,
     ) async {
-      // Restituisce una Future che completa con una lista vuota
       when(
         mockUserController.getFollowing('user1'),
       ).thenAnswer((_) async => <Users>[]);
@@ -150,10 +138,6 @@ void main() {
       expect(find.text(local.user_not_found), findsOneWidget);
     });
 
-    // ── DROPDOWN – cambio valore tramite widget state ────────────────────────────
-    // Non apriamo l'overlay (virtualizzato), verifichiamo il valore
-    // chiamando direttamente onChanged come farebbe il framework.
-
     testWidgets('dropdown giorno aggiorna il valore dopo onChanged', (
       tester,
     ) async {
@@ -163,7 +147,6 @@ void main() {
       final dropdown = tester.widget<DropdownButton<int>>(
         find.byType(DropdownButton<int>).first,
       );
-      // Simula la selezione di un nuovo valore
       dropdown.onChanged!(15);
       await tester.pumpAndSettle();
 
@@ -245,8 +228,6 @@ void main() {
       expect(updated.value, 30);
     });
 
-    // ── AMICI con following non vuoto ────────────────────────────────────────────
-
     testWidgets(
       'ExpansionTile amici mostra ListTile per ogni utente nel following',
       (tester) async {
@@ -282,11 +263,9 @@ void main() {
         await tester.pumpWidget(buildPage());
         await tester.pumpAndSettle();
 
-        // Apre expansion amici
         await tester.tap(find.byType(ExpansionTile).first);
         await tester.pumpAndSettle();
 
-        // Tappa su luigi
         await tester.tap(
           find.byWidgetPredicate(
             (w) => w is ListTile && w.leading is CircleAvatar,
@@ -294,7 +273,6 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Il Chip di luigi appare nel preview
         expect(find.text('luigi'), findsWidgets);
       },
     );
@@ -315,17 +293,14 @@ void main() {
         (w) => w is ListTile && w.leading is CircleAvatar,
       );
 
-      // Aggiunge
       await tester.tap(userTile);
       await tester.pumpAndSettle();
 
-      // Riapre l'ExpansionTile se si è chiuso
       if (tester.widgetList(userTile).isEmpty) {
         await tester.tap(friendsExpansion);
         await tester.pumpAndSettle();
       }
 
-      // Rimuove
       await tester.tap(userTile);
       await tester.pumpAndSettle();
 
@@ -334,8 +309,6 @@ void main() {
       )!;
       expect(find.text(local.friends_selected_label), findsOneWidget);
     });
-
-    // ── CHALLENGES con trekking che le ha ───────────────────────────────────────
 
     testWidgets(
       'sezione challenges mostra testo "no challenges" inizialmente',
@@ -359,7 +332,6 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      // Silenzia gli errori di immagine di rete attesi
       final originalOnError = FlutterError.onError;
       FlutterError.onError = (details) {
         if (details.toString().contains('NetworkImageLoadException')) return;
@@ -380,8 +352,6 @@ void main() {
       expect(find.byType(GridView), findsOneWidget);
     });
 
-    // ── MOOD – più emoji ─────────────────────────────────────────────────────────
-
     testWidgets('è possibile selezionare più emoji contemporaneamente', (
       tester,
     ) async {
@@ -395,7 +365,6 @@ void main() {
       await tester.tap(tiles.last);
       await tester.pumpAndSettle();
 
-      // Seleziona 😍
       await tester.tap(
         find.byWidgetPredicate(
           (w) =>
@@ -406,7 +375,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Ri-apre se necessario
       if (tester
           .widgetList(
             find.byWidgetPredicate(
@@ -421,7 +389,6 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      // Seleziona 😁
       await tester.tap(
         find.byWidgetPredicate(
           (w) =>
@@ -432,7 +399,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Entrambi i Chip devono essere nel preview
       expect(
         find.byWidgetPredicate(
           (w) => w is Chip && w.label is Text && (w.label as Text).data == '😍',
@@ -460,7 +426,6 @@ void main() {
       await tester.tap(tiles.last);
       await tester.pumpAndSettle();
 
-      // Prima della selezione: circle_outlined
       final tileBefore = tester.widget<ListTile>(
         find.byWidgetPredicate(
           (w) =>
@@ -471,7 +436,6 @@ void main() {
       );
       expect((tileBefore.trailing as Icon).icon, Icons.circle_outlined);
 
-      // Seleziona
       await tester.tap(
         find.byWidgetPredicate(
           (w) =>
@@ -482,7 +446,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Ri-apre se necessario
       if (tester
           .widgetList(
             find.byWidgetPredicate(
@@ -497,7 +460,6 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      // Dopo la selezione: check_circle
       final tileAfter = tester.widget<ListTile>(
         find.byWidgetPredicate(
           (w) =>
@@ -508,11 +470,6 @@ void main() {
       );
       expect((tileAfter.trailing as Icon).icon, Icons.check_circle);
     });
-
-    // ── SALVA – logica costruzione data e durata ─────────────────────────────────
-    // Non possiamo testare la navigazione completa (richiede uploadDiaryImages),
-    // ma possiamo verificare che il DiaryController riceva i parametri corretti
-    // impostando mock su uploadDiaryImages.
 
     testWidgets('bottone Salva chiama addDiary con data e durata corrette',
     (tester) async {
@@ -663,14 +620,12 @@ void main() {
         });
 
         await tester.pumpWidget(buildPage());
-        await tester.pump(); // un frame: FutureBuilder in waiting
+        await tester.pump(); 
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
         await tester.pumpAndSettle();
       },
     );
-
-    // ── DATE/ORA INIZIALI ───────────────────────────────────────────────────
 
     testWidgets('dropdown giorno inizializzato con giorno corrente', (
       tester,
@@ -728,8 +683,6 @@ void main() {
       expect(minutesDropdown.value, 0);
     });
 
-    // ── AMICI ───────────────────────────────────────────────────────────────
-
     testWidgets('sezione amici mostra testo "no friends" con lista vuota', (
       tester,
     ) async {
@@ -760,8 +713,6 @@ void main() {
       },
     );
 
-    // ── NOTE ────────────────────────────────────────────────────────────────
-
     testWidgets('campo Note è inizialmente vuoto', (tester) async {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
@@ -781,8 +732,6 @@ void main() {
 
       expect(find.text('Nota di test'), findsOneWidget);
     });
-
-    // ── RIFORNIMENTO ────────────────────────────────────────────────────────
 
     testWidgets('chip No è selezionato di default (usedRefreshment=false)', (
       tester,
@@ -806,7 +755,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Solo il TextField delle note deve essere presente
       expect(find.byType(TextField), findsOneWidget);
     });
 
@@ -826,7 +774,6 @@ void main() {
       await tester.tap(find.widgetWithText(ChoiceChip, local.yes_botton_label));
       await tester.pumpAndSettle();
 
-      // Ora ci sono 2 TextField: note + rifornimento
       expect(find.byType(TextField), findsNWidgets(2));
     });
 
@@ -878,8 +825,6 @@ void main() {
 
       expect(find.text('Rifugio Alpino'), findsOneWidget);
     });
-
-    // ── MOOD ────────────────────────────────────────────────────────────────
 
     testWidgets('sezione mood mostra testo "no mood" con lista vuota', (
       tester,
@@ -957,7 +902,6 @@ void main() {
       await tester.tap(tiles.last);
       await tester.pumpAndSettle();
 
-      // Finder specifico per il ListTile dell'emoji nell'ExpansionTile
       final emojiListTile = find.byWidgetPredicate(
         (w) =>
             w is ListTile &&
@@ -965,11 +909,9 @@ void main() {
             (w.leading as Text).data == '😍',
       );
 
-      // Prima aggiunge
       await tester.tap(emojiListTile);
       await tester.pumpAndSettle();
 
-      // Verifica che il Chip sia apparso nel preview
       expect(
         find.byWidgetPredicate(
           (w) => w is Chip && w.label is Text && (w.label as Text).data == '😍',
@@ -977,14 +919,11 @@ void main() {
         findsOneWidget,
       );
 
-      // L'ExpansionTile deve essere ancora aperto: il ListTile è ancora nel tree.
-      // Se si è chiuso, lo riapriamo.
       if (tester.widgetList(emojiListTile).isEmpty) {
         await tester.tap(tiles.last);
         await tester.pumpAndSettle();
       }
 
-      // Poi rimuove tappando di nuovo il ListTile
       await tester.tap(emojiListTile);
       await tester.pumpAndSettle();
 
@@ -996,8 +935,6 @@ void main() {
       );
     });
 
-    // ── FOTO ────────────────────────────────────────────────────────────────
-
     testWidgets('pulsante aggiungi foto è presente', (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -1007,8 +944,6 @@ void main() {
 
       expect(find.byIcon(Icons.add_photo_alternate), findsOneWidget);
     });
-
-    // ── PUBBLICO/PRIVATO ────────────────────────────────────────────────────
 
     testWidgets('bottone Privato è active di default (isPublic=false)', (
       tester,
@@ -1076,8 +1011,6 @@ void main() {
       final fg = privateBtn.style!.foregroundColor!.resolve(<MaterialState>{});
       expect(fg, Colors.white);
     });
-
-    // ── SALVA/ANNULLA ───────────────────────────────────────────────────────
 
     testWidgets('bottoni Salva e Annulla sono presenti', (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 2000));
@@ -1148,8 +1081,6 @@ void main() {
       expect(popped, true);
     });
 
-    // ── CHALLENGES (trekking senza challenges) ──────────────────────────────
-
     testWidgets('sezione challenges non appare se trekking non ha challenges', (
       tester,
     ) async {
@@ -1174,8 +1105,6 @@ void main() {
   });
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 Users _buildUser({String uid = 'user1', String username = 'mario'}) => Users(
   uid: uid,
   username: username,
@@ -1194,7 +1123,6 @@ Users _buildUser({String uid = 'user1', String username = 'mario'}) => Users(
   photoProfile: null,
 );
 
-/// Trekking senza challenges → la sezione non viene renderizzata
 Trekking _buildTrekkingNoChallenge() => Trekking(
   documentId: 'trek1',
   name: 'Sentiero Facile',
@@ -1218,7 +1146,6 @@ Trekking _buildTrekkingNoChallenge() => Trekking(
   challenges: [],
 );
 
-/// Trekking con challenges → la sezione viene renderizzata
 Trekking _buildTrekkingWithChallenges() => Trekking(
   documentId: 'trek_with_challenges',
   name: 'Sentiero Difficile',
@@ -1241,5 +1168,3 @@ Trekking _buildTrekkingWithChallenges() => Trekking(
   familyFirendly: false,
   challenges: ['challenge1', 'challenge2'],
 );
-
-
