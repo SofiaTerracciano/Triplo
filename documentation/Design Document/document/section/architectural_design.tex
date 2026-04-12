@@ -438,13 +438,13 @@ The method is invoked:
 
 
 
-
 \begin{itemize}
     \item once during initialization,
     \item periodically through a timer (every 5 minutes),
     \item when the user switches between trail-based and GPS-based weather.
 \end{itemize}
 The method \texttt{\_loadAlertState()} is responsible for retrieving the current notification status for the selected trekking route. It queries the \texttt{TrekkingController}, which:
+
 \begin{itemize}
     \item retrieves the current user identifier through \texttt{AuthService},
     \item queries Firestore to check whether the trekking is present in the user’s alert list.

@@ -1,5 +1,104 @@
 \csname documentclass\endcsname[../main.tex]{subfiles}
 
 \begin{document}
+\chapter{Implementation and Integration}
+
+\section{Implementation Strategy}
+
+The development of the Triplo application followed a structured and incremental approach, aligned with the architectural design of the system. The implementation was carried out using a bottom-up strategy, where foundational components were developed first and progressively extended towards higher-level functionalities.
+
+In particular, the implementation process evolved through a set of stages that were not strictly sequential but partially overlapped during development.
+
+First, the \textbf{model components} were defined. These components represent the core domain entities of the application and include \texttt{challengeModel}, \texttt{trekkingModel}, \texttt{UserModel}, and \texttt{DiaryModel}. They provide a structured representation of the data managed by the system and exchanged with the backend.
+
+Second, the \textbf{controller components} were introduced. Controllers were developed early in the process and progressively refined as new functionalities were added. Rather than being completed in a single phase, they evolved incrementally together with the introduction of application features. This includes \texttt{languagecontroller}, \texttt{challengecontroller}, \texttt{trekkingcontroller}, \texttt{UserController}, and \texttt{DiaryController}. Over time, controllers were improved to better coordinate logic and interactions among components.
+
+As development progressed, the implementation of the \textbf{view components} and controllers proceeded together, following the introduction of new functionalities. The user interface components, such as \texttt{GeowatchPage}, \texttt{HomePage}, \texttt{trekkingPage}, \texttt{SettingsPage}, \texttt{LoginRegistrationPage}, \texttt{SearchPage}, \texttt{UserProfilePage}, and \texttt{DiaryPage}, were developed incrementally to support the growing feature set of the application.
+
+Finally, the \textbf{service components} were introduced. Services such as \texttt{Background\_service}, \texttt{InternetService}, \texttt{permissionservice}, \texttt{geoservice}, \texttt{memoryservice}, \texttt{notificationservice}, and \texttt{authservice} were implemented to reduce the responsibilities of controllers and to delineate and isolate individual technical duties. In particular, services encapsulate interactions with the operating system (e.g., permissions, geolocation, notifications) and provide reusable functionality. This design improves modularity and maintainability by decoupling application logic from platform-specific operations.
+
+\newpage
+\subsection{Implementation Process Overview}
+The incremental construction of the system components is summarized in Figure~\ref{Implementation Process}
+
+
+
+
+
+
+
+\label{Implementation Process}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{./images/Implementation process.jpg}
+    \caption{Implementation Process}
+\end{figure}.
+
+\newpage
+\section{Integration of Software Components}
+
+After the implementation of the individual components, the system was progressively assembled through an integration phase. This phase followed a clear incremental strategy.
+
+Initially, \textbf{Firebase} was integrated together with the controller components. Controllers directly interact with Firebase services (such as authentication, database, and storage) through platform-specific SDKs, enabling early validation of backend-related functionalities.
+
+Subsequently, the integration of \textbf{view components} and controllers continued in parallel with the implementation of functionalities. This allowed the application to evolve incrementally, ensuring that each feature was fully integrated before introducing new ones.
+
+External services, such as weather and map providers, were integrated at a later stage of development, once the corresponding user interface components were available. As the number of external dependencies increased, a dedicated \textbf{ServiceController} was introduced following the Facade design pattern. This controller centralizes access to external APIs and OS-level services, simplifying interactions and reducing coupling across the system.
+
+Finally, \textbf{device-level services} were fully integrated through the service components, which manage interactions with the operating system in a controlled and modular way.
+
+Overall, the integration process was incremental: core backend functionality was integrated first, followed by user interface components, and finally external services and OS interactions.
+
+
+
+
+\label{Package Diagram Smartphone}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{./images/package diagram.drawio.png}
+    \caption{Package diagram representing the dependencies in the smartphone application}
+\end{figure}
+
+
+\section{Testing}
+
+The testing strategy is defined according to the testing levels recommended in the Flutter documentation.
+
+\subsection{Unit Tests}
+
+Unit tests (also referred to as module tests) focus on verifying the correctness of individual components in isolation. In the context of the Triplo application, unit tests target models, controllers, and services, ensuring that each component behaves as expected when provided with controlled inputs.
+
+\subsection{Widget Tests}
+
+Widget tests are specific to Flutter and are used to verify the behavior of individual UI components. These tests simulate user interactions and validate the rendering and state changes of widgets without requiring a full application runtime. Widget tests are particularly useful to ensure that UI components correctly interact with controllers and display the expected data.
+
+\subsection{Integration Tests}
+
+Integration tests validate the interaction between multiple components of the application. In Flutter, these tests run the application in a simulated or real environment and verify complete user flows, including navigation, data retrieval, and interaction with services. Integration tests are essential to ensure that controllers, services, and UI components work together correctly.
+
+\subsection{User Testing}
+
+User testing represents the final stage of validation, where the application is tested by end users in realistic scenarios. This type of testing focuses on usability, user experience, and overall system behavior in real-world conditions.
+
+\subsection{Test Environment}
+
+The testing and validation activities are performed using a combination of physical devices and emulators, as summarized in Table~\ref{tab:test-environment}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Device} & \textbf{Type} & OS & \textbf{Architecture} \\
+\hline
+Android Emulator (Medium Phone API 36) & Emulator & Android & x86\_64 \\
+Wear OS Emulator (Small Round) & Emulator & Android Wear OS & x86\_64 \\
+Samsung Galaxy A34 5G & Real Device & Android & ARM64 \\
+iPhone 15 Plus & Real Device & iOS & ARM64 \\
+\hline
+\end{tabular}
+\caption{Testing environment devices and architectures}
+\label{tab:test-environment}
+\end{table}
+
 
 \end{document}
