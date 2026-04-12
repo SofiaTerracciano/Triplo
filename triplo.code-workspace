@@ -1,9 +1,0 @@
-{
-  "folders": [
-    { "name": "triplo", "path": "./triplo" },
-    { "name": "app_wearos", "path": "./app_wearos" }
-  ],
-  "settings": {
-    "coverage-gutters.coverageFileNames": ["coverage/lcov.info"]
-  }
-}
