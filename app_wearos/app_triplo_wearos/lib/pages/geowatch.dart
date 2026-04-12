@@ -84,10 +84,10 @@ class _GeowatchPageState extends State<GeowatchPage> {
         mockAlerts = await serviceController.mockAlerts();
       } catch (_) {}
 
-      debugPrint("Weather loaded: ${weatherRes != null}");
-      debugPrint("Forecast loaded: ${forecastRes?.length ?? 0}");
-      debugPrint("Real alerts: ${realAlerts.length}");
-      debugPrint("Mock alerts: ${mockAlerts.length}");
+      debugPrint("Weather loaded: ${weatherRes != null}");  //coverage:ignore-line
+      debugPrint("Forecast loaded: ${forecastRes?.length ?? 0}"); //coverage:ignore-line
+      debugPrint("Real alerts: ${realAlerts.length}"); //coverage:ignore-line
+      debugPrint("Mock alerts: ${mockAlerts.length}"); //coverage:ignore-line
 
       if (!mounted) return;
 
@@ -100,7 +100,7 @@ class _GeowatchPageState extends State<GeowatchPage> {
         loading = false;
       });
     } catch (e) {
-      debugPrint("Weather page load error: $e");
+      debugPrint("Weather page load error: $e"); //coverage:ignore-line
       if (!mounted) return;
       setState(() {
         error = e.toString();

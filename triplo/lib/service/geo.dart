@@ -17,7 +17,7 @@ class GeoService {
 
       return LatLng(pos.latitude, pos.longitude);
     } catch (e) {
-      debugPrint("Error getting location: $e");
+      debugPrint("Error getting location: $e"); //coverage:ignore-line
       return null;
     }
   }

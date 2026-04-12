@@ -36,7 +36,7 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    debugPrint(".env file not found — continuing without it.");
+    debugPrint(".env file not found — continuing without it."); //coverage:ignore-line
   }
 
   await Firebase.initializeApp(
@@ -57,7 +57,7 @@ Future<void> main() async {
       frequency: const Duration(minutes: 15),
     );
   } catch (e) {
-    debugPrint('Workmanager setup failed: $e');
+    debugPrint('Workmanager setup failed: $e'); //coverage:ignore-line
   }
 
 

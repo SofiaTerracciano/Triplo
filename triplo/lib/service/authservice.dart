@@ -125,11 +125,11 @@ class AuthService extends ChangeNotifier {
     );
 
     try {
-      debugPrint("AuthService: Google login start");
+      debugPrint("AuthService: Google login start"); //coverage:ignore-line
 
-      debugPrint("AuthService: calling googleSignIn.signOut()");
+      debugPrint("AuthService: calling googleSignIn.signOut()"); //coverage:ignore-line
       await googleSignIn.signOut();
-      debugPrint("AuthService: signOut completed");
+      debugPrint("AuthService: signOut completed"); //coverage:ignore-line
 
 
       // try {
@@ -140,52 +140,52 @@ class AuthService extends ChangeNotifier {
       //   debugPrint("AuthService: disconnect skipped/failed: $e");
       // }
 
-      debugPrint("AuthService: opening Google account picker");
+      debugPrint("AuthService: opening Google account picker"); //coverage:ignore-line
       final googleUser = await googleSignIn.signIn();
 
-      debugPrint("AuthService: signIn() returned");
+      debugPrint("AuthService: signIn() returned");  //coverage:ignore-line
       if (googleUser == null) {
-        debugPrint("AuthService: Google sign-in cancelled by user");
+        debugPrint("AuthService: Google sign-in cancelled by user"); //coverage:ignore-line
         throw Exception("Google sign-in cancelled");
       }
 
-      debugPrint("AuthService: selected Google account = ${googleUser.email}");
+      debugPrint("AuthService: selected Google account = ${googleUser.email}"); //coverage:ignore-line
 
-      debugPrint("AuthService: requesting Google authentication tokens");
+      debugPrint("AuthService: requesting Google authentication tokens"); //coverage:ignore-line
       final googleAuth = await googleUser.authentication;
-      debugPrint("AuthService: tokens received");
+      debugPrint("AuthService: tokens received"); //coverage:ignore-line
       debugPrint(
-          "AuthService: accessToken null? ${googleAuth.accessToken == null}");
-      debugPrint("AuthService: idToken null? ${googleAuth.idToken == null}");
+          "AuthService: accessToken null? ${googleAuth.accessToken == null}"); //coverage:ignore-line
+      debugPrint("AuthService: idToken null? ${googleAuth.idToken == null}"); //coverage:ignore-line
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      debugPrint("AuthService: Firebase credential created");
+      debugPrint("AuthService: Firebase credential created");  //coverage:ignore-line
 
-      debugPrint("AuthService: calling FirebaseAuth.signInWithCredential()");
+      debugPrint("AuthService: calling FirebaseAuth.signInWithCredential()"); //coverage:ignore-line
       final cred = await _auth.signInWithCredential(credential);
-      debugPrint("AuthService: Firebase signInWithCredential completed");
+      debugPrint("AuthService: Firebase signInWithCredential completed"); //coverage:ignore-line
 
       final user = cred.user;
-      debugPrint("AuthService: Firebase user uid = ${user?.uid}");
-      debugPrint("AuthService: Firebase user email = ${user?.email}");
+      debugPrint("AuthService: Firebase user uid = ${user?.uid}"); //coverage:ignore-line
+      debugPrint("AuthService: Firebase user email = ${user?.email}"); //coverage:ignore-line
 
       if (user == null) {
         throw StateError("Firebase user is null after Google sign-in");
       }
 
-      debugPrint("AuthService: ensuring Firestore docs");
+      debugPrint("AuthService: ensuring Firestore docs"); //coverage:ignore-line
       await _ensureUserFirestoreDocs(user);
-      debugPrint("AuthService: Firestore docs ensured");
+      debugPrint("AuthService: Firestore docs ensured"); //coverage:ignore-line
 
-      debugPrint("AuthService: loading user core");
+      debugPrint("AuthService: loading user core"); //coverage:ignore-line
       await loadUserCore(user.uid);
-      debugPrint("AuthService: loadUserCore completed");
+      debugPrint("AuthService: loadUserCore completed"); //coverage:ignore-line
     } catch (e, st) {
-      debugPrint("AuthService: Google login failed");
-      debugPrint("AuthService ERROR: $e");
+      debugPrint("AuthService: Google login failed"); //coverage:ignore-line
+      debugPrint("AuthService ERROR: $e"); //coverage:ignore-line
       debugPrintStack(stackTrace: st);
       rethrow;
     }
@@ -332,7 +332,7 @@ class AuthService extends ChangeNotifier {
 
   ({String watchId, String token}) extractWatchPair(String raw) {
     final uri = Uri.tryParse(raw.trim());
-    debugPrint(uri as String?);
+    debugPrint(uri as String?); //coverage:ignore-line
     if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {
       throw const FormatException("QR non valido");
     }
@@ -438,8 +438,8 @@ class AuthService extends ChangeNotifier {
       throw Exception("Email non disponibile");
     }
 
-    debugPrint("refreshEmailFromAuth: email Firebase Auth = $refreshedEmail");
-    debugPrint("refreshEmailFromAuth: uid = ${refreshedUser.uid}");
+    debugPrint("refreshEmailFromAuth: email Firebase Auth = $refreshedEmail"); //coverage:ignore-line
+    debugPrint("refreshEmailFromAuth: uid = ${refreshedUser.uid}"); //coverage:ignore-line
 
     await _db.collection("users").doc(refreshedUser.uid).update({
       "Email": refreshedEmail,

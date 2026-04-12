@@ -183,7 +183,7 @@ class PairingService extends ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint("restoreWatchPairing get failed: $e");
+      debugPrint("restoreWatchPairing get failed: $e");  //coverage:ignore-line
     }
 
     _pairSub = docRef.snapshots().listen(
@@ -204,7 +204,7 @@ class PairingService extends ChangeNotifier {
         }
       },
       onError: (e) {
-        debugPrint("restoreWatchPairing listener error: $e");
+        debugPrint("restoreWatchPairing listener error: $e"); //coverage:ignore-line
       },
     );
 

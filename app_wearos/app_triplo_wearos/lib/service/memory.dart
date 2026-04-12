@@ -43,7 +43,7 @@ class MemoryService {
 
   void saveImageToMemory(String key, File file) {
     _internalRamCache[key] = file;
-    debugPrint("Memory: salvata immagine $key in RAM");
+    debugPrint("Memory: salvata immagine $key in RAM"); //coverage:ignore-line
   }
 
   Future<File?> getImageFromMemory(String key) async {
@@ -57,7 +57,7 @@ class MemoryService {
 
   void clearAllRam() {
     _internalRamCache.clear();
-    debugPrint("Memory: RAM pulita");
+    debugPrint("Memory: RAM pulita"); //coverage:ignore-line
   }
 
   // --- 4. GESTIONE DISCO (Metodi usati dal Controller) ---
@@ -68,7 +68,7 @@ class MemoryService {
       final fileInfo = await _diskCache.getFileFromCache(url);
       return fileInfo?.file;
     } catch (e) {
-      debugPrint("Errore recupero disco: $e");
+      debugPrint("Errore recupero disco: $e"); //coverage:ignore-line
       return null;
     }
   }
@@ -78,8 +78,8 @@ class MemoryService {
     try {
       return await _diskCache.getSingleFile(url);
     } catch (e) {
-      debugPrint("Errore salvataggio disco: $e");
-      rethrow; 
+      debugPrint("Errore salvataggio disco: $e"); //coverage:ignore-line
+      rethrow;  
     }
   }
 }

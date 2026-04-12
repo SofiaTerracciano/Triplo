@@ -26,7 +26,7 @@ class BackgroundService with WidgetsBindingObserver {
 
   void start() {
     WidgetsBinding.instance.addObserver(this);
-    debugPrint("BackgroundService started");
+    debugPrint("BackgroundService started"); //coverage:ignore-line
     _run();
     _timer = Timer.periodic(
       const Duration(minutes: 12),
@@ -40,7 +40,7 @@ class BackgroundService with WidgetsBindingObserver {
     _running = true;
 
     try {
-      debugPrint("BackgroundService running check");
+      debugPrint("BackgroundService running check"); //coverage:ignore-line
 
       final trekkingController = context.read<TrekkingController>();
       final api = context.read<ServiceController>();
@@ -54,7 +54,7 @@ class BackgroundService with WidgetsBindingObserver {
         memory: memory,
       );
     } catch (e) {
-      debugPrint("BackgroundService error: $e");
+      debugPrint("BackgroundService error: $e"); //coverage:ignore-line
     } finally {
       _running = false;
     }
@@ -80,13 +80,13 @@ class BackgroundServiceLogic {
     required NotificationService notification,
     required MemoryService memory,
   }) async {
-    debugPrint("BackgroundServiceLogic running");
+    debugPrint("BackgroundServiceLogic running"); //coverage:ignore-line
 
     final trekkings = await trekkingController.getWeatherAlertTrekkings();
-    debugPrint("Subscribed trekkings: ${trekkings.length}");
+    debugPrint("Subscribed trekkings: ${trekkings.length}"); //coverage:ignore-line
 
     for (final trekking in trekkings) {
-      debugPrint("Checking trekking: ${trekking.name} (${trekking.documentId})");
+      debugPrint("Checking trekking: ${trekking.name} (${trekking.documentId})"); //coverage:ignore-line
 
       final target = trekking.starting_point ?? trekking.ending_point;
       if (target == null) continue;
@@ -99,14 +99,14 @@ class BackgroundServiceLogic {
       final mock = await api.mockAlerts();
 
       final alerts = [...real, ...mock];
-      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}");
+      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}"); //coverage:ignore-line
 
       for (final alert in alerts) {
         final alertKey = _buildAlertKey(trekking.documentId, alert);
 
         final alreadyShown = await memory.hasShownWeatherAlertKey(alertKey);
         if (alreadyShown) {
-          debugPrint("Skipping duplicate alert: $alertKey");
+          debugPrint("Skipping duplicate alert: $alertKey"); //coverage:ignore-line
           continue;
         }
 
@@ -122,7 +122,7 @@ class BackgroundServiceLogic {
         );
 
         await memory.addShownWeatherAlertKey(alertKey);
-        debugPrint("Notification shown for ${trekking.name}: $alertKey");
+        debugPrint("Notification shown for ${trekking.name}: $alertKey"); //coverage:ignore-line
       }
     }
   }
@@ -176,7 +176,7 @@ void callbackDispatcher() {
         memory: memory,
       );
     } catch (e) {
-      debugPrint("Workmanager background error: $e");
+      debugPrint("Workmanager background error: $e"); //coverage:ignore-line
     }
 
     return Future.value(true);

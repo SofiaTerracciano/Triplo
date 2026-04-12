@@ -110,7 +110,7 @@ class _SearchPageState extends State<SearchPage>
         loading = false;
       });
     } catch (e) {
-      debugPrint("Error loading random diaries: $e");
+      debugPrint("Error loading random diaries: $e"); //coverage:ignore-line
       if (!mounted) return;
       setState(() {
         randomDiaries = [];
@@ -372,8 +372,8 @@ class _SearchPageState extends State<SearchPage>
         _trekkingResults =
         await trekkingController.searchTrekking(query);
       }
-    } catch (e) {
-      debugPrint("Search error: $e");
+    } catch (e) { 
+      debugPrint("Search error: $e"); //coverage:ignore-line
     }
 
     if (currentToken == _searchToken && mounted) {

@@ -36,7 +36,7 @@ class _DiaryPageState extends State<DiaryPage> {
         _friendFutures[id] = userController.getUserById(id);
       }
     } catch (e) {
-      debugPrint('Errore in _loadData: $e');
+      debugPrint('Errore in _loadData: $e'); //coverage:ignore-line
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

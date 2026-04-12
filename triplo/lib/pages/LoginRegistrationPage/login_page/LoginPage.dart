@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       //  context,
       //).showSnackBar(SnackBar(content: Text(local.login_success)));
     } catch (e) {
-      debugPrint("Login error: $e\n");
+      debugPrint("Login error: $e\n"); // coverage:ignore-line
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("${local.login_failed} : $e")));
@@ -109,14 +109,14 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loginGoogle(BuildContext context) async {
     final controller = context.read<UserController>();
 
-    debugPrint("UI: Google login button pressed");
+    debugPrint("UI: Google login button pressed"); //coverage:ignore-line
 
     try {
-      debugPrint("UI: calling UserController.loginWithGoogle()");
+      debugPrint("UI: calling UserController.loginWithGoogle()"); //coverage:ignore-line
       await controller.loginWithGoogle();
-      debugPrint("UI: UserController.loginWithGoogle() completed");
+      debugPrint("UI: UserController.loginWithGoogle() completed"); //coverage:ignore-line
 
-      debugPrint("UI: currentUser after Google login = ${controller.currentUser?.uid}");
+      debugPrint("UI: currentUser after Google login = ${controller.currentUser?.uid}"); //coverage:ignore-line
 
       Navigator.pushReplacement(
         context,
@@ -125,10 +125,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      debugPrint("UI: navigation to UserPage completed");
+      debugPrint("UI: navigation to UserPage completed"); //coverage:ignore-line
     } catch (e, st) {
-      debugPrint("UI: Google login failed");
-      debugPrint("UI ERROR: $e");
+      debugPrint("UI: Google login failed"); //coverage:ignore-line
+      debugPrint("UI ERROR: $e"); //coverage:ignore-line
       debugPrintStack(stackTrace: st);
 
       final local = AppLocalizations.of(context)!;
