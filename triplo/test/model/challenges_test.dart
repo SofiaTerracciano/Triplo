@@ -1,9 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-
-// Adjust import path to match your project structure
 import 'package:triplo/model/challenges.dart';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 Challenges buildChallenges({
   String documentId = 'challenge_1',
@@ -32,7 +28,6 @@ Map<String, dynamic> buildFirestoreMap({
 }
 
 void main() {
-  // ─── Constructor & Getters ────────────────────────────────────────────────
 
   group('Constructor & Getters', () {
     test('stores all fields correctly', () {
@@ -59,8 +54,6 @@ void main() {
       expect(c.photo, '');
     });
   });
-
-  // ─── Setters ─────────────────────────────────────────────────────────────
 
   group('Setters', () {
     test('photo setter works', () {
@@ -94,8 +87,6 @@ void main() {
     });
   });
 
-  // ─── toMap() ─────────────────────────────────────────────────────────────
-
   group('toMap()', () {
     test('produces correct keys and values', () {
       final c = buildChallenges();
@@ -114,8 +105,6 @@ void main() {
     });
 
     test('description key is "Descrption" (typo is intentional)', () {
-      // The model uses "Descrption" (missing 'i') — test locks this behaviour
-      // so a future "fix" does not silently break Firestore reads
       final c = buildChallenges();
       final map = c.toMap();
       expect(map.containsKey('Descrption'), isTrue);
@@ -137,8 +126,6 @@ void main() {
       expect(c.toMap()['Photo'], '');
     });
   });
-
-  // ─── fromMap() ───────────────────────────────────────────────────────────
 
   group('fromMap()', () {
     test('parses all fields correctly', () {
@@ -200,11 +187,6 @@ void main() {
     });
   });
 
-  // ─── Round-trip ───────────────────────────────────────────────────────────
-  // NOTE: toMap() writes "Descrption" but fromMap() reads "Description".
-  // This mismatch means description is lost in a pure round-trip.
-  // The tests below document this known behaviour so it is explicit.
-
   group('Round-trip toMap() → fromMap()', () {
     test('title and photo survive round-trip', () {
       final original = buildChallenges(
@@ -221,13 +203,10 @@ void main() {
     });
 
     test('description is empty after round-trip due to key typo bug', () {
-      // toMap() writes key "Descrption", fromMap() reads key "Description"
-      // → description is always lost in a Dart-only round-trip
       final original = buildChallenges(description: ['Descrizione IT']);
       final map = original.toMap();
       final restored = Challenges.fromMap(map, docId: original.documentId);
 
-      // This documents the bug — update this test once the typo is fixed
       expect(restored.description, isEmpty);
     });
   });

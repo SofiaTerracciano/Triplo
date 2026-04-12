@@ -1,9 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-
-// Adjust import path to match your project structure
 import 'package:triplo/model/diary.dart';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 Diary buildDiary({
   String diaryId = 'diary_1',
@@ -64,7 +60,6 @@ Map<String, dynamic> buildFirestoreMap({
 }
 
 void main() {
-  // ─── Constructor & Getters ────────────────────────────────────────────────
 
   group('Constructor & Getters', () {
     test('stores all fields correctly', () {
@@ -103,8 +98,6 @@ void main() {
       expect(d.isPublic, isFalse);
     });
   });
-
-  // ─── Setters ─────────────────────────────────────────────────────────────
 
   group('Setters', () {
     test('userId setter works', () {
@@ -174,8 +167,6 @@ void main() {
     });
   });
 
-  // ─── toMap() ─────────────────────────────────────────────────────────────
-
   group('toMap()', () {
     test('produces correct scalar values', () {
       final d = buildDiary();
@@ -232,8 +223,6 @@ void main() {
       expect(d.toMap()['Is_public'], isFalse);
     });
   });
-
-  // ─── fromMap() ───────────────────────────────────────────────────────────
 
   group('fromMap()', () {
     test('parses all scalar fields correctly', () {
@@ -375,8 +364,6 @@ void main() {
       expect(d.mood, ['true', 'Felice']);
     });
   });
-
-  // ─── Round-trip toMap() → fromMap() ──────────────────────────────────────
 
   group('Round-trip toMap() → fromMap()', () {
     test('all fields survive serialization round-trip', () {

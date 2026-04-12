@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:triplo/model/trekking.dart';
 
 void main() {
-  // ─── Helpers ────────────────────────────────────────────────────────────────
 
   Trekking buildTrekking({
     String documentId = 'doc1',
@@ -55,8 +54,6 @@ void main() {
       challenges: challenges,
     );
   }
-
-  // ─── Constructor & Getters ──────────────────────────────────────────────────
 
   group('Constructor & Getters', () {
     test('stores all required fields correctly', () {
@@ -113,8 +110,6 @@ void main() {
       expect(t.points.length, 3);
     });
   });
-
-  // ─── Setters ────────────────────────────────────────────────────────────────
 
   group('Setters', () {
     test('name setter updates the name', () {
@@ -223,8 +218,6 @@ void main() {
     });
   });
 
-  // ─── toMap() ────────────────────────────────────────────────────────────────
-
   group('toMap()', () {
     test('produces correct keys and scalar values', () {
       final t = buildTrekking();
@@ -283,8 +276,6 @@ void main() {
       expect(map['Challenges'], isEmpty);
     });
   });
-
-  // ─── fromMap() ──────────────────────────────────────────────────────────────
 
   group('fromMap()', () {
     Map<String, dynamic> buildFirestoreMap({
@@ -452,8 +443,6 @@ void main() {
     });
   });
 
-  // ─── Round-trip (toMap → fromMap) ───────────────────────────────────────────
-
   group('Round-trip toMap() → fromMap()', () {
     test('full object survives serialization round-trip', () {
       final original = buildTrekking(
@@ -463,7 +452,6 @@ void main() {
         familyFriendly: true,
       );
 
-      // toMap produces GeoPoints; fromMap reads GeoPoints — simulate the cycle
       final map = original.toMap();
       final restored = Trekking.fromMap(map, docId: original.documentId);
 

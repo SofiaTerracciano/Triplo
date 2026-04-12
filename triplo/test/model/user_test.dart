@@ -3,11 +3,6 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 
-// Adjust import paths to match your project structure
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-/// Minimal Users builder — all lists default to empty.
 Users buildUser({
   String uid = 'uid_1',
   String username = 'mario_rossi',
@@ -69,7 +64,6 @@ Map<String, dynamic> buildFirestoreMap({
 }
 
 void main() {
-  // ─── Constructor & Getters ─────────────────────────────────────────────────
 
   group('Constructor & Getters', () {
     test('stores all fields correctly', () {
@@ -101,8 +95,6 @@ void main() {
       expect(u.photoProfile, 'https://example.com/photo.jpg');
     });
   });
-
-  // ─── Setters ──────────────────────────────────────────────────────────────
 
   group('Setters', () {
     test('username setter works', () {
@@ -200,8 +192,6 @@ void main() {
     });
   });
 
-  // ─── toMap() ──────────────────────────────────────────────────────────────
-
   group('toMap()', () {
     test('produces correct scalar values', () {
       final u = buildUser(
@@ -269,8 +259,6 @@ void main() {
       expect(u.toMap()['Saved_trekkings'], isEmpty);
     });
   });
-
-  // ─── fromMap() ────────────────────────────────────────────────────────────
 
   group('fromMap()', () {
     test('parses all scalar fields correctly', () {
@@ -382,8 +370,6 @@ void main() {
     });
   });
 
-  // ─── _parseBirthdate ──────────────────────────────────────────────────────
-
   group('_parseBirthdate (via fromMap)', () {
     test('parses valid Birthdate string', () {
       final u = Users.fromMap(buildFirestoreMap(birthdate: '2000-03-20T00:00:00.000'), uid: 'u1');
@@ -434,8 +420,6 @@ void main() {
     });
   });
 
-  // ─── Round-trip toMap → fromMap ───────────────────────────────────────────
-
   group('Round-trip toMap() → fromMap()', () {
     test('scalar fields survive serialization round-trip', () {
       final original = buildUser(
@@ -467,7 +451,6 @@ void main() {
       final map = original.toMap();
       final restored = Users.fromMap(map, uid: original.uid);
 
-      // fromMap intentionally leaves lists empty — they are rebuilt by the controller
       expect(restored.followers, isEmpty);
       expect(restored.following, isEmpty);
     });
