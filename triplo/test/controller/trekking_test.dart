@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -15,13 +14,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import 'trekking_test.mocks.dart';
 
-// ─── Code generation ──────────────────────────────────────────────────────────
-// Run: dart run build_runner build
 @GenerateMocks([AuthService, MemoryService, NotificationService, FirebaseStorage, Reference])
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/// Minimal Firestore-compatible trekking document.
 Map<String, dynamic> fakeTrekkingDoc({
   String name = 'Monte Bello',
   String difficulty = 'Medium',
@@ -51,7 +45,6 @@ Map<String, dynamic> fakeTrekkingDoc({
   };
 }
 
-/// Builds a [Trekking] instance for use in local list tests.
 Trekking buildTrekking({
   String documentId = 'trek_1',
   String name = 'Monte Bello',
@@ -83,7 +76,6 @@ Trekking buildTrekking({
   );
 }
 
-/// Seeds a trekking document in FakeFirestore.
 Future<void> seedTrekking(
   FakeFirebaseFirestore db, {
   String id = 'trek_1',
@@ -111,18 +103,6 @@ void main() {
   late MockFirebaseStorage mockStorage;
   late MockReference mockReference;
 
-  /// Builds a [TrekkingController] wired to [fakeDb].
-  ///
-  /// NOTE: TrekkingController uses FirebaseFirestore.instance directly.
-  /// Add a named constructor to inject the db for testing:
-  ///
-  ///   TrekkingController.withDb({
-  ///     required this.memory,
-  ///     required this.notification,
-  ///     required this.authService,
-  ///     required List<Trekking> trekkings,
-  ///     required FirebaseFirestore db,
-  ///   }) : _db = db, _trekkings = trekkings;
   TrekkingController buildController({
     List<Trekking>? trekkings,
     String? currentUid,
@@ -150,8 +130,6 @@ void main() {
     when(mockAuth.currentUid).thenReturn(null);
   });
 
-  // ─── allTrekkings ─────────────────────────────────────────────────────────
-
   group('allTrekkings', () {
     test('returns the initial list passed to constructor', () {
       final t = buildTrekking();
@@ -165,8 +143,6 @@ void main() {
       expect(ctrl.allTrekkings, isEmpty);
     });
   });
-
-  // ─── loadTrekking ─────────────────────────────────────────────────────────
 
   group('loadTrekking()', () {
     test('loads trekking documents from Firestore', () async {
@@ -193,11 +169,9 @@ void main() {
       await ctrl.loadTrekking();
       expect(ctrl.allTrekkings.length, 1);
 
-      // Add a second document AFTER first load
       await seedTrekking(fakeDb, id: 'trek_2');
       await ctrl.loadTrekking(); // should be skipped
 
-      // Still 1 because _loaded prevents re-fetch
       expect(ctrl.allTrekkings.length, 1);
     });
 
@@ -207,8 +181,6 @@ void main() {
       expect(ctrl.allTrekkings, isEmpty);
     });
   });
-
-  // ─── getTrekkingById ──────────────────────────────────────────────────────
 
   group('getTrekkingById()', () {
     test('returns trekking when found in local list', () {
@@ -224,8 +196,6 @@ void main() {
     });
   });
 
-  // ─── getTrekkingId ────────────────────────────────────────────────────────
-
   group('getTrekkingId()', () {
     test('returns documentId when name matches', () {
       final t = buildTrekking(documentId: 'trek_1', name: 'Monte Bello');
@@ -238,8 +208,6 @@ void main() {
       expect(ctrl.getTrekkingId('Nonexistent'), isNull);
     });
   });
-
-  // ─── fetchTrekkingById ────────────────────────────────────────────────────
 
   group('fetchTrekkingById()', () {
     test('returns trekking when document exists in Firestore', () async {
@@ -256,8 +224,6 @@ void main() {
       expect(result, isNull);
     });
   });
-
-  // ─── getTrekkingByIdAsync ─────────────────────────────────────────────────
 
   group('getTrekkingByIdAsync()', () {
     test('returns trekking from local list without hitting Firestore', () async {
@@ -292,8 +258,6 @@ void main() {
     });
   });
 
-  // ─── getSavedTrekkings ────────────────────────────────────────────────────
-
   group('getSavedTrekkings()', () {
     test('returns list of saved trekking objects', () async {
       await seedTrekking(fakeDb, id: 'trek_1');
@@ -322,8 +286,6 @@ void main() {
     });
   });
 
-  // ─── addTrekkingToSaved ───────────────────────────────────────────────────
-
   group('addTrekkingToSaved()', () {
     test('adds trekkingId to Saved_trekkings in Firestore', () async {
       await seedUser(fakeDb, uid: 'uid_1');
@@ -340,8 +302,6 @@ void main() {
       await ctrl.addTrekkingToSaved('trek_1'); // should not throw
     });
   });
-
-  // ─── removeTrekkingFromSaved ──────────────────────────────────────────────
 
   group('removeTrekkingFromSaved()', () {
     test('removes trekkingId from Saved_trekkings in Firestore', () async {
@@ -361,8 +321,6 @@ void main() {
     });
   });
 
-  // ─── isTrekkingSaved ──────────────────────────────────────────────────────
-
   group('isTrekkingSaved()', () {
     test('returns true when trekkingId is in Saved_trekkings', () async {
       await seedUser(fakeDb, uid: 'uid_1', savedTrekkings: ['trek_1']);
@@ -381,8 +339,6 @@ void main() {
       expect(await ctrl.isTrekkingSaved('trek_1'), isFalse);
     });
   });
-
-  // ─── enableWeatherAlertForTrekking ────────────────────────────────────────
 
   group('enableWeatherAlertForTrekking()', () {
     test('creates weather_notification doc with trekkingId', () async {
@@ -422,8 +378,6 @@ void main() {
     });
   });
 
-  // ─── disableWeatherAlertForTrekking ───────────────────────────────────────
-
   group('disableWeatherAlertForTrekking()', () {
     test('removes trekkingId from weather_notification doc', () async {
       await fakeDb.collection('weather_notification').doc('uid_1').set({
@@ -448,8 +402,6 @@ void main() {
       await ctrl.disableWeatherAlertForTrekking('trek_1'); // should not throw
     });
   });
-
-  // ─── isWeatherAlertEnabled ────────────────────────────────────────────────
 
   group('isWeatherAlertEnabled()', () {
     test('returns true when trekkingId is in weather_notification', () async {
@@ -480,8 +432,6 @@ void main() {
     });
   });
 
-  // ─── getWeatherAlertTrekkingIds ───────────────────────────────────────────
-
   group('getWeatherAlertTrekkingIds()', () {
     test('returns list of IDs from weather_notification doc', () async {
       await fakeDb.collection('weather_notification').doc('uid_1').set({
@@ -502,8 +452,6 @@ void main() {
       expect(await ctrl.getWeatherAlertTrekkingIds(), isEmpty);
     });
   });
-
-  // ─── getWeatherAlertTrekkings ─────────────────────────────────────────────
 
   group('getWeatherAlertTrekkings()', () {
     test('returns trekking objects for each alert ID', () async {
@@ -537,8 +485,6 @@ void main() {
     });
   });
 
-  // ─── updateWeatherNotificationLastCheck ───────────────────────────────────
-
   group('updateWeatherNotificationLastCheck()', () {
     test('sets lastCheckAt and updatedAt fields', () async {
       final ctrl = buildController(currentUid: 'uid_1');
@@ -551,22 +497,18 @@ void main() {
 
       expect(snap.exists, isTrue);
       expect(snap.data()!['userId'], 'uid_1');
-      // FieldValue.serverTimestamp() is stored as a Timestamp by FakeFirestore
       expect(snap.data()!.containsKey('lastCheckAt'), isTrue);
       expect(snap.data()!.containsKey('updatedAt'), isTrue);
     });
 
     test('does nothing when uid is null', () async {
       final ctrl = buildController(currentUid: null);
-      await ctrl.updateWeatherNotificationLastCheck(); // should not throw
+      await ctrl.updateWeatherNotificationLastCheck(); 
     });
   });
 
   group('searchTrekking()', () {
 
-    /// Test for searchTrekking that verifies it first looks up the trekking ID 
-    /// from the index collection, then tries to find the trekking in the local list 
-    /// before fetching from Firestore.
     test('returns trekking found via index then local cache', () async {
       final t = buildTrekking(documentId: 'trek_1', name: 'Monte Bello');
       await fakeDb.collection('trekking_index').doc('idx_1').set({
@@ -574,14 +516,12 @@ void main() {
         'Trekking_id': 'trek_1',
       });
 
-      final ctrl = buildController(trekkings: [t]); // già in cache locale
+      final ctrl = buildController(trekkings: [t]); 
       final results = await ctrl.searchTrekking('monte');
       expect(results.length, 1);
       expect(results.first.documentId, 'trek_1');
     });
 
-    /// Test for searchTrekking that verifies it fetches from Firestore when the trekking 
-    /// is not in the local cache.
     test('fetches from Firestore when not in local cache', () async {
       await seedTrekking(fakeDb, id: 'trek_1');
       await fakeDb.collection('trekking_index').doc('idx_1').set({
@@ -589,22 +529,18 @@ void main() {
         'Trekking_id': 'trek_1',
       });
 
-      final ctrl = buildController(); // local list empty
+      final ctrl = buildController();
       final results = await ctrl.searchTrekking('monte');
       expect(results.length, 1);
       expect(results.first.documentId, 'trek_1');
     });
 
-    /// Test for searchTrekking that verifies it returns an empty list when no 
-    /// index entries match the query.
     test('returns empty list when no index matches', () async {
       final ctrl = buildController();
       final results = await ctrl.searchTrekking('zzznomatch');
       expect(results, isEmpty);
     });
 
-    /// Test for searchTrekking that verifies it returns an empty list when the index entry 
-    /// points to a trekking document that does not exist in Firestore.
     test('skips index entries whose trekking document does not exist', () async {
       await fakeDb.collection('trekking_index').doc('idx_ghost').set({
         'Normalized': 'fantasma',
@@ -615,8 +551,6 @@ void main() {
       expect(results, isEmpty);
     });
   });
-
-  // ─── getCachedImage ───────────────────────────────────────────────────────────
 
   group('getCachedImage()', () {
     test('returns image from RAM cache when available', () async {
@@ -670,8 +604,6 @@ void main() {
     });
   });
 
-  // ─── getCachedImages ──────────────────────────────────────────────────────────
-
   group('getCachedImages()', () {
     test('returns list of cached files for multiple paths', () async {
       final file1 = File('/tmp/img1.jpg');
@@ -700,8 +632,6 @@ void main() {
     });
   });
 
-  // ─── getDownloadUrl ───────────────────────────────────────────────────────────
-
   group('getDownloadUrl()', () {
     test('returns download URL from storage reference', () async {
       when(mockStorage.refFromURL(any)).thenReturn(mockReference);
@@ -715,8 +645,6 @@ void main() {
       verify(mockStorage.refFromURL('gs://bucket/photo.jpg')).called(1);
     });
   });
-
-  // ─── getDownloadUrls ──────────────────────────────────────────────────────────
 
   group('getDownloadUrls()', () {
     test('returns list of download URLs', () async {
@@ -740,8 +668,6 @@ void main() {
       expect(urls, isEmpty);
     });
   });
-
-  // ─── getCachedImage gs:// ─────────────────────────────────────────────────────
 
   group('getCachedImage() with gs:// path', () {
     test('converts gs:// to download URL then checks disk cache', () async {

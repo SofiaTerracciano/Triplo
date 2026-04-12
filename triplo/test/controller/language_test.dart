@@ -16,10 +16,6 @@ void main() {
     mockMemory = MockMemoryService();
   });
 
-  // -------------------------------------------------------------------------
-  // Constructor / initial state
-  // -------------------------------------------------------------------------
-
   group('Language – initial state', () {
     test('default locale is English', () {
       final ctrl = Language(memoryService: mockMemory);
@@ -31,10 +27,6 @@ void main() {
       expect(ctrl.memoryService, mockMemory);
     });
   });
-
-  // -------------------------------------------------------------------------
-  // loadSavedLocale
-  // -------------------------------------------------------------------------
 
   group('loadSavedLocale()', () {
     test('updates locale and notifies listeners when a valid code is saved', () async {
@@ -99,10 +91,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // setLocale
-  // -------------------------------------------------------------------------
-
   group('setLocale()', () {
     test('updates locale, notifies listeners and persists the code', () async {
       when(mockMemory.saveLocaleCode(any)).thenAnswer((_) async {});
@@ -123,7 +111,7 @@ void main() {
       bool notified = false;
       ctrl.addListener(() => notified = true);
 
-      await ctrl.setLocale(const Locale('en')); // same as default
+      await ctrl.setLocale(const Locale('en')); 
 
       expect(ctrl.locale, const Locale('en'));
       expect(notified, isFalse);
@@ -170,10 +158,6 @@ void main() {
       expect(order, ['notified', 'saved']);
     });
   });
-
-  // -------------------------------------------------------------------------
-  // loadSavedLocale + setLocale interaction
-  // -------------------------------------------------------------------------
 
   group('loadSavedLocale + setLocale interaction', () {
     test('setLocale after load correctly changes from loaded locale', () async {
