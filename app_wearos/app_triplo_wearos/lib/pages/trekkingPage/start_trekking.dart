@@ -2,15 +2,15 @@ import 'dart:ui';
 
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
-import 'package:app_triplo_wearos/pages/end_trekking.dart';
-import 'package:app_triplo_wearos/pages/home-page.dart';
+import 'package:app_triplo_wearos/pages/trekkingPage/end_trekking.dart';
+import 'package:app_triplo_wearos/pages/HomePage/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import '../controller/challenge.dart';
+import '../../controller/challenge.dart';
 
 final FlutterLocalNotificationsPlugin notifications =
     FlutterLocalNotificationsPlugin();

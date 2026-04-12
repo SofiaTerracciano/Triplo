@@ -17,7 +17,7 @@ class MemoryService {
   // --- 2. MEMORIA PERSISTENTE (SharedPreferences) ---
   static const _kLocaleKey = "user_locale";
   static const _kFirstRunKey = "is_first_run";
-
+  static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
   Future<void> saveLocale(String code) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kLocaleKey, code);
@@ -81,5 +81,36 @@ class MemoryService {
       debugPrint("Errore salvataggio disco: $e"); //coverage:ignore-line
       rethrow;  
     }
+  }
+
+  Future<Set<String>> getShownWeatherAlertKeys() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = prefs.getStringList(_kShownWeatherAlertsKey) ?? <String>[];
+      return list.toSet();
+    } catch (e) {
+      debugPrint("Errore recupero alert mostrati: $e");
+      return <String>{};
+    }
+  }
+
+  Future<void> saveShownWeatherAlertKeys(Set<String> keys) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_kShownWeatherAlertsKey, keys.toList());
+    } catch (e) {
+      debugPrint("Errore salvataggio alert mostrati: $e");
+    }
+  }
+
+  Future<bool> hasShownWeatherAlertKey(String key) async {
+    final keys = await getShownWeatherAlertKeys();
+    return keys.contains(key);
+  }
+
+  Future<void> addShownWeatherAlertKey(String key) async {
+    final keys = await getShownWeatherAlertKeys();
+    keys.add(key);
+    await saveShownWeatherAlertKeys(keys);
   }
 }

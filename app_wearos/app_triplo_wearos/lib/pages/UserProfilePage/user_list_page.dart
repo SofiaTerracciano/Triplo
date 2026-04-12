@@ -1,9 +1,9 @@
-import 'package:app_triplo_wearos/pages/user.dart'; 
+import 'package:app_triplo_wearos/pages/UserProfilePage/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart'; 
-import '../controller/user.dart';
-import '../model/user.dart';
+import '../../controller/user.dart';
+import '../../model/user.dart';
 
 class UserListPage extends StatelessWidget {
   final String title;

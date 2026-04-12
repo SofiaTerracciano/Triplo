@@ -5,9 +5,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
-import '../service/geo.dart';
-import '../service/permission_service.dart';
-import '../service/memory.dart';
+import '../service/OSservice/geo.dart';
+import '../service/OSservice/permission_service.dart';
+import '../service/OSservice/memory.dart';
 
 
 class ServiceController {
@@ -142,9 +142,9 @@ class ServiceController {
 
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
-      final res = await http.get(
-        Uri.parse("https://meteodemoserver.onrender.com/alerts"),
-      );
+      final res = await http
+          .get(Uri.parse("https://meteodemoserver.onrender.com/alerts"))
+          .timeout(const Duration(seconds: 4));
 
       if (res.statusCode != 200) return [];
 

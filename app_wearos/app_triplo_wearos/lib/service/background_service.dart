@@ -1,24 +1,12 @@
 import 'dart:async';
 
-import 'package:app_triplo_wearos/service/permission_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../controller/servicecontroller.dart';
 import '../controller/trekking.dart';
-import '../firebase_options.dart';
-import 'geo.dart';
-import 'memory.dart';
-import 'notification.dart';
-
-
-
-
-
-const String weatherCheckTask = 'weatherCheckTask';
+import 'OSservice/memory.dart';
+import 'OSservice/notification.dart';
 
 class BackgroundService with WidgetsBindingObserver {
   final BuildContext context;
@@ -28,36 +16,44 @@ class BackgroundService with WidgetsBindingObserver {
   BackgroundService(this.context);
 
   void start() {
-    WidgetsBinding.instance.addObserver(this);
-    debugPrint("BackgroundService started"); //coverage:ignore-line
-    _run();
-    _timer = Timer.periodic(
-      const Duration(minutes: 12),
-          (_) => _run(),
-    );
-  }
+    try {
+      WidgetsBinding.instance.addObserver(this);
+      debugPrint("BackgroundService started");
 
+      unawaited(_run());
+
+      _timer = Timer.periodic(
+        const Duration(seconds: 60),
+            (_) {
+          unawaited(_run());
+        },
+      );
+    } catch (e, st) {
+      debugPrint("BackgroundService start error: $e");
+      debugPrint("$st");
+    }
+  }
 
   Future<void> _run() async {
     if (_running) return;
     _running = true;
 
     try {
-      debugPrint("BackgroundService running check");  //coverage:ignore-line
+      debugPrint("BackgroundService running check");
 
       final trekkingController = context.read<TrekkingController>();
-      final servicecontroller = context.read<ServiceController>();
+      final api = context.read<ServiceController>();
       final notification = context.read<NotificationService>();
       final memory = context.read<MemoryService>();
 
       await BackgroundServiceLogic.run(
         trekkingController: trekkingController,
-        api: servicecontroller,
+        api: api,
         notification: notification,
         memory: memory,
       );
     } catch (e) {
-      debugPrint("BackgroundService error: $e"); //coverage:ignore-line
+      debugPrint("BackgroundService error: $e");
     } finally {
       _running = false;
     }
@@ -66,7 +62,7 @@ class BackgroundService with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _run();
+      unawaited(_run());
     }
   }
 
@@ -83,23 +79,36 @@ class BackgroundServiceLogic {
     required NotificationService notification,
     required MemoryService memory,
   }) async {
-    debugPrint("BackgroundServiceLogic running"); //coverage:ignore-line
+    debugPrint("BackgroundServiceLogic running");
+    if (trekkingController.uid == null) {
+      debugPrint("BackgroundService skipped: pairing uid not ready");
+      return;
+    }
 
     final trekkings = await trekkingController.getWeatherAlertTrekkings();
-    debugPrint("Subscribed trekkings: ${trekkings.length}"); //coverage:ignore-line
+    debugPrint("Subscribed trekkings: ${trekkings.length}");
 
     for (final trekking in trekkings) {
-      debugPrint("Checking trekking: ${trekking.name} (${trekking.documentId})"); //coverage:ignore-line
-
       final target = trekking.starting_point ?? trekking.ending_point;
       if (target == null) continue;
 
-      final real = await api.weatherbitAlerts(
-        target.latitude,
-        target.longitude,
-      );
+      List<Map<String, dynamic>> real = [];
+      List<Map<String, dynamic>> mock = [];
 
-      final mock = await api.mockAlerts();
+      try {
+        real = await api.weatherbitAlerts(
+          target.latitude,
+          target.longitude,
+        );
+      } catch (e) {
+        debugPrint("Real alerts error for ${trekking.name}: $e");
+      }
+
+      try {
+        mock = await api.mockAlerts();
+      } catch (e) {
+        debugPrint("Mock alerts error for ${trekking.name}: $e");
+      }
 
       final alerts = [...real, ...mock];
       debugPrint("Alerts found for ${trekking.name}: ${alerts.length}");
@@ -109,7 +118,7 @@ class BackgroundServiceLogic {
 
         final alreadyShown = await memory.hasShownWeatherAlertKey(alertKey);
         if (alreadyShown) {
-          debugPrint("Skipping duplicate alert: $alertKey"); //coverage:ignore-line
+          debugPrint("Skipping duplicate alert: $alertKey");
           continue;
         }
 
@@ -125,7 +134,7 @@ class BackgroundServiceLogic {
         );
 
         await memory.addShownWeatherAlertKey(alertKey);
-        debugPrint("Notification shown for ${trekking.name}: $alertKey"); //coverage:ignore-line
+        debugPrint("Notification shown for ${trekking.name}: $alertKey");
       }
     }
   }
@@ -138,50 +147,4 @@ class BackgroundServiceLogic {
 
     return '$trekkingId|$event|$headline|$start|$end';
   }
-}
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    if (task != weatherCheckTask) {
-      return Future.value(true);
-    }
-    try {
-      WidgetsFlutterBinding.ensureInitialized();
-      await dotenv.load(fileName: ".env");
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-
-      final memory = MemoryService();
-      final geo = GeoService();
-      final permission = PermissionService();
-      //final authService = AuthService();
-      final api = ServiceController(
-        geo: geo,
-        memory: memory,
-        permission: permission,
-      );
-
-      final notification = NotificationService();
-      await notification.init();
-
-      final trekkingController = TrekkingController(
-        //authService: authService,
-        memory: memory,
-        notification: notification,
-        trekkings: [],
-      );
-
-      await BackgroundServiceLogic.run(
-        trekkingController: trekkingController,
-        api: api,
-        notification: notification,
-        memory: memory,
-      );
-    } catch (e) {
-      debugPrint("Workmanager background error: $e"); //coverage:ignore-line
-    }
-
-    return Future.value(true);
-  });
 }

@@ -1,13 +1,13 @@
 
 import 'package:app_triplo_wearos/controller/trekking.dart';
-import 'package:app_triplo_wearos/pages/trekking-page.dart';
+import 'package:app_triplo_wearos/pages/trekkingPage/trekking-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
 import 'package:provider/provider.dart';
 
-import '../controller/servicecontroller.dart';
+import '../../controller/servicecontroller.dart';
 
 class HomePage extends StatefulWidget {
   @override

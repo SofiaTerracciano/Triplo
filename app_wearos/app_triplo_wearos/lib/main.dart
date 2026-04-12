@@ -6,11 +6,11 @@ import 'package:app_triplo_wearos/controller/servicecontroller.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/navigation.dart';
-import 'package:app_triplo_wearos/service/geo.dart';
-import 'package:app_triplo_wearos/service/memory.dart';
-import 'package:app_triplo_wearos/service/notification.dart';
+import 'package:app_triplo_wearos/service/OSservice/geo.dart';
+import 'package:app_triplo_wearos/service/OSservice/memory.dart';
+import 'package:app_triplo_wearos/service/OSservice/notification.dart';
 import 'package:app_triplo_wearos/service/pairing_service.dart';
-import 'package:app_triplo_wearos/service/permission_service.dart';
+import 'package:app_triplo_wearos/service/OSservice/permission_service.dart';
 import 'package:app_triplo_wearos/service/watch_id_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -138,6 +138,7 @@ class TriploWatchApp extends StatelessWidget {
           geo: context.read<GeoService>(),
           memory: context.read<MemoryService>(),
           notification: context.read<NotificationService>(),
+          pairingService: context.read<PairingService>(),
           trekkings: [],
         )),
 

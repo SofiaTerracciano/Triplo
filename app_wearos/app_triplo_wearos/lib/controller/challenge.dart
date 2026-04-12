@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import '../service/notification.dart';
-import '../service/memory.dart';
+import '../service/OSservice/notification.dart';
+import '../service/OSservice/memory.dart';
 // Controller for managing challenges data from Firestore
 class ChallengesController extends ChangeNotifier {
 
