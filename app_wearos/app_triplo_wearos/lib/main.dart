@@ -6,9 +6,11 @@ import 'package:app_triplo_wearos/controller/servicecontroller.dart';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/navigation.dart';
+import 'package:app_triplo_wearos/pages/offline_page.dart';
 import 'package:app_triplo_wearos/service/OSservice/geo.dart';
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
 import 'package:app_triplo_wearos/service/OSservice/notification.dart';
+import 'package:app_triplo_wearos/service/internetservice.dart';
 import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:app_triplo_wearos/service/OSservice/permission_service.dart';
 import 'package:app_triplo_wearos/service/watch_id_service.dart';
@@ -132,6 +134,11 @@ class TriploWatchApp extends StatelessWidget {
           memory: context.read<MemoryService>(),
           //notification: context.read<NotificationService>(),
         )),
+        ChangeNotifierProvider(
+          create: (context) => InternetService(
+            servicecontroller: context.read<ServiceController>(),
+          )..start(),
+        ),
 
         // TrekkingController con le dipendenze passate correttamente
         ChangeNotifierProvider(create: (context) => TrekkingController(
@@ -228,7 +235,18 @@ class TriploWatchApp extends StatelessWidget {
               Locale('de'),
               Locale('fr'),
             ],
-            home: NavigationPage()
+            builder: (context, child) {
+              final isOnline = context.watch<InternetService>().isOnline;
+
+              return Stack(
+                children: [
+                  if (child != null) child,
+                  if (!isOnline) const OfflineWatchPage(),
+                ],
+              );
+            },
+            home: const NavigationPage(),
+
 
           );
         },

@@ -213,7 +213,7 @@ Therefore, in the proposed architecture:
     \item Firebase is modeled as a set of backend services used by the application, rather than as a custom backend.
 \end{itemize}
 
-
+Note that the GeoWatch component lightly depends on the InternetService to determine the current connectivity state, only the Navigation Page depends on it for just for hiding the drawer menu in offline mode. This interaction is not based on direct method invocation, but the InternetService exposes a boolean connectivity state, which is observed by the UI through a provider-based mechanism. When the connectivity status changes, the service notifies listeners, and the UI updates accordingly.For this reason, this has not been modelled as an interface, since it is not a method invocation, but just as a light dependency with a dashed line in the diagram.
 
 \paragraph{Smartphone Application External Libraries}
 
