@@ -1,5 +1,5 @@
 import 'package:app_triplo_wearos/model/diary.dart';
-import 'package:app_triplo_wearos/pages/user.dart';
+import 'package:app_triplo_wearos/pages/UserProfilePage/user.dart';
 import 'package:flutter/material.dart';
 import 'package:app_triplo_wearos/controller/user.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';

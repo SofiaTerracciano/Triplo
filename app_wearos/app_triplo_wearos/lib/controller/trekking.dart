@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/trekking.dart';
 import 'package:flutter/material.dart';
-import '../service/notification.dart';
-import '../service/geo.dart';
-import '../service/memory.dart';
+import '../service/OSservice/notification.dart';
+import '../service/OSservice/geo.dart';
+import '../service/OSservice/memory.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

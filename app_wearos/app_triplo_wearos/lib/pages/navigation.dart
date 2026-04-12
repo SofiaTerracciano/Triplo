@@ -1,8 +1,8 @@
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../pages/home-page.dart';
-import '../pages/user.dart';
+import 'HomePage/home-page.dart';
+import 'UserProfilePage/user.dart';
 import '../service/pairing_service.dart';
 import '../widgets_for_pages/Navigation_Button.dart';
 import '../controller/language.dart';
@@ -71,7 +71,7 @@ class NavigationPage extends StatelessWidget {
                 const SizedBox(height: 4), // Spazio minimo
                 // BOTTONE LINGUA PICCOLO
                 GestureDetector(
-                  behavior: HitTestBehavior.opaque, // <--- AGGIUNGI QUESTO: rende tutta l'area cliccabile
+                  behavior: HitTestBehavior.opaque,
                   onTap: () {
                     showDialog(
                       context: context,

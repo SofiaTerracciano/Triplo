@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../controller/user.dart';
-import '../pages/login.dart';
+import '../pages/PairingLoginPage/login.dart';
 
 class PairingService extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;

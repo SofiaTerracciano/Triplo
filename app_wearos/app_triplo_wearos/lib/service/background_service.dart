@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:app_triplo_wearos/service/permission_service.dart';
+import 'package:app_triplo_wearos/service/OSservice/permission_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,14 +10,14 @@ import 'package:workmanager/workmanager.dart';
 import '../controller/servicecontroller.dart';
 import '../controller/trekking.dart';
 import '../firebase_options.dart';
-import 'geo.dart';
-import 'memory.dart';
-import 'notification.dart';
+import 'OSservice/geo.dart';
+import 'OSservice/memory.dart';
+import 'OSservice/notification.dart';
 
 
 
 
-
+/*
 const String weatherCheckTask = 'weatherCheckTask';
 
 class BackgroundService with WidgetsBindingObserver {
@@ -185,3 +185,5 @@ void callbackDispatcher() {
     return Future.value(true);
   });
 }
+
+ */

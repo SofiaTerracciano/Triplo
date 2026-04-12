@@ -5,7 +5,7 @@ import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'home-page.dart';
+import '../HomePage/home-page.dart';
 
 class GeowatchPage extends StatefulWidget {
   final String trekkingId;

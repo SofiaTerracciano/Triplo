@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:app_triplo_wearos/controller/trekking.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
-import 'package:app_triplo_wearos/pages/home-page.dart';
+import 'package:app_triplo_wearos/pages/HomePage/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

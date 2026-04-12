@@ -1,12 +1,12 @@
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/model/diary.dart';
-import 'package:app_triplo_wearos/pages/diary_list_page.dart';
+import 'package:app_triplo_wearos/pages/DiaryPage/diary_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../controller/user.dart';
-import '../controller/diary.dart';
-import '../service/pairing_service.dart';
-import 'login.dart';
+import '../../controller/user.dart';
+import '../../controller/diary.dart';
+import '../../service/pairing_service.dart';
+import '../PairingLoginPage/login.dart';
 import 'user_list_page.dart';
 
 class UserPage extends StatelessWidget {

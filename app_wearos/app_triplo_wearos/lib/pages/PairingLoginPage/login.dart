@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../controller/user.dart';
-import '../service/pairing_service.dart';
-import 'user.dart';
+import '../../controller/user.dart';
+import '../../service/pairing_service.dart';
+import '../UserProfilePage/user.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
