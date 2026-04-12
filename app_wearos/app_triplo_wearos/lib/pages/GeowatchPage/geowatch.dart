@@ -15,14 +15,14 @@ class GeowatchPage extends StatefulWidget {
   @override
   State<GeowatchPage> createState() => _GeowatchPageState();
 }
-
 class _GeowatchPageState extends State<GeowatchPage> {
   Map<String, dynamic>? currentWeather;
   List<Map<String, dynamic>> forecast = [];
   List<Map<String, dynamic>> alerts = [];
-
   bool loading = true;
+  bool alertsLoading = true;
   String? error;
+  String? alertsError;
 
   @override
   void initState() {
@@ -35,13 +35,13 @@ class _GeowatchPageState extends State<GeowatchPage> {
       final trekkingController = context.read<TrekkingController>();
       final serviceController = context.read<ServiceController>();
       final languageController = context.read<Language>();
-
       final trekking = trekkingController.getTrekkingById(widget.trekkingId);
       if (trekking == null) {
         if (!mounted) return;
         setState(() {
           error = "TREKKING_NOT_FOUND";
           loading = false;
+          alertsLoading = false;
         });
         return;
       }
@@ -52,42 +52,28 @@ class _GeowatchPageState extends State<GeowatchPage> {
         setState(() {
           error = "NO_LOCATION";
           loading = false;
+          alertsLoading = false;
         });
         return;
       }
 
       final langCode = languageController.locale.languageCode;
 
-      final weatherRes = await serviceController.weather(
-        target.latitude,
-        target.longitude,
-        langCode,
-      );
-
-      final forecastRes = await serviceController.forecast(
-        target.latitude,
-        target.longitude,
-        langCode,
-      );
-
-      List<Map<String, dynamic>> realAlerts = [];
-      List<Map<String, dynamic>> mockAlerts = [];
-
-      try {
-        realAlerts = await serviceController.weatherbitAlerts(
+      final results = await Future.wait([
+        serviceController.weather(
           target.latitude,
           target.longitude,
-        );
-      } catch (_) {}
+          langCode,
+        ),
+        serviceController.forecast(
+          target.latitude,
+          target.longitude,
+          langCode,
+        ),
+      ]);
 
-      try {
-        mockAlerts = await serviceController.mockAlerts();
-      } catch (_) {}
-
-      debugPrint("Weather loaded: ${weatherRes != null}");
-      debugPrint("Forecast loaded: ${forecastRes?.length ?? 0}");
-      debugPrint("Real alerts: ${realAlerts.length}");
-      debugPrint("Mock alerts: ${mockAlerts.length}");
+      final weatherRes = results[0] as Map<String, dynamic>?;
+      final forecastRes = results[1] as List<Map<String, dynamic>>?;
 
       if (!mounted) return;
 
@@ -96,17 +82,47 @@ class _GeowatchPageState extends State<GeowatchPage> {
         forecast = forecastRes != null
             ? serviceController.parseForecast(forecastRes)
             : [];
-        alerts = [...realAlerts, ...mockAlerts];
         loading = false;
+        alertsLoading = true;
+        alertsError = null;
       });
+      _loadAlerts(target.latitude, target.longitude);
     } catch (e) {
       debugPrint("Weather page load error: $e");
       if (!mounted) return;
       setState(() {
         error = e.toString();
         loading = false;
+        alertsLoading = false;
       });
     }
+  }
+
+
+  Future<void> _loadAlerts(double lat, double lon) async {
+    final serviceController = context.read<ServiceController>();
+
+    List<Map<String, dynamic>> realAlerts = [];
+    List<Map<String, dynamic>> mockAlerts = [];
+
+    try {
+      realAlerts = await serviceController.weatherbitAlerts(lat, lon);
+    } catch (e) {
+      debugPrint("Real alerts error: $e");
+    }
+
+    try {
+      mockAlerts = await serviceController.mockAlerts();
+    } catch (e) {
+      debugPrint("Mock alerts error: $e");
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      alerts = [...realAlerts, ...mockAlerts];
+      alertsLoading = false;
+    });
   }
 
   @override
@@ -297,6 +313,10 @@ class _GeowatchPageState extends State<GeowatchPage> {
   }
 
   Widget _buildAlertsSection(BuildContext context, Color color) {
+    if (alertsLoading) {
+      return _buildSimpleMessage("Loading alerts...", color, icon: Icons.hourglass_top);
+    }
+
     if (alerts.isEmpty) {
       return _buildSimpleMessage("No alerts", color, icon: Icons.verified);
     }

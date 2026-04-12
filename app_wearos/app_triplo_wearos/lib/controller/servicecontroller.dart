@@ -142,9 +142,9 @@ class ServiceController {
 
   Future<List<Map<String, dynamic>>> mockAlerts() async {
     try {
-      final res = await http.get(
-        Uri.parse("https://meteodemoserver.onrender.com/alerts"),
-      );
+      final res = await http
+          .get(Uri.parse("https://meteodemoserver.onrender.com/alerts"))
+          .timeout(const Duration(seconds: 4));
 
       if (res.statusCode != 200) return [];
 
