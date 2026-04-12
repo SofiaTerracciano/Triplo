@@ -138,6 +138,7 @@ class TriploWatchApp extends StatelessWidget {
           geo: context.read<GeoService>(),
           memory: context.read<MemoryService>(),
           notification: context.read<NotificationService>(),
+          pairingService: context.read<PairingService>(),
           trekkings: [],
         )),
 

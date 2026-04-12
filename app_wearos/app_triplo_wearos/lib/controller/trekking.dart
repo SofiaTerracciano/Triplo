@@ -7,20 +7,30 @@ import 'package:flutter/material.dart';
 import '../service/OSservice/notification.dart';
 import '../service/OSservice/geo.dart';
 import '../service/OSservice/memory.dart';
+import '../service/pairing_service.dart';
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  GeoService geo;
-  MemoryService memory;
-  NotificationService notification;
+  final GeoService geo;
+  final MemoryService memory;
+  final NotificationService notification;
+  final PairingService pairingService;
 
   List<Trekking> _trekkings;
   bool _loaded = false;
+  late final CollectionReference<Map<String, dynamic>> _weatherNotificationRef;
 
-  TrekkingController({required List<Trekking> trekkings, required this.geo, required this.memory, required this.notification })
-    : _trekkings = trekkings;
-
+  TrekkingController({
+    required List<Trekking> trekkings,
+    required this.geo,
+    required this.memory,
+    required this.notification,
+    required this.pairingService,
+  }) : _trekkings = trekkings {
+    _weatherNotificationRef = _db.collection('weather_notification');
+  }
+  String? get uid => pairingService.effectiveUid;
   // Getter for all trekkings
   List<Trekking> get allTrekkings => _trekkings;
 
@@ -31,10 +41,11 @@ class TrekkingController extends ChangeNotifier {
 
     // Fetch trekking documents from Firestore
     final snap = await _db
-        .collection('trekking') 
+        .collection('trekking')
         .get();
 
-    // Map documents to Trekking objects and store in the list --> this function create a 
+
+    // Map documents to Trekking objects and store in the list --> this function create a
     //list of istance of trekkning (model)
     _trekkings = snap.docs
         .map((doc) => Trekking.fromMap(doc.data(), docId: doc.id))
@@ -55,7 +66,20 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-  //Getter trekkingID by name --> if you have the name you can get the ID
+  Future<Trekking?> getTrekkingByIdAsync(String documentId) async {
+    final local = getTrekkingById(documentId);
+    if (local != null) return local;
+
+    try {
+      final doc = await _db.collection("trekking").doc(documentId).get();
+      if (!doc.exists || doc.data() == null) return null;
+      return Trekking.fromMap(doc.data()!, docId: doc.id);
+    } catch (e) {
+      debugPrint("Error loading trekking by id: $e");
+      return null;
+    }
+  }
+
   String? getTrekkingId(String name) {
     try {
       return _trekkings.firstWhere((t) => t.name == name).documentId;
@@ -97,28 +121,44 @@ class TrekkingController extends ChangeNotifier {
     }
   }
 
-  
-  /* Search trekkings by name using normalized search in Firestore
-  Future<List<Trekking>> searchTrekking(String query) async {
-    final q = query.trim().toLowerCase();
-    final snap = await _db
-        .collection("trekking_index")
-        .where("Normalized", isGreaterThanOrEqualTo: q)
-        .where("Normalized", isLessThanOrEqualTo: "$q\uf8ff")
-        .get();
+  Future<bool> isWeatherAlertEnabled(String trekkingId) async {
+    if (uid == null) return false;
 
-    final List<Trekking> results = [];
+    final snap = await _weatherNotificationRef.doc(uid).get();
+    final ids = List<String>.from(snap.data()?['trekkingIds'] ?? []);
+    return ids.contains(trekkingId);
+  }
 
-    for (var d in snap.docs) {
-      final trekkingId = d["Trekking_id"] as String;
-      print(trekkingId);
-      final trekking = getTrekkingById(trekkingId);
-      if (trekking != null) results.add(trekking);
-    }
-    
-    print(results);
-    return results;
-  }*/
+  Future<List<String>> getWeatherAlertTrekkingIds() async {
+    if (uid == null) return [];
 
-  
+    final snap = await _weatherNotificationRef.doc(uid).get();
+    return List<String>.from(snap.data()?['trekkingIds'] ?? []);
+  }
+
+  Future<List<Trekking>> getWeatherAlertTrekkings() async {
+    final ids = await getWeatherAlertTrekkingIds();
+    final trekkings = await Future.wait(ids.map(getTrekkingByIdAsync));
+    return trekkings.whereType<Trekking>().toList();
+  }
+
+  Future<void> enableWeatherAlertForTrekking(String trekkingId) async {
+    if (uid == null) return;
+
+    await _weatherNotificationRef.doc(uid).set({
+      'userId': uid,
+      'trekkingIds': FieldValue.arrayUnion([trekkingId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> disableWeatherAlertForTrekking(String trekkingId) async {
+    if (uid == null) return;
+
+    await _weatherNotificationRef.doc(uid).set({
+      'userId': uid,
+      'trekkingIds': FieldValue.arrayRemove([trekkingId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
 }

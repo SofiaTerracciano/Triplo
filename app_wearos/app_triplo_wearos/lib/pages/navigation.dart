@@ -1,25 +1,63 @@
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../service/background_service.dart';
 import 'HomePage/home-page.dart';
 import 'UserProfilePage/user.dart';
 import '../service/pairing_service.dart';
 import '../widgets_for_pages/Navigation_Button.dart';
 import '../controller/language.dart';
 
-class NavigationPage extends StatelessWidget {
+class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
 
   @override
+  State<NavigationPage> createState() => _NavigationPageState();
+}
+
+class _NavigationPageState extends State<NavigationPage> {
+  BackgroundService? _backgroundService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bootstrapNavigationPage();
+    });
+  }
+
+  Future<void> _bootstrapNavigationPage() async {
+    if (!mounted) return;
+
+    try {
+      final pairing = context.read<PairingService>();
+      await pairing.restoreWatchPairing();
+      debugPrint("NavigationPage: restoreWatchPairing completed");
+    } catch (e, st) {
+      debugPrint("NavigationPage pairing bootstrap error: $e");
+      debugPrint("$st");
+    }
+
+    if (!mounted) return;
+
+    try {
+      _backgroundService = BackgroundService(context);
+      _backgroundService!.start();
+      debugPrint("NavigationPage: BackgroundService started");
+    } catch (e, st) {
+      debugPrint("NavigationPage background bootstrap error: $e");
+      debugPrint("$st");
+    }
+  }
+  @override
   Widget build(BuildContext context) {
-    //final ctrl = context.watch<UserController>();
     final languageController = context.watch<Language>();
     final local = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        // Usiamo SingleChildScrollView per sicurezza, così se non ci sta puoi scrollare
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -30,12 +68,11 @@ class NavigationPage extends StatelessWidget {
                   "Triplo",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 13, // Leggermente più piccolo
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8), // Ridotto da 14
-                // ROW PRINCIPALE: HOME E USER
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -50,7 +87,7 @@ class NavigationPage extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(width: 10), // Ridotto da 14
+                    const SizedBox(width: 10),
                     NavigationButton(
                       icon: Icons.person,
                       label: local.user_label,
@@ -67,9 +104,7 @@ class NavigationPage extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 4), // Spazio minimo
-                // BOTTONE LINGUA PICCOLO
+                const SizedBox(height: 4),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
@@ -83,7 +118,10 @@ class NavigationPage extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20), // Aumentiamo l'area di tocco interna
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 20,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -94,7 +132,10 @@ class NavigationPage extends StatelessWidget {
                         ),
                         Text(
                           local.language_label,
-                          style: TextStyle(color: Colors.white70, fontSize: 8),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 8,
+                          ),
                         ),
                       ],
                     ),
@@ -108,7 +149,6 @@ class NavigationPage extends StatelessWidget {
     );
   }
 }
-
 // Popup dialog to select the language
 class LanguageDialog extends StatelessWidget {
   final Future<void> Function(Locale) onLocaleSelected;
