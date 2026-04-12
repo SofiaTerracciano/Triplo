@@ -19,11 +19,9 @@ class InternetService extends ChangeNotifier with WidgetsBindingObserver {
 
   bool _isOnline = true;
   bool get isOnline => _isOnline;
-
   Timer? _pollTimer;
   Timer? _offlineTimer;
   Timer? _resumeTimer;
-
   bool _started = false;
   bool _checking = false;
   bool _isForeground = true;

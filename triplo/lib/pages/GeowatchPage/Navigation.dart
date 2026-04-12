@@ -8,6 +8,7 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
 import '../../controller/servicecontroller.dart';
+import '../../service/internetservice.dart';
 import '../HomePage/home-page.dart';
 import '../SearchPage/search-page.dart';
 import '../SettingsPage/setting-page.dart';
@@ -52,7 +53,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
 
   @override
   void dispose() {
-    // 2. Rimuovi l'observer e cancella lo stream per evitare memory leak
+
     WidgetsBinding.instance.removeObserver(this);
     _positionSub?.cancel();
     super.dispose();
@@ -60,7 +61,7 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // 3. Se l'utente torna nell'app (es. dopo aver cambiato i permessi nelle impostazioni)
+
     if (state == AppLifecycleState.resumed) {
       setState(() {
         _isChecking = true;
@@ -207,9 +208,26 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
     final local = AppLocalizations.of(context)!;
     final primary = Theme.of(context).colorScheme.primary;
     final servicecontroller = context.read<ServiceController>();
+    final isOnline = context.watch<InternetService>().isOnline;
     return Scaffold(
       appBar: AppBar(
-        title: Text(local.navigation_page_title),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(local.navigation_page_title),
+            if (!isOnline) ...[
+              const SizedBox(width: 8),
+              Text(
+                "Offline",
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ],
+        ),
         centerTitle: true,
       ),
       body: _isChecking
@@ -357,7 +375,8 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
                     },
                   )
               ),
-      drawer: Drawer(
+      drawer: isOnline
+          ? Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -424,7 +443,10 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
             ),
           ],
         ),
-      ),
+
+      )
+          : null,
+
     );
   }
 }
