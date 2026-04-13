@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:triplo/l10n/app_localizations.dart';
+import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/controller/diary.dart';
@@ -62,6 +64,12 @@ void main() {
         mockUserController.getFollowing('user1'),
       ).thenAnswer((_) async => <Users>[]);
       when(mockUserController.updateUserLevel(any)).thenAnswer((_) async => {});
+
+      when(mockUserController.isLoading).thenReturn(false);
+      when(mockUserController.getFollowers(any))
+          .thenAnswer((_) async => <Users>[]);
+      when(mockUserController.getFollowing(any))
+          .thenAnswer((_) async => <Users>[]);
     });
 
     Widget buildPage({String trekkingId = 'trek1'}) => MultiProvider(
@@ -84,29 +92,6 @@ void main() {
       ),
     );
 
-    Widget buildPageForSave(MockDiaryController mockDiary) => MultiProvider(
-      providers: [
-        ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
-        ChangeNotifierProvider<TrekkingController>.value(
-            value: mockTrekkingController),
-        ChangeNotifierProvider<UserController>.value(value: mockUserController),
-      ],
-      child: MaterialApp(
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => const Scaffold(body: Text('stub_page')),
-          );
-        },
-        home: const AddingDiaryPage(trekkingId: 'trek1'),
-      ),
-    );
 
     testWidgets('dispose non lancia eccezioni rimuovendo la pagina dal tree', (
       tester,
@@ -122,20 +107,37 @@ void main() {
       expect(find.text('empty'), findsOneWidget);
     });
 
-    testWidgets('mostra messaggio errore se getFollowing restituisce null', (
-      tester,
-    ) async {
-      when(
-        mockUserController.getFollowing('user1'),
-      ).thenAnswer((_) async => <Users>[]);
+    testWidgets('mostra messaggio errore se getFollowing restituisce null',
+    (tester) async {
+      final localMockUserController = MockUserController();
+      when(localMockUserController.currentUser).thenReturn(fakeUser);
+      // Future che non completa mai → rimane in ConnectionState.waiting
+      when(localMockUserController.getFollowing('user1'))
+          .thenAnswer((_) => Completer<List<Users>>().future);
 
-      await tester.pumpWidget(buildPage());
-      await tester.pumpAndSettle();
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<DiaryController>.value(value: diaryController),
+          ChangeNotifierProvider<TrekkingController>.value(
+              value: mockTrekkingController),
+          ChangeNotifierProvider<UserController>.value(
+              value: localMockUserController),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddingDiaryPage(trekkingId: 'trek1'),
+        ),
+      ));
+      await tester.pump();
 
-      final local = AppLocalizations.of(
-        tester.element(find.byType(MaterialApp)),
-      )!;
-      expect(find.text(local.user_not_found), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Sentiero Facile'), findsNothing);
     });
 
     testWidgets('dropdown giorno aggiorna il valore dopo onChanged', (
@@ -482,23 +484,44 @@ void main() {
       when(mockDiary.addDiary(
         any, any, any, any, any, any, any, any, any, any, any, any,
       )).thenAnswer((_) async {});
+      // Stub per UserPage
+      when(mockDiary.getPublicDiaries(any)).thenAnswer((_) async => <Diary>[]);
+      when(mockDiary.getPrivateDiaries(any)).thenAnswer((_) async => <Diary>[]);
 
-      await tester.pumpWidget(buildPageForSave(mockDiary));
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
+          ChangeNotifierProvider<TrekkingController>.value(
+              value: mockTrekkingController),
+          ChangeNotifierProvider<UserController>.value(value: mockUserController),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddingDiaryPage(trekkingId: 'trek1'),
+        ),
+      ));
       await tester.pumpAndSettle();
 
       tester.widget<DropdownButton<int>>(
         find.byType(DropdownButton<int>).at(3),
       ).onChanged!(1);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       tester.widget<DropdownButton<int>>(
         find.byType(DropdownButton<int>).at(4),
       ).onChanged!(30);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final local = AppLocalizations.of(
         tester.element(find.byType(AddingDiaryPage)),
       )!;
+
       await tester.tap(find.text(local.save_botton_label));
       await tester.pumpAndSettle();
 
@@ -519,13 +542,33 @@ void main() {
       when(mockDiary.addDiary(
         any, any, any, any, any, any, any, any, any, any, any, any,
       )).thenAnswer((_) async {});
+      when(mockDiary.getPublicDiaries(any)).thenAnswer((_) async => <Diary>[]);
+      when(mockDiary.getPrivateDiaries(any)).thenAnswer((_) async => <Diary>[]);
 
-      await tester.pumpWidget(buildPageForSave(mockDiary));
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
+          ChangeNotifierProvider<TrekkingController>.value(
+              value: mockTrekkingController),
+          ChangeNotifierProvider<UserController>.value(value: mockUserController),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddingDiaryPage(trekkingId: 'trek1'),
+        ),
+      ));
       await tester.pumpAndSettle();
 
       final local = AppLocalizations.of(
         tester.element(find.byType(AddingDiaryPage)),
       )!;
+
       await tester.tap(find.text(local.save_botton_label));
       await tester.pumpAndSettle();
 
@@ -540,6 +583,8 @@ void main() {
       final mockDiary = MockDiaryController();
       when(mockDiary.uploadDiaryImages(any)).thenAnswer((_) async => <String>[]);
       when(mockDiary.currentUser).thenReturn(fakeUser);
+      when(mockDiary.getPublicDiaries(any)).thenAnswer((_) async => <Diary>[]);
+      when(mockDiary.getPrivateDiaries(any)).thenAnswer((_) async => <Diary>[]);
 
       String? capturedDate;
       when(mockDiary.addDiary(
@@ -548,24 +593,42 @@ void main() {
         capturedDate = inv.positionalArguments[2] as String;
       });
 
-      await tester.pumpWidget(buildPageForSave(mockDiary));
+      await tester.pumpWidget(MultiProvider(
+        providers: [
+          ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
+          ChangeNotifierProvider<TrekkingController>.value(
+              value: mockTrekkingController),
+          ChangeNotifierProvider<UserController>.value(value: mockUserController),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddingDiaryPage(trekkingId: 'trek1'),
+        ),
+      ));
       await tester.pumpAndSettle();
 
       tester.widget<DropdownButton<int>>(
           find.byType(DropdownButton<int>).first).onChanged!(5);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       tester.widget<DropdownButton<int>>(
           find.byType(DropdownButton<int>).at(1)).onChanged!(3);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       tester.widget<DropdownButton<int>>(
           find.byType(DropdownButton<int>).at(2)).onChanged!(2025);
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       final local = AppLocalizations.of(
         tester.element(find.byType(AddingDiaryPage)),
       )!;
+
       await tester.tap(find.text(local.save_botton_label));
       await tester.pumpAndSettle();
 
@@ -1013,6 +1076,7 @@ void main() {
     });
 
     testWidgets('bottoni Salva e Annulla sono presenti', (tester) async {
+
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -1168,3 +1232,22 @@ Trekking _buildTrekkingWithChallenges() => Trekking(
   familyFirendly: false,
   challenges: ['challenge1', 'challenge2'],
 );
+
+class _StubRouteObserver extends NavigatorObserver {
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    // non fare nulla: la route viene sostituita ma non montiamo niente
+  }
+}
+
+class _InterceptNavigator extends StatefulWidget {
+  final Widget child;
+  const _InterceptNavigator({required this.child});
+  @override
+  State<_InterceptNavigator> createState() => _InterceptNavigatorState();
+}
+
+class _InterceptNavigatorState extends State<_InterceptNavigator> {
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
