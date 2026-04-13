@@ -120,16 +120,19 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                       children: [
                         _rowDropdown([
                           _dropdown(
+                            'dayDropdown',
                             selectedDay,
                             days,
                             (v) => setState(() => selectedDay = v),
                           ),
                           _dropdown(
+                            'monthDropdown',
                             selectedMonth,
                             months,
                             (v) => setState(() => selectedMonth = v),
                           ),
                           _dropdown(
+                            'yearDropdown',
                             selectedYear,
                             years,
                             (v) => setState(() => selectedYear = v),
@@ -149,12 +152,14 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                       children: [
                         _rowDropdown([
                           _dropdown(
+                            'hoursDropdown',
                             selectedHours,
                             hoursList,
                             (v) => setState(() => selectedHours = v),
                             pad: true,
                           ),
                           _dropdown(
+                            'minutesDropdown',
                             selectedMinutes,
                             minutesList,
                             (v) => setState(() => selectedMinutes = v),
@@ -784,12 +789,14 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
 
   // Dropdown widget
   Widget _dropdown(
+    String keyName,
     int value,
     List<int> items,
     ValueChanged<int> onChanged, {
     bool pad = false,
   }) {
     return DropdownButton<int>(
+      key: Key(keyName),
       value: value,
       onChanged: (v) => onChanged(v!),
       items: items
