@@ -332,7 +332,7 @@ class AuthService extends ChangeNotifier {
 
   ({String watchId, String token}) extractWatchPair(String raw) {
     final uri = Uri.tryParse(raw.trim());
-    debugPrint(uri as String?); //coverage:ignore-line
+
     if (uri == null || uri.scheme != "triplo" || uri.host != "watch-pair") {
       throw const FormatException("QR non valido");
     }

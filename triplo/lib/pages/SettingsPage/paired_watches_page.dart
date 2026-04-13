@@ -25,18 +25,18 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
     _future = context.read<UserController>().getConnectedWatches();
   }
 
-  String _formatTimestamp(dynamic value) {
-    if (value is Timestamp) {
-      final d = value.toDate();
-      final y = d.year.toString().padLeft(4, '0');
-      final m = d.month.toString().padLeft(2, '0');
-      final day = d.day.toString().padLeft(2, '0');
-      final h = d.hour.toString().padLeft(2, '0');
-      final min = d.minute.toString().padLeft(2, '0');
-      return "$y-$m-$day $h:$min";
-    }
-    return "-";
-  }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -144,8 +144,7 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
                       const SizedBox(height: 8),
                       Text("Status: ${watch['status'] ?? '-'}"),
                       Text("Platform: ${watch['platform'] ?? '-'}"),
-                      Text("Created at: ${_formatTimestamp(watch['createdAt'])}"),
-                      Text("Expires at: ${_formatTimestamp(watch['expiresAt'])}"),
+
                       Text(
                         "Remote logout: ${remoteActive ? 'enabled' : 'disabled'}",
                       ),
@@ -164,7 +163,7 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
                             onPressed: remoteActive
                                 ? () => _clearRemoteLogout(watchId)
                                 : null,
-                            child: const Text("Clear remote logout"),
+                            child: const Text("Disable remote logout"),
                           ),
                         ],
                       ),
