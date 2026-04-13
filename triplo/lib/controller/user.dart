@@ -441,4 +441,20 @@ class UserController extends ChangeNotifier {
     _currentUser = _authService.currentUser;
     notifyListeners();
   }
+
+
+
+
+  Future<List<Map<String, dynamic>>> getConnectedWatches() async {
+    return _authService.getConnectedWatches();
+  }
+
+  Future<void> enableRemoteLogoutForWatch(String watchId) async {
+    await _authService.enableRemoteLogoutForWatch(watchId);
+  }
+
+  Future<void> clearRemoteLogoutForWatch(String watchId) async {
+    await _authService.clearRemoteLogoutForWatch(watchId);
+  }
+
 }

@@ -29,13 +29,12 @@ class PairingService extends ChangeNotifier {
 
   String? _qrToken;
   String? get qrToken => _qrToken;
-
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _pairSub;
   Timer? _expiryTimer;
   DateTime? _pairCreatedAtLocal;
-
+  bool _remoteLogoutActive = false;
+  bool get remoteLogoutActive => _remoteLogoutActive;
  PairingService({required this.watchId});
-
   String? get qrPayload {
     if (_qrToken == null) return null;
     return "triplo://watch-pair/$watchId?t=$_qrToken";
@@ -45,13 +44,15 @@ class PairingService extends ChangeNotifier {
     if (_pairId == null || _pairCreatedAtLocal == null) {
       return false;
     }
+
+
     return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
   }
 
   Future<void> startWatchPairing({bool forceNew = false}) async {
     if (_pairing) return;
+    if (_remoteLogoutActive) return;
     if (!forceNew && hasValidPairId) return;
-
     _pairing = true;
     _pairingError = null;
     notifyListeners();
@@ -92,7 +93,8 @@ class PairingService extends ChangeNotifier {
             (doc) {
           final data = doc.data();
           if (data == null) return;
-
+          _applyRemoteLogoutFlag(data);
+          if (_remoteLogoutActive) return;
           final status = data['status'] as String?;
           final uid = data['uid'] as String?;
           final tokenOnDb = data['qrToken'] as String?;
@@ -124,22 +126,23 @@ class PairingService extends ChangeNotifier {
       notifyListeners();
     }
   }
-  /*
-  Future<void> stopWatchPairing({bool clearId = false}) async {
-    _expiryTimer?.cancel();
-    _expiryTimer = null;
+  void _applyRemoteLogoutFlag(Map<String, dynamic>? data) {
+    final remoteLogoutAt = data?['remoteLogoutAt'];
+    final active = remoteLogoutAt != null;
 
-    await _pairSub?.cancel();
-    _pairSub = null;
-
-    if (clearId) {
-      _pairId = null;
-      _pairCreatedAtLocal = null;
+    if (_remoteLogoutActive != active) {
+      _remoteLogoutActive = active;
+      if (active) {
+        _pairedUid = null;
+        _pairingError = null;
+      }
+      notifyListeners();
+    } else if (active && _pairedUid != null) {
+      _pairedUid = null;
+      _pairingError = null;
+      notifyListeners();
     }
-
-    notifyListeners();
   }
-*/
   Future<bool> restoreWatchPairing() async {
     _pairingError = null;
 
@@ -151,7 +154,36 @@ class PairingService extends ChangeNotifier {
     try {
       final snap = await docRef.get();
       final data = snap.data();
+      _applyRemoteLogoutFlag(data);
+      if (_remoteLogoutActive) {
+        _pairSub = docRef.snapshots().listen(
+              (doc) {
+            final d = doc.data();
+            _applyRemoteLogoutFlag(d);
+            if (_remoteLogoutActive) return;
 
+            final st = d?['status'] as String?;
+            final u = d?['uid'] as String?;
+
+            if (st == 'approved' && u != null && u.isNotEmpty) {
+              if (_pairedUid != u) {
+                _pairedUid = u;
+                notifyListeners();
+              }
+            }
+
+            if (st == 'waiting' && _pairedUid != null) {
+              _pairedUid = null;
+              notifyListeners();
+            }
+          },
+          onError: (e) {
+            debugPrint("restoreWatchPairing listener error: $e");
+          },
+        );
+
+        return false;
+      }
       if (data != null) {
         final status = data['status'] as String?;
         final uid = data['uid'] as String?;
@@ -163,6 +195,8 @@ class PairingService extends ChangeNotifier {
           _pairSub = docRef.snapshots().listen((doc) {
             final d = doc.data();
             if (d == null) return;
+            _applyRemoteLogoutFlag(d);
+            if (_remoteLogoutActive) return;
             final st = d['status'] as String?;
             final u = d['uid'] as String?;
             if (st == 'approved' && u != null && u.isNotEmpty) {
@@ -190,6 +224,8 @@ class PairingService extends ChangeNotifier {
           (doc) {
         final d = doc.data();
         if (d == null) return;
+        _applyRemoteLogoutFlag(d);
+        if (_remoteLogoutActive) return;
         final st = d['status'] as String?;
         final u = d['uid'] as String?;
 
@@ -293,7 +329,9 @@ class _PairingGatewayState extends State<PairingGateway> {
       try {
         final alreadyPaired = await pairing.restoreWatchPairing();
         if (!mounted) return;
-
+        if (pairing.remoteLogoutActive) {
+          return;
+        }
         if (alreadyPaired) {
           await userCtrl.loadCurrentPairedUser();
         } else {
@@ -305,12 +343,17 @@ class _PairingGatewayState extends State<PairingGateway> {
     });
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
     //Pairing Gateway listens to PairingService and usercontroller
     return Consumer2<PairingService, UserController>(
       builder: (context, pairing, userCtrl, _) {
         final uid = pairing.effectiveUid;
+        if (pairing.remoteLogoutActive) return const LoginPage();
         if (uid == null) return const LoginPage();
 
         if (userCtrl.currentUser == null) {

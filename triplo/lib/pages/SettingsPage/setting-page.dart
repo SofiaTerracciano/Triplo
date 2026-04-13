@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/pages/GeowatchPage/Navigation.dart';
+import 'package:triplo/pages/SettingsPage/paired_watches_page.dart';
 import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
 import 'package:triplo/pages/SettingsPage/weather_notification_page.dart';
 import 'package:triplo/pages/trekkingPage/challenges-page.dart';
@@ -343,6 +344,25 @@ class _SettingPageState extends State<SettingPage> {
             ],
 
             const SizedBox(height: 12),
+
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PairedWatchesPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.watch),
+                label: const Text("Manage paired watches"),
+              ),
+            ),
+            const SizedBox(height: 12),
+
             ElevatedButton.icon(
               onPressed: () async {
                 final ok = await Navigator.push<bool>(

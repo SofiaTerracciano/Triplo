@@ -447,4 +447,53 @@ class AuthService extends ChangeNotifier {
 
     await loadUserCore(refreshedUser.uid);
   }
+
+  Future<List<Map<String, dynamic>>> getConnectedWatches() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("No authenticated user");
+    }
+
+    final snap = await _db
+        .collection('watch_pair')
+        .where('uid', isEqualTo: user.uid)
+        .where('status', isEqualTo: 'approved')
+        .get();
+
+    return snap.docs.map((doc) {
+      final data = doc.data();
+      return {
+        'watchId': doc.id,
+        'status': data['status'],
+        'uid': data['uid'],
+        'platform': data['platform'],
+        'createdAt': data['createdAt'],
+        'expiresAt': data['expiresAt'],
+        'remoteLogoutAt': data['remoteLogoutAt'],
+        'qrToken': data['qrToken'],
+      };
+    }).toList();
+  }
+
+  Future<void> enableRemoteLogoutForWatch(String watchId) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("No authenticated user");
+    }
+
+    await _db.collection('watch_pair').doc(watchId).update({
+      'remoteLogoutAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> clearRemoteLogoutForWatch(String watchId) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception("No authenticated user");
+    }
+
+    await _db.collection('watch_pair').doc(watchId).update({
+      'remoteLogoutAt': null,
+    });
+  }
 }
