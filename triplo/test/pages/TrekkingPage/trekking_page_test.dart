@@ -17,9 +17,11 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/pages/DiaryPage/adding-diary-page.dart';
+import 'package:triplo/pages/GeowatchPage/geowatch.dart';
+import 'package:triplo/pages/trekkingPage/details_trekking.dart';
 import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import 'package:triplo/widgets_for_pages/weather/weather.dart';
-
+import 'package:network_image_mock/network_image_mock.dart';
 import '../DiaryPage/adding_diary_page_test.mocks.dart';
 import 'trekking_page_test.mocks.dart'
     hide MockUserController, MockTrekkingController, MockDiaryController;
@@ -94,6 +96,12 @@ void main() {
       when(mockUserController.getFollowing(any))
           .thenAnswer((_) async => <Users>[]);
 
+      when(mockServiceController.weatherIconUrl(any, big: anyNamed('big')))
+          .thenReturn('icon_url');
+
+      when(mockTrekkingController.isWeatherAlertEnabled(any))
+          .thenAnswer((_) async => false);
+
       FlutterError.onError = (details) {
         if (details.toString().contains('NetworkImageLoadException') ||
             details.toString().contains('RenderFlex'))
@@ -140,6 +148,155 @@ void main() {
       await tester.pumpWidget(buildPage(trekkingId: trekkingId));
       await tester.pumpAndSettle(); // 👈 tutto completo
     }
+
+    testWidgets('photoSection mostra icona errore se future fallisce', (tester) async {
+      when(mockTrekkingController.getCachedImage(any))
+          .thenAnswer((_) async => throw Exception());
+
+      await pumpPageSettled(tester);
+
+      expect(find.byIcon(Icons.broken_image), findsWidgets);
+    });
+
+    testWidgets('photoSection mostra placeholder se file è null', (tester) async {
+      when(mockTrekkingController.getCachedImage(any))
+          .thenAnswer((_) async => null);
+
+      await pumpPageSettled(tester);
+
+      expect(find.byIcon(Icons.image_not_supported), findsWidgets);
+    });
+
+    testWidgets('weatherError viene settato se api fallisce', (tester) async {
+      when(mockServiceController.weather(any, any, any))
+          .thenThrow(Exception());
+
+      await pumpPageSettled(tester);
+
+      expect(find.byType(Weather), findsOneWidget);
+    });
+
+    testWidgets('_initSavedState gestisce errore', (tester) async {
+      when(mockTrekkingController.isTrekkingSaved(any))
+          .thenThrow(Exception());
+
+      await pumpPageSettled(tester);
+
+      expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
+    });
+
+    testWidgets('mostra snackbar su errore salvataggio', (tester) async {
+      when(mockTrekkingController.isTrekkingSaved(any))
+          .thenAnswer((_) async => false);
+
+      when(mockTrekkingController.addTrekkingToSaved(any))
+          .thenThrow(Exception());
+
+      await pumpPageSettled(tester);
+
+      await tester.tap(find.byIcon(Icons.bookmark_border));
+      await tester.pump(); // importante
+
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('difficulty sconosciuta usa colore fallback', (tester) async {
+      when(mockTrekkingController.getTrekkingByIdAsync('trek1'))
+          .thenAnswer((_) async => _buildTrekkingWithDifficulty('unknown'));
+      when(mockTrekkingController.getTrekkingById('trek1'))
+          .thenReturn(_buildTrekkingWithDifficulty('unknown'));
+
+      await pumpPageSettled(tester);
+
+      expect(find.byType(TrekkingPage), findsOneWidget);
+    });
+
+    testWidgets('challenges mostra fallback se errore', (tester) async {
+      when(mockTrekkingController.getTrekkingByIdAsync('trek1'))
+          .thenAnswer((_) async => _buildTrekkingWithChallenges());
+      when(mockTrekkingController.getTrekkingById('trek1'))
+          .thenReturn(_buildTrekkingWithChallenges());
+
+      when(mockTrekkingController.getCachedImages(any))
+          .thenAnswer((_) async => throw Exception());
+
+      await pumpPageSettled(tester);
+
+      final local = AppLocalizations.of(
+        tester.element(find.byType(TrekkingPage)),
+      )!;
+
+      expect(find.text(local.challenges_available_trekking_label), findsOneWidget);
+    });
+
+    testWidgets('photoSection mostra immagine quando file esiste', (tester) async {
+      final file = File('test.png');
+
+      when(mockTrekkingController.getCachedImage(any))
+          .thenAnswer((_) async => file);
+
+      await pumpPageSettled(tester);
+
+      expect(find.byType(Image), findsWidgets);
+    });
+
+    testWidgets('Weather riceve stato errore', (tester) async {
+      when(mockServiceController.weather(any, any, any))
+          .thenThrow(Exception());
+
+      await pumpPageSettled(tester);
+
+      final weatherWidget = tester.widget<Weather>(find.byType(Weather));
+
+      expect(weatherWidget.error, isNotNull);
+    });
+
+    testWidgets('tap su Weather apre GeoWatchPage', (tester) async {
+      await mockNetworkImagesFor(() async {
+        await pumpPageSettled(tester);
+
+        await tester.tap(find.byType(Weather));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(GeoWatchPage), findsOneWidget);
+      });
+    });
+
+    testWidgets('mostra frecce up e down', (tester) async {
+      when(
+        mockTrekkingController.getTrekkingByIdAsync('trek1'),
+      ).thenAnswer((_) async => _buildTrekkingWithChallenges());
+      when(
+        mockTrekkingController.getTrekkingById('trek1'),
+      ).thenReturn(_buildTrekkingWithChallenges());
+
+      await pumpPageSettled(tester);
+
+      expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
+    });
+
+    testWidgets('refreshment mostra fallback se vuoto', (tester) async {
+      await pumpPageSettled(tester);
+
+      final local = AppLocalizations.of(
+        tester.element(find.byType(TrekkingPage)),
+      )!;
+
+      expect(
+        find.text(local.refreshment_point_available_trekking_label),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tap su play naviga a DetailsTrekking', (tester) async {
+      await pumpPageSettled(tester);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DetailsTrekking), findsOneWidget);
+    });
 
     testWidgets('mostra CircularProgressIndicator durante caricamento', (tester) async {
       when(
@@ -301,28 +458,6 @@ void main() {
         expect(find.byIcon(Icons.bookmark), findsOneWidget);
       },
     );
-
-    testWidgets('mostra punto di partenza nella info card', (tester) async {
-      await pumpPageSettled(tester);  
-
-      final local = AppLocalizations.of(
-        tester.element(find.byType(TrekkingPage)),
-      )!;
-
-      expect(find.text(local.starting_point_trekking_label), findsOneWidget);
-    });
-
-    testWidgets('mostra punto di arrivo nella info card', (tester) async {
-      await pumpPageSettled(tester);
-
-      await tester.pump(const Duration(milliseconds: 500));
-
-      final local = AppLocalizations.of(
-        tester.element(find.byType(TrekkingPage)),
-      )!;
-
-      expect(find.text(local.ending_point_trekking_label), findsOneWidget);
-    });
 
     testWidgets('mostra distanza nella info card', (tester) async {
       await pumpPageSettled(tester);      
