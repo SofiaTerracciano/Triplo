@@ -20,6 +20,7 @@ import 'challenge_test.mocks.dart';
   Reference,
   AppLocalizations
 ])
+
 void main() {
   late MockNotificationService mockNotification;
   late MockMemoryService mockMemory;
@@ -45,10 +46,6 @@ void main() {
       storage: mockStorage,
     );
   }
-
-  // ─────────────────────────────────────────────
-  // LOAD CHALLENGES
-  // ─────────────────────────────────────────────
 
   test('loadChallenges loads data from Firestore', () async {
     final db = FakeFirebaseFirestore();
@@ -84,10 +81,6 @@ void main() {
     expect(ctrl.allChallenges.length, 1);
   });
 
-  // ─────────────────────────────────────────────
-  // GET BY ID
-  // ─────────────────────────────────────────────
-
   test('getChallengesById returns correct item', () async {
     final db = FakeFirebaseFirestore();
 
@@ -108,10 +101,6 @@ void main() {
     final ctrl = buildController();
     expect(ctrl.getChallengesById('nope'), isNull);
   });
-
-  // ─────────────────────────────────────────────
-  // getCachedImage REAL COVERAGE
-  // ─────────────────────────────────────────────
 
   test('getCachedImage returns from RAM', () async {
     final file = File('ram.png');
@@ -186,10 +175,6 @@ void main() {
 
     expect(result, isNull);
   });
-
-  // ─────────────────────────────────────────────
-  // notifyNewChallenge REAL
-  // ─────────────────────────────────────────────
 
   test('notifyNewChallenge calls notification service', () {
     when(mockNotification.showTrekkingNotification(
@@ -300,7 +285,6 @@ void main() {
 
     expect(result, file);
 
-    // IMPORTANTISSIMO: non deve chiamare storage
     verifyNever(mockStorage.refFromURL(any));
   });
 
@@ -325,7 +309,6 @@ void main() {
       payload: anyNamed('payload'),
     )).thenAnswer((_) async {});
 
-    // mock contentBuilder se lo hai iniettato
     final ctrl = buildController();
 
     ctrl.notifyNewChallenge('type', mockLocal);

@@ -8,17 +8,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-
-// Import dei tuoi file
 import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/permission.dart';
-
-// Mock generator
 import 'servicecontroller_test.mocks.dart';
 
 @GenerateMocks([MemoryService, GeoService, PermissionService])
+
 void main() {
   late MockGeoService mockGeo;
   late MockPermissionService mockPermission;
@@ -50,9 +47,6 @@ void main() {
     );
   });
 
-  // -------------------------------------------------------------------------
-  // TEST LAYER / URL
-  // -------------------------------------------------------------------------
   group('Gestione Layer e URL', () {
     test('weatherTile() costruisce URL corretta', () {
       final url = ctrl.weatherTile('temp_new');
@@ -74,9 +68,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // TEST PARSING
-  // -------------------------------------------------------------------------
   group('Parsing Meteo', () {
     test('parseForecastItem() normalizza dati', () {
       final raw = {
@@ -108,9 +99,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // GEO / PERMISSION
-  // -------------------------------------------------------------------------
   group('Geolocalizzazione', () {
     test('userLocation delega GeoService', () async {
       final pos = LatLng(45.0, 9.0);
@@ -647,7 +635,7 @@ void main() {
 
     final res = ctrl.parseForecastItem(raw);
 
-    expect(res['description'], 'null'); // toString().toLowerCase()
+    expect(res['description'], 'null'); 
   });
 
   test('resolveLayer tutti i casi', () {

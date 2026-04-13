@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -10,14 +9,9 @@ import 'package:triplo/service/authservice.dart';
 
 import 'user_test.mocks.dart';
 
-
-// ─── Code generation ─────────────────────────────────────────────────────────
-// Run: dart run build_runner build
 @GenerateMocks([AuthService])
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/// Returns a minimal Firestore-compatible user document.
 Map<String, dynamic> fakeUserDoc({
   String username = 'mario_rossi',
   String name = 'Mario',
@@ -49,7 +43,6 @@ Map<String, dynamic> fakeUserDoc({
   };
 }
 
-/// Seeds a user document in FakeFirestore and returns the pre-built [Users].
 Future<Users> seedUser(
   FakeFirebaseFirestore db, {
   String uid = 'uid_1',
@@ -64,9 +57,6 @@ void main() {
   late MockAuthService mockAuth;
   late FakeFirebaseFirestore fakeDb;
 
-  // Helper: builds a controller wired to fakeDb.
-  // Because UserController calls _init() in the constructor (which reads
-  // from Firestore), we always await the first notifyListeners cycle.
   Future<UserController> buildController({
     String? currentUid,
     Users? currentUser,
@@ -74,8 +64,7 @@ void main() {
     when(mockAuth.currentUid).thenReturn(currentUid);
     when(mockAuth.currentUser).thenReturn(currentUser);
 
-    final ctrl = UserController.withDb(mockAuth, fakeDb); // see note below
-    // Wait for _init() to finish
+    final ctrl = UserController.withDb(mockAuth, fakeDb); 
     await Future.delayed(Duration.zero);
     return ctrl;
   }
@@ -84,24 +73,12 @@ void main() {
     mockAuth = MockAuthService();
     fakeDb = FakeFirebaseFirestore();
 
-    // Safe defaults — override per test as needed
     when(mockAuth.currentUid).thenReturn(null);
     when(mockAuth.currentUser).thenReturn(null);
     when(mockAuth.isGoogleUser).thenReturn(false);
     when(mockAuth.isPasswordUser).thenReturn(true);
     when(mockAuth.currentPhotoUrl).thenReturn(null);
   });
-
-  // ─── NOTE ─────────────────────────────────────────────────────────────────
-  // UserController uses FirebaseFirestore.instance directly.
-  // To keep tests hermetic add a named constructor to UserController:
-  //
-  //   UserController.withDb(this._authService, this._db) { _init(); }
-  //
-  // All tests below assume that constructor is present.
-  // ──────────────────────────────────────────────────────────────────────────
-
-  // ─── _init / constructor ──────────────────────────────────────────────────
 
   group('_init()', () {
     test('isLoading is false after construction when no user is logged in',
@@ -125,13 +102,10 @@ void main() {
     });
   });
 
-  // ─── register ─────────────────────────────────────────────────────────────
-
   group('register()', () {
     test('calls authService.register and sets currentUser', () async {
       final user = await seedUser(fakeDb);
       when(mockAuth.register(any, any)).thenAnswer((_) async {
-        // Simula il fatto che dopo register, currentUser è valorizzato
         when(mockAuth.currentUser).thenReturn(user);
       });
 
@@ -153,8 +127,6 @@ void main() {
       expect(ctrl.isLoading, isFalse);
     });
   });
-
-  // ─── login ────────────────────────────────────────────────────────────────
 
   group('login()', () {
     test('calls authService.login and sets currentUser', () async {
@@ -180,8 +152,6 @@ void main() {
       expect(ctrl.isLoading, isFalse);
     });
   });
-
-  // ─── loginWithGoogle ──────────────────────────────────────────────────────
 
   group('loginWithGoogle()', () {
     test('calls authService.loginWithGoogle and sets currentUser', () async {
@@ -209,8 +179,6 @@ void main() {
     });
   });
 
-  // ─── logout ───────────────────────────────────────────────────────────────
-
   group('logout()', () {
     test('calls authService.logout and clears currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -225,8 +193,6 @@ void main() {
       expect(ctrl.isLoading, isFalse);
     });
   });
-
-  // ─── loadUserCore ─────────────────────────────────────────────────────────
 
   group('loadUserCore()', () {
     test('populates _currentUser from Firestore', () async {
@@ -259,8 +225,6 @@ void main() {
     });
   });
 
-  // ─── getUserById ──────────────────────────────────────────────────────────
-
   group('getUserById()', () {
     test('returns Users when document exists', () async {
       await seedUser(fakeDb, uid: 'uid_2');
@@ -277,8 +241,6 @@ void main() {
       expect(user, isNull);
     });
   });
-
-  // ─── getFollowers / getFollowing ──────────────────────────────────────────
 
   group('getFollowers()', () {
     test('returns list of follower Users', () async {
@@ -339,8 +301,6 @@ void main() {
     });
   });
 
-  // ─── updateUsername ───────────────────────────────────────────────────────
-
   group('updateUsername()', () {
     test('updates Firestore and local user', () async {
       await seedUser(fakeDb, uid: 'uid_1');
@@ -366,8 +326,6 @@ void main() {
       await ctrl.updateUsername('new_name'); // should not throw
     });
   });
-
-  // ─── updateName / updateSurname / updateBirthdate ─────────────────────────
 
   group('updateName()', () {
     test('updates Firestore and local user', () async {
@@ -421,8 +379,6 @@ void main() {
     });
   });
 
-  // ─── updateUserLevel ──────────────────────────────────────────────────────
-
   group('updateUserLevel()', () {
     Future<UserController> ctrlWithUser({
       int advanced = 0,
@@ -468,7 +424,6 @@ void main() {
         () async {
       final ctrl = await ctrlWithUser(advanced: 4, intermediate: 5);
       await ctrl.updateUserLevel('Advanced');
-      // advanced reaches 5 → level = Advanced (wins over Intermediate)
       expect(ctrl.currentUser!.level, 'Advanced');
     });
 
@@ -490,11 +445,9 @@ void main() {
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      await ctrl.updateUserLevel('Advanced'); // should not throw
+      await ctrl.updateUserLevel('Advanced'); 
     });
   });
-
-  // ─── isFollowing ──────────────────────────────────────────────────────────
 
   group('isFollowing()', () {
     test('returns true when target is in following list', () async {
@@ -520,8 +473,6 @@ void main() {
       expect(await ctrl.isFollowing('uid_2'), isFalse);
     });
   });
-
-  // ─── followUser ───────────────────────────────────────────────────────────
 
   group('followUser()', () {
     test('adds targetUid to following and myUid to followers', () async {
@@ -554,8 +505,6 @@ void main() {
       expect(await ctrl.followUser('uid_2'), isFalse);
     });
   });
-
-  // ─── unfollowUser ─────────────────────────────────────────────────────────
 
   group('unfollowUser()', () {
     test('removes targetUid from following and myUid from followers',
@@ -591,15 +540,12 @@ void main() {
     });
   });
 
-  // ─── tryAutoLogin ─────────────────────────────────────────────────────────
-
   group('tryAutoLogin()', () {
     test('loads user when uid is present', () async {
       await seedUser(fakeDb, uid: 'uid_1');
       when(mockAuth.currentUid).thenReturn('uid_1');
 
       final ctrl = await buildController(currentUid: 'uid_1');
-      // Reset to simulate cold start
       await ctrl.tryAutoLogin();
 
       expect(ctrl.currentUser, isNotNull);
@@ -615,8 +561,6 @@ void main() {
       expect(ctrl.isLoading, isFalse);
     });
   });
-
-  // ─── sendPasswordReset / requestPasswordReset ─────────────────────────────
 
   group('sendPasswordReset()', () {
     test('delegates to authService', () async {
@@ -636,8 +580,6 @@ void main() {
     });
   });
 
-  // ─── isGoogleUser / isPasswordUser ───────────────────────────────────────
-
   group('provider flags', () {
     test('isGoogleUser delegates to authService', () async {
       when(mockAuth.isGoogleUser).thenReturn(true);
@@ -651,8 +593,6 @@ void main() {
       expect(ctrl.isPasswordUser, isFalse);
     });
   });
-
-  // ─── restoreGoogleProfilePhoto ───────────────────────────────────────────
 
   group('restoreGoogleProfilePhoto()', () {
     test('updates Firestore and local user with Google photo URL', () async {
@@ -673,17 +613,15 @@ void main() {
       when(mockAuth.currentUid).thenReturn('uid_1');
       when(mockAuth.currentPhotoUrl).thenReturn('');
       final ctrl = await buildController(currentUid: 'uid_1');
-      await ctrl.restoreGoogleProfilePhoto(); // should not throw
+      await ctrl.restoreGoogleProfilePhoto(); 
     });
 
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      await ctrl.restoreGoogleProfilePhoto(); // should not throw
+      await ctrl.restoreGoogleProfilePhoto(); 
     });
   });
-
-  // ─── extractWatchPair ─────────────────────────────────────────────────────
 
   group('extractWatchPair()', () {
     test('delegates to authService and returns the pair', () async {
@@ -698,8 +636,6 @@ void main() {
       verify(mockAuth.extractWatchPair('raw_string')).called(1);
     });
   });
-
-  // ─── changeEmail ─────────────────────────────────────────────────────────
 
   group('changeEmail()', () {
     test('delegates to authService', () async {
@@ -717,8 +653,6 @@ void main() {
     });
   });
 
-  // ─── refreshEmailFromAuth ─────────────────────────────────────────────────
-
   group('refreshEmailFromAuth()', () {
     test('calls authService and syncs currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -733,8 +667,6 @@ void main() {
       expect(ctrl.currentUser, isNotNull);
     });
   });
-
-  // ─── searchUsers ──────────────────────────────────────────────────────────────
 
   group('searchUsers()', () {
     test('returns matching users from users_index', () async {
@@ -773,8 +705,6 @@ void main() {
     });
   });
 
-  // ─── approveWatchPair ─────────────────────────────────────────────────────────
-
   group('approveWatchPair()', () {
     test('delegates to authService with correct parameters', () async {
       when(mockAuth.approveWatchPair(
@@ -792,13 +722,10 @@ void main() {
     });
   });
 
-  // ─── updateProfilePhoto (guard path) ─────────────────────────────────────────
-
   group('updateProfilePhoto()', () {
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      // Non lancia nonostante uid sia null — copre il guard iniziale
       await ctrl.updateProfilePhoto(File('/tmp/fake.jpg'));
     });
   });

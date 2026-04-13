@@ -25,8 +25,6 @@ void main() {
   late MockAuthService mockAuthService;
   late MockFirebaseFirestore mockFirestore;
 
-  // ─── Helpers ────────────────────────────────────────────────────────────────
-
   Users makeUser({
     String uid = 'test_uid',
     List<Diary>? publicDiaryPages,
@@ -83,8 +81,6 @@ void main() {
         "Is_public": isPublic,
       };
 
-  /// Configures the mock Firestore chain:
-  /// mockFirestore.collection(col).doc(docId) → mockDocRef
   void stubCollectionDoc(
     MockCollectionReference<Map<String, dynamic>> mockCol,
     MockDocumentReference<Map<String, dynamic>> mockDocRef, {
@@ -97,18 +93,12 @@ void main() {
     }
   }
 
-  // ─── Setup ──────────────────────────────────────────────────────────────────
-
   setUp(() {
     mockAuthService = MockAuthService();
     mockFirestore = MockFirebaseFirestore();
     when(mockAuthService.currentUid).thenReturn('test_uid');
     controller = DiaryController(mockAuthService, firestore: mockFirestore);
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // updateDiary
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('updateDiary', () {
     test('aggiorna tutti i campi correttamente', () {
@@ -136,10 +126,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getDiaryById
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('getDiaryById', () {
     test('ritorna il diario corretto dalla lista locale', () {
       controller.allDiaries.add(makeDiary(id: '123'));
@@ -155,10 +141,6 @@ void main() {
       expect(controller.getDiaryById('1'), isNull);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // fetchDiaryById
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('fetchDiaryById', () {
     test('ritorna lista di diari quando ci sono documenti', () async {
@@ -197,10 +179,6 @@ void main() {
       expect(result, isNull);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // addDiary — nuovo (modify = false)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('addDiary (nuovo)', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
@@ -261,10 +239,6 @@ void main() {
       verifyNever(mockFirestore.collection(any));
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // addDiary — modifica (modify = true)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('addDiary (modifica)', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
@@ -333,10 +307,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // removeDiary
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('removeDiary', () {
     late MockCollectionReference<Map<String, dynamic>> mockCol;
     late MockDocumentReference<Map<String, dynamic>> mockDocRef;
@@ -401,10 +371,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getPublicDiaries / getPrivateDiaries
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('getPublicDiaries e getPrivateDiaries', () {
     MockCollectionReference<Map<String, dynamic>> buildChain(
       bool isPublic,
@@ -456,10 +422,6 @@ void main() {
       expect(result, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getRandomPublicDiariesFromFollowing
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getRandomPublicDiariesFromFollowing', () {
     test('ritorna al massimo [limit] diari', () async {
@@ -513,7 +475,7 @@ void main() {
         "Date": "2024",
         "Duration": 1,
         "Friends": [],
-        "Photos": "single_photo.jpg", // String, non lista
+        "Photos": "single_photo.jpg",
         "Challenges": "some challenge",
         "Refreshment_point": "",
         "Mood": "happy",
@@ -552,10 +514,6 @@ void main() {
       expect(result, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getDiaryByIdAsync
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getDiaryByIdAsync', () {
     test('ritorna il diario dalla cache locale senza chiamare Firestore', () async {
@@ -616,10 +574,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // currentUser setter / getter
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('currentUser', () {
     test('getter ritorna null di default', () {
       expect(controller.currentUser, isNull);
@@ -632,10 +586,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // uid getter
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('uid getter', () {
     test('delega ad AuthService.currentUid', () {
       expect(controller.uid, 'test_uid');
@@ -647,10 +597,6 @@ void main() {
       expect(ctrl.uid, isNull);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Diary model — toMap / fromMap
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('Diary model', () {
     test('toMap produce le chiavi Firestore corrette', () {
@@ -685,10 +631,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // deletePhotoFromDb
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('deletePhotoFromDb', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
     late MockDocumentReference<Map<String, dynamic>> mockDiaryDocRef;
@@ -718,18 +660,10 @@ void main() {
       );
       controller.allDiaries.add(diary);
 
-      // Intercettiamo l'aggiornamento Firestore, lo Storage viene skippato
-      // in unit test perché FirebaseStorage.instance non è inizializzato.
-      // Testiamo la logica Firestore + stato locale isolando il metodo.
-      // Usiamo un try/catch per gestire l'assenza di Firebase Storage in test.
       try {
         await controller.deletePhotoFromDb('diaryX', 'Diary_photos/foto.jpg');
-      } catch (_) {
-        // Firebase Storage non disponibile in unit test — normale
-      }
+      } catch (_) {}
 
-      // Lo stato locale deve essere aggiornato comunque dopo il .update Firestore
-      // (se Storage lancia, il catch interno lo logga e non propaga)
       verify(mockDiaryDocRef.update(argThat(
         predicate((m) =>
             m is Map && m.containsKey('Photos')),
@@ -749,10 +683,6 @@ void main() {
       })).called(1);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getRandomPublicDiariesFromFollowing — normalizzazione Friends
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getRandomPublicDiariesFromFollowing — normalizzazione Friends', () {
     Future<List<Diary>> fetchWithData(Map<String, dynamic> data) async {
@@ -817,10 +747,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Diary.fromMap — copertura branch aggiuntivi
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('Diary.fromMap — branch aggiuntivi', () {
     test('Challenges come List<dynamic> con interi viene convertita a List<String>', () {
       final diary = Diary.fromMap({'Challenges': [1, 2]}, diaryId: 'z');
@@ -852,10 +778,6 @@ void main() {
       expect(diary.friends, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Users model — toMap / fromMap / parseBirthdate / getters / setters
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('Users.toMap', () {
     test('produce le chiavi Firestore corrette', () {
@@ -1064,10 +986,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // addDiary — UUID collision (doc.exists = true → rigenera id)
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('addDiary (nuovo) — UUID collision', () {
     test('rigenera uuid se il documento esiste già', () async {
       final mockDiaryCol = MockCollectionReference<Map<String, dynamic>>();
@@ -1081,7 +999,6 @@ void main() {
       when(mockFirestore.collection('users')).thenReturn(mockUsersCol);
       when(mockDiaryCol.doc(any)).thenReturn(mockDiaryDocRef);
       when(mockUsersCol.doc(any)).thenReturn(mockUserDocRef);
-      // Prima chiamata: doc esiste → collisione; seconda: non esiste
       when(mockDiaryDocRef.get()).thenAnswer((_) async => mockDocSnapExists);
       when(mockDocSnapExists.exists).thenReturn(true);
       when(mockDiaryDocRef.set(any)).thenAnswer((_) async {});
@@ -1089,7 +1006,6 @@ void main() {
 
       controller.currentUser = makeUser();
 
-      // Non deve lanciare e deve comunque creare il diario
       await controller.addDiary(
         'Trek', false, '2024', 1.0, [], [], [], '', [], '', false, '',
       );
@@ -1098,10 +1014,6 @@ void main() {
       verify(mockDiaryDocRef.set(any)).called(1);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // addDiary (modifica) — notifyListeners + trekkigName aggiornato
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('addDiary (modifica) — dettagli aggiuntivi', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
@@ -1143,13 +1055,10 @@ void main() {
       await controller.addDiary(
         'Titolo ignorato', false, '2024', 2.0, [], [], [], '', [], '', true, 'n2',
       );
-
-      // trekkigName è immutato perché updateDiary non lo tocca
       expect(controller.getDiaryById('n2')!.trekkigName, 'Test Trek');
     });
 
     test('tutti i campi modificabili vengono aggiornati correttamente (stessa privacy)', () async {
-      // isPublic false→false: nessun cambio privacy, nessuna chiamata a users
       final diary = makeDiary(id: 'n3', isPublic: false);
       controller.allDiaries.add(diary);
 
@@ -1189,10 +1098,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // removeDiary — currentUser null (non crasha)
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('removeDiary — currentUser null', () {
     test('non lancia eccezione se currentUser è null', () async {
       final mockCol = MockCollectionReference<Map<String, dynamic>>();
@@ -1204,7 +1109,6 @@ void main() {
 
       final diary = makeDiary(id: 'del1', isPublic: true);
       controller.allDiaries.add(diary);
-      // currentUser è null di default
 
       await expectLater(
         controller.removeDiary('del1'),
@@ -1228,10 +1132,6 @@ void main() {
       expect(controller.allDiaries, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getRandomPublicDiariesFromFollowing — Friends non è List
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getRandomPublicDiariesFromFollowing — Friends non List', () {
     Future<List<Diary>> fetchWith(Map<String, dynamic> data) async {
@@ -1303,10 +1203,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getPrivateDiaries — lista vuota
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('getPrivateDiaries — edge cases', () {
     test('ritorna lista vuota se non ci sono diari privati', () async {
       final mockCol = MockCollectionReference<Map<String, dynamic>>();
@@ -1352,10 +1248,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // fetchDiaryById — più documenti
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('fetchDiaryById — più documenti', () {
     test('ritorna tutti i diari quando ci sono più documenti', () async {
       final mockCol = MockCollectionReference<Map<String, dynamic>>();
@@ -1384,10 +1276,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Diary.fromMap — branch aggiuntivi Photos null
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('Diary.fromMap — Photos/Challenges/Mood null esplicito', () {
     test('Photos null restituisce lista vuota', () {
       final diary = Diary.fromMap({'Photos': null}, diaryId: 'z');
@@ -1404,10 +1292,6 @@ void main() {
       expect(diary.mood, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Diary.toMap — copertura campi aggiuntivi
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('Diary.toMap — tutti i campi', () {
     test('Duration, Friends, Challenges, Mood, Notes, Date serializzati correttamente', () {
@@ -1436,10 +1320,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Users.fromMap — branch aggiuntivi
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('Users.fromMap — branch aggiuntivi', () {
     test('photoURL fallback usato quando Photo_profile è assente', () {
       final user = Users.fromMap({'photoURL': 'http://photo.url'}, uid: 'x');
@@ -1459,10 +1339,6 @@ void main() {
       expect(user.photoProfile, 'correct.jpg');
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Users getter photoProfile + allDiaries getter
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getter residui', () {
     test('Users.photoProfile getter ritorna il valore impostato', () {
@@ -1504,11 +1380,6 @@ void main() {
       expect(user.intermediate, 0);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // addDiary (nuovo) — notifyListeners NON chiamato (branch !modify)
-  // + verifica allDiaries.length dopo addDiary multipli
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('addDiary (nuovo) — comportamento lista', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
@@ -1553,15 +1424,7 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // uploadDiaryImages — logica estensioni (senza Firebase Storage)
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('uploadDiaryImages — filtro estensioni', () {
-    // Non possiamo testare l'upload reale (FirebaseStorage.instance non mockabile),
-    // ma possiamo testare la logica del filtro estensioni creando file fittizi
-    // e verificando che il metodo ritorni lista vuota per estensioni non valide
-    // (il loop gira ma tutti i file vengono saltati prima di toccare Storage).
 
     test('ritorna lista vuota con lista immagini vuota', () async {
       // Nessun file → nessuna chiamata Storage → paths vuoto
@@ -1569,10 +1432,6 @@ void main() {
       expect(result, isEmpty);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getDownloadUrlChild — branch null/empty (senza Firebase Storage)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('getDownloadUrlChild — branch null/empty', () {
     test('ritorna null se path è null', () async {
@@ -1586,10 +1445,6 @@ void main() {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // getDownloadUrl — branch null/empty (senza Firebase Storage)
-  // ═══════════════════════════════════════════════════════════════════════════
-
   group('getDownloadUrl — branch null/empty', () {
     test('ritorna null se path è null', () async {
       final result = await controller.getDownloadUrl(null);
@@ -1601,10 +1456,6 @@ void main() {
       expect(result, isNull);
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // deletePhotoFromDb — stato locale + notifyListeners (logica post-Storage)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   group('deletePhotoFromDb — stato locale', () {
     late MockCollectionReference<Map<String, dynamic>> mockDiaryCol;
@@ -1635,11 +1486,6 @@ void main() {
       );
       controller.allDiaries.add(diary);
 
-      // Firebase Storage lancia → catch interno → ma Firestore è già stato chiamato.
-      // Con coverage:ignore-start/end sul blocco Storage, le righe
-      // getDiaryById + diary?.photos.remove + notifyListeners sono coperte
-      // dal try che prosegue dopo lo ignore-block solo se Storage non lancia.
-      // Qui verifichiamo almeno che Firestore venga chiamato correttamente.
       try {
         await controller.deletePhotoFromDb('dx1', 'Diary_photos/a.jpg');
       } catch (_) {}
@@ -1660,12 +1506,10 @@ void main() {
         await controller.deletePhotoFromDb('dx2', 'path/photo.jpg');
       } catch (_) {}
 
-      // Firestore update avviene sempre; Storage può fallire
       verify(mockDiaryDocRef.update(any)).called(1);
     });
 
     test('non crasha se il diario non è in lista locale', () async {
-      // getDiaryById ritorna null → diary?.photos.remove non crasha (safe call)
       await expectLater(
         controller.deletePhotoFromDb('non_esiste', 'path.jpg')
             .catchError((_) {}),

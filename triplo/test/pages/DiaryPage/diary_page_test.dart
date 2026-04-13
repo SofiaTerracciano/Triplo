@@ -17,12 +17,12 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'diary_page_test.mocks.dart';
 
 @GenerateMocks([DiaryController, UserController, TrekkingController])
+
 void main() {
   late MockDiaryController mockDiaryController;
   late MockUserController mockUserController;
   late MockTrekkingController mockTrekkingController;
 
-  /// Builds a minimal [Diary] with sensible defaults.
   Diary makeDiary({
     String diaryId = 'diary-1',
     String userId = 'user-1',
@@ -53,7 +53,6 @@ void main() {
     );
   }
 
-  /// Builds a minimal [Users] object.
   Users makeUser({
     String uid = 'user-1',
     String username = 'alpinist99',
@@ -84,7 +83,6 @@ void main() {
     );
   }
 
-  /// Wraps [child] in all required providers and localization delegates.
   Widget buildTestApp(Widget child) {
     return MultiProvider(
       providers: [
@@ -108,12 +106,8 @@ void main() {
     mockTrekkingController = MockTrekkingController();
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: loading states
-  // ---------------------------------------------------------------------------
   group('DiaryPage – loading states', () {
 
-    /// Tests that a CircularProgressIndicator is shown while the diary data is being loaded.
     testWidgets('shows CircularProgressIndicator while diary is loading',
         (tester) async {
       final c = Completer<Diary?>();
@@ -128,7 +122,6 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    /// Tests that a CircularProgressIndicator is shown while the user data is being loaded.
     testWidgets('shows CircularProgressIndicator while user is loading',
         (tester) async {
       final diary = makeDiary();
@@ -148,12 +141,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: error / null states
-  // ---------------------------------------------------------------------------
   group('DiaryPage – error states', () {
 
-    /// Tests that an appropriate message is shown when the diary data cannot be found (null).
     testWidgets('shows diary_not_found when diary is null', (tester) async {
       when(mockDiaryController.getDiaryByIdAsync('missing')).thenAnswer(
         (_) async => null,
@@ -165,7 +154,6 @@ void main() {
       expect(find.textContaining('not found'), findsOneWidget);
     });
 
-    /// Tests that an appropriate message is shown when the user data cannot be found (null).
     testWidgets('shows user_not_found when user is null', (tester) async {
       final diary = makeDiary();
       when(mockDiaryController.getDiaryByIdAsync('diary-1'))
@@ -181,12 +169,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: duration formatting
-  // ---------------------------------------------------------------------------
   group('DiaryPage – duration formatting', () {
 
-    /// Helper to pump the page with a given diary and its associated user.
     Future<void> pumpFullPage(WidgetTester tester, Diary diary) async {
       final user = makeUser();
       when(mockDiaryController.getDiaryByIdAsync(diary.diaryId))
@@ -199,7 +183,6 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    /// Tests that when the duration is less than 60 minutes, it is displayed in minutes only.
     testWidgets('shows minutes only when duration < 60', (tester) async {
       await pumpFullPage(tester, makeDiary(duration: 45));
       expect(find.textContaining('45'), findsAtLeastNWidgets(1));
@@ -212,7 +195,6 @@ void main() {
       expect(find.textContaining('0 m'), findsNothing);
     });
 
-    /// Tests that when the duration includes both hours and minutes, both are displayed correctly.
     testWidgets('shows hours and minutes for mixed duration', (tester) async {
       await pumpFullPage(tester, makeDiary(duration: 95));
       // 95 min = 1h 35m — search for both parts separately
@@ -224,12 +206,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: AppBar
-  // ---------------------------------------------------------------------------
   group('DiaryPage – AppBar', () {
 
-    /// Tests that the AppBar title correctly displays the trekking name from the diary.
     testWidgets('AppBar title equals trekking name', (tester) async {
       final diary = makeDiary(trekkingName: 'Gran Paradiso');
       final user = makeUser();
@@ -245,7 +223,6 @@ void main() {
       expect(find.text('Gran Paradiso'), findsOneWidget);
     });
 
-    /// Tests that the edit button is visible in the AppBar only when the current user is the owner of the diary.
     testWidgets('edit button visible when current user is diary owner',
         (tester) async {
       final diary = makeDiary(userId: 'owner-uid');
@@ -263,7 +240,6 @@ void main() {
       expect(find.byIcon(Icons.edit), findsOneWidget);
     });
 
-    /// Tests that the edit button is not visible in the AppBar when the current user is not the owner of the diary.
     testWidgets('edit button NOT visible when current user is NOT diary owner',
         (tester) async {
       final diary = makeDiary(userId: 'owner-uid');
@@ -281,12 +257,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: user info card
-  // ---------------------------------------------------------------------------
   group('DiaryPage – user info card', () {
 
-    /// Tests that the username is displayed in the user info card.
     testWidgets('shows username in card', (tester) async {
       final diary = makeDiary();
       final user = makeUser(username: 'mountain_lover');
@@ -302,7 +274,6 @@ void main() {
       expect(find.text('mountain_lover'), findsOneWidget);
     });
 
-    /// Tests that a person icon is shown in the user info card when the user's photoProfile is null.
     testWidgets('shows person icon when photoProfile is null', (tester) async {
       final diary = makeDiary();
       final user = makeUser(photoProfile: null);
@@ -318,7 +289,6 @@ void main() {
       expect(find.byIcon(Icons.person), findsAtLeastNWidgets(1));
     });
 
-    /// Tests that the date and duration rows are displayed in the user info card with the correct icons and formatted text.
     testWidgets('shows date and duration rows', (tester) async {
       final diary = makeDiary(date: '2025-07-15', duration: 60);
       final user = makeUser();
@@ -338,9 +308,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: optional sections visibility
-  // ---------------------------------------------------------------------------
   group('DiaryPage – conditional sections', () {
     Future<void> pumpDiary(WidgetTester tester, Diary diary) async {
       final user = makeUser();
@@ -353,14 +320,12 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    /// Tests that the friends section is hidden when the friends list in the diary is empty.
     testWidgets('friends section hidden when friends list is empty',
         (tester) async {
       await pumpDiary(tester, makeDiary(friends: []));
       expect(find.byIcon(Icons.group), findsNothing);
     });
 
-    /// Tests that the friends section is visible when the friends list in the diary is not empty, and that it correctly displays the friend usernames.
     testWidgets('friends section visible when friends list is not empty',
         (tester) async {
       final friendUser = makeUser(uid: 'friend-1', username: 'buddy');
@@ -371,15 +336,12 @@ void main() {
       expect(find.byIcon(Icons.group), findsOneWidget);
     });
 
-    /// Tests that the photos section is hidden when the photos list in the diary is empty.
     testWidgets('photos section hidden when photos list is empty',
         (tester) async {
       await pumpDiary(tester, makeDiary(photos: []));
       expect(find.byIcon(Icons.photo), findsNothing);
     });
 
-    /// Tests that the photos section is visible when the photos list in the diary is not empty, 
-    /// and that it correctly displays the photo thumbnails.
     testWidgets('photos section visible when photos list is not empty',
         (tester) async {
       when(mockDiaryController.getDownloadUrlChild(any))
@@ -389,14 +351,12 @@ void main() {
       expect(find.byIcon(Icons.photo), findsOneWidget);
     });
 
-    /// Tests that the challenges section is hidden when the challenges list in the diary is empty.
     testWidgets('challenges section hidden when challenges list is empty',
         (tester) async {
       await pumpDiary(tester, makeDiary(challenges: []));
       expect(find.byIcon(Icons.flag), findsNothing);
     });
 
-    /// Tests that the challenges section is visible when the challenges list in the diary is not empty,
     testWidgets('challenges section visible when challenges list is not empty',
         (tester) async {
       when(mockDiaryController.getDownloadUrl(any))
@@ -406,14 +366,11 @@ void main() {
       expect(find.byIcon(Icons.flag), findsOneWidget);
     });
 
-    /// Tests that the mood section is hidden when the mood list in the diary is empty.
     testWidgets('mood section hidden when mood list is empty', (tester) async {
       await pumpDiary(tester, makeDiary(mood: []));
       expect(find.byIcon(Icons.mood), findsNothing);
     });
 
-    /// Tests that the mood section is visible when the mood list in the diary is not empty, 
-    /// and that it correctly displays the mood emojis.
     testWidgets('mood section visible and shows emoji chips', (tester) async {
       await pumpDiary(tester, makeDiary(mood: ['😍', '😁', '🥰', '😅', '😎', '😞', '🤩']));
       expect(find.byIcon(Icons.mood), findsOneWidget);
@@ -426,15 +383,11 @@ void main() {
       expect(find.text('🤩'), findsOneWidget);
     });
 
-    /// Tests that the refreshment point section is hidden when the refreshmentPoint field 
-    /// in the diary is empty.
     testWidgets('refreshment point section hidden when empty', (tester) async {
       await pumpDiary(tester, makeDiary(refreshmentPoint: ''));
       expect(find.byIcon(Icons.restaurant), findsNothing);
     });
 
-    /// Tests that the refreshment point section is visible when the refreshmentPoint field 
-    /// in the diary is not empty,
     testWidgets('refreshment point section visible when not empty',
         (tester) async {
       await pumpDiary(
@@ -445,13 +398,11 @@ void main() {
       expect(find.text('Rifugio Monviso'), findsOneWidget);
     });
 
-    /// Tests that the notes section is hidden when the notes field in the diary is empty.
     testWidgets('notes section hidden when empty', (tester) async {
       await pumpDiary(tester, makeDiary(notes: ''));
       expect(find.byIcon(Icons.notes), findsNothing);
     });
 
-    /// Tests that the notes section is visible when the notes field in the diary is not empty,
     testWidgets('notes section visible when not empty', (tester) async {
       await pumpDiary(
         tester,
@@ -465,13 +416,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: navigation
-  // ---------------------------------------------------------------------------
   group('DiaryPage – navigation', () {
 
-    /// Tests that tapping the username in the user info card navigates to the UserPage 
-    /// when the current user is the owner of the diary.
     testWidgets(
         'tapping username navigates to UserPage when current user is owner',
         (tester) async {
@@ -482,7 +428,6 @@ void main() {
       when(mockUserController.currentUser).thenReturn(user);
       when(mockUserController.getUserById('me'))
           .thenAnswer((_) async => user);
-      // Stubs needed by UserPage itself
       when(mockUserController.isLoading).thenReturn(false);
       when(mockDiaryController.getPublicDiaries('me'))
           .thenAnswer((_) async => []);
@@ -504,8 +449,6 @@ void main() {
       expect(find.byType(UserPage), findsOneWidget);
     });
 
-    /// Tests that tapping the username in the user info card navigates to the UserPagePublic 
-    /// when the current user is NOT the owner of the diary.
     testWidgets(
         'tapping username navigates to UserPagePublic when current user is NOT owner',
         (tester) async {
@@ -517,7 +460,6 @@ void main() {
       when(mockUserController.currentUser).thenReturn(currentUser);
       when(mockUserController.getUserById('someone-else'))
           .thenAnswer((_) async => diaryUser);
-      // Stubs needed by UserPagePublic itself
       when(mockUserController.isFollowing('someone-else'))
           .thenAnswer((_) async => false);
       when(mockDiaryController.fetchDiaryById('someone-else'))
@@ -541,12 +483,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: SectionTitle widget (unit)
-  // ---------------------------------------------------------------------------
   group('SectionTitle widget', () {
 
-    /// Tests that the SectionTitle widget correctly renders the provided icon and text.
     testWidgets('renders icon and text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -560,12 +498,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: infoRow widget (unit)
-  // ---------------------------------------------------------------------------
   group('infoRow widget', () {
 
-    /// Tests that the infoRow widget correctly renders the provided icon and label text.
     testWidgets('renders icon and label text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -579,16 +513,10 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: imageScroller widget (unit)
-  // ---------------------------------------------------------------------------
   group('imageScroller widget', () {
 
-    /// Tests that while the image URLs are loading, the imageScroller widget renders a 
-    /// placeholder (e.g., a grey container) for each image.
     testWidgets('renders one placeholder per image while loading',
         (tester) async {
-      // Use Completers that never complete to keep FutureBuilder in waiting state
       final completers = List.generate(3, (_) => Completer<String?>());
       int idx = 0;
       Future<String?> loader(String _) => completers[idx++].future;
@@ -600,21 +528,17 @@ void main() {
           ),
         ),
       );
-      await tester.pump(); // let FutureBuilders start
+      await tester.pump(); 
 
-      // 3 grey placeholder containers should be present
       final containers = tester.widgetList<Container>(find.byType(Container));
       expect(containers.length, greaterThanOrEqualTo(3));
 
-      // Complete all futures so no pending timers remain
       for (final c in completers) {
         c.complete(null);
       }
       await tester.pumpAndSettle();
     });
 
-    /// Tests that when the image URLs are loaded, the imageScroller widget renders 
-    /// Image.network widgets with the correct BoxFit for badges and photos.
     testWidgets('uses BoxFit.contain for badges and BoxFit.cover for photos',
         (tester) async {
       Future<String?> loader(String _) async => null;
@@ -625,13 +549,11 @@ void main() {
             ),
           );
 
-      // Badge scroller height = 60
       await tester.pumpWidget(buildScroller(isBadge: true));
       final sizedBoxBadge =
           tester.widget<SizedBox>(find.byType(SizedBox).first);
       expect(sizedBoxBadge.height, 60);
 
-      // Photo scroller height = 120
       await tester.pumpWidget(buildScroller(isBadge: false));
       final sizedBoxPhoto =
           tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -639,13 +561,8 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Group: uncovered lines
-  // ---------------------------------------------------------------------------
   group('DiaryPage – uncovered lines', () {
 
-    /// Tests that when the user has a photoProfile URL, the user info card displays a 
-    /// CircleAvatar with a NetworkImage background.
     testWidgets('shows NetworkImage when user has a photoProfile',
         (tester) async {
       final diary = makeDiary();
@@ -674,11 +591,9 @@ void main() {
       );
 
       await tester.pump(const Duration(seconds: 1));
-      tester.takeException(); // discard NetworkImageLoadException
+      tester.takeException(); 
     });
 
-    /// Tests that tapping a friend chip in the friends section navigates to the
-    /// UserPagePublic for that friend.
     testWidgets('tapping a friend chip navigates to UserPagePublic',
         (tester) async {
       final diary = makeDiary(userId: 'owner-uid', friends: ['friend-1']);
@@ -691,7 +606,6 @@ void main() {
           .thenAnswer((_) async => owner);
       when(mockUserController.getUserById('friend-1'))
           .thenAnswer((_) async => friend);
-      // Stubs for UserPagePublic
       when(mockUserController.isFollowing('friend-1'))
           .thenAnswer((_) async => false);
       when(mockDiaryController.fetchDiaryById('friend-1'))
@@ -714,8 +628,6 @@ void main() {
       expect(find.byType(UserPagePublic), findsOneWidget);
     });
 
-    /// Tests that when the photos section is rendered, the imageScroller widget 
-    /// correctly calls the loader function for each photo and displays the resulting images.
     testWidgets('imageScroller shows Image.network when URL is available',
         (tester) async {
       const fakeUrl = 'https://example.com/img.jpg';

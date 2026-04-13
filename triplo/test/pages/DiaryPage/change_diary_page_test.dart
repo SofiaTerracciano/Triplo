@@ -6,7 +6,6 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:latlong2/latlong.dart';
-
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
@@ -16,17 +15,11 @@ import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/pages/DiaryPage/change-diary-page.dart';
 import 'package:triplo/service/authservice.dart';
-
 import 'change_diary_page_test.mocks.dart';
 
-// ─────────────────────────────────────────────
-// Generazione mock:  flutter pub run build_runner build
-// ─────────────────────────────────────────────
 @GenerateMocks([AuthService, TrekkingController, UserController])
+
 void main() {
-  // ──────────────────────────────────────────
-  // UNIT TEST – Diary model
-  // ──────────────────────────────────────────
   group('Diary model', () {
     test('toMap() serializza tutti i campi correttamente', () {
       final map = _buildDiary().toMap();
@@ -117,9 +110,6 @@ void main() {
     });
   });
 
-  // ──────────────────────────────────────────
-  // UNIT TEST – Users model
-  // ──────────────────────────────────────────
   group('Users model', () {
     test('toMap() serializza i campi primitivi correttamente', () {
       final map = _buildUser().toMap();
@@ -237,9 +227,6 @@ void main() {
     });
   });
 
-  // ──────────────────────────────────────────
-  // UNIT TEST – Trekking model
-  // ──────────────────────────────────────────
   group('Trekking model', () {
     test('toMap() serializza i campi primitivi correttamente', () {
       final map = _buildTrekking().toMap();
@@ -353,9 +340,6 @@ void main() {
     });
   });
 
-  // ──────────────────────────────────────────
-  // UNIT TEST – DiaryController
-  // ──────────────────────────────────────────
   group('DiaryController', () {
     late FakeFirebaseFirestore fakeFirestore;
     late MockAuthService mockAuth;
@@ -371,7 +355,6 @@ void main() {
       fakeUser = _buildUser();
       controller.currentUser = fakeUser;
 
-      // Il controller chiama users/user1.update() → il documento deve esistere
       await fakeFirestore.collection('users').doc('user1').set({
         'Public_diary': [],
         'Private_diary': [],
@@ -600,9 +583,6 @@ void main() {
     });
   });
 
-  // ──────────────────────────────────────────
-  // WIDGET TEST – ModifyDiaryPage
-  // ──────────────────────────────────────────
   group('ModifyDiaryPage – widget', () {
     late MockAuthService mockAuth;
     late MockTrekkingController mockTrekkingController;
@@ -632,8 +612,6 @@ void main() {
       when(mockUserController.currentUser).thenReturn(fakeUser);
       when(mockUserController.getFollowing('user1'))
           .thenAnswer((_) async => <Users>[]);
-
-      //TestWidgetsFlutterBinding.ensureInitialized();
     });
 
     Widget buildPage() => MultiProvider(
@@ -658,8 +636,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Il diary ha date '01/06/2024' → giorno=1, mese=6, anno=2024
-      // I dropdown mostrano questi valori iniziali
       final firstDropdown = tester.widget<DropdownButton<int>>(
         find.byType(DropdownButton<int>).first,
       );
@@ -670,7 +646,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // duration=120 → ore=2, minuti=0
       final minuteDropdown = tester.widget<DropdownButton<int>>(
         find.byType(DropdownButton<int>).at(4),
       );
@@ -684,7 +659,6 @@ void main() {
       await tester.tap(find.byType(DropdownButton<int>).at(1));
       await tester.pumpAndSettle();
 
-      // Mese corrente è 6, scegliamo 3 (non ambiguo)
       await tester.tap(find.text('3'));
       await tester.pumpAndSettle();
 
@@ -720,7 +694,6 @@ void main() {
 
     testWidgets('sezione amici mostra testo "no friends" quando lista vuota',
         (tester) async {
-      // Diary senza amici → _buildDiaryForWidget() ha già friends: []
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
@@ -739,7 +712,6 @@ void main() {
       await tester.tap(expansionTiles.first);
       await tester.pumpAndSettle();
 
-      // Nessun ListTile con CircleAvatar come leading (= nessun amico)
       expect(
         find.byWidgetPredicate(
           (w) => w is ListTile && w.leading is CircleAvatar,
@@ -752,7 +724,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // diary_widget ha mood: ['😍'] → deve apparire almeno una volta nel preview
       expect(find.text('😍'), findsWidgets);
     });
 
@@ -767,7 +738,6 @@ void main() {
       await tester.tap(tiles.last);
       await tester.pumpAndSettle();
 
-      // Tap su emoji non ancora selezionata → viene aggiunta al mood
       await tester.tap(find.text('😁').first);
       await tester.pumpAndSettle();
 
@@ -778,14 +748,12 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Espande ExpansionTile mood (ultimo)
       final tiles = find.byType(ExpansionTile);
       await tester.ensureVisible(tiles.last);
       await tester.pumpAndSettle();
       await tester.tap(tiles.last);
       await tester.pumpAndSettle();
 
-      // Tap sul ListTile di 😍 per deselezionarla
       await tester.tap(
         find.byWidgetPredicate(
           (w) => w is ListTile &&
@@ -795,7 +763,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Il Chip nel preview non deve più esserci
       expect(
         find.byWidgetPredicate(
           (w) => w is Chip &&
@@ -807,7 +774,6 @@ void main() {
     });
 
     testWidgets('bottone Pubblico imposta isPublic a true', (tester) async {
-      // Aumenta la viewport per contenere tutta la pagina
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -818,15 +784,12 @@ void main() {
         tester.element(find.byType(ModifyDiaryPage)),
       )!;
 
-      // Prima porta su Privato
       await tester.tap(find.text(local.private_botton_label));
       await tester.pumpAndSettle();
 
-      // Poi torna su Pubblico
       await tester.tap(find.text(local.public_botton_label));
       await tester.pumpAndSettle();
 
-      // Verifica: il bottone Pubblico ha foreground bianco (= active)
       final publicBtn = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, local.public_botton_label),
       );
@@ -876,7 +839,6 @@ void main() {
       expect(find.byType(TextField), findsWidgets);
     });
 
-    // Aggiorna anche il test originale che aveva lo stesso problema:
     testWidgets('toggle No nasconde il campo testo del rifornimento', (tester) async {
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -921,11 +883,11 @@ void main() {
       );
 
       await tester.pumpWidget(buildPage());
-      await tester.pump(); // un solo frame: FutureBuilder è in waiting
+      await tester.pump(); 
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      await tester.pumpAndSettle(); // completa il future
+      await tester.pumpAndSettle(); 
     });
 
     testWidgets('modifica del campo refreshment aggiorna il testo', (tester) async {
@@ -989,7 +951,6 @@ void main() {
 
     testWidgets('toggle Sì ripristina la visibilità del campo rifornimento',
     (tester) async {
-      // Deve stare QUI dentro, non nel setUp
       await tester.binding.setSurfaceSize(const Size(800, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -1046,9 +1007,6 @@ void main() {
       expect(find.byIcon(Icons.add_photo_alternate), findsOneWidget);
     });
 
-    // FIX: il bottone Annulla è in fondo alla pagina (off-screen).
-    // Invece di scrollare, usiamo tester.pageBack() che simula
-    // direttamente il pop della route corrente — equivalente funzionale.
     testWidgets('bottone Annulla fa pop della route', (tester) async {
       bool popped = false;
 
@@ -1088,8 +1046,6 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      // tester.pageBack() simula il tap sul back button della AppBar:
-      // è l'equivalente esatto di Navigator.pop ed è sempre visibile.
       await tester.pageBack();
       await tester.pumpAndSettle();
 
@@ -1111,10 +1067,6 @@ void main() {
   });
 }
 
-// ──────────────────────────────────────────────
-// Helper factories
-// ──────────────────────────────────────────────
-
 Diary _buildDiary({String diaryId = 'diary1', bool isPublic = true}) => Diary(
       diaryId: diaryId,
       userId: 'user1',
@@ -1130,7 +1082,6 @@ Diary _buildDiary({String diaryId = 'diary1', bool isPublic = true}) => Diary(
       isPublic: isPublic,
     );
 
-/// Diary per widget test: photos/challenges vuote → nessuna chiamata a Storage
 Diary _buildDiaryForWidget() => Diary(
       diaryId: 'diary_widget',
       userId: 'user1',
@@ -1188,7 +1139,6 @@ Trekking _buildTrekking() => Trekking(
       challenges: ['challenge1'],
     );
 
-/// Trekking per widget test: challenges vuote → sezione non renderizzata
 Trekking _buildTrekkingForWidget() => Trekking(
       documentId: 'trek1',
       name: 'Monte Rosa',
@@ -1209,7 +1159,6 @@ Trekking _buildTrekkingForWidget() => Trekking(
       description: [],
       picNicArea: false,
       familyFirendly: true,
-      // challenges e refreshmentPoint omessi → default [] e ''
     );
 
 Map<String, dynamic> _diaryFirestoreMap({
