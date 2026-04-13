@@ -219,6 +219,34 @@ class MockAuthService extends _i1.Mock implements _i2.AuthService {
           as _i6.Future<void>);
 
   @override
+  _i6.Future<List<Map<String, dynamic>>> getConnectedWatches() =>
+      (super.noSuchMethod(
+            Invocation.method(#getConnectedWatches, []),
+            returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+              <Map<String, dynamic>>[],
+            ),
+          )
+          as _i6.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i6.Future<void> enableRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#enableRemoteLogoutForWatch, [watchId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> clearRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearRemoteLogoutForWatch, [watchId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
   void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
@@ -815,6 +843,34 @@ class MockUserController extends _i1.Mock implements _i13.UserController {
   _i6.Future<void> refreshEmailFromAuth() =>
       (super.noSuchMethod(
             Invocation.method(#refreshEmailFromAuth, []),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<List<Map<String, dynamic>>> getConnectedWatches() =>
+      (super.noSuchMethod(
+            Invocation.method(#getConnectedWatches, []),
+            returnValue: _i6.Future<List<Map<String, dynamic>>>.value(
+              <Map<String, dynamic>>[],
+            ),
+          )
+          as _i6.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i6.Future<void> enableRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#enableRemoteLogoutForWatch, [watchId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> clearRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearRemoteLogoutForWatch, [watchId]),
             returnValue: _i6.Future<void>.value(),
             returnValueForMissingStub: _i6.Future<void>.value(),
           )

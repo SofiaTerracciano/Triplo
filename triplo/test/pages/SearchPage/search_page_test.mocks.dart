@@ -350,6 +350,34 @@ class MockUserController extends _i1.Mock implements _i7.UserController {
           as _i8.Future<void>);
 
   @override
+  _i8.Future<List<Map<String, dynamic>>> getConnectedWatches() =>
+      (super.noSuchMethod(
+            Invocation.method(#getConnectedWatches, []),
+            returnValue: _i8.Future<List<Map<String, dynamic>>>.value(
+              <Map<String, dynamic>>[],
+            ),
+          )
+          as _i8.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i8.Future<void> enableRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#enableRemoteLogoutForWatch, [watchId]),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
+          )
+          as _i8.Future<void>);
+
+  @override
+  _i8.Future<void> clearRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearRemoteLogoutForWatch, [watchId]),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
+          )
+          as _i8.Future<void>);
+
+  @override
   void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
