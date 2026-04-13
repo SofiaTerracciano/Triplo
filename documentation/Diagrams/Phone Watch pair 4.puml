@@ -1,0 +1,84 @@
+@startuml
+title Phone-side see paired watches and remote logout management
+
+actor User
+
+participant SettingPage as "<color:white>SettingPage</color>" #darkgreen
+'participant ConnectedWatchesPage as "<color:white>ConnectedWatchesPage</color>" #darkgreen
+participant UserController as "<color:white>UserController</color>" #151b8e
+participant AuthService as "<color:white>AuthService</color>" #000000
+participant FirebaseAuth
+database FirebaseFirestore
+
+User -> SettingPage : tap "Managed Paired Watches"
+
+SettingPage -> UserController : getConnectedWatches()
+UserController -> AuthService : getConnectedWatches()
+
+AuthService -> FirebaseAuth : currentUser
+FirebaseAuth --> AuthService : user
+
+    AuthService -> FirebaseFirestore : collection("watch_pair").where("uid", isEqualTo: user.uid).where("status", isEqualTo: "approved").get()
+    FirebaseFirestore --> AuthService : snap
+    AuthService --> UserController : List<Map<String,dynamic>>
+    UserController --> SettingPage : connected watches
+    SettingPage --> User : show connected watches list
+
+
+
+
+note right of SettingPage
+The page shows the watches that are currently paired
+with the authenticated phone user according to the
+live state stored in the watch_pair collection.
+It is therefore a view of the current pairing state,
+not a historical registry of all watches ever used.
+end note
+
+opt Enable remote logout for a selected watch
+    User -> SettingPage : tap "Enable remote logout"
+    SettingPage -> UserController : enableRemoteLogoutForWatch(watchId)
+    UserController -> AuthService : enableRemoteLogoutForWatch(watchId)
+
+    AuthService -> FirebaseAuth : currentUser
+    FirebaseAuth --> AuthService : user / null
+
+
+
+       
+        AuthService -> FirebaseFirestore : collection("watch_pair").doc(watchId).update({"remoteLogoutAt": serverTimestamp()})
+        FirebaseFirestore --> AuthService : update completed
+        AuthService --> UserController : success
+        UserController --> SettingPage : success
+        ref over SettingPage, UserController, AuthService, FirebaseAuth, FirebaseFirestore : reload watches through getConnectedWatches()
+        SettingPage --> User : show remote logout enabled
+
+end
+
+opt Disable remote logout for a selected watch
+    User -> SettingPage : tap "Disable remote logout"
+    SettingPage -> UserController : clearRemoteLogoutForWatch(watchId)
+    UserController -> AuthService : clearRemoteLogoutForWatch(watchId)
+
+    AuthService -> FirebaseAuth : currentUser
+    FirebaseAuth --> AuthService : user / null
+
+    
+        AuthService -> FirebaseFirestore : collection("watch_pair").doc(watchId).update({"remoteLogoutAt": null})
+        FirebaseFirestore --> AuthService : update completed
+        AuthService --> UserController : success
+        UserController --> SettingPage : success
+        ref over SettingPage, UserController, AuthService, FirebaseAuth, FirebaseFirestore : reload watches through getConnectedWatches()
+        SettingPage --> User : show remote logout cleared
+   
+end
+
+note left of FirebaseFirestore
+The remote logout flag does not replace the ordinary
+pairing protocol. It is an additional control field
+written only by the phone. The watch-side reaction
+is handled by the listener already observing the
+same watch_pair document.
+end note
+
+@enduml

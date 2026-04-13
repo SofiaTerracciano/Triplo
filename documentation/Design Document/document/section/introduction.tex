@@ -37,20 +37,29 @@ The application also encourages engagement through optional challenges that user
 Each trekking activity can be recorded in a personal digital logbook, where users can document their experience by adding photos and diary notes. 
 Users can also browse selected entries from the logbooks of other hikers they follow, allowing them to discover new routes and gain inspiration from shared experiences. \\
 The application aims to support outdoor exploration while enabling users to record, revisit, and share meaningful moments from their trekking activities.
+
+
+
+
+
+
+
+
 \section{Definitions, Acronyms, Abbreviations}
 \begin{itemize}
-    \item \label{GPS} GPS Generic term used in this document to indicate satellite-based positioning systems available on the device (such as GPS, Galileo, and others)
-    \item \label{LTE} LTE (Long Term Evolution) is a mobile communication standard. LTE is also referred to as “4G”, the fourth generation of mobile communication technology. LTE consists of a number of enhancements to the “Universal Mobile Telecommunications System” (UMTS) – the third generation of mobile communications.
-    %definizione di URI nel QR code e payload
+    \item \label{GPS} \textbf{GPS:} Generic term used in this document to indicate satellite-based positioning systems available on the device (such as GPS, Galileo, and others)
+    \item \label{LTE} \textbf{LTE:} Long Term Evolution is a mobile communication standard. LTE is also referred to as “4G”, the fourth generation of mobile communication technology. LTE consists of a number of enhancements to the “Universal Mobile Telecommunications System” (UMTS) – the third generation of mobile communications.
+    \item \label{URI} \textbf{URI:} A Uniform Resource Identifier is a string of characters used to identify or name a resource on the internet. The pairing mechanism between smartphone and smartwatch is based on a custom URI scheme. The general format of the URI in this application is: \\ 
+                \begin{center}
+                    \texttt{triplo://watch-pair/\{watchId\}?t=\{token\}}
+                \end{center}    
+                This structure encodes:
+                \begin{itemize}
+                    \item the unique identifier of the watch (\texttt{watchId})
+                    \item a temporary token (\texttt{token}) used to validate the pairing request
+                \end{itemize}
+                The URI is embedded into a QR code displayed on the smartwatch.
 \end{itemize}
-
-
-
-
-
-
-
-
 
 \section{References}
 
