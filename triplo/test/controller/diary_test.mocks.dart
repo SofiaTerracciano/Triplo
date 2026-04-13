@@ -265,6 +265,34 @@ class MockAuthService extends _i1.Mock implements _i5.AuthService {
           as _i4.Future<void>);
 
   @override
+  _i4.Future<List<Map<String, dynamic>>> getConnectedWatches() =>
+      (super.noSuchMethod(
+            Invocation.method(#getConnectedWatches, []),
+            returnValue: _i4.Future<List<Map<String, dynamic>>>.value(
+              <Map<String, dynamic>>[],
+            ),
+          )
+          as _i4.Future<List<Map<String, dynamic>>>);
+
+  @override
+  _i4.Future<void> enableRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#enableRemoteLogoutForWatch, [watchId]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> clearRemoteLogoutForWatch(String? watchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearRemoteLogoutForWatch, [watchId]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
   void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
