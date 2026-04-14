@@ -1,0 +1,65 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundcorner 12
+
+hide empty members
+
+class "Service_i" << (I,#aaaaaa) >> <<interface>> {
+  - weather(lat, lon, langCode)
+  - forecast(lat, lon, langCode)
+  - parseForecast(rawForecast)
+  - weatherbitAlerts(lat, lon)
+  - mockAlerts()
+  - weatherIconUrl(icon)
+  - openTopoMapTile()
+  - openTopoMapSubdomains()
+}
+
+class "Trekking_i" << (I,#aaaaaa) >> <<interface>> {
+  - loadTrekking()
+  - allTrekkings
+  - getTrekkingById(trekkingId)
+  - checkArrival(trekkingId, distance, local)
+}
+
+class "User_i" << (I,#aaaaaa) >> <<interface>> {
+  - getUserById(uid)
+  - getFollowerUids(uid)
+  - getFollowingUids(uid)
+}
+
+class "Diary_i" << (I,#aaaaaa) >> <<interface>> {
+  - fetchDiaryById(id)
+}
+
+class "Challenge_i" << (I,#aaaaaa) >> <<interface>> {
+  - notifyNewChallenge(payload, local)
+}
+
+class "Pairing_i" << (I,#aaaaaa) >> <<interface>> {
+  - startWatchPairing(forceNew)
+  - restoreWatchPairing()
+  - logoutWatch()
+  - effectiveUid
+}
+
+class "Language_i" << (I,#aaaaaa) >> <<interface>> {
+  - setLocale(locale)
+}
+
+class "Memory_i" << (I,#aaaaaa) >> <<interface>> {
+  - getImageFromMemory(key)
+  - getImageFromDisk(url)
+  - saveImageToMemory(key, file)
+  - getSavedLocaleCode()
+  - saveLocaleCode(localeCode)
+}
+
+class "Notification_i" << (I,#aaaaaa) >> <<interface>> {
+  - showTrekkingNotification()
+  - showWeatherNotification()
+}
+
+@enduml

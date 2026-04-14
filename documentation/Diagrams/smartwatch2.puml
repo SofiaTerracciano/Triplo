@@ -1,5 +1,5 @@
 @startuml
-title Triplo Application Smartwatch App - Component Diagram (Internal Components)
+title Triplo Application Smartwatch App - Component Diagram 
 
 left to right direction
 skinparam linetype polyline
@@ -40,7 +40,7 @@ skinparam rectangle {
   RoundCorner 14
 }
 
-rectangle "External GUI" as GUIBlock {
+rectangle "GUI" as GUIBlock {
   () HomeGUI
   () PairingLoginGUI
   () UserProfileGUI
@@ -209,16 +209,16 @@ component " " as App {
   watchidservice -[#2E75B6,dashed]-( mem_i
 
   together {
-    challengecontroller -[#black,bold]- pfirebasefirestore
-    trekkingController -[#black,bold]- pfirebasefirestore
-    UserController -[#black,bold]- pfirebasefirestore
-    DiaryController -[#black,bold]- pfirebasefirestore
-    pairingservice -[#black,bold]- pfirebasefirestore
+    challengecontroller -[#black,dotted]- pfirebasefirestore
+    trekkingController -[#black,dotted]- pfirebasefirestore
+    UserController -[#black,dotted]- pfirebasefirestore
+    DiaryController -[#black,dotted]- pfirebasefirestore
+    pairingservice -[#black,dotted]- pfirebasefirestore
   }
 
   together {
-    trekkingController -- pfirebasestorage
-    challengecontroller -- pfirebasestorage
+    trekkingController -[#blue,dotted]- pfirebasestorage
+    challengecontroller -[#blue,dotted]- pfirebasestorage
   }
 
   Lib -- p1

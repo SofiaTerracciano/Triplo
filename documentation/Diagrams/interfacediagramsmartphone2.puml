@@ -61,6 +61,9 @@ class "User_i" as UserI << (I,#aaaaaa) >> <<interface>> {
   - changeEmail(newEmail, currentPassword)
   - extractWatchPair(raw)
   - approveWatchPair(watchId, token)
+  - getConnectedWatches()
+  - enableRemoteLogoutForWatch(watchId)
+  - clearRemoteLogoutForWatch(watchId)
   - currentUser
   - isGoogleUser
   - isPasswordUser
@@ -157,6 +160,9 @@ class "authservice_i" as authserviceI << (I,#aaaaaa) >> <<interface>> {
   - approveWatchPair(watchId, token)
   - changeEmail(newEmail, currentPasssword)
   - refreshEmailFromAuth() 
+  - getConnectedWatches()
+  - enableRemoteLogoutForWatch(watchId)
+  - clearRemoteLogoutForWatch(watchId)
 }
 
 

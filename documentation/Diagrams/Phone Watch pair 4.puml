@@ -41,7 +41,7 @@ opt Enable remote logout for a selected watch
     UserController -> AuthService : enableRemoteLogoutForWatch(watchId)
 
     AuthService -> FirebaseAuth : currentUser
-    FirebaseAuth --> AuthService : user / null
+    FirebaseAuth --> AuthService : user
 
 
 
@@ -61,7 +61,7 @@ opt Disable remote logout for a selected watch
     UserController -> AuthService : clearRemoteLogoutForWatch(watchId)
 
     AuthService -> FirebaseAuth : currentUser
-    FirebaseAuth --> AuthService : user / null
+    FirebaseAuth --> AuthService : user 
 
     
         AuthService -> FirebaseFirestore : collection("watch_pair").doc(watchId).update({"remoteLogoutAt": null})

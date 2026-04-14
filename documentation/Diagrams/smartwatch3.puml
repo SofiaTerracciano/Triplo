@@ -1,0 +1,76 @@
+@startuml
+title Triplo Application Smartwatch App - External Systems
+
+top to bottom direction
+skinparam linetype polyline
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam wrapWidth 220
+skinparam maxMessageSize 200
+
+skinparam backgroundColor white
+
+skinparam component {
+  BackgroundColor #F8F9FA
+  BorderColor #4A4A4A
+  FontColor #111111
+  RoundCorner 12
+}
+
+skinparam package {
+  BorderColor #666666
+  FontColor #111111
+  RoundCorner 14
+}
+
+skinparam database {
+  BackgroundColor #FDFDFD
+  BorderColor #555555
+}
+
+skinparam rectangle {
+  BackgroundColor white
+  BorderColor #999999
+  RoundCorner 14
+}
+
+rectangle "App External Ports" as PortsBlock {
+  portin p1
+  portin p2
+  portin pfirebasefirestore
+  portin pfirebasestorage
+
+  pfirebasefirestore -[hidden]down- pfirebasestorage
+  pfirebasestorage -[hidden]down- p1
+  p1 -[hidden]down- p2
+}
+
+rectangle "External Systems" as ExtBlock {
+
+  database FirebaseFirestore
+  database FirebaseStorage
+  component "<<platform>>\nOperating System" as OperatingSystem
+
+  rectangle "External Services" as ExternalServicesBlock #FAFAFA {
+    [Opentopomap]
+    [OpenWeather]
+    [Weatherbit]
+    [DemoMeteoServer]
+
+    [Opentopomap] -[hidden]down- [OpenWeather]
+    [OpenWeather] -[hidden]down- [Weatherbit]
+    [Weatherbit] -[hidden]down- [DemoMeteoServer]
+  }
+
+  FirebaseFirestore -[hidden]down- FirebaseStorage
+  FirebaseStorage -[hidden]down- OperatingSystem
+  OperatingSystem -[hidden]down- ExternalServicesBlock
+}
+
+'pfirebasefirestore -right- FirebaseFirestore
+'pfirebasestorage -right- FirebaseStorage
+'p1 -right- OperatingSystem
+'p2 -right- ExternalServicesBlock
+
+PortsBlock -[hidden]left- ExtBlock
+@enduml

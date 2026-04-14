@@ -281,14 +281,39 @@ cupertino\_icons & iOS-style icon set \\
 
 
 \newpage
+\begin{landscape}
+    
+
 \subsection{Mobile Smartwatch App component view} \label{Mobile Smartwatch App component view}
 
 
 
 
+\begin{figure}[H]
+    \label{High level component view}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch3.png}
+    \caption{Smartwatch application component view}
+\end{figure}
+\end{landscape}
 
 
 
+
+
+The component diagram of the smartwatch application closely follows the structure introduced for the smartphone application. The design intentionally mirrors the architectural organization of the mobile application, in order to promote consistency, reuse of design patterns, and easier maintainability across the two platforms.
+This alignment ensures that the smartwatch application remains coherent with the overall system architecture, despite its reduced scope and more lightweight nature.
+The main differences with respect to the smartphone application regard the authentication and pairing mechanisms. In the smartwatch application, the \textit{AuthService} component is not present. This is due to the fact that the smartwatch does not directly interact with Firebase Authentication. In the smartphone application, the \textit{AuthService} was responsible for handling user authentication and, in particular, for managing the approval phase of the pairing process.
+In the smartwatch application, this functionality is replaced by two dedicated components:
+
+\begin{itemize}
+    \item \textbf{WatchIdService}: responsible for managing the unique identifier of the smartwatch. It ensures that each device is associated with a unique ID, retrieving it if already present or making and storing a new one otherwise.
+    \item \textbf{PairingService}: responsible for handling the pairing process with the smartphone application. This component manages the communication and synchronization required to establish the association between the smartwatch and the user account, relying on the approval process performed on the smartphone side.
+\end{itemize}
+
+\subsubsection{Note on UI Components}
+In both the smartphone and smartwatch applications, the UI components, referred to as \textit{Pages} in the diagrams, represent logical groupings of user interface screens related to specific functionalities. Each \textit{Page} component may therefore encapsulate multiple concrete UI elements that are functionally connected.
+For a detailed mapping between UI components and the actual user interface elements, the reader is referred to the table presented in the User Interface chapter, where the internal composition of each \textit{Page} is explicitly described.
 
 \subsubsection{Navigation Page Disambiguation}
 
@@ -301,10 +326,10 @@ This distinction is important to avoid ambiguity when referring to navigation-re
 
 
 
+ 
 
 
-
-\section{Firebase BaaS Management}
+\section{Firestore Database Management}
 \label{Firebase BaaS Management}
 Immagine Database \\
 
@@ -1117,9 +1142,9 @@ This design choice is architecturally relevant because it keeps the original pai
 \newpage
 
 
-
 \section{Component interfaces} \label{Component interfaces}
 \subsection{Component Interfaces Smartphone Application}
+
 \begin{figure}[H]
     \label{Interface Diagram Smartphone Application}
     \centering
@@ -1183,6 +1208,14 @@ For these reasons, the interface view complements the component decomposition by
 
 \newpage
 \subsection{Component interfaces smartwatch application}
+\begin{figure}[H]
+    \label{Interface diagram smartwatch application}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/smartwatch interface diagram.png}
+    \caption{Interface diagram smartwatch application}
+\end{figure}
+
+
 
 \newpage
 \section{Selected architectural styles and patterns} \label{Selected architectural styles and patterns}
