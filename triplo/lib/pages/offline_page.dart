@@ -39,7 +39,7 @@ class OfflinePage extends StatelessWidget {
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/navigation');
+                    Navigator.pushReplacementNamed(context, '/navigation');
                   },
                   icon: const Icon(Icons.explore),
                   label: Text(local.navigation_page_title),
