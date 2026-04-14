@@ -1,0 +1,246 @@
+@startuml
+title Triplo Application Smartwatch App - Component Diagram (Internal Components)
+
+left to right direction
+skinparam linetype polyline
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam wrapWidth 220
+skinparam maxMessageSize 200
+
+skinparam backgroundColor white
+
+skinparam component {
+  BackgroundColor #F8F9FA
+  BorderColor #4A4A4A
+  FontColor #111111
+  RoundCorner 12
+}
+
+skinparam interface {
+  BackgroundColor white
+  BorderColor #555555
+  FontColor #222222
+}
+
+skinparam package {
+  BorderColor #666666
+  FontColor #111111
+  RoundCorner 14
+}
+
+skinparam database {
+  BackgroundColor #FDFDFD
+  BorderColor #555555
+}
+
+skinparam rectangle {
+  BackgroundColor white
+  BorderColor #999999
+  RoundCorner 14
+}
+
+rectangle "External GUI" as GUIBlock {
+  () HomeGUI
+  () PairingLoginGUI
+  () UserProfileGUI
+  () trekkingGUI
+  () GeowatchGUI
+  () DiaryGUI
+}
+
+component " " as App {
+
+  portout p1
+  portout p2
+  portout pfirebasefirestore
+  portout pfirebasestorage
+
+  portin p5
+  portin p7
+  portin p8
+  portin p10
+  portin p11
+  portin p12
+
+  package "View" #DCEBFF {
+    [HomePage]
+    [NavigationPage]
+    [UserProfilePage]
+    [PairingLoginPage]
+    [trekkingPage]
+    [GeowatchPage]
+    [DiaryPage]
+  }
+
+  package "Controller" #EAEAEA {
+    [DiaryController]
+    [UserController]
+    [trekkingController]
+    [challengecontroller]
+    [servicecontroller]
+    [languagecontroller]
+  }
+
+  package "Model" #F6D6D3 {
+    [DiaryModel]
+    [UserModel]
+    [trekkingModel]
+  }
+
+  package "OSservice" #F4F4F4 {
+    [memoryservice]
+    [permissionservice]
+    [notificationservice]
+  }
+
+  package "Lib" #FAFAFA {
+    [shared preferences] as sharedpreferences
+    [cache]
+    [local notifications] as notifications
+    [permission handler] as permission
+    [flutter secure storage]
+  }
+
+  package "Other Services" #F4F4F4 {
+    [internetservice]
+    [watchidservice]
+    [pairingservice]
+  }
+
+  package "Background" #F4F4F4 {
+    component "Background_Service" as Background_Service
+  }
+
+  interface notification_i
+  interface mem_i
+  interface sp_i
+  interface cache_i
+  interface permission_i
+  interface lnotifications_i
+  interface p_i
+
+  interface dmi
+  interface umi
+  interface expi
+
+  interface diary_i
+  interface user_i
+  interface trekking_i
+  interface challenge_i
+  interface language_i
+  interface service_i
+  interface pairing_i
+
+  challengecontroller -[#8B5A2B,dashed]-( notification_i
+  notification_i -[#8B5A2B,dashed]- notificationservice
+
+  challengecontroller -[#2E75B6,dashed]-( mem_i
+  languagecontroller -[#2E75B6,dashed]-( mem_i
+  trekkingController -[#2E75B6,dashed]-( mem_i
+  mem_i -[#2E75B6,dashed]- memoryservice
+
+  trekkingController -[#8B5A2B,dashed]-( notification_i
+
+  servicecontroller -[#3C9D40,dashed]-( permission_i
+  permission_i -[#3C9D40,dashed]- permissionservice
+
+  memoryservice --( sp_i
+  sp_i -- sharedpreferences
+
+  memoryservice --( cache_i
+  cache_i -- cache
+
+  notificationservice --( lnotifications_i
+  lnotifications_i -- notifications
+
+  permissionservice --( p_i
+  p_i -- permission
+
+  permissionservice --( sp_i
+
+  DiaryController -down-( dmi
+  dmi -down- DiaryModel
+
+  UserController -down-( umi
+  umi -down- UserModel
+
+  trekkingController -down-( expi
+  expi -down- trekkingModel
+
+  HomePage -down[#3C9D40]-( service_i
+  service_i -[#3C9D40]- servicecontroller
+
+  HomePage -down[#C0392B]-( trekking_i
+  trekking_i -down[#C0392B]- trekkingController
+
+  diary_i -down[#8B5A2B]- DiaryController
+
+  UserProfilePage -down[#2E75B6]-( user_i
+  user_i -[#2E75B6]- UserController
+
+  UserProfilePage -[#C0392B]-( trekking_i
+  UserProfilePage -[#8B5A2B]-( diary_i
+
+  trekkingPage -[#C0392B]-( trekking_i
+  trekkingPage -[#3C9D40]-( service_i
+  trekkingPage --( challenge_i
+  challenge_i -- challengecontroller
+
+  DiaryPage -[#8B5A2B]-( diary_i
+  DiaryPage -[#2E75B6]-( user_i
+
+  GeowatchPage -[#3C9D40]-( service_i
+  GeowatchPage -[#C0392B]-( trekking_i
+
+  NavigationPage -down-( language_i
+  language_i -- languagecontroller
+
+  PairingLoginPage -down-( pairing_i
+  NavigationPage -down-( pairing_i
+  pairing_i -- pairingservice
+
+  Background_Service -[#3C9D40]-( service_i
+  Background_Service -[#2E75B6,dashed]-( mem_i
+  Background_Service -[#C0392B]-( trekking_i
+  Background_Service -[#8B5A2B,dashed]-( notification_i
+
+  internetservice -[#3C9D40]-( service_i
+  watchidservice -[#2E75B6,dashed]-( mem_i
+
+  together {
+    challengecontroller -[#black,bold]- pfirebasefirestore
+    trekkingController -[#black,bold]- pfirebasefirestore
+    UserController -[#black,bold]- pfirebasefirestore
+    DiaryController -[#black,bold]- pfirebasefirestore
+    pairingservice -[#black,bold]- pfirebasefirestore
+  }
+
+  together {
+    trekkingController -- pfirebasestorage
+    challengecontroller -- pfirebasestorage
+  }
+
+  Lib -- p1
+}
+
+HomePage -- p5
+p5 -up- HomeGUI
+
+DiaryPage -- p7
+p7 -up- DiaryGUI
+
+UserProfilePage -- p8
+p8 -up- UserProfileGUI
+
+trekkingPage -- p10
+p10 -up- trekkingGUI
+
+GeowatchPage -- p11
+p11 -up- GeowatchGUI
+
+PairingLoginPage -- p12
+p12 -up- PairingLoginGUI
+servicecontroller -- p2
+GUIBlock -[hidden]up- App
+@enduml

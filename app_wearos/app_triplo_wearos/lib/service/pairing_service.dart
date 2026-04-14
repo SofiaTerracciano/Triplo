@@ -13,7 +13,6 @@ class PairingService extends ChangeNotifier {
   final Uuid _uuid = const Uuid();
 
   static const Duration _qrTtl = Duration(minutes: 2);
-
   String? _pairId;
   String? get pairId => _pairId;
 
