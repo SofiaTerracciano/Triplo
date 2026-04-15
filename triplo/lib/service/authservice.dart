@@ -7,8 +7,17 @@ import '../exception/change_email_exception.dart';
 import '../model/user.dart';
 
 class AuthService extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
+
+  AuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _db = firestore ?? FirebaseFirestore.instance;
 
   Users? _currentUser;
   Users? get currentUser => _currentUser;

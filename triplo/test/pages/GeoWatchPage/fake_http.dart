@@ -40,3 +40,4 @@ class FakeHttpResponse extends Stream<List<int>>
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
+
