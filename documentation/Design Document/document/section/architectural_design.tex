@@ -111,7 +111,7 @@ The token verification API is not directly managed within the application logic 
 \begin{figure}[H]
     \label{Smartphone Application component view}
     \centering
-    \includegraphics[width=0.8\linewidth]{./images/mobile app component diagram 3.png}
+    \includegraphics[width=0.7\linewidth]{./images/mobile app component diagram 3.png}
     \caption{Smartphone Application component view}
 \end{figure}
 
@@ -290,7 +290,7 @@ cupertino\_icons & iOS-style icon set \\
 
 
 \begin{figure}[H]
-    \label{High level component view}
+    \label{Smartwatch application component view}
     \centering
     \includegraphics[width=\linewidth]{./images/smartwatch3.png}
     \caption{Smartwatch application component view}
@@ -313,7 +313,7 @@ In the smartwatch application, this functionality is replaced by two dedicated c
 
 \subsubsection{Note on UI Components}
 In both the smartphone and smartwatch applications, the UI components, referred to as \textit{Pages} in the diagrams, represent logical groupings of user interface screens related to specific functionalities. Each \textit{Page} component may therefore encapsulate multiple concrete UI elements that are functionally connected.
-For a detailed mapping between UI components and the actual user interface elements, the reader is referred to the table presented in the User Interface chapter, where the internal composition of each \textit{Page} is explicitly described.
+For a detailed mapping between UI components and the actual user interface elements, the reader is referred to the table \ref{tab:ui-components-pages} presented in the User Interface chapter, where the internal composition of each \textit{Page} is explicitly described.
 
 \subsubsection{Navigation Page Disambiguation}
 
@@ -328,6 +328,67 @@ This distinction is important to avoid ambiguity when referring to navigation-re
 
  
 
+
+
+\clearpage
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Package} & \textbf{Purpose} \\
+\hline
+
+flutter & Core UI toolkit for building cross-platform applications \\
+\hline
+flutter\_localizations & Localization support for internationalized user interfaces \\
+\hline
+provider & State management and implementation of the Observer pattern \\
+\hline
+firebase\_core & Initialization of Firebase services \\
+\hline
+cloud\_firestore & Firebase cloud database for application data \\
+\hline
+firebase\_storage & Cloud storage for images and media files \\
+\hline
+flutter\_map & Map rendering using OpenStreetMap tiles \\
+\hline
+flutter\_map\_cancellable\_tile\_provider & Tile loading with cancellable requests for improved map performance \\
+\hline
+flutter\_map\_tappable\_polyline & Interactive polylines for route visualization on the map \\
+\hline
+flutter\_map\_marker\_popup & Popup support for markers displayed on the map \\
+\hline
+latlong2 & Geographic coordinate utilities \\
+\hline
+geolocator & Device location services \\
+\hline
+geocoding & Address and location conversion \\
+\hline
+qr\_flutter & QR code generation for pairing and sharing features \\
+\hline
+shared\_preferences & Local persistent key-value storage \\
+\hline
+flutter\_secure\_storage & Secure local storage for sensitive data such as device identifiers or tokens \\
+\hline
+flutter\_local\_notifications & Local notification management \\
+\hline
+permission\_handler & Runtime permission handling \\
+\hline
+flutter\_dotenv & Environment variable management \\
+\hline
+flutter\_cache\_manager & Image and file caching \\
+\hline
+intl & Internationalization and localization utilities \\
+\hline
+uuid & Unique identifier generation \\
+\hline
+cupertino\_icons & iOS-style icon set \\
+\hline
+
+\end{tabular}
+\caption{Main dependencies used in the smartwatch application}
+\end{table}
+\clearpage
 
 \section{Firestore Database Management}
 \label{Firebase BaaS Management}
@@ -1182,7 +1243,7 @@ More specifically, \texttt{Permission\_i} encapsulates permission requests.\\
  and \texttt{Memory\_i} centralizes local storage concerns, including image caching, saving the preferred locale.
 
 The diagram also contains a set of lightweight model-oriented interfaces, namely \texttt{qi}, \texttt{dmi}, \texttt{expi}, and \texttt{umi}. 
-These define conversion contracts based on \texttt{toMap()} and \texttt{fromMap(...)} operations. 
+These define conversion contracts based on \texttt{toMap()} and \texttt{fromMap()} operations. 
 Their purpose is to standardize the serialization and deserialization logic used to map application objects to and from Firestore representations. 
 
 In addition to the previously described interfaces, Figure~\ref{Interface Diagram Smartphone Application} also includes the \texttt{authservice\_i} interface, which encapsulates the operations related to user authentication and credential management.
@@ -1214,6 +1275,14 @@ For these reasons, the interface view complements the component decomposition by
     \includegraphics[width=0.8\linewidth]{./images/smartwatch interface diagram.png}
     \caption{Interface diagram smartwatch application}
 \end{figure}
+
+\subsection{Smartwatch Interfaces Diagram}
+
+The interfaces diagram of the smartwatch application is largely consistent with the one introduced for the smartphone application. The same set of interfaces is preserved, reflecting the architectural choice of maintaining a uniform interaction layer between \textit{View} components and the underlying \textit{Controller} logic across both platforms.
+This design ensures a high degree of reuse and coherence, allowing the smartwatch application to leverage the same abstraction principles adopted in the smartphone application, while adapting them to its more lightweight and specialized context.
+The main difference that can be observed regards the pairing and authentication mechanisms. In the smartwatch application, the \textit{AuthService} is not present. In the smartphone application, such component was responsible for managing authentication and for handling the approval phase of the pairing process.
+In this context, the pairing logic is primarily managed by the \textit{PairingService}, so the dedicated interface \textit{Pairing\_i} is introduced, exposing the operations required to handle the the pairing process.
+
 
 
 

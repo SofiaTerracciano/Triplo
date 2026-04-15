@@ -60,15 +60,6 @@ This page displays and allows editing of user personal information such as usern
 
 \newpage
 
-\subsection{Offline Page}
-\label{Smartphone UI 4}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\linewidth]{./images/phone/TRIPLO phone UI_page-0004.jpg}
-    \caption{Smartphone Offline Page UI}
-\end{figure}
-This page is shown when no internet connection is available. It informs the user about the offline status and still allows access to essential features such as navigation.
-\newpage
 \subsection{Drawer Menu}
 \label{Smartphone UI 5}
 \begin{figure}[H]
@@ -141,6 +132,12 @@ This page allows users to create a diary entry after completing a trekking activ
 \newpage
 
 
+\begin{figure}[H]
+    \label{challenge notifications UI}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/phone/TRIPLO NEW IMAGES_page-0001.jpg}
+    
+\end{figure}
 
 
 
@@ -148,6 +145,21 @@ This page allows users to create a diary entry after completing a trekking activ
 
 
 
+\begin{figure}[H]
+    \label{challenge notifications UI 2}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/phone/TRIPLO NEW IMAGES_page-0002.jpg}
+    \caption{challenge notifications UI}
+\end{figure}
+
+
+\begin{figure}[H]
+    \label{weather notifications}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/phone/weather alerts_page-0002.jpg}
+    \caption{Weather notifications}
+\end{figure}
+\newpage
 \subsection{Weather Notification Preferences Page}
 \label{Smartphone UI 12}
 \begin{figure}[H]
@@ -190,7 +202,7 @@ This page displays available challenges that users can complete during trekking 
     \includegraphics[width=0.8\linewidth]{./images/phone/TRIPLO phone UI_page-0015.jpg}
     \caption{Smartphone Navigation Page UI}
 \end{figure}
-This page provides real-time navigation information, including compass direction, altitude, and GPS coordinates.
+This page provides real-time navigation information, including compass direction, altitude, and GPS coordinates, it is also accessible in offline mode.
 \newpage
 \subsection{Geowatch Page}
 \label{Smartphone UI 16}
@@ -209,4 +221,125 @@ This page displays weather information related to a selected trail or the userâ€
     \caption{Smartphone Registration Page UI}
 \end{figure}
 This page displays a satellite map with optional weather overlays, for example precipitation, clouds, temperature, allowing users to visualize environmental conditions.
+\newpage
+\begin{figure}[H]
+    \label{Manage watches UI}
+    \centering
+    \includegraphics[width=\linewidth]{./images/phone/TRIPLO NEW IMAGES_page-0008.jpg}
+    \caption{Manage watches UI}
+    The settings section includes options to pair a smartwatch and manage connected devices.
+Users can view paired watches, check their status, and enable or disable remote logout functionality for security purposes.
+\end{figure}
+\newpage
+\subsection{Offline Page}
+\label{Smartphone UI 4}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\linewidth]{./images/phone/TRIPLO phone UI_page-0004.jpg}
+    \caption{Smartphone Offline Page UI}
+\end{figure}
+This page is shown when no internet connection is available. It informs the user about the offline status and still allows access to essential features such as navigation.
+\newpage
+
+
+
+
+
+\subsection{User Interface Design considerations}
+
+The Triplo smartphone application adopts a modular and controller-driven user interface design, where each UI page is responsible only for presentation logic, while business logic and data access are delegated to controllers and services.
+
+
+
+
+
+
+
+
+
+\subsubsection{Smartphone Application General UI Patterns}
+
+Across the application, the following design patterns are consistently applied:
+
+\begin{itemize}
+    \item UI components do not directly access Firebase or platform APIs; all interactions are mediated by controllers and services.
+ 
+    \item The use of \texttt{Provider} and \texttt{notifyListeners()} ensures that UI components automatically update when underlying data changes.
+ 
+    \item \textbf{Lazy loading:} Data-intensive operations are deferred using \texttt{FutureBuilder} to reduce initial loading time and improve perceived performance.
+ 
+    \item \textbf{Navigation consistency:} The use of \texttt{Navigator.pushReplacement()} and a shared Drawer ensures consistent navigation behavior across the application.
+\end{itemize}
+
+
+
+
+
+\newpage
+\section{Smartwatch Application UI Interfaces}
+
+
+\subsection{Mapping Between UI Components and Pages}
+
+Table~\ref{tab:ui-components-pages} summarizes the mapping between the UI components shown in the component diagrams and the concrete pages implemented in the smartphone and smartwatch applications. For both applications, each UI component groups together pages that are functionally related and that belong to the same logical area of the user interface.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{2.6cm}|p{3.4cm}|p{8.2cm}|}
+\hline
+\textbf{Application} & \textbf{UI Component} & \textbf{Contained Pages} \\
+\hline
+Smartphone & DiaryPage & AddingDiaryPage, ChangeDiaryPage, DiaryPage \\
+\hline
+Smartphone & GeowatchPage & GeowatchPage, GoogleSatellitePage, NavigationPage \\
+\hline
+Smartphone & HomePage & HomePage \\
+\hline
+Smartphone & LoginRegistrationPage & LoginPage, RegistrationPage, ForgottenPasswordPage \\
+\hline
+Smartphone & SearchPage & SearchPage \\
+\hline
+Smartphone & SettingPage & PairedWatchesPage, SettingPage, WatchPairPage, WeatherNotificationPage \\
+\hline
+Smartphone & TrekkingPage & ChallengesPage, DetailsTrekkingPage, EndTrekkingPage, StartTrekkingPage, TrekkingPage \\
+\hline
+Smartphone & UserProfilePage & UserPage, UserPagePublic, UserListPage, UserListPagePublic \\
+\hline
+Smartphone & Outside UI components & LoadingPage, OfflinePage \\
+\hline
+Smartwatch & DiaryPage & DiaryListPage, DiaryPage \\
+\hline
+Smartwatch & GeowatchPage & GeowatchPage \\
+\hline
+Smartwatch & HomePage & HomePage \\
+\hline
+Smartwatch & PairingLoginPage & LoginPage \\
+\hline
+Smartwatch & TrekkingPage & DetailsTrekkingPage, EndTrekkingPage, StartTrekkingPage, TrekkingPage \\
+\hline
+Smartwatch & UserProfilePage & UserPage, UserListPage \\
+\hline
+Smartwatch & NavigationPage & NavigationPage \\
+\hline
+Smartwatch & Outside UI components & OfflinePage \\
+\hline
+\end{tabular}
+\caption{Mapping between UI components and concrete pages in the smartphone and smartwatch applications.}
+\label{tab:ui-components-pages}
+\end{table}
+
+\paragraph{Note on the NavigationPage name.}
+The name \textit{NavigationPage} is used in both applications, but it refers to two different UI concepts. In the smartphone application, \textit{NavigationPage} denotes the page related to compass and altimeter functionalities. In the smartwatch application, \textit{NavigationPage} denotes the page containing the main navigation buttons, namely the buttons leading to the home area, the user area, and the language-related options.
+
+
+
+
+
+
+
+
+
 \end{document}
+

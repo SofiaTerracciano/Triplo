@@ -66,7 +66,7 @@ The system shall allow users to enable weather notifications for selected routes
 \end{enumerate}
 
 
-
+\newpage
 \subsection{Home, Routes and Route Details}
 
 \begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
@@ -342,10 +342,10 @@ When the internet connection is restored, the system shall allow users to resume
 
 \end{enumerate}
 
-
+\newpage
 \section{Smartwatch Application Functional Requirements}
 
-\subsection{Access \& Synchronization}
+\subsection{Access \& Pairing}
 
 \begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*]
 
@@ -353,13 +353,13 @@ When the internet connection is restored, the system shall allow users to resume
 The system shall allow users to access smartwatch functionalities after pairing the device with their account.
 
 \item \label{fr-watch:fr2}
-The system shall synchronize route and user data with the associated smartphone application.
+The system shall allow the smartwatch to initiate the pairing process with a smartphone application.
 
 \item \label{fr-watch:fr3}
-When synchronization fails, the system shall notify the user.
+The system shall allow the smartwatch to restore a previously established pairing with a smartphone application.
 
 \item \label{fr-watch:fr4}
-The system shall allow users to enable weather notifications for selected routes.
+The system shall allow the user to terminate the pairing between the smartwatch and the smartphone application.
 
 \end{enumerate}
 
@@ -369,16 +369,16 @@ The system shall allow users to enable weather notifications for selected routes
 \begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*, resume]
 
 \item \label{fr-watch:fr5}
-The system shall display routes on a smartwatch map.
+The system shall display trekking routes on the smartwatch map.
 
 \item \label{fr-watch:fr6}
-The system shall display refuge points as spots on the route.
+When a user selects a route, the system shall display information about the selected route.
 
 \item \label{fr-watch:fr7}
-The system shall allow users to select a refuge point on the map.
+The system shall display route information including starting point, ending point, difficulty level, length, estimated time, and elevation gain.
 
 \item \label{fr-watch:fr8}
-When a refuge point is selected, the system shall display associated information.
+The system shall display challenges associated with the selected route.
 
 \item \label{fr-watch:fr9}
 The system shall allow users to scroll through route-related information.
@@ -397,31 +397,31 @@ The system shall display routes using different colors based on their difficulty
 \begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*, resume]
 
 \item \label{fr-watch:fr12}
-The system shall display key information about a selected route.
+The system shall display route information across multiple screens when the content exceeds the smartwatch display size.
 
 \item \label{fr-watch:fr13}
-When a user selects a route, the system shall display detailed information about the selected route.
+The system shall allow users to navigate between different sections of the route information.
 
 \item \label{fr-watch:fr14}
-The system shall display route information including difficulty level, distance, estimated time, and elevation gain.
+The system shall ensure that route information is presented in a format suitable for smartwatch interaction.
 
 \item \label{fr-watch:fr15}
-The system shall indicate the suitability of a route for families.
+The system shall indicate whether a route is suitable for families.
 
 \item \label{fr-watch:fr16}
-The system shall display a concise textual description of the route.
+The system shall display a concise textual description of the selected route.
 
 \item \label{fr-watch:fr17}
-The system shall display refreshment points associated with the route.
+The system shall display refreshment points associated with the selected route.
 
 \item \label{fr-watch:fr18}
-The system shall display challenges associated with the route.
+The system shall display summary weather information associated with the selected route.
 
 \item \label{fr-watch:fr19}
-The system shall display summary weather information for the selected route.
+The system shall allow users to start a navigation session for the selected route.
 
-\item \label{fr-watch:fr20}
-The system shall allow users to start a navigation session for a selected route.
+%\item \label{fr-watch:fr20}
+%When a navigation session is active, the system shall provide navigation-related information to the user.
 
 \end{enumerate}
 
@@ -448,29 +448,31 @@ The system shall allow users to receive weather alert notifications for selected
 \item \label{fr-watch:fr26}
 The system shall display weather alerts related to the currently selected weather location.
 
-\item \label{fr-watch:fr27}
-The system shall allow users to enable weather alert notifications for a selected route.
+%\item \label{fr-watch:fr27}
+%The system shall allow users to enable weather alert notifications for a selected route.
 
 \end{enumerate}
 
 
-\subsection{Friends’ Routes}
+\subsection{Friends Features and Public Diaries}
 
 \begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*, resume]
 
 \item \label{fr-watch:fr28}
-The system shall display routes published by followed users.
+The system shall display a list of users followed by the current user.
 
 \item \label{fr-watch:fr29}
-The system shall allow users to browse routes shared by friends.
+The system shall allow users to access the public profile of a followed user.
 
 \item \label{fr-watch:fr30}
-The system shall allow users to select a route shared by a followed user.
+The system shall display public diary entries associated with a selected user.
 
 \item \label{fr-watch:fr31}
-The system shall display basic information about routes shared by friends.
+The system shall allow users to view details of a public diary entry.
 
 \end{enumerate}
+
+
 
 
 \subsection{Interaction \& Smartwatch Constraints}
@@ -483,11 +485,17 @@ The system shall present information in a format optimized for a small screen.
 \item \label{fr-watch:fr33}
 The system shall allow users to navigate content through touch-based scrolling.
 
+\end{enumerate}
+
+\subsection{Language support}
+
+\begin{enumerate}[label=\textbf{FR\arabic*}, ref=FR\arabic*, resume]
+
 \item \label{fr-watch:fr34}
-The system shall minimize user interaction steps to access route information.
+The system shall allow users to change the application language on the smartwatch.
 
 \item \label{fr-watch:fr35}
-The system shall maintain the selected route context during navigation between views.
+When the application language is changed, the system shall update all user interface elements accordingly.
 
 \end{enumerate}
 
@@ -502,5 +510,36 @@ The system shall detect when the internet connection is not available
 When the internet connection is not available, the system shall display a dedicated offline page
 
 \end{enumerate}
+
+\section{Mapping of Functional Requirements with the architectural components}
+\begin{figure}[H]
+    \label{Smartphone Application Functional Requirements Mapping 1}
+    \centering
+    \includegraphics[width=\linewidth]{./images/fr 1.jpg}
+    \caption{Smartphone Application Functional Requirements Mapping 1}
+\end{figure}
+
+
+\begin{figure}[H]
+    \label{Smartphone Application Functional Requirements Mapping 2}
+    \centering
+    \includegraphics[width=\linewidth]{./images/fr 2.jpg}
+    \caption{Smartphone Application Functional Requirements Mapping 2}
+\end{figure}
+
+
+
+
+
+
+
+\begin{figure}[H]
+    \label{Smartwatch Application Functional Requirements Mapping}
+    \centering
+    \includegraphics[width=\linewidth]{./images/fr 3.jpg}
+    \caption{Smartwatch Application Functional Requirements Mapping}
+\end{figure}
+
+
 
 \end{document}
