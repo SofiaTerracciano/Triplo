@@ -45,7 +45,7 @@ class ServiceController {
 
 
 
-  //metodo non utilizzato, il geoservice non sembra essere mai utilizzato su smartwatch quindi non lo documento, gli unici utilizzi di geoservice su smartwatch sono in alcuni costruttori dove però non è utilizzato
+
   /// Retrieves the user's current [LatLng] coordinates using the [GeoService].
   Future<LatLng?> userLocation() async {
     return geo.userLocation();
