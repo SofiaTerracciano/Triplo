@@ -17,9 +17,6 @@ class GeoWatchPage extends StatefulWidget {
   final LatLng? trailCenter;
 
 
-
-
-
   final String? trekkingId;
   final String? trekkingName;
 
@@ -151,11 +148,9 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
     final place = _useTrailWeather
         ? local.trail_area_label
         : local.your_position_label;
-    final temp = _weather?['main']?['temp']?.round()?.toString() ?? "-";
-    final List weatherList =
-    (_weather?['weather'] is List && _weather!['weather'].isNotEmpty)
-        ? _weather!['weather']
-        : [];
+    final tempValue = _weather?['main']?['temp'];
+    final temp = tempValue is num ? tempValue.round().toString() : "-";
+    final List weatherList = (_weather?['weather'] as List?) ?? [];
 
     final icon = weatherList.isNotEmpty && weatherList[0]['icon'] != null
         ? weatherList[0]['icon'].toString()

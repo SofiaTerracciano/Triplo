@@ -278,9 +278,10 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
           options: MapOptions(
             initialCenter: currentCenter,
             initialZoom: currentZoom,
-             interactionOptions: const InteractionOptions(
+            interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
               ), 
+            onMapReady: () {}
           ),
           children: [
             TileLayer(

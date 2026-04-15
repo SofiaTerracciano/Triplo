@@ -31,7 +31,7 @@ class Challenges {
     return {
       "Title": _title,
       "Photo": _photo,
-      "Descrption": _description,
+      "Description": _description,
     };
   }
 
