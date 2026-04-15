@@ -241,6 +241,17 @@ google\_sign\_in & Google authentication integration \\
 \hline
 flutter\_map & Map rendering using OpenStreetMap tiles  \\
 \hline
+
+
+
+
+\hline
+flutter\_map\_cancellable\_tile\_provider & Tile loading with cancellable requests for improved map performance \\
+\hline
+flutter\_map\_tappable\_polyline & Interactive polylines for route visualization on the map \\
+\hline
+flutter\_map\_marker\_popup & Popup support for markers displayed on the map \\
+\hline
 latlong2 & Geographic coordinate utilities \\
 \hline
 geolocator & Device location services \\
@@ -299,8 +310,6 @@ cupertino\_icons & iOS-style icon set \\
 
 
 
-
-
 The component diagram of the smartwatch application closely follows the structure introduced for the smartphone application. The design intentionally mirrors the architectural organization of the mobile application, in order to promote consistency, reuse of design patterns, and easier maintainability across the two platforms.
 This alignment ensures that the smartwatch application remains coherent with the overall system architecture, despite its reduced scope and more lightweight nature.
 The main differences with respect to the smartphone application regard the authentication and pairing mechanisms. In the smartwatch application, the \textit{AuthService} component is not present. This is due to the fact that the smartwatch does not directly interact with Firebase Authentication. In the smartphone application, the \textit{AuthService} was responsible for handling user authentication and, in particular, for managing the approval phase of the pairing process.
@@ -310,8 +319,10 @@ In the smartwatch application, this functionality is replaced by two dedicated c
     \item \textbf{WatchIdService}: responsible for managing the unique identifier of the smartwatch. It ensures that each device is associated with a unique ID, retrieving it if already present or making and storing a new one otherwise.
     \item \textbf{PairingService}: responsible for handling the pairing process with the smartphone application. This component manages the communication and synchronization required to establish the association between the smartwatch and the user account, relying on the approval process performed on the smartphone side.
 \end{itemize}
+The \texttt{PermissionService} is only used during application initialization and is therefore not connected to other components in the diagram. This reflects its limited and specific role.
 
-\subsubsection{Note on UI Components}
+
+ \subsubsection{Note on UI Components}
 In both the smartphone and smartwatch applications, the UI components, referred to as \textit{Pages} in the diagrams, represent logical groupings of user interface screens related to specific functionalities. Each \textit{Page} component may therefore encapsulate multiple concrete UI elements that are functionally connected.
 For a detailed mapping between UI components and the actual user interface elements, the reader is referred to the table \ref{tab:ui-components-pages} presented in the User Interface chapter, where the internal composition of each \textit{Page} is explicitly described.
 
@@ -366,7 +377,7 @@ geocoding & Address and location conversion \\
 \hline
 qr\_flutter & QR code generation for pairing and sharing features \\
 \hline
-shared\_preferences & Local persistent key-value storage \\
+shared\_preferences & Local key-value storage \\
 \hline
 flutter\_secure\_storage & Secure local storage for sensitive data such as device identifiers or tokens \\
 \hline
@@ -392,7 +403,13 @@ cupertino\_icons & iOS-style icon set \\
 
 \section{Firestore Database Management}
 \label{Firebase BaaS Management}
-Immagine Database \\
+\begin{figure}[H]
+    \label{Firestore}
+    \centering
+    \includegraphics[width=0.6\linewidth]{./images/db.png}
+    \caption{Firestore Database}
+\end{figure}
+
 
 The database adopted for the Triplo application is based on a NoSQL approach using Firebase Firestore. Unlike traditional relational databases, Firestore stores data as collections of JSON-like documents, where each document can contain nested structures and arrays. \\
 For documentation purposes, the database structure has been represented using a diagram similar to a relational schema. This representation has been introduced for clarity and readability, allowing an easier understanding of entities and their relationships, even though the underlying data model is document-oriented rather than relational. \\
@@ -480,8 +497,11 @@ The reported use cases are twelve in total. Some of them include sub-diagrams to
     \item Phone-side Smartwatch Pairing
     \item Watch bootstrap
     \item Watch-side Smartwatch Pairing
+    \item Phone-side view paired watches and remote logout
     \end{itemize} 
 \end{enumerate}
+
+
 
 
 \clearpage
@@ -515,8 +535,6 @@ Update User Information & Smartphone & Profile management handled on smartphone 
 \caption{Comparison of use cases between smartphone and smartwatch}
 \label{tab:usecase-comparison}
 \end{table}
-
-
 
 %\textbf{Note:} The smartphone application has been used as the reference model for defining functionalities. The smartwatch application mostly follows a very similar process.
 

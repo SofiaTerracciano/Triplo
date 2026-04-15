@@ -245,7 +245,216 @@ This page is shown when no internet connection is available. It informs the user
 
 
 
-\subsection{User Interface Design considerations}
+%\subsection{User Interface Design considerations}
+
+%The Triplo smartphone application adopts a modular and controller-driven user interface design, where each UI page is responsible only for presentation logic, while business logic and data access are delegated to controllers and services.
+
+
+
+
+
+
+
+
+
+%\subsubsection{Smartphone Application General UI Patterns}
+
+%Across the application, the following design patterns are consistently applied:
+
+
+%\begin{itemize}
+    %\item UI components do not directly access Firebase or platform APIs; all interactions are mediated by controllers and services.
+ 
+    %\item The use of \texttt{Provider} and \texttt{notifyListeners()} ensures that UI components automatically update when underlying data changes.
+ 
+    %\item \textbf{Lazy loading:} Data-intensive operations are deferred using \texttt{FutureBuilder} to reduce initial loading time and improve perceived performance.
+ 
+    %\item \textbf{Navigation consistency:} The use of \texttt{Navigator.pushReplacement()} and a shared Drawer ensures consistent navigation behavior across the application.
+%\end{itemize}
+
+\section{Smartwatch Application UI Interfaces}
+\subsection{Smartwatch Navigation Page}
+\begin{figure}[H]
+    \label{Smartwatch Navigation Page}
+    \centering
+    \includegraphics[width=0.6\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0001.jpg}
+    \caption{Smartwatch Navigation Page}
+\end{figure}
+The NavigationPage acts as the main entry point of the smartwatch application, allowing the user to access the Home Page, User Profile Page, pairing functionalities, and language preferences.
+\subsection{Smartwatch Home Page}
+\begin{figure}[H]
+    \label{Smartwatch Home Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0002.jpg}
+    \caption{Smartwatch Home Page}
+\end{figure}
+This page shows a simplified map with available routes. It is optimized for quick visualization on a small screen.
+\subsection{Smartwatch trekking Page}
+\begin{figure}[H]
+    \label{Smartwatch trekking Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0003.jpg}
+    \caption{Smartwatch trekking Page}
+\end{figure}
+
+This page provides essential information about a selected trail in a compact format suitable for smartwatch display.
+\newpage
+\subsection{Smartwatch trekking assistant}
+\begin{figure}[H]
+    \label{Smartwatch trekking assistant}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0004.jpg}   
+\end{figure}
+\begin{figure}[H]
+    \label{Smartwatch trekking assistant 2}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0005.jpg}
+    \caption{Smartwatch trekking assistant}
+\end{figure}
+
+\begin{figure}[H]
+    \label{Smartwatch end of trekking}
+    \centering
+    \includegraphics[width=0.3\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0006.jpg}
+    \caption{Smartwatch end of trekking}
+\end{figure}
+This page allows the user to start a trekking activity directly from the smartwatch.
+
+
+
+
+
+
+
+
+
+\subsection{Smartwatch challenge notifications}
+\begin{figure}[H]
+    \label{Smartwatch challenge notifications}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0007.jpg}
+    \caption{Smartwatch challenge notifications}
+\end{figure}
+This screen notifies the user about challenges during an activity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{Smartwatch Geowatch Page}
+\begin{figure}[H]
+    \label{Smartwatch Geowatch Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0008.jpg}
+    \caption{Smartwatch Geowatch Page}
+\end{figure}
+This page shows weather information and alerts related to the selected route.
+
+\subsection{Smartwatch Pairing Login Page}
+\begin{figure}[H]
+    \label{Smartwatch Pairing Login Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0009.jpg}
+    \caption{Smartwatch Pairing Login Page}
+\end{figure}
+This page allows the user to pair the smartwatch with the smartphone by displaying a QR code that can be scanned from the mobile app.
+\newpage
+\subsection{Smartwatch User Page}
+\begin{figure}[H]
+    \label{Smartwatch User Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0010.jpg}
+    \caption{Smartwatch User Page}
+\end{figure}
+This page displays basic user information, including followers, following, and diary statistics.
+\begin{figure}[H]
+    \label{Smartwatch User Page 2}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0012.jpg}
+    \caption{Smartwatch User Page 2}
+\end{figure}
+This page shows publicly shared diary entries in a compact view suitable for the smartwatch
+\newpage
+\begin{figure}[H]
+    \label{Smartwatch User Page 3 Private Diaries}
+    \centering
+    \includegraphics[width=0.3\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0013.jpg}
+    \caption{Smartwatch User Page 3 Private Diaries}
+\end{figure}
+This page shows private diary entries accessible only to the user in a compact list
+\subsection{Smartwatch Public User Page}
+\begin{figure}[H]
+    \label{Smartwatch Public User Page}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0011.jpg}
+    \caption{Smartwatch Public User Page}
+\end{figure}
+This page allows viewing basic information about other users.
+\subsection{Smartwatch Language Dialog}
+\begin{figure}[H]
+    \label{Smartwatch Language Dialog}
+    \centering
+    \includegraphics[width=\linewidth]{./images/smartwatch/TRIPLO SMARTWATCH UI_page-0014.jpg}
+    \caption{Smartwatch Language Dialog}
+\end{figure}
+
+
+
+
+
+
+
+\subsection{Smartwatch Weather Notifications}
+\begin{figure}[H]
+    \label{Smartwatch Weather Notifications}
+    \centering
+    \includegraphics[width=0.3\linewidth]{./images/smartwatch/TRIPLO NEW IMAGES_page-0009.jpg}
+    \caption{Smartwatch Weather Notifications}
+\end{figure}
+Weather alerts are displayed, providing important information about weather conditions affecting a route. \newpage
+\subsection{Smartwatch Offline Page}
+\begin{figure}[H]
+    \label{Smartwatch Offline Page}
+    \centering
+    \includegraphics[width=0.6\linewidth]{./images/smartwatch/TRIPLO NEW IMAGES_page-0010.jpg}
+    \caption{Smartwatch Offline Page}
+\end{figure}
+When no internet connection is available, the smartwatch shows an offline screen informing the user and providing a retry option.
+\newpage
+
+
+
+
+
+
+
+
+
+\section{User Interface Design considerations}
 
 The Triplo smartphone application adopts a modular and controller-driven user interface design, where each UI page is responsible only for presentation logic, while business logic and data access are delegated to controllers and services.
 
@@ -268,21 +477,31 @@ Across the application, the following design patterns are consistently applied:
  
     \item \textbf{Lazy loading:} Data-intensive operations are deferred using \texttt{FutureBuilder} to reduce initial loading time and improve perceived performance.
  
-    \item \textbf{Navigation consistency:} The use of \texttt{Navigator.pushReplacement()} and a shared Drawer ensures consistent navigation behavior across the application.
+    \item \textbf{Navigation:} The use of \texttt{Navigator.pushReplacement()} and a shared Drawer ensures consistent navigation behavior across the application.
 \end{itemize}
 
 
+\subsubsection{Smartwatch Application General UI Patterns}
 
+Across the application, the following design patterns are consistently applied:
 
+\begin{itemize}
+    \item UI components do not access Firebase or platform APIs; interactions with backend resources, pairing logic, notifications, and external services are mediated by controllers and service components.
+ 
+    \item The use of \texttt{Provider} and \texttt{notifyListeners()}, similarly to the Smartphone Application UI
 
+    \item UI elements are structured to fit the limited screen size of the smartwatch, using simplified layouts, compact cards, icon-based actions. Content-heavy pages, such as trekking and weather views, distribute information across multiple vertically scrollable or swipeable sections, avoiding overcrowded single-screen layouts.
+
+    \item \textbf{Lazy loading:} Potentially expensive operations, such as user retrieval, diary loading, image resolution, and weather acquisition, are deferred through asynchronous calls and widgets such as \texttt{FutureBuilder}, similarly to what has been done for the Smartphone Application UI
+
+    \item \textbf{Navigation} Navigation in the smartwatch application is also based on explicit transitions through \texttt{Navigator.push()}.
+
+    
+
+\end{itemize}
 \newpage
-\section{Smartwatch Application UI Interfaces}
-
-
-\subsection{Mapping Between UI Components and Pages}
-
+\section{Mapping Between UI Components and Pages}
 Table~\ref{tab:ui-components-pages} summarizes the mapping between the UI components shown in the component diagrams and the concrete pages implemented in the smartphone and smartwatch applications. For both applications, each UI component groups together pages that are functionally related and that belong to the same logical area of the user interface.
-
 \begin{table}[H]
 \centering
 \small

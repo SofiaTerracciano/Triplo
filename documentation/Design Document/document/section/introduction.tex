@@ -46,8 +46,15 @@ The application aims to support outdoor exploration while enabling users to reco
 
 
 \section{Definitions, Acronyms, Abbreviations}
+
+\subsection{Definitions}
+\paragraph{Friends}
+In the context of the Triplo application, the term \textit{friends} refers to users that a given user is following. This relationship is unidirectional and corresponds to the \textit{following} concept rather than mutual friendship.
+\paragraph{Pairing}
+In the context of the Triplo application, \textit{pairing} refers to the process of associating a smartwatch with a user account through the smartphone application. This association allows the wearable device to access user-related information and functionalities, enabling a personalized experience on the smartwatch.
+\subsection{Acronyms and Abbreviations}
 \begin{itemize}
-    \item \label{GPS} \textbf{GPS:} Generic term used in this document to indicate satellite-based positioning systems available on the device (such as GPS, Galileo, and others)
+    \item \label{GPS} \textbf{GPS:} Generic term used in this document to indicate GNSS satellite-based positioning systems available on the device (such as GPS, Galileo, and others)
     \item \label{LTE} \textbf{LTE:} Long Term Evolution is a mobile communication standard. LTE is also referred to as “4G”, the fourth generation of mobile communication technology. LTE consists of a number of enhancements to the “Universal Mobile Telecommunications System” (UMTS) – the third generation of mobile communications.
     \item \label{URI} \textbf{URI:} A Uniform Resource Identifier is a string of characters used to identify or name a resource on the internet. The pairing mechanism between smartphone and smartwatch is based on a custom URI scheme. The general format of the URI in this application is: \\ 
                 \begin{center}
@@ -59,8 +66,12 @@ The application aims to support outdoor exploration while enabling users to reco
                     \item a temporary token (\texttt{token}) used to validate the pairing request
                 \end{itemize}
                 The URI is embedded into a QR code displayed on the smartwatch.
+    \item \label{API} \textbf{API:} An Application Programming Interface (API) is a set of rules, protocols, and tools that allows different software components to communicate with each other. In the context of the Triplo application, APIs are used to interact with external services, for example weather providers, and backend platforms.
+    \item \label{rest api} \textbf{REST API:} A Representational State Transfer API is a type of Application Programming Interface that follows the architectural principles of Representational State Transfer, known as REST. It enables communication between client and server systems over HTTP, using standard methods such as \texttt{GET}, \texttt{POST}, \texttt{PUT}, and \texttt{DELETE} to operate on resources identified by URLs. REST APIs are stateless, no session state is stored on the server and responses are typically returned in lightweight formats such as JSON. In the context of the Triplo application, REST APIs are used when interacting with external services, for example weather providers, while Firebase services are generally accessed through SDK abstractions rather than direct REST calls.
+    \item \label{SDK} \textbf{SDK:} An SDK is a collection of libraries, tools, and APIs that enables developers to interact with a specific platform or service. In the context of the Triplo application, the term SDK refers in particular to the Firebase SDK, which provides high-level functions to access backend services such as authentication, cloud database, and storage without directly using low-level REST APIs.
+    \item \label{BaaS} \textbf{BaaS:} Backend as a Service is a cloud service model in which developers outsource the backend functionality of an application to a third-party provider. This allows developers to focus on implementing the frontend logic while relying on pre-built backend services such as authentication, database management, storage, and notifications, typically accessed through APIs and SDKs. In this document, the term \textit{BaaS} is used to refer to platforms such as Firebase, which provide integrated backend capabilities for mobile and web applications. The term \textit{MBaaS} (Mobile Backend as a Service) is sometimes used in the literature to emphasize mobile-specific backend services. However, the distinction between BaaS and MBaaS is often minimal, as modern platforms support both mobile and web applications. For this reason, the term \textit{BaaS} is used throughout this document.            
 \end{itemize}
-
+\newpage
 \section{References}
 
 
@@ -78,15 +89,50 @@ The application aims to support outdoor exploration while enabling users to reco
     \end{itemize}
 \end{itemize}
 
+\subsection{Book References}
+\begin{itemize}
+
+    \item \textbf{Martin Fowler}, \textit{UML Distilled: A Brief Guide to the Standard Object Modeling Language}, 4th Edition, Pearson. \\
+    Italian edition curated by Luciano Baresi.
+    
+    \begin{center}
+        \includegraphics[width=0.23\textwidth]{./images/libro1.jpg}
+    \end{center}
+
+    \item \textbf{M. Camilli, E. Di Nitto, A. Fuggetta, A. Margara, M.G. Rossi, D.A. Tamburri}, \\
+    \textit{Software Engineering: A Structured Journey from Inception to Delivery}, BUP.
+
+    \begin{center}
+        \includegraphics[width=0.23\textwidth]{./images/libro2.jpg}
+    \end{center}
+
+\end{itemize}
+
+\newpage
 \subsection{Other References}
 \begin{itemize}
     \item Flutter Documentation \url{https://docs.flutter.dev/}
     \item Firebase Documentation \url{https://firebase.google.com/docs/}
+    \item Android Developers Documentation \url{https://developer.android.com/docs}
+
     \item OpenWeather API Documentation \\ \url{https://openweathermap.org/api/one-call-3?collection=one_call_api_3.0}
-    \item Severe Weather Alerts API \\ \url{https://www.weatherbit.io/api/alerts}
-    \item Oracle Documentation: What Is Model-View-Controller (MVC)? \\ \url{https://www.oracle.com/technical-resources/articles/javase/application-design-with-mvc.html}
-    \item Deutsche Telekom Documentation: What is LTE? \\ \url{https://www.telekom.com/en/company/details/the-nine-most-important-facts-about-lte-606446}
+    \item Weatherbit: Severe Weather Alerts API \\ \url{https://www.weatherbit.io/api/alerts}
+
+    \item Oracle: Model-View-Controller (MVC) \\ \url{https://www.oracle.com/technical-resources/articles/javase/application-design-with-mvc.html}
+    \item Apple Developer Documentation: Model-View-Controller \\ \url{https://developer.apple.com/library/archive/documentation/General/Conceptual/CocoaEncyclopedia/Model-View-Controller/Model-View-Controller.html}
+
+    \item IBM: What is an API? \\ \url{https://www.ibm.com/think/topics/api}
+    \item IBM: What are REST APIs? \\ \url{https://www.ibm.com/think/topics/rest-apis}
+
+    
+    
+    
+    \item Cloudflare: Backend as a Service (BaaS) \\ \url{https://www.cloudflare.com/learning/serverless/glossary/backend-as-a-service-baas/}
+    \item WebFX: QR Codes and URI Schemes \\ \url{https://www.webfx.com/blog/web-design/qr-codes-uri-schemes/}
+    \item PlantUML Official Website \\ \url{https://www.plantuml.com}
+    \item European Commission: Galileo Satellite Navigation \\ \url{https://defence-industry-space.ec.europa.eu/eu-space/galileo-satellite-navigation_en}
+    \item European Commission: Galileo GNSS\\ \url{https://defence-industry-space.ec.europa.eu/document/download/04ae75b0-e6b6-4a12-9e14-ecd9cd6c1a7a_en?filename=Galileo%20the%20EU%20GNSS%20Factsheet.pdf}
+    \item European Union: General Data Protection Regulation (GDPR) \\ \url{https://gdpr.eu/}
+    \item Deutsche Telekom: What is LTE? \\ \url{https://www.telekom.com/en/company/details/the-nine-most-important-facts-about-lte-606446}
 \end{itemize}
-
-
 \end{document}

@@ -101,12 +101,51 @@ The testing and validation activities are performed using a combination of physi
 Android Emulator (Medium Phone API 36) & Emulator & Android & x86\_64 \\
 Wear OS Emulator (Small Round) & Emulator & Android Wear OS & x86\_64 \\
 Samsung Galaxy A34 5G & Real Device & Android & ARM64 \\
+Motorola Edge 60 &  Real Device & Android & ARM 64 \\
 iPhone 15 Plus & Real Device & iOS & ARM64 \\
 \hline
 \end{tabular}
 \caption{Testing environment devices and architectures}
 \label{tab:test-environment}
 \end{table}
+
+
+
+
+
+
+
+
+\paragraph{Weather Alerts Demo}
+
+For demonstration and testing purposes, weather alert notifications can be manually sent through a POST request to the demo server. This allows to simulate alert conditions.
+On Windows (PowerShell), the following command can be used:
+\begin{verbatim}
+Invoke-WebRequest "https://meteodemoserver.onrender.com/alerts" `
+-Method POST `
+-UseBasicParsing `
+-Headers @{ "Content-Type"="application/json" } `
+-Body '[{"event":"Heavy Snow","severity":"Severe","headline":"Snowstorm","description":"Up to 50cm above 1200m"},{"event":"Low visibility","severity":"minor","headline":"Low visibilty","description":"Up to 50cm above 1200m"}]' |
+Select-Object -ExpandProperty Content
+\end{verbatim}
+On Linux and macOS (bash), the equivalent request can be executed using \texttt{curl}:
+\begin{verbatim}
+curl -X POST "https://meteodemoserver.onrender.com/alerts" \
+-H "Content-Type: application/json" \
+-d '[{"event":"Heavy Snow","severity":"Severe","headline":"Snowstorm":"Up to 50cm above 1200m"},{"event":"Low visibility","severity":"minor","headline":"Low visibilty","description":"Up to 50cm above 1200m"}]'
+\end{verbatim}
+A successful request returns the following response:
+\begin{verbatim}
+{"status":"ok"}
+\end{verbatim}
+This mechanism is used exclusively for testing and demonstration purposes and does not represent the production workflow of the alert system.
+
+
+
+
+
+
+
 
 
 \end{document}
