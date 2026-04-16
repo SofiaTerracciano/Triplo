@@ -268,10 +268,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /* --------------------------------------------------
-   * AUTO LOGIN
-   * -------------------------------------------------- */
-
   Future<void> tryAutoLogin() async {
     final user = _auth.currentUser;
 
@@ -279,10 +275,6 @@ class AuthService extends ChangeNotifier {
       await loadUserCore(user.uid);
     }
   }
-
-  /* --------------------------------------------------
-   * GOOGLE USER DOC CREATION
-   * -------------------------------------------------- */
 
   Future<void> _ensureUserFirestoreDocs(User user) async {
     final uid = user.uid;
@@ -361,15 +353,15 @@ class AuthService extends ChangeNotifier {
     required String watchId,
     required String token,
   }) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user == null) {
       throw Exception("Devi essere loggato sul telefono.");
     }
 
-    final ref = FirebaseFirestore.instance.collection('watch_pair').doc(
+    final ref = _db.collection('watch_pair').doc(
         watchId);
 
-    await FirebaseFirestore.instance.runTransaction((tx) async {
+    await _db.runTransaction((tx) async {
       final snap = await tx.get(ref);
       if (!snap.exists) {
         throw Exception("watch_pair non trovato (watchId=$watchId)");
@@ -505,4 +497,8 @@ class AuthService extends ChangeNotifier {
       'remoteLogoutAt': null,
     });
   }
+
+  @visibleForTesting
+  Future<void> ensureUserFirestoreDocsPublic(User user) =>
+      _ensureUserFirestoreDocs(user);
 }
