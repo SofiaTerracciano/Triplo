@@ -937,6 +937,8 @@ class ModifyDiaryPageState extends State<ModifyDiaryPage> {
                         ),
                       ],
                     ),
+                    //messo per non far sovrapporre i bottoni alla navbar di android
+                    SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
                   ],
                 ),
               ),
