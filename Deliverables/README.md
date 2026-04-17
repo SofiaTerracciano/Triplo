@@ -1,1 +1,0 @@
-Folder for the versions of the documents to be delivered

@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1776438829.16071 "main.bcf" "main.bbl" "main" 1776446373.5451 0
+["biber main"] 1776438829.16071 "main.bcf" "main.bbl" "main" 1776459952.91708 0
   "bibliography.bib" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "main.bcf" 1776446373 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
+  "main.bcf" 1776459952 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1776446368.4224 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1776446373.5457 0
+["pdflatex"] 1776459948.13246 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1776459952.91761 0
   "./images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "./images/logo.png" 1776433090 159243 2d67b935335b282b2cf1d69bcca999cc ""
   "C:/Users/giuli/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1771289980 83609 ebbc432e6cbbb238d39535255db2c8bd ""
@@ -372,7 +372,7 @@
   "images/Implementation process.jpg" 1775954820 30270 df98c33371102a019551353f8ec98e05 ""
   "images/Overview.png" 1775173084 1618330 90df30103678dcbaabaa37f98da8e964 ""
   "images/Phone Watch pair 1.png" 1775954820 167940 9eaba75bcdb434fc7d74b0db8aa3181b ""
-  "images/Phone Watch pair 2.png" 1775954820 96809 bcb11c59ced6ba4f212571f00aad1741 ""
+  "images/Phone Watch pair 2.png" 1776459393 113842 93e9a0c9eae57428135ac434173e3ca5 ""
   "images/Phone Watch pair 3.png" 1775954820 258473 daf06cdc170889e4685211e0fab913cf ""
   "images/Phone Watch pair 4.png" 1776213868 127505 a4249a23394fa15a34c4bebf6abe72b9 ""
   "images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
@@ -418,7 +418,7 @@
   "images/phone/TRIPLO phone UI_page-0016.jpg" 1775954820 1108338 48c4b2ac9ee4a38935d3726f6c3ecadd ""
   "images/phone/TRIPLO phone UI_page-0017.jpg" 1775954820 2029197 657d8f881332d827786ed63a9ee9867f ""
   "images/phone/weather alerts_page-0002.jpg" 1776213869 1385948 39ed9df77092bfc5ac5b447343d41c6d ""
-  "images/smartwatch interface diagram.png" 1776213869 25481 46317a892298a6ab4ac372bf3e6c23ee ""
+  "images/smartwatch interface diagram.png" 1776459500 26744 b24654f31467dc2c7839503fbb22d990 ""
   "images/smartwatch/TRIPLO NEW IMAGES_page-0009.jpg" 1776268684 232428 19858a25e2ec982f84b05703c882acec ""
   "images/smartwatch/TRIPLO NEW IMAGES_page-0010.jpg" 1776268684 134404 27fac5f671f56677f62a59e9e329bbd9 ""
   "images/smartwatch/TRIPLO SMARTWATCH UI_page-0001.jpg" 1776268684 204173 b1270429640cd0441d0b18315c1146bc ""
@@ -436,18 +436,18 @@
   "images/smartwatch/TRIPLO SMARTWATCH UI_page-0013.jpg" 1776268684 200412 562f4d5a6a3441ad831ef7ea12e0d3b4 ""
   "images/smartwatch/TRIPLO SMARTWATCH UI_page-0014.jpg" 1776268684 310783 36f500ab24432261a92256ec60d0e863 ""
   "images/smartwatch3.png" 1776268684 307139 62c594e723d59c688e685c307470798d ""
-  "main.aux" 1776446373 70418 47c09ae1d75db2eec9f727af9dc67601 "pdflatex"
+  "main.aux" 1776459952 70418 7566b81cbbe8079281926c1b885c284a "pdflatex"
   "main.bbl" 1776438836 486 ee04f40f768daeed26442158e95aba61 "biber main"
-  "main.run.xml" 1776446373 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
+  "main.run.xml" 1776459952 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
   "main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
-  "main.toc" 1776446373 14411 e00cd9d0bf329f89638bcd6cf8ffd9cc "pdflatex"
+  "main.toc" 1776459952 14411 cb6b9ea66d866d53908204ceebf7eea7 "pdflatex"
   "preamble.sty" 1771292682 25286 6754b688c001e6e75b4838b421f3b4d9 ""
-  "section/architectural_design.tex" 1776445658 113203 49ff613e744b3310f52724c8841bdfcf ""
+  "section/architectural_design.tex" 1776459942 113211 fc8873873e119da934a00099c399bca4 ""
   "section/effort_spent.tex" 1771292682 94 08ce874b714f77532f8163eb8296a33b ""
   "section/implementation_integration_testplan.tex" 1776446367 9274 f65fc0a22ff2d30af5cb40f782b34094 ""
   "section/introduction.tex" 1776438158 12582 349c49d503194dd60b636f55734e2e61 ""
   "section/requirements_traceability.tex" 1776437078 18147 3a3201aea39bbb8723fdb8ec142d3500 ""
-  "section/user_interface_design.tex" 1776446000 20444 fa171f0c10796c4a32165a7088ad4dc9 ""
+  "section/user_interface_design.tex" 1776459730 20423 b1a3e22dcffa9d181e9b7284f7deea62 ""
   "title.tex" 1776434049 1626 ae40fb229a460eec7eb5b8c97e6a4cd2 ""
   (generated)
   "main.aux"

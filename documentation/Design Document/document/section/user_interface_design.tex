@@ -427,7 +427,6 @@ This page allows viewing basic information about other users.
 
 
 
-
 \subsection{Smartwatch Weather Notifications}
 \begin{figure}[H]
     \label{Smartwatch Weather Notifications}
@@ -487,17 +486,10 @@ Across the application, the following design patterns are consistently applied:
 
 \begin{itemize}
     \item UI components do not access Firebase or platform APIs; interactions with backend resources, pairing logic, notifications, and external services are mediated by controllers and service components.
- 
     \item The use of \texttt{Provider} and \texttt{notifyListeners()}, similarly to the Smartphone Application UI
-
     \item UI elements are structured to fit the limited screen size of the smartwatch, using simplified layouts, compact cards, icon-based actions. Content-heavy pages, such as trekking and weather views, distribute information across multiple vertically scrollable or swipeable sections, avoiding overcrowded single-screen layouts.
-
     \item \textbf{Lazy loading:} Potentially expensive operations, such as user retrieval, diary loading, image resolution, and weather acquisition, are deferred through asynchronous calls and widgets such as \texttt{FutureBuilder}, similarly to what has been done for the Smartphone Application UI
-
     \item \textbf{Navigation} Navigation in the smartwatch application is also based on explicit transitions through \texttt{Navigator.push()}.
-
-    
-
 \end{itemize}
 \newpage
 \section{Mapping Between UI Components and Pages}

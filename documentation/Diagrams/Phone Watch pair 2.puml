@@ -7,6 +7,7 @@ actor User
 'participant UserPage as "<color:white>UserPage</color>" #darkgreen
 participant WatchIdService as "<color:white>WatchIdService</color>" #000000
 participant PairingService as "<color:white>PairingService</color>" #000000
+participant MemoryService as "<color:white>MemoryService</color>" #000000
 participant UserController as "<color:white>UserController</color>" #151b8e
 participant Users as "<color:white>User Model</color>" #378641
 participant FlutterSecureStorage
@@ -14,16 +15,19 @@ database FirebaseFirestore
 
 User -> WatchIdService : launch watch application\n main.dart \n getOrCreateWatchId()
 
-
-alt watchId found locally
-    WatchIdService -> FlutterSecureStorage : read("watch_id")
-    FlutterSecureStorage --> WatchIdService : watchId
+    WatchIdService -> MemoryService: getWatchId()
+    MemoryService -> FlutterSecureStorage : read("watch_id_key")
+    alt Local watchid found
+    FlutterSecureStorage --> MemoryService : watch_id
+    MemoryService --> WatchIdService : watch_id
     'WatchIdService -> FirebaseFirestore : ensure watch document is on Firestore asynchronously without waiting for completion \n unawaited(_ensureWatchDoc(local));
     
-    alt local watchId found
-    WatchIdService -> WatchIdService : return local watchId
+    
+    
+    
+    
+    
     WatchIdService -> FirebaseFirestore : _ensureWatchDoc(watchId)
-
     alt watch document does not exist
         FirebaseFirestore --> WatchIdService : snap (not exists)
         WatchIdService -> FirebaseFirestore : ref.set({"platform","createdAt","lastSeenAt"})
@@ -33,30 +37,48 @@ alt watchId found locally
         WatchIdService -> FirebaseFirestore : ref.update({"lastSeenAt"})
         FirebaseFirestore --> WatchIdService : update completed
     end
-
-   
-   
     note right of WatchIdService
     _ensureWatchDoc() is started without awaiting it.
     The goal is to reuse the locally stored watchId
     immediately and keep the startup responsive,
     while Firestore synchronization proceeds asynchronously.
     end note
-
     WatchIdService --> User : watchId
 
+
+
+
+
+
+
+
+
+
+
+
+
 else no local watchId
+    FlutterSecureStorage --> MemoryService : null
+    MemoryService --> WatchIdService : null
     WatchIdService -> FirebaseFirestore : collection("watch").add({})
     alt Firestore creation succeeds
         FirebaseFirestore --> WatchIdService : ref.id
-        WatchIdService -> FlutterSecureStorage : write("watch_id", watchId)
-        FlutterSecureStorage --> WatchIdService : stored
+
+        note right of WatchIdService
+        WatchIdService uses the ref.id field of the Firestore document as watch id to save
+        end note
+        WatchIdService -> MemoryService : saveWatchId(watchId )
+        MemoryService-> FlutterSecureStorage : write("watch_id", watchId)
+        FlutterSecureStorage --> MemoryService : stored
+        MemoryService --> WatchIdService : stored
         WatchIdService --> User : watchId
     else Firestore unavailable or timeout
         FirebaseFirestore --> WatchIdService : error / timeout
         WatchIdService -> WatchIdService : generate fallback UUID
-        WatchIdService -> FlutterSecureStorage : write("watch_id", fallback)
-        FlutterSecureStorage --> WatchIdService : stored
+        WatchIdService -> MemoryService : saveWatchId(watchId)
+        MemoryService-> FlutterSecureStorage : write("watch_id", watchId)
+        FlutterSecureStorage --> MemoryService : stored
+        MemoryService --> WatchIdService : stored
         WatchIdService -> FirebaseFirestore : _ensureWatchDoc(fallback)
 
         note right of WatchIdService

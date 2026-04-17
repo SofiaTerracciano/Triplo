@@ -1210,7 +1210,7 @@ In this context, the pairing logic is primarily managed by the \textit{PairingSe
 \begin{figure}[H]
     \label{Overview Diagram}
     \centering
-    \includegraphics[width=0.7\linewidth]{./images/modelviewcontroller.png}
+    \includegraphics[width=0.6\linewidth]{./images/modelviewcontroller.png}
     \caption{Model view controller pattern, adapted from Apple and Oracle documentation}
 \end{figure}
 The system adopts the Model--View--Controller (MVC) architectural pattern to separate presentation, application logic, and data management. Within this structure, each role is assigned a specific responsibility in order to improve modularity, maintainability, and clarity of interactions.
@@ -1251,7 +1251,7 @@ Firebase was adopted as the backend solution to support a scalable and robust sy
 This choice allows the architecture to focus on the coordination of application logic on the client side, while relying on well-established and production-ready services for critical backend responsibilities such as authentication, data persistence, and media storage, integrating with the client applications through platform-specific SDKs.
 From an architectural perspective, this approach improves modularity and reduces system complexity by eliminating the need to design and maintain a dedicated backend infrastructure. This approach presents notable advantages, including scalability, reliability, and security, through managed services that are designed to handle distributed workloads and concurrent access patterns.
 Furthermore, the use of Firebase aligns well with the multi-platform nature of the system, as both smartphone and smartwatch applications can interact with the same backend services in a consistent and unified manner. This contributes to maintaining a coherent data model across different devices.
-
+\newpage
 
 
 

@@ -52,6 +52,8 @@ class "Language_i" << (I,#aaaaaa) >> <<interface>> {
 class "Memory_i" << (I,#aaaaaa) >> <<interface>> {
   - getImageFromMemory(key)
   - getImageFromDisk(url)
+  - saveWatchId(watchId)
+  - getWatchId()
   - saveImageToMemory(key, file)
   - getSavedLocaleCode()
   - saveLocaleCode(localeCode)
