@@ -1,21 +1,15 @@
 \csname documentclass\endcsname[../main.tex]{subfiles}
 
 \begin{document}
-\chapter{Implementation and Integration}
+\chapter{Implementation and Integration} \label{Implementation and Integration}
 
 \section{Implementation Strategy}
-
-The development of the Triplo application followed a structured and incremental approach, aligned with the architectural design of the system. The implementation was carried out using a bottom-up strategy, where foundational components were developed first and progressively extended towards higher-level functionalities.
-
-In particular, the implementation process evolved through a set of stages that were not strictly sequential but partially overlapped during development.
-
-First, the \textbf{model components} were defined. These components represent the core domain entities of the application and include \texttt{challengeModel}, \texttt{trekkingModel}, \texttt{UserModel}, and \texttt{DiaryModel}. They provide a structured representation of the data managed by the system and exchanged with the backend.
-
-Second, the \textbf{controller components} were introduced. Controllers were developed early in the process and progressively refined as new functionalities were added. Rather than being completed in a single phase, they evolved incrementally together with the introduction of application features. This includes \texttt{languagecontroller}, \texttt{challengecontroller}, \texttt{trekkingcontroller}, \texttt{UserController}, and \texttt{DiaryController}. Over time, controllers were improved to better coordinate logic and interactions among components.
-
-As development progressed, the implementation of the \textbf{view components} and controllers proceeded together, following the introduction of new functionalities. The user interface components, such as \texttt{GeowatchPage}, \texttt{HomePage}, \texttt{trekkingPage}, \texttt{SettingsPage}, \texttt{LoginRegistrationPage}, \texttt{SearchPage}, \texttt{UserProfilePage}, and \texttt{DiaryPage}, were developed incrementally to support the growing feature set of the application.
-
-Finally, the \textbf{service components} were introduced. Services such as \texttt{Background\_service}, \texttt{InternetService}, \texttt{permissionservice}, \texttt{geoservice}, \texttt{memoryservice}, \texttt{notificationservice}, and \texttt{authservice} were implemented to reduce the responsibilities of controllers and to delineate and isolate individual technical duties. In particular, services encapsulate interactions with the operating system (e.g., permissions, geolocation, notifications) and provide reusable functionality. This design improves modularity and maintainability by decoupling application logic from platform-specific operations.
+The development of the Triplo application followed a structured and incremental approach, aligned with the architectural design of the system. The implementation was carried out using a bottom-up strategy, where foundational components were developed first and progressively extended towards higher-level functionalities. \\
+In particular, the implementation process evolved through a set of stages that were not strictly sequential but partially overlapped during development. \\
+First, the \textbf{model components} were defined. These components represent the core domain entities of the application and include \texttt{challengeModel}, \texttt{trekkingModel}, \texttt{UserModel}, and \texttt{DiaryModel}. They provide a structured representation of the data managed by the system and exchanged with the backend. \\
+Second, the \textbf{controller components} were introduced. Controllers were developed early in the process and progressively refined as new functionalities were added. Rather than being completed in a single phase, they evolved incrementally together with the introduction of application features. This includes \texttt{languagecontroller}, \texttt{challengecontroller}, \texttt{trekkingcontroller}, \texttt{UserController}, and \texttt{DiaryController}. Over time, controllers were improved to better coordinate logic and interactions among components. \\
+As development progressed, the implementation of the \textbf{view components} and controllers proceeded together, following the introduction of new functionalities. The user interface components, such as \texttt{GeowatchPage}, \texttt{HomePage}, \texttt{trekkingPage}, \texttt{SettingsPage}, \texttt{LoginRegistrationPage}, \texttt{SearchPage}, \texttt{UserProfilePage}, and \texttt{DiaryPage}, were developed incrementally to support the growing feature set of the application. \\
+Finally, the \textbf{service components} were introduced. Services such as \texttt{Background\_service}, \texttt{InternetService}, \texttt{permissionservice}, \texttt{geoservice}, \texttt{memoryservice}, \texttt{notificationservice}, and \texttt{authservice} were implemented to reduce the responsibilities of controllers and to delineate and isolate individual technical duties. In particular, services encapsulate interactions with the operating system, for example permissions, geolocation, notifications, and provide reusable functionality. This design improves modularity and maintainability by decoupling application logic from platform-specific operations. \\
 
 \newpage
 \subsection{Implementation Process Overview}
@@ -38,16 +32,17 @@ The incremental construction of the system components is summarized in Figure~\r
 \section{Integration of Software Components}
 
 After the implementation of the individual components, the system was progressively assembled through an integration phase. This phase followed a clear incremental strategy.
-
 Initially, \textbf{Firebase} was integrated together with the controller components. Controllers directly interact with Firebase services (such as authentication, database, and storage) through platform-specific SDKs, enabling early validation of backend-related functionalities.
-
 Subsequently, the integration of \textbf{view components} and controllers continued in parallel with the implementation of functionalities. This allowed the application to evolve incrementally, ensuring that each feature was fully integrated before introducing new ones.
-
 External services, such as weather and map providers, were integrated at a later stage of development, once the corresponding user interface components were available. As the number of external dependencies increased, a dedicated \textbf{ServiceController} was introduced following the Facade design pattern. This controller centralizes access to external APIs and OS-level services, simplifying interactions and reducing coupling across the system.
-
 Finally, \textbf{device-level services} were fully integrated through the service components, which manage interactions with the operating system in a controlled and modular way.
+The integration process was incremental: core backend functionality was integrated first, followed by user interface components, and finally external services and OS interactions.
 
-Overall, the integration process was incremental: core backend functionality was integrated first, followed by user interface components, and finally external services and OS interactions.
+
+
+
+
+
 
 
 
@@ -115,34 +110,67 @@ iPhone 15 Plus & Real Device & iOS & ARM64 \\
 
 
 
-
+\newpage
 \paragraph{Weather Alerts Demo}
 
-For demonstration and testing purposes, weather alert notifications can be manually sent through a POST request to the demo server. This allows to simulate alert conditions.
+For demonstration and testing purposes, weather alert notifications can be manually sent through a POST request to the demo server. This allows developers to simulate alert conditions and verify the correct behavior of the system.
+
 On Windows (PowerShell), the following command can be used:
+
+{\small
 \begin{verbatim}
 Invoke-WebRequest "https://meteodemoserver.onrender.com/alerts" `
 -Method POST `
 -UseBasicParsing `
 -Headers @{ "Content-Type"="application/json" } `
--Body '[{"event":"Heavy Snow","severity":"Severe","headline":"Snowstorm","description":"Up to 50cm above 1200m"},{"event":"Low visibility","severity":"minor","headline":"Low visibilty","description":"Up to 50cm above 1200m"}]' |
-Select-Object -ExpandProperty Content
+-Body '[
+  {
+    "event":"Heavy Snow",
+    "severity":"Severe",
+    "headline":"Snowstorm",
+    "description":"Up to 50cm above 1200m"
+  },
+  {
+    "event":"Low visibility",
+    "severity":"minor",
+    "headline":"Low visibility",
+    "description":"Up to 50cm above 1200m"
+  }
+]' | Select-Object -ExpandProperty Content
 \end{verbatim}
+}
+
 On Linux and macOS (bash), the equivalent request can be executed using \texttt{curl}:
+
+
+
+
+
+{\small
 \begin{verbatim}
 curl -X POST "https://meteodemoserver.onrender.com/alerts" \
 -H "Content-Type: application/json" \
--d '[{"event":"Heavy Snow","severity":"Severe","headline":"Snowstorm":"Up to 50cm above 1200m"},{"event":"Low visibility","severity":"minor","headline":"Low visibilty","description":"Up to 50cm above 1200m"}]'
+-d '[
+  {
+    "event":"Heavy Snow",
+    "severity":"Severe",
+    "headline":"Snowstorm",
+    "description":"Up to 50cm above 1200m"
+  },
+  {
+    "event":"Low visibility",
+    "severity":"minor",
+    "headline":"Low visibility",
+    "description":"Up to 50cm above 1200m"
+  }
+]'
 \end{verbatim}
+}
 A successful request returns the following response:
 \begin{verbatim}
 {"status":"ok"}
 \end{verbatim}
 This mechanism is used exclusively for testing and demonstration purposes and does not represent the production workflow of the alert system.
-
-
-
-
 
 
 

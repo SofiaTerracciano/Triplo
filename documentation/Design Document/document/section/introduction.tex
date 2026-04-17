@@ -4,8 +4,15 @@
 
 
 \chapter{Introduction}
-
+\label{Introduction}
 \section{Purpose}
+
+
+
+
+
+
+
 
 
 
@@ -14,7 +21,6 @@ The application aims to enhance the experience of hiking in mountain environment
 Users can explore predefined trekking routes and access useful information about the paths, including navigation support and contextual data such as weather conditions.  \\
 At the same time, the application allows hikers to document their experiences by creating logbook entries enriched with photos and personal diary notes. \\
 The platform also enables users to discover and follow other hikers, and to browse selected entries from their trekking diaries, enhancing the sharing of experiences and inspiration for future hikes. 
-
 During a hike, users can optionally complete challenges, such as time-based goals designed to enrich the trekking experience. \\
 The following sections describe the system architecture, the main functionalities of the application, and the technological choices adopted in its development.
 
@@ -69,7 +75,7 @@ In the context of the Triplo application, \textit{pairing} refers to the process
     \item \label{API} \textbf{API:} An Application Programming Interface (API) is a set of rules, protocols, and tools that allows different software components to communicate with each other. In the context of the Triplo application, APIs are used to interact with external services, for example weather providers, and backend platforms.
     \item \label{rest api} \textbf{REST API:} A Representational State Transfer API is a type of Application Programming Interface that follows the architectural principles of Representational State Transfer, known as REST. It enables communication between client and server systems over HTTP, using standard methods such as \texttt{GET}, \texttt{POST}, \texttt{PUT}, and \texttt{DELETE} to operate on resources identified by URLs. REST APIs are stateless, no session state is stored on the server and responses are typically returned in lightweight formats such as JSON. In the context of the Triplo application, REST APIs are used when interacting with external services, for example weather providers, while Firebase services are generally accessed through SDK abstractions rather than direct REST calls.
     \item \label{SDK} \textbf{SDK:} An SDK is a collection of libraries, tools, and APIs that enables developers to interact with a specific platform or service. In the context of the Triplo application, the term SDK refers in particular to the Firebase SDK, which provides high-level functions to access backend services such as authentication, cloud database, and storage without directly using low-level REST APIs.
-    \item \label{BaaS} \textbf{BaaS:} Backend as a Service is a cloud service model in which developers outsource the backend functionality of an application to a third-party provider. This allows developers to focus on implementing the frontend logic while relying on pre-built backend services such as authentication, database management, storage, and notifications, typically accessed through APIs and SDKs. In this document, the term \textit{BaaS} is used to refer to platforms such as Firebase, which provide integrated backend capabilities for mobile and web applications. The term \textit{MBaaS} (Mobile Backend as a Service) is sometimes used in the literature to emphasize mobile-specific backend services. However, the distinction between BaaS and MBaaS is often minimal, as modern platforms support both mobile and web applications. For this reason, the term \textit{BaaS} is used throughout this document.            
+    \item \label{BaaS} \textbf{BaaS:} Backend as a Service is a cloud service model in which developers outsource the backend functionality of an application to a third-party provider. This allows to focus on implementing the frontend logic while relying on pre-built backend services such as authentication, database management, storage, and notifications, typically accessed through APIs and SDKs. In this document, the term \textit{BaaS} is used to refer to platforms such as Firebase, which provide integrated backend capabilities for mobile and web applications. The term \textit{MBaaS} (Mobile Backend as a Service) is sometimes used in the literature to emphasize mobile-specific backend services. However, some sources consider BaaS and MBaaS to be basically interchangeable terms, as modern platforms support both mobile and web applications. For this reason, the term \textit{BaaS} is used throughout this document.            
 \end{itemize}
 \newpage
 \section{References}
@@ -81,11 +87,11 @@ In the context of the Triplo application, \textit{pairing} refers to the process
 \begin{itemize}
     \item Design and Implementation of Mobile Applications Lectures and Slides
     \begin{itemize}
-        \item Introduction \url{https://webeep.polimi.it/mod/resource/view.php?id=399280}
-        \item Flutter \url{https://webeep.polimi.it/mod/resource/view.php?id=399287}
-        \item Android \url{https://webeep.polimi.it/mod/resource/view.php?id=411641}
-        \item iOS \url{https://webeep.polimi.it/mod/resource/view.php?id=417791}
-        \item Lectures \url{https://webeep.polimi.it/mod/url/view.php?id=376880}
+        \item \href{https://webeep.polimi.it/mod/resource/view.php?id=399280}{Introduction}
+        \item \href{https://webeep.polimi.it/mod/resource/view.php?id=399287}{Flutter}
+        \item \href{https://webeep.polimi.it/mod/resource/view.php?id=411641}{Android}
+        \item \href{https://webeep.polimi.it/mod/resource/view.php?id=417791}{iOS}
+        \item \href{https://webeep.polimi.it/mod/url/view.php?id=376880}{Lectures}
     \end{itemize}
 \end{itemize}
 
@@ -99,40 +105,73 @@ In the context of the Triplo application, \textit{pairing} refers to the process
         \includegraphics[width=0.23\textwidth]{./images/libro1.jpg}
     \end{center}
 
-    \item \textbf{M. Camilli, E. Di Nitto, A. Fuggetta, A. Margara, M.G. Rossi, D.A. Tamburri}, \\
-    \textit{Software Engineering: A Structured Journey from Inception to Delivery}, BUP.
 
-    \begin{center}
-        \includegraphics[width=0.23\textwidth]{./images/libro2.jpg}
-    \end{center}
 
 \end{itemize}
+
+
+
 
 \newpage
 \subsection{Other References}
 \begin{itemize}
-    \item Flutter Documentation \url{https://docs.flutter.dev/}
-    \item Firebase Documentation \url{https://firebase.google.com/docs/}
-    \item Android Developers Documentation \url{https://developer.android.com/docs}
+    \item \href{https://docs.flutter.dev/}{Flutter Documentation}
+    \item \href{https://firebase.google.com/docs/}{Firebase Documentation}
+    \item \href{https://developer.android.com/docs}{Android Developers Documentation}
 
-    \item OpenWeather API Documentation \\ \url{https://openweathermap.org/api/one-call-3?collection=one_call_api_3.0}
-    \item Weatherbit: Severe Weather Alerts API \\ \url{https://www.weatherbit.io/api/alerts}
+    \item \href{https://openweathermap.org/api/one-call-3?collection=one_call_api_3.0}{OpenWeather API Documentation}
+    \item \href{https://www.weatherbit.io/api/alerts}{Weatherbit: Severe Weather Alerts API}
 
-    \item Oracle: Model-View-Controller (MVC) \\ \url{https://www.oracle.com/technical-resources/articles/javase/application-design-with-mvc.html}
-    \item Apple Developer Documentation: Model-View-Controller \\ \url{https://developer.apple.com/library/archive/documentation/General/Conceptual/CocoaEncyclopedia/Model-View-Controller/Model-View-Controller.html}
+    \item \href{https://www.oracle.com/technical-resources/articles/javase/application-design-with-mvc.html}{Oracle: Model-View-Controller (MVC)}
+    \item \href{https://developer.apple.com/library/archive/documentation/General/Conceptual/CocoaEncyclopedia/Model-View-Controller/Model-View-Controller.html}{Apple Developer Documentation: Model-View-Controller}
 
-    \item IBM: What is an API? \\ \url{https://www.ibm.com/think/topics/api}
-    \item IBM: What are REST APIs? \\ \url{https://www.ibm.com/think/topics/rest-apis}
+    \item \href{https://www.ibm.com/think/topics/api}{IBM: What is an API?}
+    \item \href{https://www.ibm.com/think/topics/rest-apis}{IBM: What are REST APIs?}
 
-    
-    
-    
-    \item Cloudflare: Backend as a Service (BaaS) \\ \url{https://www.cloudflare.com/learning/serverless/glossary/backend-as-a-service-baas/}
-    \item WebFX: QR Codes and URI Schemes \\ \url{https://www.webfx.com/blog/web-design/qr-codes-uri-schemes/}
-    \item PlantUML Official Website \\ \url{https://www.plantuml.com}
-    \item European Commission: Galileo Satellite Navigation \\ \url{https://defence-industry-space.ec.europa.eu/eu-space/galileo-satellite-navigation_en}
-    \item European Commission: Galileo GNSS\\ \url{https://defence-industry-space.ec.europa.eu/document/download/04ae75b0-e6b6-4a12-9e14-ecd9cd6c1a7a_en?filename=Galileo%20the%20EU%20GNSS%20Factsheet.pdf}
-    \item European Union: General Data Protection Regulation (GDPR) \\ \url{https://gdpr.eu/}
-    \item Deutsche Telekom: What is LTE? \\ \url{https://www.telekom.com/en/company/details/the-nine-most-important-facts-about-lte-606446}
+    \item \href{https://www.cloudflare.com/learning/serverless/glossary/backend-as-a-service-baas/}{Cloudflare: Backend as a Service (BaaS)}
+    \item \href{https://www.webfx.com/blog/web-design/qr-codes-uri-schemes/}{WebFX: QR Codes and URI Schemes}
+    \item \href{https://www.plantuml.com}{PlantUML Official Website}
+    \item \href{https://defence-industry-space.ec.europa.eu/eu-space/galileo-satellite-navigation_en}{European Commission: Galileo Satellite Navigation}
+    \item \href{https://defence-industry-space.ec.europa.eu/document/download/04ae75b0-e6b6-4a12-9e14-ecd9cd6c1a7a_en?filename=Galileo%20the%20EU%20GNSS%20Factsheet.pdf}{European Commission: Galileo GNSS}
+    \item \href{https://gdpr.eu/}{European Union: General Data Protection Regulation (GDPR)}
+    \item \href{https://www.telekom.com/en/company/details/the-nine-most-important-facts-about-lte-606446}{Deutsche Telekom: What is LTE?}
+\end{itemize}
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{Document Structure}
+
+This document is organized into five main chapters, each addressing a specific aspect of the Triplo application design and implementation.
+\begin{itemize}
+\item chapter \ref{Introduction} introduces the purpose and scope of the document, together with definitions, acronyms, and references used throughout the report.
+\item chapter \ref{Architectural Design} focuses on the architectural design of the system. It presents the overall architecture, including high-level components, component views for both smartphone and smartwatch applications, database management, deployment and runtime views. It also includes sequence diagrams for key use cases, component interfaces, architectural patterns, and design decisions.
+\item chapter \ref{User Interface} describes the user interface of the application. It provides a detailed overview of the smartphone and smartwatch UI components, including individual pages and interaction patterns. The section concludes with general UI design considerations and a mapping between UI components and application pages.
+\item chapter \ref{Functional Requirements} presents the functional requirements of the system. Requirements are organized separately for the smartphone and smartwatch applications, covering features such as account management, route exploration, diary management, weather information, and offline mode. A mapping between requirements and architectural components is also provided.
+\item chapter \ref{Implementation and Integration} describes the implementation and integration process. It outlines the development strategy, component integration, and testing activities, including unit, widget, integration, and user testing, as well as the test environment used.
+
+
+
+\subsection{Revision History}
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|p{9cm}|}
+\hline
+\textbf{Date} & \textbf{Version} & \textbf{Description} \\
+\hline
+18 April 2026 & 1.0 (Final Draft) & Initial complete draft of the Design Document. The document is complete in all main sections; however, the final subsections of the testing section are still under refinement. This version also reflects the final version of both the smartphone and smartwatch application code. \\
+\hline
+\end{tabular}
+\caption{Revision history of the document}
+\end{table}
+
+\textit{Note:} The testing subsections included in this version have been introduced but are still under development and may be subject to further updates.
 \end{itemize}
 \end{document}
+
