@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService {
@@ -14,10 +15,12 @@ class MemoryService {
     ),
   );
 
-  // --- 2. MEMORIA PERSISTENTE (SharedPreferences) ---
+  // --- 2. secondary storage (SharedPreferences and flutter secure storage) ---
   static const _kLocaleKey = "user_locale";
-  static const _kFirstRunKey = "is_first_run";
+  //static const _kFirstRunKey = "is_first_run";
   static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
+  static const String _kWatchIdKey = 'watch_id';
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   Future<void> saveLocale(String code) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_kLocaleKey, code);
@@ -28,15 +31,25 @@ class MemoryService {
     return prefs.getString(_kLocaleKey);
   }
 
-  Future<bool> isFirstRun() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_kFirstRunKey) ?? true;
+
+
+  Future<void> saveWatchId(String watchId) async {
+    await _secureStorage.write(key: _kWatchIdKey, value: watchId);
   }
 
-  Future<void> setFirstRunDone() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kFirstRunKey, false);
+  Future<String?> getWatchId() async {
+    return _secureStorage.read(key: _kWatchIdKey);
   }
+
+  //Future<bool> isFirstRun() async {
+  //  final prefs = await SharedPreferences.getInstance();
+  //  return prefs.getBool(_kFirstRunKey) ?? true;
+  //}
+
+  //Future<void> setFirstRunDone() async {
+  //  final prefs = await SharedPreferences.getInstance();
+  //  await prefs.setBool(_kFirstRunKey, false);
+  //}
 
   // --- 3. MEMORIA VOLATILE (RAM Cache) ---
   final Map<String, dynamic> _internalRamCache = {};

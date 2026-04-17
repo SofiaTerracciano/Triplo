@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../service/OSservice/memory.dart';
+
 
 // Language controller for localization --> manage app language
 class Language extends ChangeNotifier {
   // Current locale, default to English
   Locale _locale = const Locale('en');
 
+  final MemoryService _memoryService = MemoryService();
+
   // Getter for current locale
   Locale get locale => _locale;
 
   Language();
 
-  static const String _kLocaleCodeKey = "locale_code";
-
   // Set a new locale and notify listeners
-  void setLocale(Locale locale) {
-    if (_locale == locale) 
+  Future<void> setLocale(Locale locale) async {
+    if (_locale == locale) {
       return;
-    
-    _locale = locale;
+    }
 
+    _locale = locale;
+    await _memoryService.saveLocale(locale.languageCode);
     notifyListeners();
   }
 
-  // Carica la lingua salvata nelle SharedPreferences
+  // Carica la lingua salvata nel MemoryService
   Future<void> loadSavedLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_kLocaleCodeKey);
+    final code = await _memoryService.getLocale();
 
     if (code == null || code.isEmpty) return;
 

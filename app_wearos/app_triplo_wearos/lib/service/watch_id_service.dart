@@ -1,36 +1,33 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 
+import 'OSservice/memory.dart';
+
+
 class WatchIdService {
-  static const _storage = FlutterSecureStorage();
-  static const _watchIdKey = 'watch_id';
+  static final MemoryService _memoryService = MemoryService();
   static const _uuid = Uuid();
 
   static Future<String> getOrCreateWatchId() async {
-
-    final local = await _storage.read(key: _watchIdKey);
+    final local = await _memoryService.getWatchId();
     if (local != null && local.isNotEmpty) {
-
-
       debugPrint("WatchIdService: usando watchId locale=$local"); //coverage:ignore-line
 
       unawaited(_ensureWatchDoc(local));
       return local;
     }
 
-
     try {
       final watchId = await _createWatchDocOnFirestore()
           .timeout(const Duration(seconds: 4));
-      await _storage.write(key: _watchIdKey, value: watchId);
+      await _memoryService.saveWatchId(watchId);
       return watchId;
     } catch (e) {
       debugPrint("WatchIdService: Firestore non disponibile ($e). Uso UUID locale."); //coverage:ignore-line
       final fallback = _uuid.v4();
-      await _storage.write(key: _watchIdKey, value: fallback);
+      await _memoryService.saveWatchId(fallback);
 
       unawaited(_ensureWatchDoc(fallback));
       return fallback;
@@ -56,14 +53,12 @@ class WatchIdService {
 
       final snap = await ref.get();
       if (!snap.exists) {
-
         await ref.set({
           'platform': 'wearos',
           'createdAt': FieldValue.serverTimestamp(),
           'lastSeenAt': FieldValue.serverTimestamp(),
         });
       } else {
-
         await ref.update({
           'lastSeenAt': FieldValue.serverTimestamp(),
         });
