@@ -4,16 +4,17 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
-import 'dart:io' as _i10;
-import 'dart:ui' as _i7;
+import 'dart:io' as _i11;
+import 'dart:ui' as _i8;
 
+import 'package:firebase_auth/firebase_auth.dart' as _i7;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
-import 'package:triplo/controller/trekking.dart' as _i8;
-import 'package:triplo/controller/user.dart' as _i12;
-import 'package:triplo/l10n/app_localizations.dart' as _i11;
-import 'package:triplo/model/trekking.dart' as _i9;
-import 'package:triplo/model/user.dart' as _i13;
+import 'package:triplo/controller/trekking.dart' as _i9;
+import 'package:triplo/controller/user.dart' as _i13;
+import 'package:triplo/l10n/app_localizations.dart' as _i12;
+import 'package:triplo/model/trekking.dart' as _i10;
+import 'package:triplo/model/user.dart' as _i14;
 import 'package:triplo/service/authservice.dart' as _i2;
 import 'package:triplo/service/memory.dart' as _i3;
 import 'package:triplo/service/notification.dart' as _i4;
@@ -240,13 +241,22 @@ class MockAuthService extends _i1.Mock implements _i2.AuthService {
           as _i5.Future<void>);
 
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  _i5.Future<void> ensureUserFirestoreDocsPublic(_i7.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#ensureUserFirestoreDocsPublic, [user]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -268,7 +278,7 @@ class MockAuthService extends _i1.Mock implements _i2.AuthService {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTrekkingController extends _i1.Mock
-    implements _i8.TrekkingController {
+    implements _i9.TrekkingController {
   MockTrekkingController() {
     _i1.throwOnMissingStub(this);
   }
@@ -304,12 +314,12 @@ class MockTrekkingController extends _i1.Mock
           as _i4.NotificationService);
 
   @override
-  List<_i9.Trekking> get allTrekkings =>
+  List<_i10.Trekking> get allTrekkings =>
       (super.noSuchMethod(
             Invocation.getter(#allTrekkings),
-            returnValue: <_i9.Trekking>[],
+            returnValue: <_i10.Trekking>[],
           )
-          as List<_i9.Trekking>);
+          as List<_i10.Trekking>);
 
   @override
   set authService(_i2.AuthService? value) => super.noSuchMethod(
@@ -330,7 +340,7 @@ class MockTrekkingController extends _i1.Mock
   );
 
   @override
-  set onTrekkingSelected(void Function(_i9.Trekking)? value) =>
+  set onTrekkingSelected(void Function(_i10.Trekking)? value) =>
       super.noSuchMethod(
         Invocation.setter(#onTrekkingSelected, value),
         returnValueForMissingStub: null,
@@ -351,9 +361,9 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<void>);
 
   @override
-  _i9.Trekking? getTrekkingById(String? documentId) =>
+  _i10.Trekking? getTrekkingById(String? documentId) =>
       (super.noSuchMethod(Invocation.method(#getTrekkingById, [documentId]))
-          as _i9.Trekking?);
+          as _i10.Trekking?);
 
   @override
   String? getTrekkingId(String? name) =>
@@ -382,28 +392,32 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<String>);
 
   @override
-  _i5.Future<List<_i9.Trekking>> searchTrekking(String? query) =>
+  _i5.Future<List<_i10.Trekking>> searchTrekking(String? query) =>
       (super.noSuchMethod(
             Invocation.method(#searchTrekking, [query]),
-            returnValue: _i5.Future<List<_i9.Trekking>>.value(<_i9.Trekking>[]),
+            returnValue: _i5.Future<List<_i10.Trekking>>.value(
+              <_i10.Trekking>[],
+            ),
           )
-          as _i5.Future<List<_i9.Trekking>>);
+          as _i5.Future<List<_i10.Trekking>>);
 
   @override
-  _i5.Future<_i9.Trekking?> fetchTrekkingById(String? id) =>
+  _i5.Future<_i10.Trekking?> fetchTrekkingById(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#fetchTrekkingById, [id]),
-            returnValue: _i5.Future<_i9.Trekking?>.value(),
+            returnValue: _i5.Future<_i10.Trekking?>.value(),
           )
-          as _i5.Future<_i9.Trekking?>);
+          as _i5.Future<_i10.Trekking?>);
 
   @override
-  _i5.Future<List<_i9.Trekking>> getSavedTrekkings(String? uid) =>
+  _i5.Future<List<_i10.Trekking>> getSavedTrekkings(String? uid) =>
       (super.noSuchMethod(
             Invocation.method(#getSavedTrekkings, [uid]),
-            returnValue: _i5.Future<List<_i9.Trekking>>.value(<_i9.Trekking>[]),
+            returnValue: _i5.Future<List<_i10.Trekking>>.value(
+              <_i10.Trekking>[],
+            ),
           )
-          as _i5.Future<List<_i9.Trekking>>);
+          as _i5.Future<List<_i10.Trekking>>);
 
   @override
   _i5.Future<void> addTrekkingToSaved(String? trekkingId) =>
@@ -432,18 +446,18 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<bool>);
 
   @override
-  _i5.Future<_i10.File?> getCachedImage(String? imagePath) =>
+  _i5.Future<_i11.File?> getCachedImage(String? imagePath) =>
       (super.noSuchMethod(
             Invocation.method(#getCachedImage, [imagePath]),
-            returnValue: _i5.Future<_i10.File?>.value(),
+            returnValue: _i5.Future<_i11.File?>.value(),
           )
-          as _i5.Future<_i10.File?>);
+          as _i5.Future<_i11.File?>);
 
   @override
   _i5.Future<void> checkArrival(
     String? trekkingId,
     double? distanceInMeters,
-    _i11.AppLocalizations? local,
+    _i12.AppLocalizations? local,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#checkArrival, [
@@ -457,20 +471,20 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<void>);
 
   @override
-  _i5.Future<List<_i10.File>> getCachedImages(List<String>? imagePaths) =>
+  _i5.Future<List<_i11.File>> getCachedImages(List<String>? imagePaths) =>
       (super.noSuchMethod(
             Invocation.method(#getCachedImages, [imagePaths]),
-            returnValue: _i5.Future<List<_i10.File>>.value(<_i10.File>[]),
+            returnValue: _i5.Future<List<_i11.File>>.value(<_i11.File>[]),
           )
-          as _i5.Future<List<_i10.File>>);
+          as _i5.Future<List<_i11.File>>);
 
   @override
-  _i5.Future<_i9.Trekking?> getTrekkingByIdAsync(String? trekkingId) =>
+  _i5.Future<_i10.Trekking?> getTrekkingByIdAsync(String? trekkingId) =>
       (super.noSuchMethod(
             Invocation.method(#getTrekkingByIdAsync, [trekkingId]),
-            returnValue: _i5.Future<_i9.Trekking?>.value(),
+            returnValue: _i5.Future<_i10.Trekking?>.value(),
           )
-          as _i5.Future<_i9.Trekking?>);
+          as _i5.Future<_i10.Trekking?>);
 
   @override
   _i5.Future<void> enableWeatherAlertForTrekking(String? trekkingId) =>
@@ -507,12 +521,14 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<List<String>>);
 
   @override
-  _i5.Future<List<_i9.Trekking>> getWeatherAlertTrekkings() =>
+  _i5.Future<List<_i10.Trekking>> getWeatherAlertTrekkings() =>
       (super.noSuchMethod(
             Invocation.method(#getWeatherAlertTrekkings, []),
-            returnValue: _i5.Future<List<_i9.Trekking>>.value(<_i9.Trekking>[]),
+            returnValue: _i5.Future<List<_i10.Trekking>>.value(
+              <_i10.Trekking>[],
+            ),
           )
-          as _i5.Future<List<_i9.Trekking>>);
+          as _i5.Future<List<_i10.Trekking>>);
 
   @override
   _i5.Future<void> updateWeatherNotificationLastCheck() =>
@@ -524,13 +540,13 @@ class MockTrekkingController extends _i1.Mock
           as _i5.Future<void>);
 
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -551,7 +567,7 @@ class MockTrekkingController extends _i1.Mock
 /// A class which mocks [UserController].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserController extends _i1.Mock implements _i12.UserController {
+class MockUserController extends _i1.Mock implements _i13.UserController {
   MockUserController() {
     _i1.throwOnMissingStub(this);
   }
@@ -625,28 +641,28 @@ class MockUserController extends _i1.Mock implements _i12.UserController {
           as _i5.Future<void>);
 
   @override
-  _i5.Future<_i13.Users?> getUserById(String? uid) =>
+  _i5.Future<_i14.Users?> getUserById(String? uid) =>
       (super.noSuchMethod(
             Invocation.method(#getUserById, [uid]),
-            returnValue: _i5.Future<_i13.Users?>.value(),
+            returnValue: _i5.Future<_i14.Users?>.value(),
           )
-          as _i5.Future<_i13.Users?>);
+          as _i5.Future<_i14.Users?>);
 
   @override
-  _i5.Future<List<_i13.Users>> getFollowers(String? uid) =>
+  _i5.Future<List<_i14.Users>> getFollowers(String? uid) =>
       (super.noSuchMethod(
             Invocation.method(#getFollowers, [uid]),
-            returnValue: _i5.Future<List<_i13.Users>>.value(<_i13.Users>[]),
+            returnValue: _i5.Future<List<_i14.Users>>.value(<_i14.Users>[]),
           )
-          as _i5.Future<List<_i13.Users>>);
+          as _i5.Future<List<_i14.Users>>);
 
   @override
-  _i5.Future<List<_i13.Users>> getFollowing(String? uid) =>
+  _i5.Future<List<_i14.Users>> getFollowing(String? uid) =>
       (super.noSuchMethod(
             Invocation.method(#getFollowing, [uid]),
-            returnValue: _i5.Future<List<_i13.Users>>.value(<_i13.Users>[]),
+            returnValue: _i5.Future<List<_i14.Users>>.value(<_i14.Users>[]),
           )
-          as _i5.Future<List<_i13.Users>>);
+          as _i5.Future<List<_i14.Users>>);
 
   @override
   _i5.Future<List<String>> getFollowingIds(String? uid) =>
@@ -657,12 +673,12 @@ class MockUserController extends _i1.Mock implements _i12.UserController {
           as _i5.Future<List<String>>);
 
   @override
-  _i5.Future<List<_i13.Users>> searchUsers(String? query) =>
+  _i5.Future<List<_i14.Users>> searchUsers(String? query) =>
       (super.noSuchMethod(
             Invocation.method(#searchUsers, [query]),
-            returnValue: _i5.Future<List<_i13.Users>>.value(<_i13.Users>[]),
+            returnValue: _i5.Future<List<_i14.Users>>.value(<_i14.Users>[]),
           )
-          as _i5.Future<List<_i13.Users>>);
+          as _i5.Future<List<_i14.Users>>);
 
   @override
   _i5.Future<void> updateUsername(String? username) =>
@@ -701,7 +717,7 @@ class MockUserController extends _i1.Mock implements _i12.UserController {
           as _i5.Future<void>);
 
   @override
-  _i5.Future<void> updateProfilePhoto(_i10.File? image) =>
+  _i5.Future<void> updateProfilePhoto(_i11.File? image) =>
       (super.noSuchMethod(
             Invocation.method(#updateProfilePhoto, [image]),
             returnValue: _i5.Future<void>.value(),
@@ -864,13 +880,13 @@ class MockUserController extends _i1.Mock implements _i12.UserController {
           as _i5.Future<void>);
 
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );

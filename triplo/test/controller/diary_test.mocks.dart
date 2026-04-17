@@ -4,10 +4,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
-import 'dart:typed_data' as _i8;
-import 'dart:ui' as _i7;
+import 'dart:typed_data' as _i9;
+import 'dart:ui' as _i8;
 
 import 'package:cloud_firestore/cloud_firestore.dart' as _i3;
+import 'package:firebase_auth/firebase_auth.dart' as _i7;
 import 'package:firebase_core/firebase_core.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
@@ -293,13 +294,22 @@ class MockAuthService extends _i1.Mock implements _i5.AuthService {
           as _i4.Future<void>);
 
   @override
-  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  _i4.Future<void> ensureUserFirestoreDocsPublic(_i7.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#ensureUserFirestoreDocsPublic, [user]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -437,7 +447,7 @@ class MockFirebaseFirestore extends _i1.Mock implements _i3.FirebaseFirestore {
           as _i4.Future<void>);
 
   @override
-  _i3.LoadBundleTask loadBundle(_i8.Uint8List? bundle) =>
+  _i3.LoadBundleTask loadBundle(_i9.Uint8List? bundle) =>
       (super.noSuchMethod(
             Invocation.method(#loadBundle, [bundle]),
             returnValue: _FakeLoadBundleTask_4(

@@ -5,19 +5,20 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
 import 'dart:io' as _i2;
-import 'dart:typed_data' as _i13;
-import 'dart:ui' as _i9;
+import 'dart:typed_data' as _i14;
+import 'dart:ui' as _i10;
 
+import 'package:firebase_auth/firebase_auth.dart' as _i9;
 import 'package:firebase_core/firebase_core.dart' as _i3;
 import 'package:firebase_storage/firebase_storage.dart' as _i4;
 import 'package:firebase_storage_platform_interface/firebase_storage_platform_interface.dart'
     as _i5;
-import 'package:flutter/material.dart' as _i12;
+import 'package:flutter/material.dart' as _i13;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i8;
 import 'package:triplo/service/authservice.dart' as _i6;
-import 'package:triplo/service/memory.dart' as _i10;
-import 'package:triplo/service/notification.dart' as _i11;
+import 'package:triplo/service/memory.dart' as _i11;
+import 'package:triplo/service/notification.dart' as _i12;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -271,13 +272,22 @@ class MockAuthService extends _i1.Mock implements _i6.AuthService {
           as _i7.Future<void>);
 
   @override
-  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
+  _i7.Future<void> ensureUserFirestoreDocsPublic(_i9.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#ensureUserFirestoreDocsPublic, [user]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
+
+  @override
+  void addListener(_i10.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i10.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -298,7 +308,7 @@ class MockAuthService extends _i1.Mock implements _i6.AuthService {
 /// A class which mocks [MemoryService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMemoryService extends _i1.Mock implements _i10.MemoryService {
+class MockMemoryService extends _i1.Mock implements _i11.MemoryService {
   MockMemoryService() {
     _i1.throwOnMissingStub(this);
   }
@@ -403,13 +413,13 @@ class MockMemoryService extends _i1.Mock implements _i10.MemoryService {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockNotificationService extends _i1.Mock
-    implements _i11.NotificationService {
+    implements _i12.NotificationService {
   MockNotificationService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void setNavKey(_i12.GlobalKey<_i12.NavigatorState>? key) =>
+  void setNavKey(_i13.GlobalKey<_i13.NavigatorState>? key) =>
       super.noSuchMethod(
         Invocation.method(#setNavKey, [key]),
         returnValueForMissingStub: null,
@@ -726,16 +736,16 @@ class MockReference extends _i1.Mock implements _i4.Reference {
           as _i7.Future<_i4.ListResult>);
 
   @override
-  _i7.Future<_i13.Uint8List?> getData([int? maxSize = 10485760]) =>
+  _i7.Future<_i14.Uint8List?> getData([int? maxSize = 10485760]) =>
       (super.noSuchMethod(
             Invocation.method(#getData, [maxSize]),
-            returnValue: _i7.Future<_i13.Uint8List?>.value(),
+            returnValue: _i7.Future<_i14.Uint8List?>.value(),
           )
-          as _i7.Future<_i13.Uint8List?>);
+          as _i7.Future<_i14.Uint8List?>);
 
   @override
   _i4.UploadTask putData(
-    _i13.Uint8List? data, [
+    _i14.Uint8List? data, [
     _i5.SettableMetadata? metadata,
   ]) =>
       (super.noSuchMethod(

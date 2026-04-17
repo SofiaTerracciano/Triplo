@@ -4,8 +4,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
-import 'dart:ui' as _i5;
+import 'dart:ui' as _i6;
 
+import 'package:firebase_auth/firebase_auth.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i4;
 import 'package:triplo/service/authservice.dart' as _i2;
@@ -216,13 +217,22 @@ class MockAuthService extends _i1.Mock implements _i2.AuthService {
           as _i3.Future<void>);
 
   @override
-  void addListener(_i5.VoidCallback? listener) => super.noSuchMethod(
+  _i3.Future<void> ensureUserFirestoreDocsPublic(_i5.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#ensureUserFirestoreDocsPublic, [user]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i5.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
