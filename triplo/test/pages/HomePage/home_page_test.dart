@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_tappable_polyline/flutter_map_tappable_polyline.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,7 @@ void main() {
 
   testWidgets('pagina si carica', (tester) async {
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     expect(find.byType(MyHomePage), findsOneWidget);
     expect(find.byType(FlutterMap), findsOneWidget);
@@ -59,7 +60,7 @@ void main() {
 
   testWidgets('zoom in e zoom out funzionano', (tester) async {
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
@@ -72,23 +73,23 @@ void main() {
 
   testWidgets('apre drawer', (tester) async {
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Open navigation menu'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(Drawer), findsOneWidget);
   });
 
   testWidgets('naviga a SearchPage', (tester) async {
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Open navigation menu'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.search));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(SearchPage), findsOneWidget);
   });
@@ -127,7 +128,15 @@ void main() {
     when(mockTrekking.allTrekkings).thenReturn([fake]);
 
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    // forza zoom basso
+    final state = tester.state(find.byType(ZoomAwareMap)) as dynamic;
+    state.setState(() {
+      state.currentZoom = 10.0;
+    });
+
+    await tester.pump();
 
     expect(find.byIcon(Icons.place), findsWidgets);
   });
@@ -158,15 +167,21 @@ void main() {
     when(mockTrekking.allTrekkings).thenReturn([fake]);
 
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    final state = tester.state(find.byType(ZoomAwareMap)) as dynamic;
+    state.setState(() {
+      state.currentZoom = 10.0;
+    });
+
+    await tester.pump();
 
     await tester.tap(find.byIcon(Icons.place).first);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(TrekkingPage), findsOneWidget);
   });
 
-  // ---------------- POLYLINE ----------------
 
   testWidgets('mostra polylines se zoom alto', (tester) async {
     final fake = Trekking(
@@ -194,16 +209,22 @@ void main() {
     when(mockTrekking.allTrekkings).thenReturn([fake]);
 
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
-    expect(find.byType(FlutterMap), findsOneWidget);
+    final state = tester.state(find.byType(ZoomAwareMap)) as dynamic;
+    state.setState(() {
+      state.currentZoom = 13.0;
+    });
+
+    await tester.pump();
+
+    expect(find.byType(TappablePolylineLayer), findsOneWidget);
   });
 
-  // ---------------- RECENTER ----------------
 
   testWidgets('mostra bottone recenter', (tester) async {
     await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     final state = tester.state(find.byType(ZoomAwareMap)) as dynamic;
 
@@ -215,6 +236,24 @@ void main() {
 
     expect(find.byIcon(Icons.my_location), findsOneWidget);
   });
+
+testWidgets('tap recenter funziona', (tester) async {
+  await tester.pumpWidget(buildTestWidget());
+  await tester.pumpAndSettle();
+
+  final state = tester.state(find.byType(ZoomAwareMap)) as dynamic;
+
+  state.setState(() {
+    state.showRecenter = true;
+  });
+
+  await tester.pump();
+
+  await tester.tap(find.byIcon(Icons.my_location));
+  await tester.pump();
+
+  expect(find.byIcon(Icons.my_location), findsNothing);
+});
 
   testWidgets('tap recenter funziona', (tester) async {
     await tester.pumpWidget(buildTestWidget());
@@ -232,22 +271,6 @@ void main() {
     await tester.pump();
 
     expect(find.byIcon(Icons.my_location), findsNothing);
-  });
-}
-
-// ---------------- FAKE MODEL ----------------
-
-class FakeTrekking {
-  final String documentId;
-  final LatLng starting_point;
-  final List<LatLng> points;
-  final String difficulty_level;
-
-  FakeTrekking({
-    required this.documentId,
-    required this.starting_point,
-    required this.points,
-    required this.difficulty_level,
   });
 }
 
