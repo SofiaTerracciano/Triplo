@@ -48,6 +48,8 @@ void main() {
     HttpOverrides.global = NoNetworkHttpOverrides();
   });
 
+  tearDown(() {});
+
   Widget buildWidget({
     LatLng trail = trailCenter,
     LatLng? user = userCenter,
@@ -74,6 +76,7 @@ void main() {
     testWidgets('mostra AppBar con titolo corretto', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byType(AppBar), findsOneWidget);
     });
@@ -81,7 +84,7 @@ void main() {
     testWidgets('mostra i pulsanti zoom in e zoom out', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
-
+      await tester.pump(const Duration(milliseconds: 100));
       expect(find.byIcon(Icons.add), findsOneWidget);
       expect(find.byIcon(Icons.remove), findsOneWidget);
     });
@@ -89,14 +92,15 @@ void main() {
     testWidgets('mostra il menu layer con gli switch', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
-      // 6 switch: precip, snow, wind, clouds, temp, pressure
       expect(find.byType(Switch), findsNWidgets(6));
     });
 
     testWidgets('mostra il marker della trail (rosso)', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byIcon(Icons.location_pin), findsOneWidget);
     });
@@ -106,6 +110,7 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget(user: userCenter));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byIcon(Icons.person_pin_circle), findsOneWidget);
     });
@@ -115,6 +120,7 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget(user: null));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byIcon(Icons.person_pin_circle), findsNothing);
     });
@@ -124,6 +130,7 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Nessun layer attivo → _buildLegendWidget() ritorna null
       // Verifichiamo indirettamente che non ci siano widget legend
@@ -141,10 +148,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[0]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('precip')).called(greaterThan(0));
     });
@@ -154,10 +163,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[1]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('snow')).called(greaterThan(0));
     });
@@ -167,10 +178,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[2]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('wind')).called(greaterThan(0));
     });
@@ -180,10 +193,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[3]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('clouds')).called(greaterThan(0));
     });
@@ -193,10 +208,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[4]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('temp')).called(greaterThan(0));
     });
@@ -206,10 +223,12 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[5]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.weatherTileFromId('pressure')).called(greaterThan(0));
     });
@@ -222,12 +241,14 @@ void main() {
     testWidgets('attivare precip disattiva gli altri switch', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
 
       // Prima attiva snow
       await tester.tap(find.byWidget(switches[1]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Poi attiva precip
       await tester.tap(
@@ -236,7 +257,7 @@ void main() {
         ),
       );
       await tester.pump();
-
+      await tester.pump(const Duration(milliseconds: 100));
       // Ora solo precip deve essere true
       final updatedSwitches = tester
           .widgetList<Switch>(find.byType(Switch))
@@ -252,16 +273,19 @@ void main() {
     testWidgets('attivare temp disattiva gli altri switch', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Prima attiva pressure
       var switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[5]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Poi attiva temp
       switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[4]));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final updatedSwitches = tester
           .widgetList<Switch>(find.byType(Switch))
@@ -275,16 +299,18 @@ void main() {
       (tester) async {
         await tester.pumpWidget(buildWidget());
         await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
 
-        // Attiva clouds
         var switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
         await tester.tap(find.byWidget(switches[3]));
         await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
 
         // Disattiva clouds
         switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
         await tester.tap(find.byWidget(switches[3]));
         await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
 
         final updatedSwitches = tester
             .widgetList<Switch>(find.byType(Switch))
@@ -303,18 +329,22 @@ void main() {
     testWidgets('tap zoom in non lancia eccezioni', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.tap(find.byIcon(Icons.add));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
       // Se non lancia, il test passa
     });
 
     testWidgets('tap zoom out non lancia eccezioni', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.tap(find.byIcon(Icons.remove));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
     });
   });
 
@@ -327,6 +357,7 @@ void main() {
     ) async {
       await tester.pumpWidget(buildWidget());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       verify(mockService.googleSatelliteTile()).called(greaterThan(0));
     });
@@ -335,6 +366,7 @@ void main() {
   testWidgets('tap zoom in non lancia eccezioni', (tester) async {
     await tester.pumpWidget(buildWidget());
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump(Duration.zero);
