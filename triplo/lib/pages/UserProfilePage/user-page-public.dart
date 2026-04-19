@@ -34,7 +34,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
     if (!mounted) return;
 
     setState(() {
-      user = u!;
+      user = u;
       diaries = _loadDiaries();
       loading = false;
     });
