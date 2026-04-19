@@ -34,7 +34,10 @@ class ForgottenPasswordPage extends StatelessWidget {
         ),
       );
 
-      Navigator.pop(context); // go back to login
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(context);
+      });
+      //Navigator.pop(context); // go back to login
     } catch (e) {
       String message = "Error: $e";
 
