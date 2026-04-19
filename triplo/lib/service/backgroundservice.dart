@@ -136,8 +136,10 @@ class BackgroundServiceLogic {
     return '$trekkingId|$event|$headline|$start|$end';
   }
 }
+
+// coverage:ignore-start
 @pragma('vm:entry-point')
-void callbackDispatcher() {
+void callbackDispatcher() { 
   Workmanager().executeTask((task, inputData) async {
     if (task != weatherCheckTask) {
       return Future.value(true);
@@ -176,9 +178,9 @@ void callbackDispatcher() {
         memory: memory,
       );
     } catch (e) {
-      debugPrint("Workmanager background error: $e"); //coverage:ignore-line
+      debugPrint("Workmanager background error: $e"); 
     }
 
     return Future.value(true);
   });
-}
+} // coverage:ignore-end

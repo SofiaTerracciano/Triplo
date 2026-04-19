@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
@@ -7,8 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 
 class GeoService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   Future<LatLng?> userLocation() async {
     try {
       final pos = await Geolocator.getCurrentPosition(

@@ -31,9 +31,6 @@ class AuthService extends ChangeNotifier {
 
   String? get currentPhotoUrl => _auth.currentUser?.photoURL;
   String? get currentEmailFromAuth => _auth.currentUser?.email;
-  /* --------------------------------------------------
-   * AUTH
-   * -------------------------------------------------- */
 
   Future<void> register(String email, String password) async {
     final cred = await _auth.createUserWithEmailAndPassword(
@@ -44,9 +41,6 @@ class AuthService extends ChangeNotifier {
     final uid = cred.user!.uid;
     final username = email.split("@")[0];
 
-    // -----------------------
-    // USERS COLLECTION
-    // -----------------------
     await _db.collection("users").doc(uid).set({
       "Username": username,
       "Photo_profile": "",
@@ -62,9 +56,6 @@ class AuthService extends ChangeNotifier {
       "Level": "Beginner",
     });
 
-    // -----------------------
-    // USERS_INDEX COLLECTION
-    // -----------------------
     await _db.collection("users_index").doc(uid).set({
       "uid": uid,
       "username": username,
@@ -207,9 +198,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /* --------------------------------------------------
-   * PASSWORD
-   * -------------------------------------------------- */
 
   Future<void> sendPasswordReset(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
@@ -220,9 +208,6 @@ class AuthService extends ChangeNotifier {
     await _auth.sendPasswordResetEmail(email: _currentUser!.email);
   }
 
-  /* --------------------------------------------------
-   * PROVIDERS
-   * -------------------------------------------------- */
 
   bool get isGoogleUser {
     final user = _auth.currentUser;
@@ -235,10 +220,6 @@ class AuthService extends ChangeNotifier {
     if (user == null) return false;
     return user.providerData.any((p) => p.providerId == "password");
   }
-
-  /* --------------------------------------------------
-   * LOAD CORE USER
-   * -------------------------------------------------- */
 
   Future<void> loadUserCore(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();

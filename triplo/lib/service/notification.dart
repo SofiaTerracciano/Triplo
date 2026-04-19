@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
-  // Riferimento al navigatorKey del main per accedere al context
   GlobalKey<NavigatorState>? _navKey;
 
   void setNavKey(GlobalKey<NavigatorState> key) {
@@ -26,7 +24,6 @@ class NotificationService {
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
-      // IMPORTANTE: Permette di mostrare la notifica di sistema ANCHE se l'app è aperta
       defaultPresentAlert: true,
       defaultPresentBadge: true,
       defaultPresentSound: true,
@@ -44,15 +41,12 @@ class NotificationService {
       },
     );
 
-    // --- LOGICA SPECIFICA PER iOS (App terminata/chiusa) ---
     if (Platform.isIOS) {
       final launchDetails = await _notifications
           .getNotificationAppLaunchDetails();
       if (launchDetails?.didNotificationLaunchApp ?? false) {
         final payload = launchDetails?.notificationResponse?.payload;
         if (payload != null) {
-          // Usiamo un delay per essere sicuri che la UI di Flutter sia pronta
-          // e il navigatorKey sia popolato dopo il boot
           Future.delayed(const Duration(milliseconds: 800), () {
             _handleNotificationTap(payload);
           });
@@ -72,7 +66,6 @@ class NotificationService {
     }
   }
 
-  // Tutta la logica del tap sulla notifica è qui dentro
   void _handleNotificationTap(String payload) {
     final context = _navKey?.currentContext;
     if (context == null) return;
@@ -83,8 +76,6 @@ class NotificationService {
     final challengeContent = notificationcontent(payload, local);
     final String title = challengeContent['title'] ?? "";
 
-    // QUI LA LOGICA RICHIESTA:
-    // Se esiste un alert specifico, usalo. Altrimenti usa il body.
     final String textToShow = (challengeContent['alert']?.isNotEmpty ?? false)
         ? challengeContent['alert']!
         : challengeContent['body'] ?? "";
