@@ -16,7 +16,6 @@ import 'start_trekking_page_test.mocks.dart';
 void main() {
   late MockTrekkingController mockController;
 
-  // Helper per costruire un Trekking di test
   Trekking buildTrekking({
     String id = 'trek1',
     String name = 'Monte Test',
@@ -263,11 +262,9 @@ void main() {
     await tester.tap(find.text('Vai'));
     await tester.pumpAndSettle();
 
-    // Ora siamo su DetailsTrekking, tappa Indietro
     await tester.tap(find.byType(TextButton));
     await tester.pumpAndSettle();
 
-    // Siamo tornati alla schermata precedente
     expect(find.text('Vai'), findsOneWidget);
   });
 

@@ -4,11 +4,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:triplo/service/geo.dart';
-
 import '../controller/servicecontroller_test.mocks.dart';
 
 @GenerateMocks([GeoService])
-
 
 class TestableGeoService extends GeoService {
   final Future<Position> Function()? fakeGetPosition;
@@ -198,9 +196,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Mock-based: verifica che GeoService sia mockabile (per altri test)
-  // -------------------------------------------------------------------------
   group('MockGeoService', () {
     test('userLocation() può essere mockato', () async {
       final mock = MockGeoService();

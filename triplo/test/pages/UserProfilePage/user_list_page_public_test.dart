@@ -16,6 +16,7 @@ import 'user_list_page_public_test.mocks.dart';
   MockSpec<UserController>(),
   MockSpec<DiaryController>(),
 ])
+
 void main() {
   late MockUserController mockUserController;
   late MockDiaryController mockDiaryController;
@@ -57,18 +58,10 @@ void main() {
         photoProfile: photoProfile,
       );
 
-  // ---------------------------------------------------------------------------
-  // Setup
-  // ---------------------------------------------------------------------------
-
   setUp(() {
     mockUserController = MockUserController();
     mockDiaryController = MockDiaryController();
   });
-
-  // ---------------------------------------------------------------------------
-  // Loading state
-  // ---------------------------------------------------------------------------
 
   group('Loading state', () {
     testWidgets('mostra CircularProgressIndicator durante il caricamento',
@@ -87,10 +80,6 @@ void main() {
       await tester.pumpAndSettle();
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // Empty state
-  // ---------------------------------------------------------------------------
 
   group('Empty state', () {
     testWidgets('mostra label quando la lista followers è vuota',
@@ -115,10 +104,6 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // List rendering
-  // ---------------------------------------------------------------------------
 
   group('List rendering', () {
     testWidgets('renderizza un ListTile per ogni follower', (tester) async {
@@ -176,10 +161,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Avatar rendering
-  // ---------------------------------------------------------------------------
-
   group('Avatar rendering', () {
     testWidgets('mostra Icons.person quando photoProfile è null',
         (tester) async {
@@ -229,10 +210,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Controller interaction
-  // ---------------------------------------------------------------------------
-
   group('Controller interaction', () {
     testWidgets(
         'chiama getFollowers con userId corretto quando listName è "Follower"',
@@ -263,10 +240,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // Navigation
-  // ---------------------------------------------------------------------------
-
   group('Navigation', () {
     testWidgets('il tap su un ListTile naviga verso UserPagePublic',
         (tester) async {
@@ -274,10 +247,6 @@ void main() {
       when(mockUserController.getFollowers('u1'))
           .thenAnswer((_) async => [user]);
 
-      // Con @GenerateNiceMocks non servono stub espliciti per getUserById,
-      // isFollowing, fetchDiaryById, getFollowers('nav-uid') ecc.:
-      // i nice mock restituiscono null/false/[] di default senza esplodere.
-      // Stubiamo solo getUserById per fornire un utente valido alla pagina.
       when(mockUserController.getUserById('nav-uid'))
           .thenAnswer((_) async => user);
 

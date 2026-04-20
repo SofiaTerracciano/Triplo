@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,7 +16,6 @@ import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/service/memory.dart';
-
 import 'user_page_test.mocks.dart';
 
 @GenerateNiceMocks([
@@ -27,16 +25,13 @@ import 'user_page_test.mocks.dart';
   MockSpec<ServiceController>(),
   MockSpec<MemoryService>(),
 ])
+
 void main() {
   late MockUserController mockUserController;
   late MockDiaryController mockDiaryController;
   late MockTrekkingController mockTrekkingController;
   late MockServiceController mockServiceController;
   late MockMemoryService mockMemoryService;
-
-  // ---------------------------------------------------------------------------
-  // Factories
-  // ---------------------------------------------------------------------------
 
   Users makeUser({
     String uid = 'uid-1',
@@ -491,7 +486,7 @@ void main() {
     await tester.pumpWidget(buildWidget());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.logout)); // usa quello giusto
+    await tester.tap(find.byIcon(Icons.logout)); 
     await tester.pumpAndSettle();
 
     verify(mockUserController.logout()).called(1);
@@ -516,8 +511,8 @@ void main() {
       Icons.home,
       Icons.search,
       Icons.settings,
-      Icons.emoji_events, // challenges
-      Icons.explore, // compass
+      Icons.emoji_events,
+      Icons.explore, 
     ];
 
     for (final icon in icons) {
@@ -528,7 +523,6 @@ void main() {
 
       expect(find.byType(UserPage), findsNothing);
 
-      // torna indietro per continuare il test
       await tester.pageBack();
       await tester.pumpAndSettle();
     }

@@ -126,7 +126,7 @@ void main() {
     controller.add(position);
     compass.add(90);
 
-    await tester.pumpAndSettle(); // 🔥 importante
+    await tester.pumpAndSettle(); 
 
     expect(find.textContaining("120.0"), findsOneWidget);
     expect(find.textContaining("45.00000"), findsOneWidget);
@@ -146,8 +146,8 @@ void main() {
 
     await tester.pumpWidget(buildWidget());
 
-    await tester.pump(); // primo frame
-    await tester.pump(const Duration(milliseconds: 100)); // lascia buildare UI
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100)); 
 
     expect(find.textContaining("Offline"), findsOneWidget);
   });

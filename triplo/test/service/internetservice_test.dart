@@ -31,9 +31,6 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
   });
 
-  // -------------------------------------------------------------------------
-  // Stato iniziale
-  // -------------------------------------------------------------------------
   group('stato iniziale', () {
     test('isOnline è true prima di start()', () {
       final service = makeService(mockApi);
@@ -62,7 +59,6 @@ void main() {
       service.start();
       await tester.pump();
 
-      // Solo una chiamata immediata, non due
       verify(mockApi.hasInternet()).called(1);
       service.dispose();
     });
@@ -79,9 +75,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Transizione online → offline
-  // -------------------------------------------------------------------------
   group('rilevamento offline', () {
     testWidgets('dopo offlineThreshold imposta isOnline=false', (tester) async {
       when(mockApi.hasInternet()).thenAnswer((_) async => false);
@@ -91,7 +84,6 @@ void main() {
       service.addListener(() => notified = true);
       service.start();
 
-      // Aspetta il primo tick + offlineThreshold + conferma
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(service.isOnline, isFalse);
@@ -104,7 +96,6 @@ void main() {
       var callCount = 0;
       when(mockApi.hasInternet()).thenAnswer((_) async {
         callCount++;
-        // Prima chiamata: offline; seconda (conferma): online
         return callCount >= 2;
       });
 
@@ -130,15 +121,12 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Transizione offline → online
-  // -------------------------------------------------------------------------
   group('ritorno online', () {
     testWidgets('imposta isOnline=true quando hasInternet() torna true', (tester) async {
       var callCount = 0;
       when(mockApi.hasInternet()).thenAnswer((_) async {
         callCount++;
-        return callCount > 3; // prime chiamate offline, poi online
+        return callCount > 3; 
       });
 
       final service = makeService(mockApi);
@@ -175,15 +163,11 @@ void main() {
       service.start();
       await tester.pump(const Duration(milliseconds: 200));
 
-      // isOnline era già true, non deve notificare
       expect(notifyCount, 0);
       service.dispose();
     });
   });
 
-  // -------------------------------------------------------------------------
-  // forceRecheck()
-  // -------------------------------------------------------------------------
   group('forceRecheck()', () {
     testWidgets('chiama hasInternet() immediatamente', (tester) async {
       when(mockApi.hasInternet()).thenAnswer((_) async => true);
@@ -208,9 +192,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Lifecycle: resumed
-  // -------------------------------------------------------------------------
   group('didChangeAppLifecycleState - resumed', () {
     testWidgets('dopo resumeGracePeriod esegue un tick', (tester) async {
       when(mockApi.hasInternet()).thenAnswer((_) async => true);
@@ -221,11 +202,9 @@ void main() {
       clearInteractions(mockApi);
       service.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
-      // Durante il grace period NON deve tickare
       await tester.pump(const Duration(milliseconds: 40));
       verifyNever(mockApi.hasInternet());
 
-      // Dopo il grace period DEVE tickare
       await tester.pump(const Duration(milliseconds: 100));
       verify(mockApi.hasInternet()).called(greaterThanOrEqualTo(1));
 
@@ -244,9 +223,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Lifecycle: paused / inactive / hidden
-  // -------------------------------------------------------------------------
   group('didChangeAppLifecycleState - background', () {
     for (final state in [
       AppLifecycleState.paused,
@@ -262,7 +238,6 @@ void main() {
         service.didChangeAppLifecycleState(state);
         clearInteractions(mockApi);
 
-        // Il polling continua ma _isForeground=false blocca i tick
         await tester.pump(const Duration(milliseconds: 200));
         verifyNever(mockApi.hasInternet());
 
@@ -277,21 +252,16 @@ void main() {
       await tester.pump();
 
       service.didChangeAppLifecycleState(AppLifecycleState.resumed);
-      // Va subito in paused prima che scada il grace period
       service.didChangeAppLifecycleState(AppLifecycleState.paused);
 
       clearInteractions(mockApi);
       await tester.pump(const Duration(milliseconds: 200));
 
-      // Il grace period è stato cancellato, nessun tick
       verifyNever(mockApi.hasInternet());
       service.dispose();
     });
   });
 
-  // -------------------------------------------------------------------------
-  // dispose()
-  // -------------------------------------------------------------------------
   group('dispose()', () {
     testWidgets('cancella tutti i timer senza errori', (tester) async {
       when(mockApi.hasInternet()).thenAnswer((_) async => true);

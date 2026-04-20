@@ -8,10 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/pages/SettingsPage/watch_pair_page.dart';
-
 import 'setting_page_test.mocks.dart';
 
-// Fake BarcodeCapture per simulare la scansione
 BarcodeCapture _makeCapture(String? rawValue) {
   final barcode = Barcode(rawValue: rawValue);
   return BarcodeCapture(barcodes: [barcode]);
@@ -22,6 +20,7 @@ BarcodeCapture _makeEmptyCapture() {
 }
 
 @GenerateMocks([UserController])
+
 void main() {
   group('WatchPairScannerPage – widget', () {
     late MockUserController mockUserController;
@@ -67,7 +66,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Il banner rosso di errore non deve essere visibile
       expect(find.byType(Material).evaluate().where((e) {
         final w = e.widget as Material;
         return w.color != null &&

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -10,7 +9,6 @@ import 'package:triplo/model/challenges.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-
 import 'challenge_test.mocks.dart';
 
 @GenerateMocks([

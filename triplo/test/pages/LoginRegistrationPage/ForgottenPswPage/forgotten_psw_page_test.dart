@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:mockito/mockito.dart';
-
 import 'forgotten_psw_page_test.mocks.dart';
 
 @GenerateNiceMocks([

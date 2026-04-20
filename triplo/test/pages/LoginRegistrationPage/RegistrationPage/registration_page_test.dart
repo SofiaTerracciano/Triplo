@@ -3,12 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
-import 'package:triplo/pages/SettingsPage/setting-page.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:mockito/annotations.dart';
-import 'package:triplo/controller/user.dart';
-
 import 'registration_page_test.mocks.dart' show MockUserController;
 
 @GenerateMocks([UserController])

@@ -7,7 +7,6 @@ import 'package:triplo/model/user.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/service/authservice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'diary_test.mocks.dart';
 
 @GenerateMocks([
@@ -20,6 +19,7 @@ import 'diary_test.mocks.dart';
   QueryDocumentSnapshot<Map<String, dynamic>>,
   Query<Map<String, dynamic>>,
 ])
+
 void main() {
   late DiaryController controller;
   late MockAuthService mockAuthService;
@@ -993,7 +993,6 @@ void main() {
       final mockDiaryDocRef = MockDocumentReference<Map<String, dynamic>>();
       final mockUserDocRef = MockDocumentReference<Map<String, dynamic>>();
       final mockDocSnapExists = MockDocumentSnapshot<Map<String, dynamic>>();
-      final mockDocSnapNotExists = MockDocumentSnapshot<Map<String, dynamic>>();
 
       when(mockFirestore.collection('diary')).thenReturn(mockDiaryCol);
       when(mockFirestore.collection('users')).thenReturn(mockUsersCol);

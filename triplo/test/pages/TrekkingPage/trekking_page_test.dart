@@ -33,6 +33,7 @@ import 'trekking_page_test.mocks.dart'
   Language,
   DiaryController,
 ])
+
 void main() {
   group('TrekkingPage – widget', () {
     late MockTrekkingController mockTrekkingController;
@@ -108,7 +109,6 @@ void main() {
           return;
         FlutterError.dumpErrorToConsole(details);
       };
-
     });
 
 
@@ -139,14 +139,14 @@ void main() {
     {String trekkingId = 'trek1'}) async {
       await tester.binding.setSurfaceSize(const Size(800, 3000));
       await tester.pumpWidget(buildPage(trekkingId: trekkingId));
-      await tester.pump(); // 👈 solo un frame
+      await tester.pump(); 
     }
 
     Future<void> pumpPageSettled(WidgetTester tester,
         {String trekkingId = 'trek1'}) async {
       await tester.binding.setSurfaceSize(const Size(800, 3000));
       await tester.pumpWidget(buildPage(trekkingId: trekkingId));
-      await tester.pumpAndSettle(); // 👈 tutto completo
+      await tester.pumpAndSettle();
     }
 
     testWidgets('photoSection mostra icona errore se future fallisce', (tester) async {
@@ -195,7 +195,7 @@ void main() {
       await pumpPageSettled(tester);
 
       await tester.tap(find.byIcon(Icons.bookmark_border));
-      await tester.pump(); // importante
+      await tester.pump(); 
 
       expect(find.byType(SnackBar), findsOneWidget);
     });

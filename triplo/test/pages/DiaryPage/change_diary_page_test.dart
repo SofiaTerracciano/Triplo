@@ -682,7 +682,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // ora iniziale = 120/60 = 2 → selezioniamo 5 (non ambiguo)
       await tester.tap(find.byType(DropdownButton<int>).at(3));
       await tester.pumpAndSettle();
 
@@ -874,7 +873,6 @@ void main() {
 
     testWidgets('FutureBuilder mostra loading indicator durante caricamento following',
         (tester) async {
-      // Ritardo artificiale per intercettare lo stato di loading
       when(mockUserController.getFollowing('user1')).thenAnswer(
         (_) async {
           await Future.delayed(const Duration(seconds: 1));

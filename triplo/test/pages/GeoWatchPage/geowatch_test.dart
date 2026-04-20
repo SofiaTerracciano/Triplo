@@ -11,7 +11,6 @@ import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 import 'fake_http.dart';
-
 import '../TrekkingPage/trekking_page_test.mocks.dart';
 
 @GenerateMocks([ServiceController, TrekkingController])
@@ -134,8 +133,6 @@ void main() {
     });
   });
 
-  // ---------------- EXTRA TEST PER COVERAGE ----------------
-
   testWidgets('Switch Trail <-> GPS', (tester) async {
     await mockNetworkImagesFor(() async {
       await tester.pumpWidget(makeTestableWidget());
@@ -172,7 +169,6 @@ void main() {
       await tester.pumpWidget(makeTestableWidget());
       await tester.pumpAndSettle();
 
-      // NON testiamo stringhe fragili → solo presenza UI
       expect(find.byType(ListView), findsWidgets);
     });
   });

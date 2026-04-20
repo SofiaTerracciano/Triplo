@@ -846,14 +846,8 @@ void main() {
       expect(payload['Username'], 'anna');
     });
   });
- 
-  // =========================================================================
-  // _ensureUserFirestoreDocs() branch — via _FakeGoogleUser helper
-  // =========================================================================
+
   group('_ensureUserFirestoreDocs() branch username', () {
-    // Testiamo i 3 branch di username direttamente istanziando un User fake
-    // e chiamando il metodo tramite una sottoclasse esposta per test.
- 
     test('usa primo token del displayName come username', () async {
       when(mockAuth.currentUser).thenReturn(mockUser);
       when(mockUser.displayName).thenReturn('Mario Rossi');
@@ -861,11 +855,9 @@ void main() {
       when(mockUser.photoURL).thenReturn('');
       when(mockUser.uid).thenReturn('uid-123');
  
-      // Il doc non esiste → _ensureUserFirestoreDocs scrive
       when(mockDocSnap.exists).thenReturn(false);
       when(mockDocRef.get()).thenAnswer((_) async => mockDocSnap);
  
-      // Stub batch
       final fakeBatch = _FakeBatch();
       when(mockFirestore.batch()).thenReturn(fakeBatch);
  
@@ -919,7 +911,6 @@ void main() {
  
       await sut.ensureUserFirestoreDocsPublic(mockUser);
  
-      // batch.set non deve essere stato chiamato
       expect(fakeBatch.setPayloads, isEmpty);
     });
   });

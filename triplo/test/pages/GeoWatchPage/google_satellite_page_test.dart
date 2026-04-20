@@ -132,16 +132,10 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Nessun layer attivo → _buildLegendWidget() ritorna null
-      // Verifichiamo indirettamente che non ci siano widget legend
-      // (la legend è un Card con colori specifici per layer)
       expect(find.byKey(const Key('weather_legend')), findsNothing);
     });
   });
 
-  // =========================================================================
-  // Switch layer — attivazione
-  // =========================================================================
   group('layer switches', () {
     testWidgets('attivare precipitazione chiama weatherTileFromId("precip")', (
       tester,
@@ -234,9 +228,6 @@ void main() {
     });
   });
 
-  // =========================================================================
-  // _disableOthers() — attivarne uno disattiva gli altri
-  // =========================================================================
   group('_disableOthers()', () {
     testWidgets('attivare precip disattiva gli altri switch', (tester) async {
       await tester.pumpWidget(buildWidget());
@@ -245,12 +236,10 @@ void main() {
 
       final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
 
-      // Prima attiva snow
       await tester.tap(find.byWidget(switches[1]));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Poi attiva precip
       await tester.tap(
         find.byWidget(
           tester.widgetList<Switch>(find.byType(Switch)).toList()[0],
@@ -275,13 +264,11 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Prima attiva pressure
       var switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[5]));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Poi attiva temp
       switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
       await tester.tap(find.byWidget(switches[4]));
       await tester.pump();
@@ -290,8 +277,8 @@ void main() {
       final updatedSwitches = tester
           .widgetList<Switch>(find.byType(Switch))
           .toList();
-      expect(updatedSwitches[4].value, isTrue); // temp ON
-      expect(updatedSwitches[5].value, isFalse); // pressure OFF
+      expect(updatedSwitches[4].value, isTrue); 
+      expect(updatedSwitches[5].value, isFalse); 
     });
 
     testWidgets(
@@ -322,9 +309,6 @@ void main() {
     );
   });
 
-  // =========================================================================
-  // Zoom buttons
-  // =========================================================================
   group('zoom buttons', () {
     testWidgets('tap zoom in non lancia eccezioni', (tester) async {
       await tester.pumpWidget(buildWidget());
@@ -334,7 +318,6 @@ void main() {
       await tester.tap(find.byIcon(Icons.add));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-      // Se non lancia, il test passa
     });
 
     testWidgets('tap zoom out non lancia eccezioni', (tester) async {
@@ -348,9 +331,6 @@ void main() {
     });
   });
 
-  // =========================================================================
-  // googleSatelliteTile chiamato al build
-  // =========================================================================
   group('ServiceController calls', () {
     testWidgets('googleSatelliteTile() viene chiamato durante il build', (
       tester,

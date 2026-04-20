@@ -341,10 +341,6 @@ void main() {
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // BackgroundService tests (wrapper con BuildContext)
-  // ---------------------------------------------------------------------------
-
   group('BackgroundService', () {
     testWidgets('start() registra il lifecycle observer e chiama _run()', (tester) async {
       when(mockTrekkingController.getWeatherAlertTrekkings())
@@ -366,7 +362,6 @@ void main() {
       service.start();
       await tester.pump();
 
-      // getWeatherAlertTrekkings chiamato almeno una volta da _run()
       verify(mockTrekkingController.getWeatherAlertTrekkings()).called(greaterThanOrEqualTo(1));
 
       service.dispose();
@@ -392,7 +387,6 @@ void main() {
       service.start();
       await tester.pump();
 
-      // non deve lanciare eccezioni
       expect(() => service.dispose(), returnsNormally);
     });
 
@@ -433,7 +427,6 @@ void main() {
       service.start();
       await tester.pump();
 
-      // Simula app che torna in foreground
       clearInteractions(mockTrekkingController);
       service.didChangeAppLifecycleState(AppLifecycleState.resumed);
       await tester.pump();
@@ -474,7 +467,6 @@ void main() {
     });
 
     testWidgets('_run() non esegue se già in esecuzione (_running guard)', (tester) async {
-      // Usiamo un completer per bloccare il primo _run() mentre ne arriva un secondo
       var callCount = 0;
       when(mockTrekkingController.getWeatherAlertTrekkings()).thenAnswer((_) async {
         callCount++;
@@ -496,12 +488,10 @@ void main() {
       ));
 
       service.start();
-      // Secondo _run() mentre il primo è ancora in corso
       service.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
       await tester.pump(const Duration(milliseconds: 200));
 
-      // Solo una chiamata reale grazie al guard _running
       expect(callCount, 1);
 
       service.dispose();
@@ -524,7 +514,6 @@ void main() {
         }),
       ));
 
-      // non deve propagare l'eccezione
       expect(() async {
         service.start();
         await tester.pump();

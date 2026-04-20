@@ -13,7 +13,6 @@ import 'package:triplo/pages/DiaryPage/diary-page.dart';
 import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
 import 'package:triplo/pages/UserProfilePage/user-page.dart';
 import 'package:triplo/l10n/app_localizations.dart';
-
 import 'diary_page_test.mocks.dart';
 
 @GenerateMocks([DiaryController, UserController, TrekkingController])
@@ -197,7 +196,6 @@ void main() {
 
     testWidgets('shows hours and minutes for mixed duration', (tester) async {
       await pumpFullPage(tester, makeDiary(duration: 95));
-      // 95 min = 1h 35m — search for both parts separately
       final allText = tester
           .widgetList<Text>(find.byType(Text))
           .map((t) => t.data ?? '')

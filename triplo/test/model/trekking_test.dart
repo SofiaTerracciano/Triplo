@@ -412,7 +412,6 @@ void main() {
 
     test('_safeDouble handles int values', () {
       final map = buildFirestoreMap(distance: 10, estimatedTime: 3, elevationGain: 500);
-      // Pass them as int to simulate Firestore storing integers
       map['Distance'] = 10;
       map['Estimated_time'] = 3;
       map['Elevation_gain'] = 500;

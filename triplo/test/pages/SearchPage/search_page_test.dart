@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,10 +14,10 @@ import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/SearchPage/search-page.dart';
-
 import 'search_page_test.mocks.dart';
 
 @GenerateMocks([UserController, DiaryController, TrekkingController, Language])
+
 void main() {
   group('SearchPage – widget', () {
     late MockUserController mockUserController;
@@ -336,7 +335,6 @@ void main() {
       await tester.enterText(find.byType(TextField), 'luigi');
       await tester.pumpAndSettle();
 
-      // findsWidgets perché 'luigi' appare sia nel TextField che nel ListTile
       expect(find.text('luigi'), findsWidgets);
       expect(find.text('mario@test.it'), findsOneWidget);
     });

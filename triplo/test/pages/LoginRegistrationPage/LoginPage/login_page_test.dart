@@ -11,7 +11,6 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
 import 'package:triplo/service/memory.dart';
-
 import 'login_page_test.mocks.dart';
 
 @GenerateNiceMocks([
@@ -91,7 +90,6 @@ void main() {
 
       verify(mockUserController.login("test@test.com", "123456")).called(1);
 
-      // ✅ verifica navigazione SENZA costruire UserPage
       verify(mockObserver.didPush(any, any)).called(greaterThan(0));
     });
 

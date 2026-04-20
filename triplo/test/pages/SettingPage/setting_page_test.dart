@@ -10,11 +10,10 @@ import 'package:triplo/model/user.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/pages/SettingsPage/setting-page.dart';
-
 import 'setting_page_test.mocks.dart';
 
-
 @GenerateMocks([UserController, Language])
+
 void main() {
   group('SettingPage – widget', () {
     late MockUserController mockUserController;
@@ -38,24 +37,6 @@ void main() {
       when(mockLanguage.addListener(any)).thenReturn(null);
       when(mockLanguage.removeListener(any)).thenReturn(null);
     });
-
-    /*Widget buildPage() => MultiProvider(
-          providers: [
-            ChangeNotifierProvider<UserController>.value(
-                value: mockUserController),
-            ChangeNotifierProvider<Language>.value(value: mockLanguage),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: SettingPage(),
-          ),
-        );*/
 
     Widget buildPage() => MultiProvider(
       providers: [
@@ -99,7 +80,6 @@ void main() {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      // Apre il drawer
       final ScaffoldState scaffold =
           tester.firstState(find.byType(Scaffold));
       scaffold.openDrawer();
@@ -679,7 +659,6 @@ void main() {
       await tester.tap(find.text(local.email_label));
       await tester.pumpAndSettle();
 
-      // tap Salva senza inserire nulla
       await tester.tap(find.text(local.save_trekking_button_label));
       await tester.pumpAndSettle();
 
@@ -744,10 +723,8 @@ void main() {
       await tester.tap(find.text(local.save_trekking_button_label));
       await tester.pumpAndSettle();
 
-      // SnackBar con istruzioni di conferma
       expect(find.byType(SnackBar), findsOneWidget);
 
-      // Bottone per riauthenticarsi
       expect(find.text('Sign in again with the new email'), findsOneWidget);
     });
 
@@ -1134,7 +1111,6 @@ void main() {
       await tester.pumpAndSettle();
 
       verify(mockUserController.logout()).called(1);
-      // Verifica che sia arrivato alla login page
       expect(find.text('Login Page'), findsOneWidget);
     });
 
@@ -1182,8 +1158,6 @@ void main() {
 
       expect(find.text('Nessun utente autenticato'), findsOneWidget);
     });
-
-
   });
 }
 

@@ -11,7 +11,6 @@ import 'package:triplo/service/authservice.dart';
 import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'trekking_test.mocks.dart';
 
 @GenerateMocks([AuthService, MemoryService, NotificationService, FirebaseStorage, Reference])
@@ -84,7 +83,6 @@ Future<void> seedTrekking(
   await db.collection('trekking').doc(id).set(data ?? fakeTrekkingDoc());
 }
 
-/// Seeds a user document in FakeFirestore with optional saved trekkings.
 Future<void> seedUser(
   FakeFirebaseFirestore db, {
   String uid = 'uid_1',
@@ -299,7 +297,7 @@ void main() {
 
     test('does nothing when uid is null', () async {
       final ctrl = buildController(currentUid: null);
-      await ctrl.addTrekkingToSaved('trek_1'); // should not throw
+      await ctrl.addTrekkingToSaved('trek_1');
     });
   });
 
@@ -317,7 +315,7 @@ void main() {
 
     test('does nothing when uid is null', () async {
       final ctrl = buildController(currentUid: null);
-      await ctrl.removeTrekkingFromSaved('trek_1'); // should not throw
+      await ctrl.removeTrekkingFromSaved('trek_1');
     });
   });
 
@@ -374,7 +372,7 @@ void main() {
 
     test('does nothing when uid is null', () async {
       final ctrl = buildController(currentUid: null);
-      await ctrl.enableWeatherAlertForTrekking('trek_1'); // should not throw
+      await ctrl.enableWeatherAlertForTrekking('trek_1'); 
     });
   });
 
@@ -399,7 +397,7 @@ void main() {
 
     test('does nothing when uid is null', () async {
       final ctrl = buildController(currentUid: null);
-      await ctrl.disableWeatherAlertForTrekking('trek_1'); // should not throw
+      await ctrl.disableWeatherAlertForTrekking('trek_1'); 
     });
   });
 

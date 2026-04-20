@@ -26,6 +26,7 @@ import 'diary_page_test.mocks.dart'
   UserController,
   DiaryController,
 ])
+
 void main() {
   group('AddingDiaryPage – widget', () {
     late MockAuthService mockAuth;
@@ -112,7 +113,6 @@ void main() {
     ) async {
       final localMockUserController = MockUserController();
       when(localMockUserController.currentUser).thenReturn(fakeUser);
-      // Future che non completa mai → rimane in ConnectionState.waiting
       when(
         localMockUserController.getFollowing('user1'),
       ).thenAnswer((_) => Completer<List<Users>>().future);

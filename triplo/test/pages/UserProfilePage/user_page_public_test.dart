@@ -146,10 +146,6 @@ void main() {
       expect(find.byType(UserPagePublic), findsNothing);
     });
 
-    // -----------------------------------------------------------------------
-    // DIARIES LIST
-    // -----------------------------------------------------------------------
-
     testWidgets('mostra lista diari', (tester) async {
       final user = makeUser(uid: 'u2');
 

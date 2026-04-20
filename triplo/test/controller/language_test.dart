@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-
 import 'package:triplo/controller/language.dart';
 import 'package:triplo/service/memory.dart';
 import 'language_test.mocks.dart';

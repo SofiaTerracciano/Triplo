@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,6 +14,7 @@ import '../TrekkingPage/trekking_page_test.mocks.dart';
 import 'weather_notification_page_test.mocks.dart' hide MockTrekkingController;
 
 @GenerateMocks([TrekkingController])
+
 void main() {
   group('WeatherAlertSubscriptionPage – widget', () {
     late MockTrekkingController mockTrekkingController;
@@ -25,7 +25,6 @@ void main() {
       when(mockTrekkingController.removeListener(any)).thenReturn(null);
     });
 
-    // Helper per costruire un Trekking fake
     Trekking _buildTrekking({
       String id = 'trek-1',
       String name = 'Monte Bianco',
@@ -68,10 +67,6 @@ void main() {
           ),
         );
 
-    // -----------------------------------------------------------------------
-    // STATO: LOADING
-    // -----------------------------------------------------------------------
-
     testWidgets('mostra CircularProgressIndicator durante il caricamento',
         (tester) async {
       final completer = Completer<List<Trekking>>();
@@ -83,10 +78,6 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
-
-    // -----------------------------------------------------------------------
-    // STATO: ERRORE
-    // -----------------------------------------------------------------------
 
     testWidgets('mostra messaggio errore se Future lancia eccezione',
         (tester) async {
@@ -111,10 +102,6 @@ void main() {
 
       expect(find.byType(ListView), findsNothing);
     });
-
-    // -----------------------------------------------------------------------
-    // STATO: LISTA VUOTA
-    // -----------------------------------------------------------------------
 
     testWidgets('mostra messaggio no_weather_alerts se lista vuota',
         (tester) async {
@@ -143,10 +130,6 @@ void main() {
 
       expect(find.byType(ListView), findsNothing);
     });
-
-    // -----------------------------------------------------------------------
-    // STATO: LISTA CON DATI
-    // -----------------------------------------------------------------------
 
     testWidgets('mostra AppBar con titolo weather_alerts_label', (tester) async {
       when(mockTrekkingController.getWeatherAlertTrekkings())
@@ -283,10 +266,6 @@ void main() {
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
 
-    // -----------------------------------------------------------------------
-    // IMMAGINE: null → icona terrain, file presente → Image.file
-    // -----------------------------------------------------------------------
-
     testWidgets('senza immagine cached mostra icona terrain', (tester) async {
       when(mockTrekkingController.getWeatherAlertTrekkings())
           .thenAnswer((_) async => [_buildTrekking()]);
@@ -391,7 +370,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Chiamato almeno 2 volte: initState + refresh
       verify(mockTrekkingController.getWeatherAlertTrekkings())
           .called(greaterThanOrEqualTo(2));
     });

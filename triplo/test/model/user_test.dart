@@ -244,7 +244,6 @@ void main() {
     });
 
     test('public_diary serializes as list of diary IDs', () {
-      // requires a real or mock Diary with a diaryId getter
       final u = buildUser(publicDiaryPages: []);
       expect(u.toMap()['Public_diary'], isEmpty);
     });

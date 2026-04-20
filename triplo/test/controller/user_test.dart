@@ -6,7 +6,6 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/service/authservice.dart';
-
 import 'user_test.mocks.dart';
 
 @GenerateMocks([AuthService])
@@ -323,7 +322,7 @@ void main() {
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      await ctrl.updateUsername('new_name'); // should not throw
+      await ctrl.updateUsername('new_name');
     });
   });
 
@@ -530,13 +529,13 @@ void main() {
     test('does nothing when unfollowing self', () async {
       when(mockAuth.currentUid).thenReturn('uid_1');
       final ctrl = await buildController(currentUid: 'uid_1');
-      await ctrl.unfollowUser('uid_1'); // should not throw
+      await ctrl.unfollowUser('uid_1'); 
     });
 
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      await ctrl.unfollowUser('uid_2'); // should not throw
+      await ctrl.unfollowUser('uid_2'); 
     });
   });
 

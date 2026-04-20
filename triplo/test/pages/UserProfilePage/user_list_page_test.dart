@@ -10,14 +10,13 @@ import 'package:triplo/controller/user.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/user.dart';
 import 'package:triplo/pages/UserProfilePage/users-list-page.dart';
-
 import 'user_list_page_test.mocks.dart' show MockUserController, MockDiaryController;
-
 
 @GenerateNiceMocks([
   MockSpec<UserController>(),
   MockSpec<DiaryController>(),
 ])
+
 void main() {
   late MockUserController mockUserController;
   late MockDiaryController mockDiaryController;
@@ -62,9 +61,6 @@ void main() {
         photoProfile: photoProfile,
       );
 
-  /// Costruisce il widget in un MaterialApp con i provider necessari.
-  /// [listName] deve corrispondere alla stringa localizzata ("Follower" /
-  /// "Following") così come viene confrontata nel widget.
   Widget buildWidget(String listName) {
     return MultiProvider(
       providers: [
@@ -79,22 +75,12 @@ void main() {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Setup
-  // ---------------------------------------------------------------------------
-
   setUp(() {
     mockUserController = MockUserController();
     mockDiaryController = MockDiaryController();
 
-    // currentUser è letto nel build() in modo sincrono: deve essere sempre
-    // disponibile prima del primo frame.
     when(mockUserController.currentUser).thenReturn(makeCurrentUser());
   });
-
-  // ---------------------------------------------------------------------------
-  // Loading state
-  // ---------------------------------------------------------------------------
 
   group('Loading state', () {
     testWidgets('mostra CircularProgressIndicator mentre il future è in attesa',
@@ -104,21 +90,15 @@ void main() {
           .thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(buildWidget('Follower'));
-      // Un solo pump: il FutureBuilder è in ConnectionState.waiting.
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.byType(ListView), findsNothing);
 
-      // Pulizia timer pendenti.
       completer.complete([]);
       await tester.pumpAndSettle();
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // Empty state
-  // ---------------------------------------------------------------------------
 
   group('Empty state', () {
     testWidgets('mostra "no users found" quando i followers sono vuoti',
@@ -145,10 +125,6 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // List rendering
-  // ---------------------------------------------------------------------------
 
   group('List rendering', () {
     testWidgets('renderizza username ed email per ogni follower',
@@ -207,10 +183,6 @@ void main() {
       expect(find.widgetWithText(AppBar, 'Following'), findsOneWidget);
     });
   });
-
-  // ---------------------------------------------------------------------------
-  // Avatar rendering
-  // ---------------------------------------------------------------------------
 
   group('Avatar rendering', () {
     testWidgets('mostra Icons.person quando photoProfile è null',
