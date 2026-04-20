@@ -13,8 +13,6 @@ class NavigationButton extends StatelessWidget {
     required this.onTap,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
     final disabled = onTap == null;

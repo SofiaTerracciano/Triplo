@@ -24,7 +24,6 @@ import 'package:provider/provider.dart';
 import 'package:triplo/controller/user.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/controller/diary.dart';
-
 import 'package:triplo/controller/servicecontroller.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
@@ -43,8 +42,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
-
   try {
     await Workmanager().initialize(
       callbackDispatcher,
@@ -59,7 +56,6 @@ Future<void> main() async {
   } catch (e) {
     debugPrint('Workmanager setup failed: $e'); //coverage:ignore-line
   }
-
 
   final memoryService = MemoryService();
   final geoService= GeoService();
@@ -86,7 +82,6 @@ Future<void> main() async {
     ),
   );
 }
-
 class MyApp extends StatelessWidget {
   final MemoryService memoryService;
   final GeoService geoService;
@@ -184,7 +179,6 @@ class MyApp extends StatelessWidget {
         ),
       ],
 
-
       child: Consumer<InternetService>(
         builder: (context, internet, child) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -202,7 +196,6 @@ class MyApp extends StatelessWidget {
               _isShowingOfflinePage = false;
               nav.pushNamedAndRemoveUntil('/user', (r) => false);
             }
-
           });
 
           return Consumer<Language>(
@@ -274,7 +267,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class BackgroundServiceHost extends StatefulWidget {
   final Widget child;
 
@@ -307,5 +299,3 @@ class _BackgroundServiceHostState extends State<BackgroundServiceHost> {
     return widget.child;
   }
 }
-
-

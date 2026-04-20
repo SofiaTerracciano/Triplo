@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,7 +11,6 @@ import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/permission.dart';
 import 'package:triplo/firebase_options.dart';
-
 import 'authservice.dart';
 
 const String weatherCheckTask = 'weatherCheckTask';

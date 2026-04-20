@@ -1,14 +1,8 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import '../model/user.dart';
 import '../model/diary.dart';
-import '../model/trekking.dart';
-import 'package:uuid/uuid.dart';
 
 import '../service/pairing_service.dart';
 class UserController extends ChangeNotifier {
@@ -21,14 +15,6 @@ class UserController extends ChangeNotifier {
   String? get uid => _pairingService.pairedUid;
 
   UserController(this._pairingService);
-
-
-
-
-
-
-
-
 
   Future<void> loadCurrentPairedUser() async {
     final uid = _pairingService.pairedUid;

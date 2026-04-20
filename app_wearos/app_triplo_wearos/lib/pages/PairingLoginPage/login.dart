@@ -12,7 +12,6 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userController = context.watch<UserController>();
     final pairing = context.watch<PairingService>();
     final local = AppLocalizations.of(context)!;
 
