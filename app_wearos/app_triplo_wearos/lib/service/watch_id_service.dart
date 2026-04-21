@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -10,7 +11,14 @@ class WatchIdService {
   static final MemoryService _memoryService = MemoryService();
   static const _uuid = Uuid();
 
+  static Future<void> _anonymousAuth() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+  }
+
   static Future<String> getOrCreateWatchId() async {
+    await _anonymousAuth();
     final local = await _memoryService.getWatchId();
     if (local != null && local.isNotEmpty) {
       debugPrint("WatchIdService: usando watchId locale=$local"); //coverage:ignore-line
