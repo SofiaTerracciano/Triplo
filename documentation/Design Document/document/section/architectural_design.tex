@@ -1266,24 +1266,49 @@ Furthermore, the use of Firebase aligns well with the multi-platform nature of t
 
 
 
-
-
 \subsection{Phone Smartwatch Pairing} \label{Phone Smartwatch Pairing}
-While the smartphone application directly relies on Firebase Authentication, the smartwatch application does not perform authentication independently. Instead, it adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
+While the smartphone application directly relies on Firebase Authentication, the smartwatch application adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
 This design choice provides several advantages:
 \begin{itemize}
 \item avoids handling user credentials on the smartwatch or to enforce specific authentication methods, such as Google Sign-In, reducing the exposure of sensitive data on a constrained and potentially less secure device 
 \item simplifies the user interaction model, eliminating the need for credential input on devices where text entry is inherently limited and less user-friendly
 \end{itemize}
 For these reasons, the interaction is intentionally defined as a pairing process rather than a traditional login, reflecting both its security properties and its role within the overall system architecture. \\
+\subsubsection{Pairing Strategy and Architectural Trade-offs}
+The application adopts a custom QR-based pairing mechanism instead of relying on the Wear OS companion communication mechanisms, the Data Layer API. This design choice is motivated by architectural, cross-platform, and implementation considerations.
+\subsubsection{Rationale for custom pairing}
+The implemented pairing mechanism is based on a QR code made by the smartwatch and scanned by the smartphone. The QR encodes a temporary token that is used to associate the smartwatch with a user account through a backend document stored in Firestore.
+This approach provides the following advantages:
+\begin{itemize}
+    \item \textbf{Standalone smartwatch application}: once the pairing is completed, the smartwatch can operate independently by directly communicating with the backend, without requiring the smartphone to be connected, following the \textit{Android Developers Documentation} Google guidelines:\\ \textit{"We recommend that Wear OS apps work independently of a phone so users can complete tasks on a watch without access to an Android or iOS phone. If your watch app requires phone interaction, you must mark your Wear OS app as non-standalone and take steps to ensure that the user has the phone app available"}.
+    \item \textbf{Platform independence}: the solution does not rely on Android-specific communication layers such as the Data Layer API. Further insights about this choice are stated in the Data Layer API limitations section.
+    \item \textbf{No third party dependencies}: the pairing logic is implemented entirely at the application level using Firestore, avoiding the need for native platform bridges or third-party plugins in Flutter. The only dependencies that are needed in order for the custom pairing to work are Firebase Auth for Anonymous Auth, and the dependencies for handling UUIDs and QR codes.
+    \item \textbf{Backend-centric design}: the smartwatch behaves as a client of backend services instead of relying on the phone to transfer the informations that it needs, aliging with the principle of a standalone client as indicated by the \textit{Android Developers Documentation}
+\end{itemize} \newpage
+\subsubsection{Limitations of the Data Layer API Approach}
+An alternative to the custom pairing mechanism would be to use the Wear OS Data Layer API, a mechanism to exchange data between a smartwatch and its paired smartphone. It supports message passing and data synchronization, including authentication token transfer.
+However, adopting this approach would introduce several limitations:
+\begin{itemize}
+    \item \textbf{Android-only compatibility}: the Data Layer API does not function when the smartwatch is paired with an iPhone, limiting cross-platform support.  
+    \item \textbf{Designed for native APIs, Flutter requires integration}: in Flutter, the Data Layer API is not natively available and requires either third-party plugins or custom native bridges.
+    \item \textbf{Companion-dependent architecture}: the smartwatch becomes tightly coupled with the smartphone, reducing its ability to operate independently and, as already stated, it is recommended to build a standalone wearable application.
+    \item \textbf{Different pairing strategies required}: supporting both Android and iOS would require different pairing mechanisms or fallback solutions.
+\end{itemize}
 
 
 
 
+\subsubsection{Security Considerations for Watch Pairing}
+
+In order to securely enable communication between the smartwatch and the backend, the system relies on Firebase Anonymous Authentication.
+Through this mechanism, each smartwatch instance authenticates with Firebase at startup and obtains a unique identifier (\texttt{request.auth.uid}). This authenticated context is then used by Firestore security rules to regulate access to backend resources. As a result, data access is restricted to authenticated clients only, preventing arbitrary external entities from interacting with the database.
+This design maintains the \emph{standalone nature} of the smartwatch application, avoids introducing additional authentication steps on the wearable, which would negatively impact usability due to device constraints, and allows the backend to enforce a basic level of access control.
+It improves the protection of backend resources while preserving the lightweight and autonomous design of the wearable application. Further improvements could involve strengthening the link between the authenticated device identity and the paired user to enable more fine-grained access control policies.
 
 
-
-
+\subsubsection{Summary of the Wear OS Pairing Approach}
+For these reasons, a custom solution using an URI embedded in QR codes was preferred over the data layer API, as it offers a good trade-off between cross-platform compatibility, data security, implementation complexity and usability.
+\newpage
 
 \subsection{OSservice Package Design}
 \label{OSService Package Design}
@@ -1296,11 +1321,25 @@ In particular, this package includes the following services:
     \item \texttt{NotificationService}, responsible for managing local notifications;
 \end{itemize}
 
-Each service encapsulates the interaction with specific Flutter packages and platform APIs, such as geolocation, local storage, or notification systems. These dependencies correspond to external libraries (e.g., packages available on \textit{pub.dev}) that internally communicate with the underlying operating system.
+Each service encapsulates the interaction with specific Flutter packages and platform APIs, such as geolocation, local storage, or notification systems. These dependencies correspond to external libraries, packages available on \textit{pub.dev}, that internally communicate with the underlying operating system.
 This design ensures that the rest of the application does not directly depend on platform-specific APIs or external libraries. Instead, all such dependencies are confined within the OSService package.
 The main motivation behind this decision is maintainability. If a library or underlying implementation needs to be replaced, only the corresponding service must be modified, without requiring changes in the rest of the system. This significantly reduces the impact of technological changes.
 
 %Moreover, this approach improves testability, as services can be mocked or replaced during testing without affecting higher-level components.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
