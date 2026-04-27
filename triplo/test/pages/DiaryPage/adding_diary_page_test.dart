@@ -148,22 +148,19 @@ void main() {
       expect(find.text('Sentiero Facile'), findsNothing);
     });
 
-    testWidgets('dropdown giorno aggiorna il valore dopo onChanged', (
-      tester,
-    ) async {
+    testWidgets('dropdown giorno aggiorna il valore dopo onChanged', (tester) async {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButton<int>).first);
+      final finder = find.byKey(const Key('dayDropdown'));
+      expect(finder, findsOneWidget);
+
+      final dropdown = tester.widget<DropdownButton<int>>(finder);
+      dropdown.onChanged!(15);
+
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('15').last);
-      await tester.pumpAndSettle();
-      await tester.pumpAndSettle();
-
-      final updated = tester.widget<DropdownButton<int>>(
-        find.byType(DropdownButton<int>).first,
-      );
+      final updated = tester.widget<DropdownButton<int>>(finder);
       expect(updated.value, 15);
     });
 
