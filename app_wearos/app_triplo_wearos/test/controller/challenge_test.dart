@@ -2,12 +2,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-
 import 'package:app_triplo_wearos/controller/challenge.dart';
 import 'package:app_triplo_wearos/service/OSservice/notification.dart';
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
-
 @GenerateMocks([NotificationService, MemoryService, AppLocalizations])
 import 'challenge_test.mocks.dart';
 import 'trekking_test.mocks.dart' hide MockNotificationService, MockAppLocalizations, MockMemoryService;
@@ -54,8 +52,6 @@ void main() {
     when(mockLocal.body_notification_arrival).thenReturn('Arrival Body');
     when(mockLocal.alert_notification_arrival).thenReturn('Arrival Alert');
   });
-
-  // ── notifyNewChallenge ────────────────────────────────────────────────────
 
   group('notifyNewChallenge', () {
     void verifyNotif({required String title, required String body, required String payload}) {
@@ -127,8 +123,6 @@ void main() {
       )).called(1);
     });
   });
-
-  // ── getCachedImage ────────────────────────────────────────────────────────
 
   group('getCachedImage', () {
     final fakeFile = File('/tmp/fake_image.jpg');

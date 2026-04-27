@@ -133,15 +133,6 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
     }
   }
 
-  /*Future<void> _initNotifications() async {
-    const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    );
-    await notifications.initialize(
-      const InitializationSettings(android: androidSettings),
-    );
-  }*/
-
   void _start() {
     _stopwatch.start();
 

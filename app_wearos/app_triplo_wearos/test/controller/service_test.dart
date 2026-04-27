@@ -14,15 +14,12 @@ import 'service_test.mocks.dart' show MockGeoService;
 
 @GenerateMocks([GeoService, MemoryService])
 void main() {
-  // ── Setup: load a fake .env before any test runs ─────────────────
   setUpAll(() async {
     await dotenv.load(mergeWith: {
       'OPENWEATHER_API_KEY': 'test-ow-key',
       'WEATHERBIT_API_KEY': 'test-wb-key',
     });
   });
-
-  // ── Helpers ──────────────────────────────────────────────────────
 
   ServiceController makeController({
     MockGeoService? geo,
@@ -33,7 +30,6 @@ void main() {
         memory: memory ?? MockMemoryService(),
       );
 
-  /// Returns a [MockClient] that always responds with [statusCode] and [body].
   http.Client fakeClient(int statusCode, dynamic body) => MockClient(
         (_) async => http.Response(
           body is String ? body : jsonEncode(body),
@@ -41,7 +37,6 @@ void main() {
         ),
       );
 
-  // ── Constructor ──────────────────────────────────────────────────
   group('constructor', () {
     test('reads API keys from dotenv', () {
       final c = makeController();
@@ -66,7 +61,6 @@ void main() {
     });
   });
 
-  // ── userLocation ─────────────────────────────────────────────────
   group('userLocation', () {
     test('delegates to GeoService and returns LatLng', () async {
       const expected = LatLng(45.0, 9.0);
@@ -87,7 +81,6 @@ void main() {
     });
   });
 
-  // ── weather ──────────────────────────────────────────────────────
   group('weather', () {
     final weatherBody = {
       'weather': [{'id': 800, 'description': 'clear sky'}],
@@ -132,9 +125,7 @@ void main() {
     });
   });
 
-  // ── forecast ─────────────────────────────────────────────────────
   group('forecast', () {
-    /// 16 entries → after step-8 sampling we expect entries at index 0, 8.
     List<Map<String, dynamic>> makeRawList(int count) => List.generate(
           count,
           (i) => {
@@ -151,7 +142,7 @@ void main() {
           client: fakeClient(200, body));
 
       expect(result, isNotNull);
-      expect(result, hasLength(2)); // index 0 and 8 from 16 entries
+      expect(result, hasLength(2)); 
     });
 
     test('returns null on non-200 status', () async {
@@ -182,7 +173,6 @@ void main() {
     });
   });
 
-  // ── parseForecastItem ────────────────────────────────────────────
   group('parseForecastItem', () {
     final raw = {
       'dt_txt': '2024-06-01 12:00:00',
@@ -212,7 +202,6 @@ void main() {
     });
   });
 
-  // ── parseForecast ────────────────────────────────────────────────
   group('parseForecast', () {
     test('maps every raw entry through parseForecastItem', () {
       final c = makeController();
@@ -239,7 +228,6 @@ void main() {
     });
   });
 
-  // ── weatherIconUrl ───────────────────────────────────────────────
   group('weatherIconUrl', () {
     test('returns standard URL for normal size', () {
       final url = makeController().weatherIconUrl('01d');
@@ -252,7 +240,6 @@ void main() {
     });
   });
 
-  // ── openTopoMap helpers ──────────────────────────────────────────
   group('openTopoMapTile', () {
     test('returns the expected template URL', () {
       expect(
@@ -268,7 +255,6 @@ void main() {
     });
   });
 
-  // ── mockAlerts ───────────────────────────────────────────────────
   group('mockAlerts', () {
     test('returns list when server responds with a JSON array', () async {
       final body = [
@@ -300,7 +286,6 @@ void main() {
     });
   });
 
-  // ── weatherbitAlerts ─────────────────────────────────────────────
   group('weatherbitAlerts', () {
     final alertsBody = {
       'alerts': [

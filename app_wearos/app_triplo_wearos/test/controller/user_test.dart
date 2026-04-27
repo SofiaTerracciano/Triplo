@@ -2,14 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-
 import 'package:app_triplo_wearos/controller/user.dart';
 import 'package:app_triplo_wearos/service/pairing_service.dart';
-
 @GenerateMocks([PairingService])
 import 'user_test.mocks.dart';
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 Map<String, dynamic> _userDoc({
   String uid = 'u1',
@@ -63,7 +60,6 @@ Map<String, dynamic> _diaryDoc({
       'Is_public': isPublic,
     };
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
   late FakeFirebaseFirestore fakeDb;
@@ -77,8 +73,6 @@ void main() {
     when(mockPairing.pairedUid).thenReturn(null);
   });
 
-  // ── uid getter ────────────────────────────────────────────────────────────
-
   group('uid getter', () {
     test('delega a pairingService.pairedUid', () {
       when(mockPairing.pairedUid).thenReturn('myUid');
@@ -89,8 +83,6 @@ void main() {
       expect(makeCtrl().uid, isNull);
     });
   });
-
-  // ── loadCurrentPairedUser ─────────────────────────────────────────────────
 
   group('loadCurrentPairedUser', () {
     test('con uid null → currentUser null e notifica', () async {
@@ -117,8 +109,6 @@ void main() {
     });
   });
 
-  // ── loadUserCore ──────────────────────────────────────────────────────────
-
   group('loadUserCore', () {
     test('documento esistente → popola currentUser', () async {
       await fakeDb.collection('users').doc('u2').set(_userDoc(uid: 'u2', username: 'giulia'));
@@ -131,7 +121,6 @@ void main() {
 
     test('documento NON esistente → currentUser rimane null', () async {
       await makeCtrl().loadUserCore('nonexistent');
-      // nessun crash, currentUser rimane null
     });
 
     test('notifica i listener', () async {
@@ -163,8 +152,6 @@ void main() {
     });
   });
 
-  // ── getUserById ───────────────────────────────────────────────────────────
-
   group('getUserById', () {
     test('restituisce Users se esiste', () async {
       await fakeDb.collection('users').doc('u6').set(_userDoc(uid: 'u6', username: 'luca'));
@@ -176,8 +163,6 @@ void main() {
       expect(await makeCtrl().getUserById('ghost'), isNull);
     });
   });
-
-  // ── getFollowers / getFollowing ───────────────────────────────────────────
 
   group('getFollowers / getFollowing', () {
     test('getFollowers restituisce lista corretta', () async {
@@ -211,9 +196,6 @@ void main() {
       expect(await makeCtrl().getFollowing('lonely'), isEmpty);
     });
   });
-
-  // ── searchUsers ───────────────────────────────────────────────────────────
-
   group('searchUsers', () {
     test('trova utenti per query esatta', () async {
       await fakeDb.collection('users').doc('u10').set(_userDoc(uid: 'u10', username: 'carlo'));
@@ -233,8 +215,6 @@ void main() {
       expect(await makeCtrl().searchUsers('  ELENA  '), hasLength(1));
     });
   });
-
-  // ── diary methods ─────────────────────────────────────────────────────────
 
   group('diary methods', () {
     test('getDiaryById → Diary se esiste', () async {
@@ -273,8 +253,6 @@ void main() {
       expect(await makeCtrl().getPrivateDiaries('uE2'), isEmpty);
     });
   });
-
-  // ── getFollowerUids / getFollowingUids ────────────────────────────────────
 
   group('getFollowerUids / getFollowingUids', () {
     test('getFollowerUids restituisce lista uid', () async {

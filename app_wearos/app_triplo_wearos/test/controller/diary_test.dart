@@ -1,10 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-
 import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/model/user.dart';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 Map<String, dynamic> _diaryDoc({
   required String userId,
@@ -42,19 +39,14 @@ Users _fakeUser() => Users(
       intermediate: 0,
     );
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
-
 void main() {
   late FakeFirebaseFirestore fakeDb;
 
-  // Ora DiaryController accetta db opzionale — niente più Firebase.initializeApp()
   DiaryController makeCtrl() => DiaryController(db: fakeDb);
 
   setUp(() {
     fakeDb = FakeFirebaseFirestore();
   });
-
-  // ── currentUser setter / getter ───────────────────────────────────────────
 
   group('currentUser', () {
     test('getter restituisce null inizialmente', () {
@@ -68,15 +60,11 @@ void main() {
     });
   });
 
-  // ── allDiaries getter ─────────────────────────────────────────────────────
-
   group('allDiaries', () {
     test('lista vuota inizialmente', () {
       expect(makeCtrl().allDiaries, isEmpty);
     });
   });
-
-  // ── loadPublicDiary ───────────────────────────────────────────────────────
 
   group('loadPublicDiary', () {
     test('carica solo diari pubblici per lo userId', () async {
@@ -129,12 +117,10 @@ void main() {
       await fakeDb.collection('diary').add(_diaryDoc(userId: 'u1', isPublic: true));
       final ctrl = makeCtrl();
       await ctrl.loadPublicDiary('u1');
-      await ctrl.loadPublicDiary('u1'); // secondo call → ignorato
-      expect(ctrl.allDiaries.length, 1); // non duplicato
+      await ctrl.loadPublicDiary('u1'); 
+      expect(ctrl.allDiaries.length, 1);
     });
   });
-
-  // ── loadPrivateDiary ──────────────────────────────────────────────────────
 
   group('loadPrivateDiary', () {
     test('carica solo diari privati per lo userId', () async {
@@ -181,8 +167,6 @@ void main() {
     });
   });
 
-  // ── getDiaryById ──────────────────────────────────────────────────────────
-
   group('getDiaryById', () {
     test('restituisce il diario corretto se presente in lista', () async {
       await fakeDb.collection('diary').doc('d1').set(_diaryDoc(userId: 'u1', trekkingName: 'Target'));
@@ -201,8 +185,6 @@ void main() {
       expect(makeCtrl().getDiaryById('anything'), isNull);
     });
   });
-
-  // ── fetchDiaryById ────────────────────────────────────────────────────────
 
   group('fetchDiaryById', () {
     test('restituisce lista di diari per userId', () async {

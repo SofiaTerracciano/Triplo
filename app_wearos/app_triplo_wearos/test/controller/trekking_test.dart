@@ -429,7 +429,6 @@ void main() {
       });
     });
 
-    // ── getTrekkingByIdAsync ─────────────────────────────────────
     group('getTrekkingByIdAsync', () {
       test('returns from local cache when available', () async {
         final trek = makeTrekking();
@@ -458,8 +457,6 @@ void main() {
         expect(await c.getTrekkingByIdAsync('ghost-id'), isNull);
       });
     });
-
-    // ── getTrekkingId ────────────────────────────────────────────
     group('getTrekkingId', () {
       test('returns documentId for a known name', () {
         final trek = makeTrekking(id: 'trek-99', name: 'Dolomiti');
@@ -475,8 +472,6 @@ void main() {
         expect(c.getTrekkingId('Fantasyland'), isNull);
       });
     });
-
-    // ── checkArrival ─────────────────────────────────────────────
     group('checkArrival', () {
       MockAppLocalizations mockLocal() {
         final l = MockAppLocalizations();
@@ -552,8 +547,6 @@ void main() {
         ));
       });
     });
-
-    // ── weather alerts ───────────────────────────────────────────
     group('weather alert', () {
       const uid = 'user-123';
 

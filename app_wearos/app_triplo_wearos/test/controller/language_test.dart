@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-
 import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
-
 @GenerateMocks([MemoryService])
 import 'language_test.mocks.dart';
 import 'trekking_test.mocks.dart' hide MockMemoryService;
@@ -17,20 +15,15 @@ void main() {
 
   setUp(() {
     mockMemory = MockMemoryService();
-    // Default stub: saveLocale e getLocale non fanno nulla / restituiscono null
     when(mockMemory.saveLocale(any)).thenAnswer((_) async {});
     when(mockMemory.getLocale()).thenAnswer((_) async => null);
   });
-
-  // ── locale getter ─────────────────────────────────────────────────────────
 
   group('locale getter', () {
     test('locale di default è inglese', () {
       expect(makeCtrl().locale, const Locale('en'));
     });
   });
-
-  // ── setLocale ─────────────────────────────────────────────────────────────
 
   group('setLocale', () {
     test('cambia la locale e notifica i listener', () async {
@@ -57,7 +50,7 @@ void main() {
       int count = 0;
       ctrl.addListener(() => count++);
 
-      await ctrl.setLocale(const Locale('en')); // stessa locale di default
+      await ctrl.setLocale(const Locale('en')); 
 
       expect(count, 0);
       verifyNever(mockMemory.saveLocale(any));
@@ -81,13 +74,11 @@ void main() {
       int count = 0;
       ctrl.addListener(() => count++);
 
-      await ctrl.setLocale(const Locale('it')); // già impostata
+      await ctrl.setLocale(const Locale('it'));
 
       expect(count, 0);
     });
   });
-
-  // ── loadSavedLocale ───────────────────────────────────────────────────────
 
   group('loadSavedLocale', () {
     test('carica la locale salvata e notifica', () async {
@@ -110,7 +101,7 @@ void main() {
 
       await ctrl.loadSavedLocale();
 
-      expect(ctrl.locale, const Locale('en')); // invariata
+      expect(ctrl.locale, const Locale('en')); 
       expect(count, 0);
     });
 
@@ -134,7 +125,7 @@ void main() {
 
       await ctrl.loadSavedLocale();
 
-      expect(count, 0); // locale già 'en', nessuna notifica
+      expect(count, 0); 
     });
 
     test('carica locale dopo setLocale senza duplicare notifiche', () async {
