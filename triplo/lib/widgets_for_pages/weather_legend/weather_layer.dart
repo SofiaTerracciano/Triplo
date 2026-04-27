@@ -11,9 +11,12 @@ class WeatherLayer {
   /// Builds a TileLayer for the given weather type.
 
 
-  static TileLayer build(String url) {
+  static TileLayer build(
+      String url, {
+        TileProvider? tileProvider,
+      }) {
     return TileLayer(
-      tileProvider: CancellableNetworkTileProvider(),
+      tileProvider: tileProvider ?? CancellableNetworkTileProvider(),
       urlTemplate: url,
       subdomains: const [],
       userAgentPackageName: 'com.example.triplo2',
