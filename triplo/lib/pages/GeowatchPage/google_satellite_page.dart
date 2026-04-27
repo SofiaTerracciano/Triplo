@@ -12,13 +12,14 @@ import 'package:triplo/controller/servicecontroller.dart';
 class GoogleSatellitePage extends StatefulWidget {
   final LatLng trailCenter;
   final LatLng? userCenter;
-
+  final TileProvider? tileProvider;
   final LatLng initialCenter;
   const GoogleSatellitePage({
     Key? key,
     required this.trailCenter,
     required this.userCenter,
     required this.initialCenter,
+    this.tileProvider,
   }) : super(key: key);
 
 
@@ -71,7 +72,7 @@ class _GoogleSatellitePageState extends State<GoogleSatellitePage> {
             ),
             children: [
               TileLayer(
-                tileProvider: CancellableNetworkTileProvider(),
+                tileProvider: widget.tileProvider ?? CancellableNetworkTileProvider(),
                 urlTemplate: api.googleSatelliteTile(),
                 userAgentPackageName: 'com.example.triplo',
               ),

@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -9,8 +12,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/pages/GeowatchPage/google_satellite_page.dart';
+import '../../stub/fake_tile_provider.dart';
 import '../TrekkingPage/trekking_page_test.mocks.dart';
-
+import 'dart:typed_data';
 @GenerateMocks([ServiceController])
 
 class NoNetworkHttpOverrides extends HttpOverrides {
@@ -68,6 +72,7 @@ void main() {
           trailCenter: trail,
           userCenter: user,
           initialCenter: initial,
+          tileProvider: FakeTileProvider(),
         ),
       ),
     );
@@ -352,3 +357,4 @@ void main() {
     await tester.pump(Duration.zero);
   });
 }
+
