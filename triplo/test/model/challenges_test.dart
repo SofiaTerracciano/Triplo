@@ -94,7 +94,7 @@ void main() {
 
       expect(map['Title'], ['Titolo IT', 'Title EN']);
       expect(map['Photo'], 'https://example.com/challenge.jpg');
-      expect(map['Descrption'], ['Descrizione IT', 'Description EN']);
+      expect(map['Description'], ['Descrizione IT', 'Description EN']);
     });
 
     test('documentId is NOT included in toMap output', () {
@@ -104,11 +104,12 @@ void main() {
       expect(map.containsKey('DocumentId'), isFalse);
     });
 
-    test('description key is "Descrption" (typo is intentional)', () {
+    test('description key is "Description"', () {
       final c = buildChallenges();
       final map = c.toMap();
-      expect(map.containsKey('Descrption'), isTrue);
-      expect(map.containsKey('Description'), isFalse);
+
+      expect(map.containsKey('Description'), isTrue);
+      expect(map.containsKey('Descrption'), isFalse);
     });
 
     test('empty title serializes to empty list', () {
@@ -118,7 +119,7 @@ void main() {
 
     test('empty description serializes to empty list', () {
       final c = buildChallenges(description: []);
-      expect(c.toMap()['Descrption'], isEmpty);
+      expect(c.toMap()['Description'], isEmpty);
     });
 
     test('photo serializes correctly', () {
@@ -202,12 +203,12 @@ void main() {
       expect(restored.photo, original.photo);
     });
 
-    test('description is empty after round-trip due to key typo bug', () {
+    test('description survives round-trip', () {
       final original = buildChallenges(description: ['Descrizione IT']);
       final map = original.toMap();
       final restored = Challenges.fromMap(map, docId: original.documentId);
 
-      expect(restored.description, isEmpty);
+      expect(restored.description, original.description);
     });
   });
 }
