@@ -31,9 +31,13 @@ class _DiaryPageState extends State<DiaryPage> {
       final userController = context.read<UserController>();
       final diary = widget.diary;
 
-      _ownerFuture = userController.getUserById(diary.userId);
+      final ownerResult = userController.getUserById(diary.userId);
+      _ownerFuture = ownerResult;
+      await ownerResult;
+
       for (final id in diary.friends) {
-        _friendFutures[id] = userController.getUserById(id);
+        final f = userController.getUserById(id);
+        _friendFutures[id] = f;
       }
     } catch (e) {
       debugPrint('Errore in _loadData: $e'); //coverage:ignore-line
@@ -92,7 +96,7 @@ class _DiaryPageState extends State<DiaryPage> {
                     FutureBuilder<Users?>(
                       future: _ownerFuture,
                       builder: (_, snap) {
-                        if (!snap.hasData) return const SizedBox(height: 20);
+                        if (!snap.hasData || snap.data == null) return const SizedBox(height: 20);
                         final user = snap.data!;
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +145,7 @@ class _DiaryPageState extends State<DiaryPage> {
                       return FutureBuilder<Users?>(
                         future: _friendFutures[id],
                         builder: (_, snap) {
-                          if (!snap.hasData) return const SizedBox(height: 24);
+                          if (!snap.hasData || snap.data == null) return const SizedBox(height: 24);
                           final friend = snap.data!;
                           return InkWell(
                             onTap: () => Navigator.push(
