@@ -10,6 +10,7 @@ import 'package:triplo/pages/GeowatchPage/geowatch.dart';
 import 'package:triplo/controller/servicecontroller.dart';
 import 'package:triplo/controller/trekking.dart';
 import 'package:network_image_mock/network_image_mock.dart';
+import '../../stub/fake_tile_provider.dart';
 import 'fake_http.dart';
 import '../TrekkingPage/trekking_page_test.mocks.dart';
 
@@ -70,10 +71,12 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: MediaQuery(
           data: const MediaQueryData(size: Size(390, 844)),
-          child: const GeoWatchPage(
-            trekkingId: "test_id",
-            trailCenter: LatLng(46.0, 11.0),
-          ),
+          child: GeoWatchPage(
+            trailCenter: const LatLng(46.0, 11.0),
+            trekkingId: 'trek1',
+            trekkingName: 'Test Trek',
+            tileProvider: FakeTileProvider(),
+          )
         ),
       ),
     );
@@ -115,7 +118,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.notifications_none));
         await tester.pump();
 
-        verify(mockTrekking.enableWeatherAlertForTrekking("test_id"))
+        verify(mockTrekking.enableWeatherAlertForTrekking("trek1"))
             .called(1);
       });
     });
@@ -257,7 +260,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.notifications_active));
       await tester.pumpAndSettle();
 
-      verify(mockTrekking.disableWeatherAlertForTrekking("test_id"))
+      verify(mockTrekking.disableWeatherAlertForTrekking("trek1"))
           .called(1);
     });
   });

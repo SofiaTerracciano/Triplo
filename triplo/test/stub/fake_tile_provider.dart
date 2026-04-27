@@ -6,6 +6,6 @@ class FakeTileProvider extends TileProvider {
 
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
-    return const AssetImage('images/test_blank_tile.png');
+    return const AssetImage('images/blank_tile.png');
   }
 }
