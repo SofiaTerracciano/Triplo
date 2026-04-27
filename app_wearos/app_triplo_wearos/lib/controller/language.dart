@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-
 import '../service/OSservice/memory.dart';
-
 
 // Language controller for localization --> manage app language
 class Language extends ChangeNotifier {
   // Current locale, default to English
   Locale _locale = const Locale('en');
 
-  final MemoryService _memoryService = MemoryService();
+  final MemoryService _memoryService;
 
   // Getter for current locale
   Locale get locale => _locale;
 
-  Language();
+  Language({MemoryService? memoryService})
+      : _memoryService = memoryService ?? MemoryService();
 
   // Set a new locale and notify listeners
   Future<void> setLocale(Locale locale) async {

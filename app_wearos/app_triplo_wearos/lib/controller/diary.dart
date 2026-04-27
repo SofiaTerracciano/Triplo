@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 // Controller for managing diary data from and to Firestore
 class DiaryController extends ChangeNotifier {
   //final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  late FirebaseFirestore _db;
 
   List<Diary> _diaries = [];
   bool _loaded = false;
@@ -19,7 +19,8 @@ class DiaryController extends ChangeNotifier {
     _currentUser = user;
   }
 
-  DiaryController();
+  DiaryController({FirebaseFirestore? db})
+    : _db = db ?? FirebaseFirestore.instance;
 
   // Getter for all diaries
   List<Diary> get allDiaries => _diaries;
@@ -27,6 +28,7 @@ class DiaryController extends ChangeNotifier {
   // Load public diaries from Firestore
   Future<void> loadPublicDiary(String userId) async {
     if (_loaded) return; // To avoid reloading
+    _loaded = true;
 
 
     // Fetch diary documents from Firestore

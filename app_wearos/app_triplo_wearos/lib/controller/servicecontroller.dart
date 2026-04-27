@@ -30,6 +30,7 @@ class ServiceController {
 
   //NotificationService notification;
   
+  
   // Constructor to load API keys from .env
   ServiceController({required this.memory, required this.geo}) {
     openWeatherKey = dotenv.env['OPENWEATHER_API_KEY'] ?? "";
@@ -52,18 +53,21 @@ class ServiceController {
   }
 
   Future<Map<String, dynamic>?> weather(
-      double lat,
-      double lon,
-      String lang,
-      ) async {
+    double lat,
+    double lon,
+    String lang, {
+    http.Client? client,
+  }) async {
     if (openWeatherKey.isEmpty) return null;
 
     final url =
         "https://api.openweathermap.org/data/2.5/weather"
         "?lat=$lat&lon=$lon&appid=$openWeatherKey&units=metric&lang=$lang";
 
+    final c = client ?? http.Client();
+
     try {
-      final res = await http
+      final res = await c
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 6));
 
@@ -82,16 +86,20 @@ class ServiceController {
   Future<List<Map<String, dynamic>>?> forecast(
       double lat,
       double lon,
-      String lang,
-      ) async {
+      String lang,{
+    http.Client? client,
+  }) async {
     if (openWeatherKey.isEmpty) return null;
 
     final url =
         "https://api.openweathermap.org/data/2.5/forecast"
         "?lat=$lat&lon=$lon&appid=$openWeatherKey&units=metric&lang=$lang";
+    
+    final c = client ?? http.Client();
+
 
     try {
-      final res = await http
+      final res = await c
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 6));
 
@@ -140,9 +148,10 @@ class ServiceController {
     }
   }
 
-  Future<List<Map<String, dynamic>>> mockAlerts() async {
+  Future<List<Map<String, dynamic>>> mockAlerts({http.Client? client}) async {
+    final c = client ?? http.Client();   // ← prima di tutto
     try {
-      final res = await http
+      final res = await c               // ← usa c, non http.get
           .get(Uri.parse("https://meteodemoserver.onrender.com/alerts"))
           .timeout(const Duration(seconds: 4));
 
@@ -153,30 +162,32 @@ class ServiceController {
       if (data is List) {
         return List<Map<String, dynamic>>.from(data);
       }
-
       if (data is Map) {
         return [Map<String, dynamic>.from(data)];
       }
-
       return [];
     } catch (e) {
-      debugPrint("Mock alerts error $e");  //coverage:ignore-line
+      debugPrint("Mock alerts error $e"); //coverage:ignore-line
       return [];
     }
   }
 
   Future<List<Map<String, dynamic>>> weatherbitAlerts(
       double lat,
-      double lon,
-      ) async {
+      double lon,{
+      http.Client? client,
+      }) async {
     if (weatherbitKey.isEmpty) return [];
 
     final url =
         "https://api.weatherbit.io/v2.0/alerts"
         "?lat=$lat&lon=$lon&key=$weatherbitKey";
 
+    final c = client ?? http.Client();
+ 
+
     try {
-      final res = await http
+      final res = await c
           .get(Uri.parse(url))
           .timeout(const Duration(seconds: 6));
 

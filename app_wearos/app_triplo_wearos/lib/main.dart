@@ -14,6 +14,7 @@ import 'package:app_triplo_wearos/service/internetservice.dart';
 import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:app_triplo_wearos/service/OSservice/permission_service.dart';
 import 'package:app_triplo_wearos/service/watch_id_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -147,6 +148,7 @@ class TriploWatchApp extends StatelessWidget {
           notification: context.read<NotificationService>(),
           pairingService: context.read<PairingService>(),
           trekkings: [],
+          db: FirebaseFirestore.instance
         )),
 
         // ChallengesController con le dipendenze passate correttamente

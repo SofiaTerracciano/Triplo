@@ -6,7 +6,7 @@ import '../model/diary.dart';
 
 import '../service/pairing_service.dart';
 class UserController extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  late FirebaseFirestore _db;
   final PairingService _pairingService;
 
   Users? _currentUser;
@@ -14,7 +14,8 @@ class UserController extends ChangeNotifier {
 
   String? get uid => _pairingService.pairedUid;
 
-  UserController(this._pairingService);
+  UserController(this._pairingService, {FirebaseFirestore? db})
+    : _db = db ?? FirebaseFirestore.instance;
 
   Future<void> loadCurrentPairedUser() async {
     final uid = _pairingService.pairedUid;
@@ -27,10 +28,6 @@ class UserController extends ChangeNotifier {
     await loadUserCore(uid);
   }
 
-  /* --------------------------------------------------
-   * LOAD CORE USER (lightweight)
-   * -------------------------------------------------- */
-
   Future<void> loadUserCore(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     if (!snap.exists) return;
@@ -41,10 +38,6 @@ class UserController extends ChangeNotifier {
 
     notifyListeners();
   }
-
-  /* --------------------------------------------------
-   * PUBLIC USERS
-   * -------------------------------------------------- */
 
   Future<Users?> getUserById(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
@@ -66,10 +59,6 @@ class UserController extends ChangeNotifier {
     return users.whereType<Users>().toList();
   }
 
-  /* --------------------------------------------------
-   * SEARCH
-   * -------------------------------------------------- */
-
   Future<List<Users>> searchUsers(String query) async {
     final q = query.toLowerCase().trim();
 
@@ -86,10 +75,6 @@ class UserController extends ChangeNotifier {
     }
     return results;
   }
-
-  /* --------------------------------------------------
-   * DIARY (optional sul watch)
-   * -------------------------------------------------- */
 
   Future<Diary?> getDiaryById(String id) async {
     final snap = await _db.collection("diary").doc(id).get();
@@ -111,283 +96,7 @@ class UserController extends ChangeNotifier {
     return diaries.whereType<Diary>().toList();
   }
 
-  /* --------------------------------------------------
-   * TREKKING (optional sul watch)
-   * -------------------------------------------------- */
 
-  /*
-  Future<Trekking?> getTrekkingById(String id) async {
-    final snap = await _db.collection("trekking").doc(id).get();
-    if (!snap.exists) return null;
-    return Trekking.fromMap(snap.data()!, docId: id);
-  }
-
-  Future<List<Trekking>> getSavedTrekkings(String uid) async {
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
-    final trekkings = await Future.wait(ids.map(getTrekkingById));
-    return trekkings.whereType<Trekking>().toList();
-  }
-
-  Future<void> addTrekkingToSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayUnion([trekkingId]),
-    });
-
-    notifyListeners();
-  }
-
-  Future<void> removeTrekkingFromSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    await _db.collection("users").doc(uid).update({
-      "Saved_trekkings": FieldValue.arrayRemove([trekkingId]),
-    });
-
-    notifyListeners();
-  }
-
-  Future<bool> isTrekkingSaved(String trekkingId) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return false;
-
-    final snap = await _db.collection("users").doc(uid).get();
-    final ids = List<String>.from(snap.data()?["Saved_trekkings"] ?? []);
-    return ids.contains(trekkingId);
-  }
-
-   */
-
-
-
-
-  /*
-  Future<void> startWatchPairing({bool forceNew = false}) async {
-    if (_pairing) return;
-
-    if (_watchId == null) {
-      _pairingError = "WatchId mancante (bootstrap non eseguito).";
-      notifyListeners();
-      return;
-    }
-
-    if (!forceNew && hasValidPairId) return;
-
-    _pairing = true;
-    _pairingError = null;
-    notifyListeners();
-
-    await _pairSub?.cancel();
-    _pairSub = null;
-
-    _expiryTimer?.cancel();
-    _expiryTimer = null;
-
-    if (isLoggedIn) {
-      await Future.delayed(const Duration(milliseconds: 50));
-      await logout();
-    }
-
-    // token QR nuovo
-    final token = _uuid.v4();
-
-    _pairedUid = null;
-    _qrToken = token;
-    _pairId = token;
-    _pairCreatedAtLocal = DateTime.now();
-    notifyListeners();
-
-    final docRef = _db.collection('watch_pair').doc(_watchId);
-
-    try {
-      await docRef.set({
-        'watchId': _watchId,
-        'qrToken': token,
-        'status': 'waiting',
-        'platform': 'wearos',
-        'createdAt': FieldValue.serverTimestamp(),
-        'expiresAt': Timestamp.fromDate(DateTime.now().add(_qrTtl)),
-        'uid': null,
-      }, SetOptions(merge: true));
-
-      _expiryTimer = Timer(_qrTtl, () {
-        _pairingError = "QR scaduto, rigenera.";
-        notifyListeners();
-      });
-
-      _pairSub = docRef.snapshots().listen(
-        (doc) {
-          final data = doc.data();
-          if (data == null) return;
-
-          final status = data['status'] as String?;
-          final uid = data['uid'] as String?;
-          final tokenOnDb = data['qrToken'] as String?;
-
-          if (tokenOnDb != _qrToken) return;
-
-          if (status == 'approved' && uid != null && uid.isNotEmpty) {
-            _expiryTimer?.cancel();
-            _pairedUid = uid;
-            notifyListeners();
-          }
-
-          if (status == 'expired') {
-            _pairingError = "QR scaduto, rigenera.";
-            notifyListeners();
-          }
-        },
-        onError: (e) {
-          _pairingError = "Errore listener pairing: $e";
-          notifyListeners();
-        },
-      );
-    } catch (e) {
-      _pairingError = "Errore pairing: $e";
-    } finally {
-      _pairing = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> stopWatchPairing({bool clearId = false}) async {
-    _expiryTimer?.cancel();
-    _expiryTimer = null;
-
-    await _pairSub?.cancel();
-    _pairSub = null;
-
-    if (clearId) {
-      _pairId = null;
-      _pairCreatedAtLocal = null;
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> logoutWatch() async {
-    _expiryTimer?.cancel();
-    _expiryTimer = null;
-
-    await _pairSub?.cancel();
-    _pairSub = null;
-
-    // 1) reset pairing su Firestore (uid null, waiting + nuovo QR)
-    await resetPairingOnLogout(regenerateQr: true);
-
-    // 2) reset locale (NON watchId)
-    _pairedUid = null;
-    _pairingError = null;
-
-    if (isLoggedIn) {
-      await logout();
-    }
-
-    notifyListeners();
-  }
-
-  Future<bool> restoreWatchPairing() async {
-    if (_watchId == null) return false;
-
-    _pairingError = null;
-
-    await _pairSub?.cancel();
-    _pairSub = null;
-
-    final docRef = _db.collection('watch_pair').doc(_watchId);
-
-    try {
-      final snap = await docRef.get();
-      final data = snap.data();
-
-      if (data != null) {
-        final status = data['status'] as String?;
-        final uid = data['uid'] as String?;
-
-        if (status == 'approved' && uid != null && uid.isNotEmpty) {
-          _pairedUid = uid;
-          notifyListeners();
-
-          _pairSub = docRef.snapshots().listen((doc) {
-            final d = doc.data();
-            if (d == null) return;
-            final st = d['status'] as String?;
-            final u = d['uid'] as String?;
-            if (st == 'approved' && u != null && u.isNotEmpty) {
-              if (_pairedUid != u) {
-                _pairedUid = u;
-                notifyListeners();
-              }
-            }
-          });
-
-          return true;
-        }
-      }
-    } catch (e) {
-      debugPrint("restoreWatchPairing get failed: $e");
-    }
-
-    _pairSub = docRef.snapshots().listen(
-      (doc) {
-        final d = doc.data();
-        if (d == null) return;
-        final st = d['status'] as String?;
-        final u = d['uid'] as String?;
-        if (st == 'approved' && u != null && u.isNotEmpty) {
-          _pairedUid = u;
-          notifyListeners();
-        }
-      },
-      onError: (e) {
-        debugPrint("restoreWatchPairing listener error: $e");
-      },
-    );
-
-    return false;
-  }
-
-  Future<void> resetPairingOnLogout({bool regenerateQr = true}) async {
-    if (_watchId == null) return;
-
-    final docRef = _db.collection('watch_pair').doc(_watchId);
-
-    final newToken = _uuid.v4();
-    final now = DateTime.now();
-
-    try {
-      if (regenerateQr) {
-        await docRef.set({
-          'watchId': _watchId,
-          'qrToken': newToken,
-          'status': 'waiting',
-          'platform': 'wearos',
-          'createdAt': FieldValue.serverTimestamp(),
-          'expiresAt': Timestamp.fromDate(now.add(_qrTtl)),
-          'uid': null,
-        }, SetOptions(merge: true));
-
-        _qrToken = newToken;
-        _pairId = newToken;
-        _pairCreatedAtLocal = now;
-      } else {
-        await docRef.set({
-          'status': 'waiting',
-          'uid': null,
-        }, SetOptions(merge: true));
-      }
-    } catch (e) {
-      _pairingError = "Errore logout reset: $e";
-      notifyListeners();
-    }
-  }
-
-
-   */
   Future<List<String>> getFollowerUids(String uid) async {
     final snap = await _db.collection("users").doc(uid).get();
     final raw = snap.data()?["Followers"] ?? [];

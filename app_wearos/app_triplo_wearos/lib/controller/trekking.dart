@@ -8,9 +8,11 @@ import '../service/OSservice/notification.dart';
 import '../service/OSservice/geo.dart';
 import '../service/OSservice/memory.dart';
 import '../service/pairing_service.dart';
+
 // Controller for managing trekking data
 class TrekkingController extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db;
 
   final GeoService geo;
   final MemoryService memory;
@@ -27,7 +29,9 @@ class TrekkingController extends ChangeNotifier {
     required this.memory,
     required this.notification,
     required this.pairingService,
-  }) : _trekkings = trekkings {
+    required FirebaseFirestore db,
+  }) : _db = db,
+   _trekkings = trekkings {
     _weatherNotificationRef = _db.collection('weather_notification');
   }
   String? get uid => pairingService.effectiveUid;
@@ -40,10 +44,7 @@ class TrekkingController extends ChangeNotifier {
     _loaded = true;
 
     // Fetch trekking documents from Firestore
-    final snap = await _db
-        .collection('trekking')
-        .get();
-
+    final snap = await _db.collection('trekking').get();
 
     // Map documents to Trekking objects and store in the list --> this function create a
     //list of istance of trekkning (model)
@@ -91,10 +92,12 @@ class TrekkingController extends ChangeNotifier {
   // Fetch image URLs from Firebase Storage given a list of complete firestore url
   // It returns a list of download URLs that can be used to display images
   Future<List<String>> getDownloadUrls(List<String> paths) async {
-    return await Future.wait(paths.map((path) async {
-      Reference ref = FirebaseStorage.instance.refFromURL(path);
-      return await ref.getDownloadURL();
-    }));
+    return await Future.wait(
+      paths.map((path) async {
+        Reference ref = FirebaseStorage.instance.refFromURL(path);
+        return await ref.getDownloadURL();
+      }),
+    );
   }
 
   // Fetch image URL from Firebase Storage given complete firestore url
@@ -104,8 +107,12 @@ class TrekkingController extends ChangeNotifier {
     return await ref.getDownloadURL();
   }
 
-   // Metodo per gestire l'arrivo
-  Future<void> checkArrival(String trekkingId, double distanceInMeters, AppLocalizations local) async {
+  // Metodo per gestire l'arrivo
+  Future<void> checkArrival(
+    String trekkingId,
+    double distanceInMeters,
+    AppLocalizations local,
+  ) async {
     // Se la distanza è inferiore a 1000 metri (o quella che preferisci)
     if (distanceInMeters <= 1000) {
       final content = notificationcontent('end_trekking_arrival', local);

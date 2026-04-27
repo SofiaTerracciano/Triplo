@@ -160,3 +160,8 @@ flutter_native_splash:
     image: images/Triplo.png
     
   fullscreen: true
+
+dart_test:
+  coverage:
+    include:
+      -lib/**
