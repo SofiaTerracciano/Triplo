@@ -18,6 +18,7 @@ import 'package:triplo/pages/SearchPage/search-page.dart';
 import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../stub/fake_tile_provider.dart';
 import '../TrekkingPage/trekking_page_test.mocks.dart';
 
 class MockLanguage extends Mock implements Language {
@@ -107,7 +108,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const MyHomePage(),
+        home: MyHomePage(
+          tileProvider: FakeTileProvider(),
+        )
       ),
     );
   }

@@ -15,7 +15,12 @@ import 'package:provider/provider.dart';
 
 // Home page widget with map and navigation drawer --> main landing page after login
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final TileProvider? tileProvider;
+
+  const MyHomePage({
+    super.key,
+    this.tileProvider,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -53,14 +58,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          local.home_page_title, 
+          local.home_page_title,
           style: optionStyle
         ),
         centerTitle: true, // Forced center the title
       ),
 
       // Main map body
-      body: ZoomAwareMap(mapController: mapController),
+      body: ZoomAwareMap(
+        mapController: mapController,
+        tileProvider: widget.tileProvider,
+      ),
 
       // Zoom buttons
       floatingActionButton: Column(
@@ -190,8 +198,13 @@ class _MyHomePageState extends State<MyHomePage> {
 // Widget that updates its content based on the zoom level
 class ZoomAwareMap extends StatefulWidget {
   final MapController mapController;
+  final TileProvider? tileProvider;
 
-  const ZoomAwareMap({super.key, required this.mapController});
+  const ZoomAwareMap({
+    super.key,
+    required this.mapController,
+    this.tileProvider,
+  });
 
   @override
   _ZoomAwareMapState createState() => _ZoomAwareMapState();
@@ -280,14 +293,14 @@ class _ZoomAwareMapState extends State<ZoomAwareMap> {
             initialZoom: currentZoom,
             interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
-              ), 
+              ),
             onMapReady: () {}
           ),
           children: [
             TileLayer(
               urlTemplate: api.openTopoMapTile(),
               subdomains: api.openTopoMapSubdomains(),
-              tileProvider: NetworkTileProvider(),
+              tileProvider: widget.tileProvider ?? NetworkTileProvider(),
               userAgentPackageName: 'com.example.triplo2',
             ),
 
