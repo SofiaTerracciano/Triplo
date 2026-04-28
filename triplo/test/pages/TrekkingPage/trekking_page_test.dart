@@ -100,6 +100,26 @@ void main() {
       when(mockServiceController.weatherIconUrl(any, big: anyNamed('big')))
           .thenReturn('icon_url');
 
+      when(mockServiceController.googleSatelliteTile()).thenReturn(
+        'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      );
+
+      when(mockServiceController.weatherTileFromId(any)).thenReturn(
+        'https://tile.openweathermap.org/map/precipitation/{z}/{x}/{y}.png',
+      );
+
+      when(mockServiceController.weatherbitAlerts(any, any))
+          .thenAnswer((_) async => <Map<String, dynamic>>[]);
+
+      when(mockServiceController.mockAlerts())
+          .thenAnswer((_) async => <Map<String, dynamic>>[]);
+
+      when(mockServiceController.forecast(any, any, any))
+          .thenAnswer((_) async => <Map<String, dynamic>>[]);
+
+      when(mockServiceController.parseForecast(any))
+          .thenReturn(<Map<String, dynamic>>[]);
+
       when(mockTrekkingController.isWeatherAlertEnabled(any))
           .thenAnswer((_) async => false);
 
