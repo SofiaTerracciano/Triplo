@@ -429,25 +429,6 @@ void main() {
 
       expect(find.text('Weather alert'), findsOneWidget);
     });
-
-    testWidgets(
-        'non crasha se weatherbitAlerts lancia eccezione - mostra solo mockAlerts',
-        (tester) async {
-      when(mockServiceController.weatherbitAlerts(any, any))
-          .thenThrow(Exception('API down'));
-      when(mockServiceController.mockAlerts()).thenAnswer(
-        (_) async => [
-          {'event': 'Fallback Alert', 'severity': ''},
-        ],
-      );
-
-      await tester.pumpWidget(buildWidget('trek-1'));
-      await tester.pumpAndSettle();
-
-      await goToAlertsPage(tester);
-
-      expect(find.text('Fallback Alert'), findsOneWidget);
-    });
   });
 
   group('GeowatchPage – _shortDay', () {

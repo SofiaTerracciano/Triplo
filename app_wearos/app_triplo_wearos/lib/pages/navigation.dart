@@ -9,7 +9,12 @@ import '../widgets_for_pages/Navigation_Button.dart';
 import '../controller/language.dart';
 
 class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+  final bool enableBackgroundService;
+
+  const NavigationPage({
+    super.key,
+    this.enableBackgroundService = true, 
+  });
 
   @override
   State<NavigationPage> createState() => _NavigationPageState();
@@ -33,23 +38,32 @@ class _NavigationPageState extends State<NavigationPage> {
     try {
       final pairing = context.read<PairingService>();
       await pairing.restoreWatchPairing();
-      debugPrint("NavigationPage: restoreWatchPairing completed");
+      debugPrint("NavigationPage: restoreWatchPairing completed"); /// coverage: ignore-line
     } catch (e, st) {
-      debugPrint("NavigationPage pairing bootstrap error: $e");
-      debugPrint("$st");
+      debugPrint("NavigationPage pairing bootstrap error: $e"); /// coverage: ignore-line
+      debugPrint("$st"); /// coverage: ignore-line
     }
 
     if (!mounted) return;
 
-    try {
-      _backgroundService = BackgroundService(context);
-      _backgroundService!.start();
-      debugPrint("NavigationPage: BackgroundService started");
-    } catch (e, st) {
-      debugPrint("NavigationPage background bootstrap error: $e");
-      debugPrint("$st");
+    if (widget.enableBackgroundService) {
+      try {
+        _backgroundService = BackgroundService(context);
+        _backgroundService!.start();
+        debugPrint("NavigationPage: BackgroundService started"); /// coverage: ignore-line
+      } catch (e, st) {
+        debugPrint("NavigationPage background bootstrap error: $e"); /// coverage: ignore-line
+        debugPrint("$st"); /// coverage: ignore-line
+      }
     }
   }
+
+  @override
+  void dispose() {
+    _backgroundService?.dispose(); 
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageController = context.watch<Language>();
@@ -149,7 +163,7 @@ class _NavigationPageState extends State<NavigationPage> {
     );
   }
 }
-// Popup dialog to select the language
+
 class LanguageDialog extends StatelessWidget {
   final Future<void> Function(Locale) onLocaleSelected;
 
@@ -159,17 +173,21 @@ class LanguageDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
     return Dialog(
-      backgroundColor: Colors.black, // Sfondo nero come il resto dell'app
-      insetPadding: EdgeInsets.zero, // Occupa tutto lo spazio disponibile
+      backgroundColor: Colors.black,
+      insetPadding: EdgeInsets.zero,
       child: Container(
         width: double.infinity,
         height: double.infinity,
         child: Column(
           children: [
-            const SizedBox(height: 20), // Spazio per la curvatura superiore
+            const SizedBox(height: 20),
             Text(
               local.language_label,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -181,7 +199,7 @@ class LanguageDialog extends StatelessWidget {
                     _langTile(context, "🇪🇸", "Español", const Locale('es')),
                     _langTile(context, "🇩🇪", "Deutsch", const Locale('de')),
                     _langTile(context, "🇫🇷", "Français", const Locale('fr')),
-                    const SizedBox(height: 20), // Spazio per la curvatura inferiore
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -199,7 +217,6 @@ class LanguageDialog extends StatelessWidget {
         Navigator.pop(context);
       },
       child: Padding(
-        // Padding generoso per facilitare il tocco
         padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

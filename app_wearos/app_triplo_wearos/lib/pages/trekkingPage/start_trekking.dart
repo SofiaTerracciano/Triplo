@@ -17,8 +17,9 @@ final FlutterLocalNotificationsPlugin notifications =
 
 class StartTrekkingPage extends StatefulWidget {
   final String trekkingid;
+  final Stream<Position>? positionStreamOverride;
 
-  const StartTrekkingPage({Key? key, required this.trekkingid})
+  const StartTrekkingPage({Key? key, required this.trekkingid, this.positionStreamOverride})
     : super(key: key);
 
   @override
@@ -50,20 +51,32 @@ class _StartTrekkingPageState extends State<StartTrekkingPage> {
   }
 
   void _initGpsTracking() async {
-    // Controlliamo semplicemente se abbiamo il permesso prima di far partire lo stream.
-    // Se non lo abbiamo, usciamo dalla funzione senza dire nulla all'utente.
     final status = await Permission.location.status;
+
     if (!status.isGranted) return;
 
-    LocationSettings locationSettings = AndroidSettings(
+    final stream = widget.positionStreamOverride ?? Geolocator.getPositionStream(
+      locationSettings: AndroidSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 0,
+        intervalDuration: const Duration(seconds: 1),
+        forceLocationManager: true,
+      ),
+    );
+
+    /*LocationSettings locationSettings = AndroidSettings(
       accuracy: LocationAccuracy.best,
       distanceFilter: 0,
       intervalDuration: const Duration(seconds: 1),
       forceLocationManager: true
-    );
+    );*/
 
-    _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
+    /*_positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
         .listen((Position position) {
+      _checkDistance(position);
+    });*/
+
+    _positionStream = stream.listen((Position position) {
       _checkDistance(position);
     });
   }

@@ -1,6 +1,5 @@
 import 'package:app_triplo_wearos/l10n/app_localizations.dart';
 import 'package:app_triplo_wearos/pages/PairingLoginPage/login.dart';
-import 'package:app_triplo_wearos/pages/UserProfilePage/user.dart';
 import 'package:app_triplo_wearos/service/pairing_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -42,7 +41,6 @@ void main() {
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      // Il testo viene dalla localizzazione — cerchiamo tramite il widget Text
       expect(
         find.byWidgetPredicate(
           (w) => w is Text && (w.data?.isNotEmpty ?? false),
@@ -89,10 +87,6 @@ void main() {
       expect(scaffold.backgroundColor, Colors.black);
     });
   });
-
-  // ===========================================================================
-  // GRUPPO 3 – stato loading (pairing == true)
-  // ===========================================================================
 
   group('LoginPage – stato loading', () {
     setUp(() {
