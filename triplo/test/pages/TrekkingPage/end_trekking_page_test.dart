@@ -10,11 +10,18 @@ import 'package:triplo/controller/trekking.dart';
 import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/pages/trekkingPage/end_trekking_page.dart';
-import 'start_trekking_page_test.mocks.dart';
 
+import 'end_trekking_page_test.mocks.dart';
+import 'start_trekking_page_test.mocks.dart';
+import 'package:mockito/annotations.dart';
+
+@GenerateNiceMocks([
+  MockSpec<NavigatorObserver>(),
+])
 void main() {
   late MockTrekkingController mockController;
 
+  late MockNavigatorObserver mockObserver;
   Trekking buildTrekking({String difficultyLevel = 'easy'}) {
     return Trekking(
       documentId: 'trek1',
@@ -52,6 +59,7 @@ void main() {
         ChangeNotifierProvider<TrekkingController>.value(value: mockController),
       ],
       child: MaterialApp(
+        navigatorObservers: [mockObserver],
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -70,6 +78,7 @@ void main() {
 
   setUp(() {
     mockController = MockTrekkingController();
+    mockObserver = MockNavigatorObserver();
     when(mockController.getCachedImage(any)).thenAnswer((_) async => null);
   });
 
@@ -149,17 +158,17 @@ void main() {
       expect(find.byType(EndTrekkingPage), findsOneWidget);
     });
 
-    testWidgets(
-        'Tap su "Aggiungi al diario" usa pushReplacement (EndTrekkingPage rimossa)',
-        (tester) async {
+    testWidgets('Tap su "Aggiungi al diario" avvia pushReplacement', (tester) async {
       await tester.pumpWidget(buildWidget(const Duration(minutes: 1)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(ElevatedButton));
       await tester.pump();
-      tester.takeException(); 
 
-      expect(find.byType(EndTrekkingPage), findsNothing);
+      verify(mockObserver.didReplace(
+        newRoute: anyNamed('newRoute'),
+        oldRoute: anyNamed('oldRoute'),
+      )).called(1);
     });
   });
 

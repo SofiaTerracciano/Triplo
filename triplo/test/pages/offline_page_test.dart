@@ -41,7 +41,7 @@ void main() {
 
     expect(find.byType(Text), findsNWidgets(3));
 
-    expect(find.byType(ElevatedButton), findsOneWidget);
+    expect(find.byKey(const Key('offline_navigation_button')), findsOneWidget);
     expect(find.byIcon(Icons.explore), findsOneWidget);
   });
 
@@ -55,9 +55,11 @@ void main() {
     await tester.pumpWidget(createWidget(const Locale('en')));
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.byType(ElevatedButton));
+    final button = find.byKey(const Key('offline_navigation_button'));
 
-    await tester.tap(find.byType(ElevatedButton));
+    expect(button, findsOneWidget);
+    await tester.ensureVisible(button);
+    await tester.tap(button);
     await tester.pumpAndSettle();
 
     expect(find.text('Navigation Page'), findsOneWidget);

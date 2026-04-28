@@ -127,7 +127,9 @@ void main() {
 
       await tester.pumpWidget(buildTestableWidget());
 
-      final googleBtn = find.byType(OutlinedButton);
+      final googleBtn = find.byKey(const Key('google_login_button'));
+      expect(googleBtn, findsOneWidget);
+
       await tester.ensureVisible(googleBtn);
       await tester.tap(googleBtn);
       await tester.pumpAndSettle();

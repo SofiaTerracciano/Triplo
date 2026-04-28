@@ -238,6 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     width: 250,
                     child: OutlinedButton.icon(
+                      key: const Key('google_login_button'),
                       onPressed: () => _loginGoogle(context),
                       icon: Image.asset(
                         'images/google_logo.png',

@@ -20,6 +20,9 @@ class $ImagesGen {
   /// File path: images/Triplo_def.png
   AssetGenImage get triploDef => const AssetGenImage('images/Triplo_def.png');
 
+  /// File path: images/blank_tile.png
+  AssetGenImage get blankTile => const AssetGenImage('images/blank_tile.png');
+
   /// File path: images/compass.png
   AssetGenImage get compass => const AssetGenImage('images/compass.png');
 
@@ -40,6 +43,7 @@ class $ImagesGen {
   List<AssetGenImage> get values => [
     triplo,
     triploDef,
+    blankTile,
     compass,
     googleLogo,
     logo,
