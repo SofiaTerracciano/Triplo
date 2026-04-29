@@ -66,6 +66,12 @@ class MockPairingService extends _i1.Mock implements _i2.PairingService {
           as bool);
 
   @override
+  set testPairingError(String? v) => super.noSuchMethod(
+    Invocation.setter(#testPairingError, v),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);

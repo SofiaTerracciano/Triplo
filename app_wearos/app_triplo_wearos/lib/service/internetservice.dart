@@ -48,11 +48,9 @@ class InternetService extends ChangeNotifier with WidgetsBindingObserver {
     if (_checking) return;
 
     _checking = true;
-    //debugPrint("InternetService tick: started=$_started foreground=$_isForeground resumeWaiting=$_resumeWaiting checking=$_checking");
 
     try {
       final ok = await servicecontroller.hasInternet();
-      //debugPrint("InternetService hasInternet -> $ok");
       if (ok) {
         _offlineTimer?.cancel();
         _setOnline(true);

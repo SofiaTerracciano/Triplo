@@ -1,9 +1,5 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:latlong2/latlong.dart';
 import '/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +14,10 @@ class NotificationService {
   void setNavKey(GlobalKey<NavigatorState> key) {
     _navKey = key;
   }
+
+  @visibleForTesting
+  void handleNotificationTapForTest(String payload) =>
+      _handleNotificationTap(payload);
 
   // In notification_service.dart
   FlutterLocalNotificationsPlugin get plugin => _notifications;
@@ -58,16 +58,11 @@ class NotificationService {
       builder: (_) =>
           Dialog(
             backgroundColor: Colors.transparent,
-            // Sfondo trasparente per il dialog esterno
             insetPadding: const EdgeInsets.all(12),
-            // Margine esterno per distanziare dai bordi dell'orologio
             child: Container(
-              // QUESTA È LA CHIAVE: Un cerchio perfetto!
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E1E),
-                // Grigio molto scuro, coerente con Wear OS
                 shape: BoxShape.circle,
-                // Forza il popup a essere tondo
                 border: Border.all(color: Colors.white24,
                     width: 1), // Bordo sottile opzionale per definizione
               ),

@@ -56,7 +56,7 @@ class MemoryService {
 
   void saveImageToMemory(String key, File file) {
     _internalRamCache[key] = file;
-    debugPrint("Memory: salvata immagine $key in RAM"); //coverage:ignore-line
+    debugPrint("Memory: salvata immagine $key in RAM"); // coverage:ignore-line
   }
 
   Future<File?> getImageFromMemory(String key) async {
@@ -70,7 +70,7 @@ class MemoryService {
 
   void clearAllRam() {
     _internalRamCache.clear();
-    debugPrint("Memory: RAM pulita"); //coverage:ignore-line
+    debugPrint("Memory: RAM pulita"); // coverage:ignore-line
   }
 
   // --- 4. GESTIONE DISCO (Metodi usati dal Controller) ---
@@ -81,7 +81,7 @@ class MemoryService {
       final fileInfo = await _diskCache.getFileFromCache(url);
       return fileInfo?.file;
     } catch (e) {
-      debugPrint("Errore recupero disco: $e"); //coverage:ignore-line
+      debugPrint("Errore recupero disco: $e"); // coverage:ignore-line
       return null;
     }
   }
@@ -91,7 +91,7 @@ class MemoryService {
     try {
       return await _diskCache.getSingleFile(url);
     } catch (e) {
-      debugPrint("Errore salvataggio disco: $e"); //coverage:ignore-line
+      debugPrint("Errore salvataggio disco: $e"); // coverage:ignore-line
       rethrow;  
     }
   }
@@ -102,7 +102,7 @@ class MemoryService {
       final list = prefs.getStringList(_kShownWeatherAlertsKey) ?? <String>[];
       return list.toSet();
     } catch (e) {
-      debugPrint("Errore recupero alert mostrati: $e");
+      debugPrint("Errore recupero alert mostrati: $e"); // coverage: ignore-line
       return <String>{};
     }
   }
@@ -112,7 +112,7 @@ class MemoryService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_kShownWeatherAlertsKey, keys.toList());
     } catch (e) {
-      debugPrint("Errore salvataggio alert mostrati: $e");
+      debugPrint("Errore salvataggio alert mostrati: $e"); // coverage: ignore-line
     }
   }
 

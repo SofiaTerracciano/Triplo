@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:app_triplo_wearos/controller/language.dart';
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 @GenerateMocks([MemoryService])
 import 'language_test.mocks.dart';
 import 'trekking_test.mocks.dart' hide MockMemoryService;
@@ -12,11 +13,14 @@ void main() {
   late MockMemoryService mockMemory;
 
   Language makeCtrl() => Language(memoryService: mockMemory);
+  
+  setUp(() => SharedPreferences.setMockInitialValues({}));
 
   setUp(() {
     mockMemory = MockMemoryService();
     when(mockMemory.saveLocale(any)).thenAnswer((_) async {});
     when(mockMemory.getLocale()).thenAnswer((_) async => null);
+
   });
 
   group('locale getter', () {
@@ -148,6 +152,104 @@ void main() {
       await ctrl.loadSavedLocale();
 
       verify(mockMemory.getLocale()).called(1);
+    });
+  });
+
+  group('Language – stato iniziale –', () {
+    test('locale di default è en', () {
+      final lang = Language(memoryService: MockMemoryService());
+      expect(lang.locale, const Locale('en'));
+    });
+  });
+
+  group('Language – setLocale –', () {
+    test('cambia locale e notifica i listener', () async {
+      final memory = MockMemoryService();
+      when(memory.saveLocale(any)).thenAnswer((_) async {});
+      final lang = Language(memoryService: memory);
+      int notifications = 0;
+      lang.addListener(() => notifications++);
+
+      await lang.setLocale(const Locale('it'));
+
+      expect(lang.locale, const Locale('it'));
+      expect(notifications, 1);
+      verify(memory.saveLocale('it')).called(1);
+    });
+
+    test('non notifica se la locale è la stessa', () async {
+      final memory = MockMemoryService();
+      final lang = Language(memoryService: memory);
+      int notifications = 0;
+      lang.addListener(() => notifications++);
+
+      await lang.setLocale(const Locale('en')); // già en
+
+      expect(notifications, 0);
+      verifyNever(memory.saveLocale(any));
+    });
+
+    test('supporta tutte e 5 le lingue configurate', () async {
+      final memory = MockMemoryService();
+      when(memory.saveLocale(any)).thenAnswer((_) async {});
+      final lang = Language(memoryService: memory);
+
+      for (final code in ['en', 'it', 'es', 'de', 'fr']) {
+        await lang.setLocale(Locale(code));
+        expect(lang.locale.languageCode, code);
+        // reset per prossima iterazione
+        await lang.setLocale(const Locale('en'));
+      }
+    });
+  });
+
+  group('Language – loadSavedLocale –', () {
+    test('carica la locale salvata e notifica', () async {
+      final memory = MockMemoryService();
+      when(memory.getLocale()).thenAnswer((_) async => 'fr');
+      final lang = Language(memoryService: memory);
+      int notifications = 0;
+      lang.addListener(() => notifications++);
+
+      await lang.loadSavedLocale();
+
+      expect(lang.locale, const Locale('fr'));
+      expect(notifications, 1);
+    });
+
+    test('non cambia locale se getLocale restituisce null', () async {
+      final memory = MockMemoryService();
+      when(memory.getLocale()).thenAnswer((_) async => null);
+      final lang = Language(memoryService: memory);
+      int notifications = 0;
+      lang.addListener(() => notifications++);
+
+      await lang.loadSavedLocale();
+
+      expect(lang.locale, const Locale('en'));
+      expect(notifications, 0);
+    });
+
+    test('non notifica se la locale salvata è già quella corrente', () async {
+      final memory = MockMemoryService();
+      when(memory.getLocale()).thenAnswer((_) async => 'en');
+      final lang = Language(memoryService: memory);
+      int notifications = 0;
+      lang.addListener(() => notifications++);
+
+      await lang.loadSavedLocale();
+
+      expect(notifications, 0);
+    });
+
+    test('non cambia locale se getLocale restituisce stringa vuota', () async {
+      final memory = MockMemoryService();
+      when(memory.getLocale()).thenAnswer((_) async => '');
+      final lang = Language(memoryService: memory);
+
+      await lang.loadSavedLocale();
+
+      expect(lang.locale, const Locale('en'));
     });
   });
 }

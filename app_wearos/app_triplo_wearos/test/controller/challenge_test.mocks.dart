@@ -70,6 +70,12 @@ class MockNotificationService extends _i1.Mock
   );
 
   @override
+  void handleNotificationTapForTest(String? payload) => super.noSuchMethod(
+    Invocation.method(#handleNotificationTapForTest, [payload]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   _i6.Future<void> init() =>
       (super.noSuchMethod(
             Invocation.method(#init, []),

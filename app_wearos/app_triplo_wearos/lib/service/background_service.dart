@@ -18,7 +18,7 @@ class BackgroundService with WidgetsBindingObserver {
   void start() {
     try {
       WidgetsBinding.instance.addObserver(this);
-      debugPrint("BackgroundService started");
+      debugPrint("BackgroundService started"); /// coverage: ignore-line
 
       unawaited(_run());
 
@@ -29,8 +29,8 @@ class BackgroundService with WidgetsBindingObserver {
         },
       );
     } catch (e, st) {
-      debugPrint("BackgroundService start error: $e");
-      debugPrint("$st");
+      debugPrint("BackgroundService start error: $e"); /// coverage: ignore-line
+      debugPrint("$st"); /// coverage: ignore-line
     }
   }
 
@@ -39,7 +39,7 @@ class BackgroundService with WidgetsBindingObserver {
     _running = true;
 
     try {
-      debugPrint("BackgroundService running check");
+      debugPrint("BackgroundService running check"); /// coverage: ignore-line
 
       final trekkingController = context.read<TrekkingController>();
       final api = context.read<ServiceController>();
@@ -53,7 +53,7 @@ class BackgroundService with WidgetsBindingObserver {
         memory: memory,
       );
     } catch (e) {
-      debugPrint("BackgroundService error: $e");
+      debugPrint("BackgroundService error: $e"); /// coverage: ignore-line
     } finally {
       _running = false;
     }
@@ -79,14 +79,14 @@ class BackgroundServiceLogic {
     required NotificationService notification,
     required MemoryService memory,
   }) async {
-    debugPrint("BackgroundServiceLogic running");
+    debugPrint("BackgroundServiceLogic running"); /// coverage: ignore-line
     if (trekkingController.uid == null) {
-      debugPrint("BackgroundService skipped: pairing uid not ready");
+      debugPrint("BackgroundService skipped: pairing uid not ready"); /// coverage: ignore-line
       return;
     }
 
     final trekkings = await trekkingController.getWeatherAlertTrekkings();
-    debugPrint("Subscribed trekkings: ${trekkings.length}");
+    debugPrint("Subscribed trekkings: ${trekkings.length}"); /// coverage: ignore-line
 
     for (final trekking in trekkings) {
       final target = trekking.starting_point ?? trekking.ending_point;
@@ -101,24 +101,24 @@ class BackgroundServiceLogic {
           target.longitude,
         );
       } catch (e) {
-        debugPrint("Real alerts error for ${trekking.name}: $e");
+        debugPrint("Real alerts error for ${trekking.name}: $e"); /// coverage: ignore-line
       }
 
       try {
         mock = await api.mockAlerts();
       } catch (e) {
-        debugPrint("Mock alerts error for ${trekking.name}: $e");
+        debugPrint("Mock alerts error for ${trekking.name}: $e"); /// coverage: ignore-line
       }
 
       final alerts = [...real, ...mock];
-      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}");
+      debugPrint("Alerts found for ${trekking.name}: ${alerts.length}"); /// coverage: ignore-line
 
       for (final alert in alerts) {
         final alertKey = _buildAlertKey(trekking.documentId, alert);
 
         final alreadyShown = await memory.hasShownWeatherAlertKey(alertKey);
         if (alreadyShown) {
-          debugPrint("Skipping duplicate alert: $alertKey");
+          debugPrint("Skipping duplicate alert: $alertKey"); /// coverage: ignore-line
           continue;
         }
 
@@ -134,7 +134,7 @@ class BackgroundServiceLogic {
         );
 
         await memory.addShownWeatherAlertKey(alertKey);
-        debugPrint("Notification shown for ${trekking.name}: $alertKey");
+        debugPrint("Notification shown for ${trekking.name}: $alertKey"); /// coverage: ignore-line
       }
     }
   }

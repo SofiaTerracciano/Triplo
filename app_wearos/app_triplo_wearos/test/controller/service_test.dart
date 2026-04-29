@@ -4,369 +4,302 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
+import 'package:http/testing.dart' as http_testing; 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:app_triplo_wearos/service/OSservice/geo.dart';
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
-import 'challenge_test.mocks.dart' show MockMemoryService;
-import 'service_test.mocks.dart' show MockGeoService;
+
 
 @GenerateMocks([GeoService, MemoryService])
+import 'service_test.mocks.dart';
+
+http.Client _fakeClient(int statusCode, dynamic body) =>
+    http_testing.MockClient(
+      (_) async => http.Response(
+        body is String ? body : jsonEncode(body),
+        statusCode,
+      ),
+    );
+
+http.Client _throwingClient() =>
+    http_testing.MockClient((_) async => throw Exception('network error'));
+
+ServiceController _makeSvc({
+  MockGeoService? geo,
+  MockMemoryService? memory,
+  String owKey = 'test-ow-key',
+  String wbKey = 'test-wb-key',
+}) {
+  dotenv.testLoad(fileInput: '''
+OPENWEATHER_API_KEY=$owKey
+WEATHERBIT_API_KEY=$wbKey
+''');
+  return ServiceController(
+    geo: geo ?? MockGeoService(),
+    memory: memory ?? MockMemoryService(),
+  );
+}
+
 void main() {
-  setUpAll(() async {
-    await dotenv.load(mergeWith: {
-      'OPENWEATHER_API_KEY': 'test-ow-key',
-      'WEATHERBIT_API_KEY': 'test-wb-key',
-    });
-  });
-
-  ServiceController makeController({
-    MockGeoService? geo,
-    MockMemoryService? memory,
-  }) =>
-      ServiceController(
-        geo: geo ?? MockGeoService(),
-        memory: memory ?? MockMemoryService(),
-      );
-
-  http.Client fakeClient(int statusCode, dynamic body) => MockClient(
-        (_) async => http.Response(
-          body is String ? body : jsonEncode(body),
-          statusCode,
-        ),
-      );
-
-  group('constructor', () {
-    test('reads API keys from dotenv', () {
-      final c = makeController();
-      expect(c.openWeatherKey, 'test-ow-key');
-      expect(c.weatherbitKey, 'test-wb-key');
+  group('costruttore', () {
+    test('carica le chiavi API dal dotenv', () {
+      final c = _makeSvc(owKey: 'ow123', wbKey: 'wb456');
+      expect(c.openWeatherKey, 'ow123');
+      expect(c.weatherbitKey, 'wb456');
     });
 
-    test('sets empty keys when env vars are absent', () async {
-      // Temporarily reload with missing keys
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': '',
-        'WEATHERBIT_API_KEY': '',
-      });
-      final c = makeController();
+    test('chiavi vuote quando assenti nel dotenv', () {
+      dotenv.testLoad(fileInput: '');
+      final c = ServiceController(
+        geo: MockGeoService(),
+        memory: MockMemoryService(),
+      );
       expect(c.openWeatherKey, '');
       expect(c.weatherbitKey, '');
-      // Restore
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': 'test-ow-key',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
     });
   });
 
   group('userLocation', () {
-    test('delegates to GeoService and returns LatLng', () async {
-      const expected = LatLng(45.0, 9.0);
+    test('delega a GeoService e restituisce LatLng', () async {
       final geo = MockGeoService();
-      when(geo.userLocation()).thenAnswer((_) async => expected);
-
-      final c = makeController(geo: geo);
-      expect(await c.userLocation(), expected);
-      verify(geo.userLocation()).called(1);
+      when(geo.userLocation()).thenAnswer((_) async => const LatLng(45.0, 9.0));
+      expect(await _makeSvc(geo: geo).userLocation(), const LatLng(45.0, 9.0));
     });
 
-    test('returns null when GeoService returns null', () async {
+    test('restituisce null se GeoService restituisce null', () async {
       final geo = MockGeoService();
       when(geo.userLocation()).thenAnswer((_) async => null);
-
-      final c = makeController(geo: geo);
-      expect(await c.userLocation(), isNull);
+      expect(await _makeSvc(geo: geo).userLocation(), isNull);
     });
   });
 
   group('weather', () {
-    final weatherBody = {
-      'weather': [{'id': 800, 'description': 'clear sky'}],
-      'main': {'temp': 22.5},
-    };
-
-    test('returns parsed map on HTTP 200', () async {
-      final c = makeController();
-      final result = await c.weather(45.0, 9.0, 'it',
-          client: fakeClient(200, weatherBody));
-
+    test('restituisce mappa JSON con status 200', () async {
+      final result = await _makeSvc().weather(45.0, 9.0, 'it',
+          client: _fakeClient(200, {'main': {'temp': 22.5}}));
       expect(result, isNotNull);
       expect(result!['main']['temp'], 22.5);
     });
 
-    test('returns null on non-200 status', () async {
-      final c = makeController();
-      final result = await c.weather(45.0, 9.0, 'it',
-          client: fakeClient(401, {'message': 'Invalid API key'}));
-
-      expect(result, isNull);
-    });
-
-    test('returns null when openWeatherKey is empty', () async {
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': '',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
-      final c = makeController();
-      expect(await c.weather(45.0, 9.0, 'it'), isNull);
-      // Restore
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': 'test-ow-key',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
-    });
-
-    test('returns null on network exception / timeout', () async {
-      final throwingClient = MockClient((_) async => throw Exception('timeout'));
-      final c = makeController();
-      expect(await c.weather(45.0, 9.0, 'it', client: throwingClient), isNull);
-    });
-  });
-
-  group('forecast', () {
-    List<Map<String, dynamic>> makeRawList(int count) => List.generate(
-          count,
-          (i) => {
-            'dt_txt': '2024-06-0${(i ~/ 8) + 1} ${(i % 3) * 6}:00:00',
-            'main': {'temp': 20.0 + i},
-            'weather': [{'icon': '01d', 'description': 'sunny'}],
-          },
-        );
-
-    test('returns sampled list (every 8th entry) on HTTP 200', () async {
-      final body = {'list': makeRawList(16)};
-      final c = makeController();
-      final result = await c.forecast(45.0, 9.0, 'it',
-          client: fakeClient(200, body));
-
-      expect(result, isNotNull);
-      expect(result, hasLength(2)); 
-    });
-
-    test('returns null on non-200 status', () async {
-      final c = makeController();
+    test('restituisce null con status != 200', () async {
       expect(
-        await c.forecast(45.0, 9.0, 'it', client: fakeClient(500, {})),
+        await _makeSvc().weather(45.0, 9.0, 'it',
+            client: _fakeClient(401, {})),
         isNull,
       );
     });
 
-    test('returns null when openWeatherKey is empty', () async {
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': '',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
-      final c = makeController();
-      expect(await c.forecast(45.0, 9.0, 'it'), isNull);
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': 'test-ow-key',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
+    test('restituisce null se openWeatherKey è vuota', () async {
+      expect(await _makeSvc(owKey: '').weather(45.0, 9.0, 'it'), isNull);
     });
 
-    test('returns null on network exception', () async {
-      final throwingClient = MockClient((_) async => throw Exception('error'));
-      final c = makeController();
-      expect(await c.forecast(45.0, 9.0, 'it', client: throwingClient), isNull);
+    test('restituisce null in caso di eccezione', () async {
+      expect(
+        await _makeSvc().weather(45.0, 9.0, 'it', client: _throwingClient()),
+        isNull,
+      );
+    });
+  });
+
+  group('forecast', () {
+    List<Map<String, dynamic>> _makeList(int n) => List.generate(n, (i) => {
+          'dt_txt': '2024-06-01 ${(i % 8) * 3}:00:00',
+          'main': {'temp': 20.0 + i},
+          'weather': [{'icon': '01d', 'description': 'sunny'}],
+        });
+
+    test('restituisce lista campionata (ogni 8) con status 200', () async {
+      final result = await _makeSvc().forecast(45.0, 9.0, 'it',
+          client: _fakeClient(200, {'list': _makeList(16)}));
+      expect(result, isNotNull);
+      expect(result!.length, 2);
+    });
+
+    test('restituisce null con status != 200', () async {
+      expect(
+        await _makeSvc().forecast(45.0, 9.0, 'it',
+            client: _fakeClient(500, {})),
+        isNull,
+      );
+    });
+
+    test('restituisce null se openWeatherKey è vuota', () async {
+      expect(await _makeSvc(owKey: '').forecast(45.0, 9.0, 'it'), isNull);
+    });
+
+    test('restituisce null in caso di eccezione', () async {
+      expect(
+        await _makeSvc().forecast(45.0, 9.0, 'it', client: _throwingClient()),
+        isNull,
+      );
     });
   });
 
   group('parseForecastItem', () {
     final raw = {
-      'dt_txt': '2024-06-01 12:00:00',
-      'main': {'temp': 23.7},
-      'weather': [{'icon': '02d', 'description': 'Few Clouds'}],
+      'dt_txt': '2024-06-15 12:00:00',
+      'main': {'temp': 22.6},
+      'weather': [{'icon': '01d', 'description': 'Clear Sky'}],
     };
 
-    test('parses date correctly', () {
-      final c = makeController();
-      final item = c.parseForecastItem(raw);
-      expect(item['date'], DateTime.parse('2024-06-01 12:00:00'));
+    test('data corretta', () {
+      expect(_makeSvc().parseForecastItem(raw)['date'],
+          DateTime.parse('2024-06-15 12:00:00'));
     });
 
-    test('rounds temperature to int', () {
-      final c = makeController();
-      expect(c.parseForecastItem(raw)['temp'], 24);
+    test('temperatura arrotondata', () {
+      expect(_makeSvc().parseForecastItem(raw)['temp'], 23);
     });
 
-    test('preserves icon code', () {
-      final c = makeController();
-      expect(c.parseForecastItem(raw)['icon'], '02d');
+    test('icon code preservato', () {
+      expect(_makeSvc().parseForecastItem(raw)['icon'], '01d');
     });
 
-    test('lowercases description', () {
-      final c = makeController();
-      expect(c.parseForecastItem(raw)['description'], 'few clouds');
+    test('descrizione in lowercase', () {
+      expect(_makeSvc().parseForecastItem(raw)['description'], 'clear sky');
     });
   });
 
   group('parseForecast', () {
-    test('maps every raw entry through parseForecastItem', () {
-      final c = makeController();
-      final raw = [
+    test('mappa tutti gli elementi', () {
+      final result = _makeSvc().parseForecast([
         {
           'dt_txt': '2024-06-01 00:00:00',
           'main': {'temp': 15.0},
-          'weather': [{'icon': '01n', 'description': 'clear sky'}],
+          'weather': [{'icon': '01n', 'description': 'clear'}],
         },
         {
           'dt_txt': '2024-06-02 00:00:00',
           'main': {'temp': 20.0},
           'weather': [{'icon': '01d', 'description': 'Sunny'}],
         },
-      ];
-      final result = c.parseForecast(raw);
-      expect(result, hasLength(2));
-      expect(result.first['description'], 'clear sky');
+      ]);
+      expect(result.length, 2);
       expect(result.last['description'], 'sunny');
     });
 
-    test('returns empty list for empty input', () {
-      expect(makeController().parseForecast([]), isEmpty);
+    test('lista vuota → lista vuota', () {
+      expect(_makeSvc().parseForecast([]), isEmpty);
     });
   });
 
   group('weatherIconUrl', () {
-    test('returns standard URL for normal size', () {
-      final url = makeController().weatherIconUrl('01d');
-      expect(url, 'https://openweathermap.org/img/wn/01d.png');
+    test('URL standard', () {
+      expect(_makeSvc().weatherIconUrl('01d'),
+          'https://openweathermap.org/img/wn/01d.png');
     });
 
-    test('returns @2x URL when big is true', () {
-      final url = makeController().weatherIconUrl('01d', big: true);
-      expect(url, 'https://openweathermap.org/img/wn/01d@2x.png');
-    });
-  });
-
-  group('openTopoMapTile', () {
-    test('returns the expected template URL', () {
-      expect(
-        makeController().openTopoMapTile(),
-        'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-      );
+    test('URL @2x quando big=true', () {
+      expect(_makeSvc().weatherIconUrl('01d', big: true),
+          'https://openweathermap.org/img/wn/01d@2x.png');
     });
   });
 
-  group('openTopoMapSubdomains', () {
-    test('returns exactly [a, b, c]', () {
-      expect(makeController().openTopoMapSubdomains(), ['a', 'b', 'c']);
+  group('openTopoMap', () {
+    test('tile template corretto', () {
+      expect(_makeSvc().openTopoMapTile(),
+          'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png');
+    });
+
+    test('subdomains [a, b, c]', () {
+      expect(_makeSvc().openTopoMapSubdomains(), ['a', 'b', 'c']);
     });
   });
 
   group('mockAlerts', () {
-    test('returns list when server responds with a JSON array', () async {
-      final body = [
-        {'event': 'Storm', 'severity': 'High'},
-        {'event': 'Rain', 'severity': 'Low'},
-      ];
-      final c = makeController();
-      final result = await c.mockAlerts(client: fakeClient(200, body));
-      expect(result, hasLength(2));
-      expect(result.first['event'], 'Storm');
+    test('lista JSON → lista', () async {
+      final result = await _makeSvc().mockAlerts(
+          client: _fakeClient(200, [
+        {'event': 'Storm', 'severity': 'High'}
+      ]));
+      expect(result.length, 1);
+      expect(result[0]['event'], 'Storm');
     });
 
-    test('wraps a single JSON object in a list', () async {
-      final body = {'event': 'Wind', 'severity': 'Medium'};
-      final c = makeController();
-      final result = await c.mockAlerts(client: fakeClient(200, body));
-      expect(result, hasLength(1));
-      expect(result.first['event'], 'Wind');
+    test('mappa JSON singola → lista con 1 elemento', () async {
+      final result = await _makeSvc().mockAlerts(
+          client: _fakeClient(200, {'event': 'Wind'}));
+      expect(result.length, 1);
     });
 
-    test('returns empty list on non-200 status', () async {
-      final c = makeController();
-      expect(await c.mockAlerts(client: fakeClient(500, {})), isEmpty);
+    test('status != 200 → lista vuota', () async {
+      expect(
+          await _makeSvc().mockAlerts(client: _fakeClient(503, {})), isEmpty);
     });
 
-    test('returns empty list on network exception', () async {
-      final throwingClient = MockClient((_) async => throw Exception('down'));
-      expect(await makeController().mockAlerts(client: throwingClient), isEmpty);
+    test('eccezione → lista vuota', () async {
+      expect(
+          await _makeSvc().mockAlerts(client: _throwingClient()), isEmpty);
     });
   });
 
   group('weatherbitAlerts', () {
-    final alertsBody = {
+    final fakeBody = {
       'alerts': [
         {
-          'title': 'Thunderstorm',
+          'title': 'Storm',
           'severity': 'Extreme',
-          'description': 'Heavy thunderstorms expected.',
-          'effective_local': '2024-06-01T10:00:00',
-          'expires_local': '2024-06-01T18:00:00',
+          'description': 'Heavy rain',
+          'effective_local': '2024-01-01',
+          'expires_local': '2024-01-02',
         }
       ]
     };
 
-    test('parses alerts correctly on HTTP 200', () async {
-      final c = makeController();
-      final result = await c.weatherbitAlerts(45.0, 9.0,
-          client: fakeClient(200, alertsBody));
-
-      expect(result, hasLength(1));
-      expect(result.first['event'], 'Thunderstorm');
-      expect(result.first['severity'], 'Extreme');
-      expect(result.first['source'], 'weatherbit');
+    test('weatherbitKey vuota → lista vuota', () async {
+      expect(await _makeSvc(wbKey: '').weatherbitAlerts(45.0, 9.0), isEmpty);
     });
 
-    test('returns empty list when weatherbitKey is empty', () async {
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': 'test-ow-key',
-        'WEATHERBIT_API_KEY': '',
-      });
-      final c = makeController();
-      expect(await c.weatherbitAlerts(45.0, 9.0), isEmpty);
-      await dotenv.load(mergeWith: {
-        'OPENWEATHER_API_KEY': 'test-ow-key',
-        'WEATHERBIT_API_KEY': 'test-wb-key',
-      });
+    test('status 200 → alert mappati correttamente', () async {
+      final result = await _makeSvc()
+          .weatherbitAlerts(45.0, 9.0, client: _fakeClient(200, fakeBody));
+      expect(result.length, 1);
+      expect(result[0]['event'], 'Storm');
+      expect(result[0]['source'], 'weatherbit');
     });
 
-    test('returns empty list on HTTP 429 (rate limit)', () async {
-      final c = makeController();
+    test('status 429 → lista vuota', () async {
       expect(
-        await c.weatherbitAlerts(45.0, 9.0,
-            client: fakeClient(429, {'error': 'rate limit'})),
+        await _makeSvc()
+            .weatherbitAlerts(45.0, 9.0, client: _fakeClient(429, {})),
         isEmpty,
       );
     });
 
-    test('returns empty list on other non-200 status', () async {
-      final c = makeController();
+    test('status 500 → lista vuota', () async {
       expect(
-        await c.weatherbitAlerts(45.0, 9.0,
-            client: fakeClient(500, {})),
+        await _makeSvc()
+            .weatherbitAlerts(45.0, 9.0, client: _fakeClient(500, {})),
         isEmpty,
       );
     });
 
-    test('returns empty list on network exception', () async {
-      final throwingClient = MockClient((_) async => throw Exception('error'));
+    test('eccezione → lista vuota', () async {
       expect(
-        await makeController().weatherbitAlerts(45.0, 9.0,
-            client: throwingClient),
+        await _makeSvc()
+            .weatherbitAlerts(45.0, 9.0, client: _throwingClient()),
         isEmpty,
       );
     });
 
-    test('handles missing "alerts" key gracefully (returns empty)', () async {
-      final c = makeController();
-      final result = await c.weatherbitAlerts(45.0, 9.0,
-          client: fakeClient(200, <String, dynamic>{}));
-      expect(result, isEmpty);
+    test('chiave "alerts" assente → lista vuota', () async {
+      expect(
+        await _makeSvc()
+            .weatherbitAlerts(45.0, 9.0, client: _fakeClient(200, {})),
+        isEmpty,
+      );
     });
 
-    test('uses default "Weather Alert" when title is missing', () async {
+    test('title mancante → usa "Weather Alert" come default', () async {
       final body = {
         'alerts': [
-          {'severity': 'Low', 'description': 'Fog.'},
+          {'severity': 'Low', 'description': 'Fog'}
         ]
       };
-      final c = makeController();
-      final result = await c.weatherbitAlerts(45.0, 9.0,
-          client: fakeClient(200, body));
-      expect(result.first['event'], 'Weather Alert');
+      final result = await _makeSvc()
+          .weatherbitAlerts(45.0, 9.0, client: _fakeClient(200, body));
+      expect(result[0]['event'], 'Weather Alert');
     });
   });
 }

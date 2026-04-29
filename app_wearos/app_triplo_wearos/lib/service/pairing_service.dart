@@ -8,7 +8,8 @@ import '../controller/user.dart';
 import '../pages/PairingLoginPage/login.dart';
 
 class PairingService extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //final FirebaseFirestore _db = FirebaseFirestore.instance;
+  late final FirebaseFirestore _db;
   final String watchId;
   final Uuid _uuid = const Uuid();
 
@@ -33,7 +34,12 @@ class PairingService extends ChangeNotifier {
   DateTime? _pairCreatedAtLocal;
   bool _remoteLogoutActive = false;
   bool get remoteLogoutActive => _remoteLogoutActive;
- PairingService({required this.watchId});
+  PairingService({required this.watchId}) : _db = FirebaseFirestore.instance;
+
+  PairingService.withFirestore({
+    required this.watchId,
+    required FirebaseFirestore db,
+  }) : _db = db;
   String? get qrPayload {
     if (_qrToken == null) return null;
     return "triplo://watch-pair/$watchId?t=$_qrToken";
@@ -46,6 +52,12 @@ class PairingService extends ChangeNotifier {
 
 
     return DateTime.now().difference(_pairCreatedAtLocal!) < _qrTtl;
+  }
+
+  @visibleForTesting
+  set testPairingError(String? v) {
+    _pairingError = v;
+    notifyListeners();
   }
 
   Future<void> startWatchPairing({bool forceNew = false}) async {

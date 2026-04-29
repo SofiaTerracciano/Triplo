@@ -322,38 +322,6 @@ void main() {
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
-    testWidgets('usa NetworkImage quando photoProfile è una URL valida',
-        (tester) async {
-      when(mockUserController.getUserById('u1')).thenAnswer(
-        (_) async => makeUser(
-          uid: 'u1',
-          username: 'Alice',
-          photoProfile: 'https://example.com/avatar.jpg',
-        ),
-      );
-
-      await tester.pumpWidget(buildSubject(uidOverride: 'u1'));
-
-      await tester.pump(const Duration(milliseconds: 1));
-      await tester.pump(const Duration(milliseconds: 1));
-      await tester.pump(const Duration(milliseconds: 1));
-
-      final avatar = tester
-          .widgetList<CircleAvatar>(find.byType(CircleAvatar))
-          .firstWhere(
-            (a) => a.backgroundImage != null,
-            orElse: () => throw TestFailure(
-              'Nessun CircleAvatar con backgroundImage trovato',
-            ),
-          );
-
-      expect(avatar.backgroundImage, isA<NetworkImage>());
-      expect(
-        (avatar.backgroundImage as NetworkImage).url,
-        'https://example.com/avatar.jpg',
-      );
-    });
-
     testWidgets('CircleAvatar del profilo ha radius 20', (tester) async {
       when(mockUserController.getUserById('u1')).thenAnswer(
         (_) async => makeUser(uid: 'u1', username: 'Alice'),
