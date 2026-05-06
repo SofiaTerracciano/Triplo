@@ -1,8 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../controller/user.dart';
+import 'package:triplo/l10n/app_localizations.dart';
 
 class PairedWatchesPage extends StatefulWidget {
   const PairedWatchesPage({super.key});
@@ -10,7 +9,6 @@ class PairedWatchesPage extends StatefulWidget {
   @override
   State<PairedWatchesPage> createState() => _PairedWatchesPageState();
 }
-
 
 class _PairedWatchesPageState extends State<PairedWatchesPage> {
   late Future<List<Map<String, dynamic>>> _future;
@@ -25,67 +23,66 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
     _future = context.read<UserController>().getConnectedWatches();
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   bool _remoteLogoutActive(Map<String, dynamic> watch) {
     return watch['remoteLogoutAt'] != null;
   }
 
   Future<void> _enableRemoteLogout(String watchId) async {
+    final local = AppLocalizations.of(context)!;
+
     try {
       await context.read<UserController>().enableRemoteLogoutForWatch(watchId);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Remote logout enabled.")),
+        SnackBar(content: Text(local.remote_logout_enabled)),
       );
+
       setState(_reload);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error enabling remote logout: $e")),
+        SnackBar(
+          content: Text("${local.remote_logout_enable_error}: $e"),
+        ),
       );
     }
   }
 
   Future<void> _clearRemoteLogout(String watchId) async {
+    final local = AppLocalizations.of(context)!;
+
     try {
       await context.read<UserController>().clearRemoteLogoutForWatch(watchId);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Remote logout cleared.")),
+        SnackBar(content: Text(local.remote_logout_cleared)),
       );
+
       setState(_reload);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error clearing remote logout: $e")),
+        SnackBar(
+          content: Text("${local.remote_logout_clear_error}: $e"),
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Connected watches"),
+        title: Text(local.connected_watches_title),
         actions: [
           IconButton(
             onPressed: () => setState(_reload),
             icon: const Icon(Icons.refresh),
+            tooltip: local.refresh,
           ),
         ],
       ),
@@ -101,7 +98,7 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "Error loading connected watches:\n${snapshot.error}",
+                  "${local.error_loading_watches}:\n${snapshot.error}",
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -111,11 +108,11 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
           final watches = snapshot.data ?? [];
 
           if (watches.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Text(
-                  "No currently connected watches found.",
+                  local.no_watches,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -138,17 +135,21 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Watch ID: $watchId",
+                        "${local.watch_id}: $watchId",
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text("Status: ${watch['status'] ?? '-'}"),
-                      Text("Platform: ${watch['platform'] ?? '-'}"),
+
+                      Text("${local.status}: ${watch['status'] ?? '-'}"),
+                      Text("${local.platform}: ${watch['platform'] ?? '-'}"),
 
                       Text(
-                        "Remote logout: ${remoteActive ? 'enabled' : 'disabled'}",
+                        "${local.remote_logout}: "
+                        "${remoteActive ? local.enabled : local.disabled}",
                       ),
+
                       const SizedBox(height: 12),
+
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
@@ -157,13 +158,13 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
                             onPressed: remoteActive
                                 ? null
                                 : () => _enableRemoteLogout(watchId),
-                            child: const Text("Enable remote logout"),
+                            child: Text(local.enable_remote_logout),
                           ),
                           ElevatedButton(
                             onPressed: remoteActive
                                 ? () => _clearRemoteLogout(watchId)
                                 : null,
-                            child: const Text("Disable remote logout"),
+                            child: Text(local.disable_remote_logout),
                           ),
                         ],
                       ),

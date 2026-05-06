@@ -245,5 +245,34 @@
   "no_weather_alerts": "Aucun parcours avec des alertes météo actives",
   "weather_alert_removed": "Alerte météo supprimée",
   "open_button": "Ouvrir",
-  "remove_button": "Supprimer"
+  "remove_button": "Supprimer",
+
+  "provider_google": "Pour les comptes Google, l'email est géré par le fournisseur d'identification.",
+  "sign_in_again_label": "Reconnectez-vous avec le nouvel email",
+  "email_change_error": "Erreur lors du changement d'email",
+  "wrong_password": "Le mot de passe actuel n'est pas correct",
+  "email_already_in_use": "Cet email est déjà utilisé",
+  "invalid_email": "L'adresse email n'est pas valide",
+  "requires_recent_login": "Vous devez vous reconnecter avant de changer d'email",
+  "not_authenticated": "Aucun utilisateur authentifié",
+  "email_change_success_label": "Nous vous avons envoyé un lien de confirmation à votre nouvel email. Après l'avoir confirmé, reconnectez-vous avec le nouvel email.",
+
+  "connected_watches_title": "Montres connectées",
+  "no_watches": "Aucune montre connectée trouvée.",
+  "error_loading_watches": "Erreur lors du chargement des montres connectées",
+  "watch_id": "ID montre",
+  "status": "Statut",
+  "platform": "Plateforme",
+  "remote_logout": "Déconnexion à distance",
+  "enabled": "activé",
+  "disabled": "désactivé",
+  "enable_remote_logout": "Activer la déconnexion à distance",
+  "disable_remote_logout": "Désactiver la déconnexion à distance",
+  "remote_logout_enabled": "Déconnexion activée.",
+  "remote_logout_cleared": "Déconnexion désactivée.",
+  "remote_logout_enable_error": "Erreur d’activation",
+  "remote_logout_clear_error": "Erreur de désactivation",
+  "refresh": "Actualiser",
+
+  "paired_watches_label": "Gérer les montres associées"
 }

@@ -609,6 +609,12 @@ class MockInternetService extends _i1.Mock implements _i12.InternetService {
   );
 
   @override
+  void handleStatusBarTap() => super.noSuchMethod(
+    Invocation.method(#handleStatusBarTap, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   _i8.Future<bool> didPushRoute(String? route) =>
       (super.noSuchMethod(
             Invocation.method(#didPushRoute, [route]),

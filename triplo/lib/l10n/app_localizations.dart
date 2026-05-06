@@ -1360,6 +1360,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get remove_button;
+
+  /// No description provided for @provider_google.
+  ///
+  /// In en, this message translates to:
+  /// **'For Google accounts, the email is managed by the authentication provider.'**
+  String get provider_google;
+
+  /// No description provided for @sign_in_again_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again with the new email'**
+  String get sign_in_again_label;
+
+  /// No description provided for @email_change_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error changing email'**
+  String get email_change_error;
+
+  /// No description provided for @wrong_password.
+  ///
+  /// In en, this message translates to:
+  /// **'The current password is incorrect'**
+  String get wrong_password;
+
+  /// No description provided for @email_already_in_use.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already in use'**
+  String get email_already_in_use;
+
+  /// No description provided for @invalid_email.
+  ///
+  /// In en, this message translates to:
+  /// **'The email address is not valid'**
+  String get invalid_email;
+
+  /// No description provided for @requires_recent_login.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to sign in again before changing email'**
+  String get requires_recent_login;
+
+  /// No description provided for @not_authenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'No authenticated user'**
+  String get not_authenticated;
+
+  /// No description provided for @email_change_success_label.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a confirmation link to the new email. After confirming it, sign in again with the new email.'**
+  String get email_change_success_label;
+
+  /// No description provided for @connected_watches_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected watches'**
+  String get connected_watches_title;
+
+  /// No description provided for @no_watches.
+  ///
+  /// In en, this message translates to:
+  /// **'No connected watches found.'**
+  String get no_watches;
+
+  /// No description provided for @error_loading_watches.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading connected watches'**
+  String get error_loading_watches;
+
+  /// No description provided for @watch_id.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch ID'**
+  String get watch_id;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @platform.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get platform;
+
+  /// No description provided for @remote_logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote logout'**
+  String get remote_logout;
+
+  /// No description provided for @enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'enabled'**
+  String get enabled;
+
+  /// No description provided for @disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'disabled'**
+  String get disabled;
+
+  /// No description provided for @enable_remote_logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable remote logout'**
+  String get enable_remote_logout;
+
+  /// No description provided for @disable_remote_logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable remote logout'**
+  String get disable_remote_logout;
+
+  /// No description provided for @remote_logout_enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote logout enabled.'**
+  String get remote_logout_enabled;
+
+  /// No description provided for @remote_logout_cleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote logout cleared.'**
+  String get remote_logout_cleared;
+
+  /// No description provided for @remote_logout_enable_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error enabling remote logout'**
+  String get remote_logout_enable_error;
+
+  /// No description provided for @remote_logout_clear_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error disabling remote logout'**
+  String get remote_logout_clear_error;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @paired_watches_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage paired watches'**
+  String get paired_watches_label;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

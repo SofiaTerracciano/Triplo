@@ -3,7 +3,6 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-
 class GeoService {
 
   Future<LatLng?> userLocation() async {
@@ -18,22 +17,7 @@ class GeoService {
       return null;
     }
   }
-  //geoservice non dovrebbe parlare con firestore, è servizio per OS
-  //spostato nel controller dei trekking dove questo metodo è usato
-  /*Future<void> uploadLocation(Position position) async {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) return;
 
-    await _firestore
-        .collection('location')
-        .doc(userId)
-        .set({
-      'lat': position.latitude,
-      'lng': position.longitude,
-    });
-  }
-
-   */
   Future<bool> isLocationServiceEnabled() async {
     return Geolocator.isLocationServiceEnabled();
   }

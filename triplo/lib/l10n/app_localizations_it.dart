@@ -637,4 +637,82 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get remove_button => 'Rimuovi';
+
+  @override
+  String get provider_google => 'Per gli account Google l\'email è gestita dal provider di accesso.';
+
+  @override
+  String get sign_in_again_label => 'Accedi di nuovo con la nuova email';
+
+  @override
+  String get email_change_error => 'Errore durante il cambio email';
+
+  @override
+  String get wrong_password => 'La password attuale non è corretta';
+
+  @override
+  String get email_already_in_use => 'Questa email è già in uso';
+
+  @override
+  String get invalid_email => 'L\'indirizzo email non è valido';
+
+  @override
+  String get requires_recent_login => 'Devi autenticarti di nuovo prima di cambiare email';
+
+  @override
+  String get not_authenticated => 'Nessun utente autenticato';
+
+  @override
+  String get email_change_success_label => 'Ti abbiamo inviato un link di conferma alla nuova email. Dopo averla confermata, accedi di nuovo con la nuova email.';
+
+  @override
+  String get connected_watches_title => 'Orologi collegati';
+
+  @override
+  String get no_watches => 'Nessun orologio collegato trovato.';
+
+  @override
+  String get error_loading_watches => 'Errore nel caricamento degli orologi collegati';
+
+  @override
+  String get watch_id => 'ID orologio';
+
+  @override
+  String get status => 'Stato';
+
+  @override
+  String get platform => 'Piattaforma';
+
+  @override
+  String get remote_logout => 'Logout remoto';
+
+  @override
+  String get enabled => 'attivo';
+
+  @override
+  String get disabled => 'disattivo';
+
+  @override
+  String get enable_remote_logout => 'Abilita logout remoto';
+
+  @override
+  String get disable_remote_logout => 'Disabilita logout remoto';
+
+  @override
+  String get remote_logout_enabled => 'Logout remoto attivato.';
+
+  @override
+  String get remote_logout_cleared => 'Logout remoto disattivato.';
+
+  @override
+  String get remote_logout_enable_error => 'Errore attivazione logout remoto';
+
+  @override
+  String get remote_logout_clear_error => 'Errore disattivazione logout remoto';
+
+  @override
+  String get refresh => 'Aggiorna';
+
+  @override
+  String get paired_watches_label => 'Gestisci orologi collegati';
 }

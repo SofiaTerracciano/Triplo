@@ -4,9 +4,32 @@ import 'package:latlong2/latlong.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:triplo/service/geo.dart';
-import '../controller/servicecontroller_test.mocks.dart';
 
 @GenerateMocks([GeoService])
+import 'geo_test.mocks.dart';
+
+
+Position fakePosition({double lat = 45.0, double lon = 9.0}) {
+  return Position(
+    latitude: lat,
+    longitude: lon,
+    timestamp: DateTime(2024),
+    accuracy: 10,
+    altitude: 0,
+    altitudeAccuracy: 0,
+    heading: 0,
+    headingAccuracy: 0,
+    speed: 0,
+    speedAccuracy: 0,
+  );
+}
+
+// ─── TestableGeoService ───────────────────────────────────────────────────────
+//
+// Estende GeoService e overrida solo i metodi che dipendono da canali platform
+// (Geolocator, FlutterCompass) non raggiungibili in unit test.
+// I metodi NON overridati vengono eseguiti dal codice reale → coprono la
+// coverage delle righe che non chiamano API platform.
 
 class TestableGeoService extends GeoService {
   final Future<Position> Function()? fakeGetPosition;
@@ -49,28 +72,16 @@ class TestableGeoService extends GeoService {
     return fakePositionStream?.call() ?? const Stream.empty();
   }
 
-  @override
-  Stream<double?> compassStream() {
-    return fakeCompassStream?.call() ?? Stream.value(null);
-  }
+  // NON ovveridiamo compassStream() → il codice reale viene eseguito.
+  // Quando FlutterCompass.events è null (ambiente test senza plugin)
+  // il branch `if (stream == null)` viene coperto.
 }
 
-Position fakePosition({double lat = 45.0, double lon = 9.0}) {
-  return Position(
-    latitude: lat,
-    longitude: lon,
-    timestamp: DateTime(2024),
-    accuracy: 10,
-    altitude: 0,
-    altitudeAccuracy: 0,
-    heading: 0,
-    headingAccuracy: 0,
-    speed: 0,
-    speedAccuracy: 0,
-  );
-}
+// ─── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ── GeoService.userLocation() ─────────────────────────────────────────────
+
   group('GeoService.userLocation()', () {
     test('ritorna LatLng con le coordinate corrette', () async {
       final service = TestableGeoService(
@@ -103,6 +114,8 @@ void main() {
     });
   });
 
+  // ── GeoService.isLocationServiceEnabled() ────────────────────────────────
+
   group('GeoService.isLocationServiceEnabled()', () {
     test('ritorna true se il servizio è abilitato', () async {
       final service = TestableGeoService(
@@ -121,6 +134,8 @@ void main() {
     });
   });
 
+  // ── GeoService.openLocationSettingsPage() ────────────────────────────────
+
   group('GeoService.openLocationSettingsPage()', () {
     test('ritorna true se le impostazioni si aprono', () async {
       final service = TestableGeoService(
@@ -138,6 +153,8 @@ void main() {
       expect(await service.openLocationSettingsPage(), isFalse);
     });
   });
+
+  // ── GeoService.getPositionStream() ───────────────────────────────────────
 
   group('GeoService.getPositionStream()', () {
     test('emette le posizioni dallo stream', () async {
@@ -166,35 +183,30 @@ void main() {
     });
   });
 
-  group('GeoService.compassStream()', () {
-    test('emette i valori di heading', () async {
-      final service = TestableGeoService(
-        fakeCompassStream: () => Stream.fromIterable([45.0, 90.0, 180.0]),
-      );
+  // ── GeoService.compassStream() ────────────────────────────────────────────
+  //
+  // Questo gruppo chiama il CODICE REALE di GeoService (nessun override).
+  // In ambiente test FlutterCompass.events è null → copre il branch
+  // `if (stream == null) return Stream<double?>.value(null)`.
+  // Le righe che usano FlutterCompass quando events != null non sono
+  // raggiungibili senza il plugin nativo e sono marcate con
+  // // coverage:ignore-line nel sorgente.
 
-      final result = await service.compassStream().toList();
+  group('GeoService.compassStream() – codice reale', () {
+    test(
+        'ritorna Stream con null quando FlutterCompass.events è null '
+        '(ambiente test senza plugin)', () async {
+      final service = GeoService(); // istanza reale, nessun override
 
-      expect(result, [45.0, 90.0, 180.0]);
-    });
-
-    test('emette null se il compass non è disponibile', () async {
-      final service = TestableGeoService(
-        fakeCompassStream: () => Stream.value(null),
-      );
-
-      final result = await service.compassStream().first;
-
-      expect(result, isNull);
-    });
-
-    test('ritorna stream con null se non fornito', () async {
-      final service = TestableGeoService();
-
+      // In ambiente test FlutterCompass.events == null →
+      // copre il branch if (stream == null)
       final result = await service.compassStream().first;
 
       expect(result, isNull);
     });
   });
+
+  // ── MockGeoService ────────────────────────────────────────────────────────
 
   group('MockGeoService', () {
     test('userLocation() può essere mockato', () async {

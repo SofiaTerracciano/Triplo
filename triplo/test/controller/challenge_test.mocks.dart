@@ -2931,4 +2931,279 @@ class MockAppLocalizations extends _i1.Mock implements _i12.AppLocalizations {
             ),
           )
           as String);
+
+  @override
+  String get provider_google =>
+      (super.noSuchMethod(
+            Invocation.getter(#provider_google),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#provider_google),
+            ),
+          )
+          as String);
+
+  @override
+  String get sign_in_again_label =>
+      (super.noSuchMethod(
+            Invocation.getter(#sign_in_again_label),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#sign_in_again_label),
+            ),
+          )
+          as String);
+
+  @override
+  String get email_change_error =>
+      (super.noSuchMethod(
+            Invocation.getter(#email_change_error),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#email_change_error),
+            ),
+          )
+          as String);
+
+  @override
+  String get wrong_password =>
+      (super.noSuchMethod(
+            Invocation.getter(#wrong_password),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#wrong_password),
+            ),
+          )
+          as String);
+
+  @override
+  String get email_already_in_use =>
+      (super.noSuchMethod(
+            Invocation.getter(#email_already_in_use),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#email_already_in_use),
+            ),
+          )
+          as String);
+
+  @override
+  String get invalid_email =>
+      (super.noSuchMethod(
+            Invocation.getter(#invalid_email),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#invalid_email),
+            ),
+          )
+          as String);
+
+  @override
+  String get requires_recent_login =>
+      (super.noSuchMethod(
+            Invocation.getter(#requires_recent_login),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#requires_recent_login),
+            ),
+          )
+          as String);
+
+  @override
+  String get not_authenticated =>
+      (super.noSuchMethod(
+            Invocation.getter(#not_authenticated),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#not_authenticated),
+            ),
+          )
+          as String);
+
+  @override
+  String get email_change_success_label =>
+      (super.noSuchMethod(
+            Invocation.getter(#email_change_success_label),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#email_change_success_label),
+            ),
+          )
+          as String);
+
+  @override
+  String get connected_watches_title =>
+      (super.noSuchMethod(
+            Invocation.getter(#connected_watches_title),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#connected_watches_title),
+            ),
+          )
+          as String);
+
+  @override
+  String get no_watches =>
+      (super.noSuchMethod(
+            Invocation.getter(#no_watches),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#no_watches),
+            ),
+          )
+          as String);
+
+  @override
+  String get error_loading_watches =>
+      (super.noSuchMethod(
+            Invocation.getter(#error_loading_watches),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#error_loading_watches),
+            ),
+          )
+          as String);
+
+  @override
+  String get watch_id =>
+      (super.noSuchMethod(
+            Invocation.getter(#watch_id),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#watch_id),
+            ),
+          )
+          as String);
+
+  @override
+  String get status =>
+      (super.noSuchMethod(
+            Invocation.getter(#status),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#status),
+            ),
+          )
+          as String);
+
+  @override
+  String get platform =>
+      (super.noSuchMethod(
+            Invocation.getter(#platform),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#platform),
+            ),
+          )
+          as String);
+
+  @override
+  String get remote_logout =>
+      (super.noSuchMethod(
+            Invocation.getter(#remote_logout),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#remote_logout),
+            ),
+          )
+          as String);
+
+  @override
+  String get enabled =>
+      (super.noSuchMethod(
+            Invocation.getter(#enabled),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#enabled),
+            ),
+          )
+          as String);
+
+  @override
+  String get disabled =>
+      (super.noSuchMethod(
+            Invocation.getter(#disabled),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#disabled),
+            ),
+          )
+          as String);
+
+  @override
+  String get enable_remote_logout =>
+      (super.noSuchMethod(
+            Invocation.getter(#enable_remote_logout),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#enable_remote_logout),
+            ),
+          )
+          as String);
+
+  @override
+  String get disable_remote_logout =>
+      (super.noSuchMethod(
+            Invocation.getter(#disable_remote_logout),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#disable_remote_logout),
+            ),
+          )
+          as String);
+
+  @override
+  String get remote_logout_enabled =>
+      (super.noSuchMethod(
+            Invocation.getter(#remote_logout_enabled),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#remote_logout_enabled),
+            ),
+          )
+          as String);
+
+  @override
+  String get remote_logout_cleared =>
+      (super.noSuchMethod(
+            Invocation.getter(#remote_logout_cleared),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#remote_logout_cleared),
+            ),
+          )
+          as String);
+
+  @override
+  String get remote_logout_enable_error =>
+      (super.noSuchMethod(
+            Invocation.getter(#remote_logout_enable_error),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#remote_logout_enable_error),
+            ),
+          )
+          as String);
+
+  @override
+  String get remote_logout_clear_error =>
+      (super.noSuchMethod(
+            Invocation.getter(#remote_logout_clear_error),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#remote_logout_clear_error),
+            ),
+          )
+          as String);
+
+  @override
+  String get refresh =>
+      (super.noSuchMethod(
+            Invocation.getter(#refresh),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#refresh),
+            ),
+          )
+          as String);
 }

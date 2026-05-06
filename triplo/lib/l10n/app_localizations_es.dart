@@ -637,4 +637,82 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get remove_button => 'Eliminar';
+
+  @override
+  String get provider_google => 'Para las cuentas de Google, el correo electrónico es gestionado por el proveedor de autenticación.';
+
+  @override
+  String get sign_in_again_label => 'Inicia sesión de nuevo con el nuevo correo electrónico';
+
+  @override
+  String get email_change_error => 'Error al cambiar el correo electrónico';
+
+  @override
+  String get wrong_password => 'La contraseña actual no es correcta';
+
+  @override
+  String get email_already_in_use => 'Este correo electrónico ya está en uso';
+
+  @override
+  String get invalid_email => 'La dirección de correo electrónico no es válida';
+
+  @override
+  String get requires_recent_login => 'Debes iniciar sesión de nuevo antes de cambiar el correo electrónico';
+
+  @override
+  String get not_authenticated => 'Ningún usuario autenticado';
+
+  @override
+  String get email_change_success_label => '¡Correo electrónico cambiado con éxito! Te hemos enviado un enlace de confirmación al nuevo correo electrónico. Después de confirmarlo, inicia sesión de nuevo con el nuevo correo electrónico.';
+
+  @override
+  String get connected_watches_title => 'Relojes conectados';
+
+  @override
+  String get no_watches => 'No se encontraron relojes conectados.';
+
+  @override
+  String get error_loading_watches => 'Error al cargar los relojes conectados';
+
+  @override
+  String get watch_id => 'ID del reloj';
+
+  @override
+  String get status => 'Estado';
+
+  @override
+  String get platform => 'Plataforma';
+
+  @override
+  String get remote_logout => 'Cierre remoto';
+
+  @override
+  String get enabled => 'activado';
+
+  @override
+  String get disabled => 'desactivado';
+
+  @override
+  String get enable_remote_logout => 'Activar cierre remoto';
+
+  @override
+  String get disable_remote_logout => 'Desactivar cierre remoto';
+
+  @override
+  String get remote_logout_enabled => 'Cierre remoto activado.';
+
+  @override
+  String get remote_logout_cleared => 'Cierre remoto desactivado.';
+
+  @override
+  String get remote_logout_enable_error => 'Error al activar';
+
+  @override
+  String get remote_logout_clear_error => 'Error al desactivar';
+
+  @override
+  String get refresh => 'Actualizar';
+
+  @override
+  String get paired_watches_label => 'Gestionar relojes emparejados';
 }

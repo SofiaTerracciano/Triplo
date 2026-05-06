@@ -246,6 +246,34 @@
     "no_weather_alerts": "Nessun percorso con allerte meteo attive",
     "weather_alert_removed": "Allerta meteo rimossa",
     "open_button": "Apri",
-    "remove_button": "Rimuovi"
+    "remove_button": "Rimuovi",
 
+    "provider_google": "Per gli account Google l'email è gestita dal provider di accesso.",
+    "sign_in_again_label": "Accedi di nuovo con la nuova email",
+    "email_change_error": "Errore durante il cambio email",
+    "wrong_password": "La password attuale non è corretta",
+    "email_already_in_use": "Questa email è già in uso",
+    "invalid_email": "L'indirizzo email non è valido",
+    "requires_recent_login": "Devi autenticarti di nuovo prima di cambiare email",
+    "not_authenticated": "Nessun utente autenticato",
+    "email_change_success_label": "Ti abbiamo inviato un link di conferma alla nuova email. Dopo averla confermata, accedi di nuovo con la nuova email.",
+
+    "connected_watches_title": "Orologi collegati",
+    "no_watches": "Nessun orologio collegato trovato.",
+    "error_loading_watches": "Errore nel caricamento degli orologi collegati",
+    "watch_id": "ID orologio",
+    "status": "Stato",
+    "platform": "Piattaforma",
+    "remote_logout": "Logout remoto",
+    "enabled": "attivo",
+    "disabled": "disattivo",
+    "enable_remote_logout": "Abilita logout remoto",
+    "disable_remote_logout": "Disabilita logout remoto",
+    "remote_logout_enabled": "Logout remoto attivato.",
+    "remote_logout_cleared": "Logout remoto disattivato.",
+    "remote_logout_enable_error": "Errore attivazione logout remoto",
+    "remote_logout_clear_error": "Errore disattivazione logout remoto",
+    "refresh": "Aggiorna",
+
+    "paired_watches_label": "Gestisci orologi collegati"
 }

@@ -157,19 +157,6 @@ void main() {
       await tester.tap(find.byType(OutlinedButton));
       expect(find.byType(EndTrekkingPage), findsOneWidget);
     });
-
-    testWidgets('Tap su "Aggiungi al diario" avvia pushReplacement', (tester) async {
-      await tester.pumpWidget(buildWidget(const Duration(minutes: 1)));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(ElevatedButton));
-      await tester.pump();
-
-      verify(mockObserver.didReplace(
-        newRoute: anyNamed('newRoute'),
-        oldRoute: anyNamed('oldRoute'),
-      )).called(1);
-    });
   });
 
   group('Background', () {

@@ -637,4 +637,82 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get remove_button => 'Entfernen';
+
+  @override
+  String get provider_google => 'Für Google-Konten wird die E-Mail vom Authentifizierungsanbieter verwaltet.';
+
+  @override
+  String get sign_in_again_label => 'Melde dich erneut mit der neuen E-Mail an';
+
+  @override
+  String get email_change_error => 'Fehler beim Ändern der E-Mail';
+
+  @override
+  String get wrong_password => 'Das aktuelle Passwort ist falsch';
+
+  @override
+  String get email_already_in_use => 'Diese E-Mail wird bereits verwendet';
+
+  @override
+  String get invalid_email => 'Die E-Mail-Adresse ist ungültig';
+
+  @override
+  String get requires_recent_login => 'Du musst dich erneut anmelden, bevor du die E-Mail ändernn kannst';
+
+  @override
+  String get not_authenticated => 'Kein authentifizierter Benutzer';
+
+  @override
+  String get email_change_success_label => 'Wir haben einen Bestätigungslink an die neue E-Mail gesendet. Nachdem du sie bestätigt hast, melde dich erneut mit der neuen E-Mail an.';
+
+  @override
+  String get connected_watches_title => 'Verbundene Uhren';
+
+  @override
+  String get no_watches => 'Keine verbundenen Uhren gefunden.';
+
+  @override
+  String get error_loading_watches => 'Fehler beim Laden der verbundenen Uhren';
+
+  @override
+  String get watch_id => 'Uhren-ID';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get platform => 'Plattform';
+
+  @override
+  String get remote_logout => 'Remote-Logout';
+
+  @override
+  String get enabled => 'aktiviert';
+
+  @override
+  String get disabled => 'deaktiviert';
+
+  @override
+  String get enable_remote_logout => 'Remote-Logout aktivieren';
+
+  @override
+  String get disable_remote_logout => 'Remote-Logout deaktivieren';
+
+  @override
+  String get remote_logout_enabled => 'Remote-Logout aktiviert.';
+
+  @override
+  String get remote_logout_cleared => 'Remote-Logout deaktiviert.';
+
+  @override
+  String get remote_logout_enable_error => 'Fehler beim Aktivieren';
+
+  @override
+  String get remote_logout_clear_error => 'Fehler beim Deaktivieren';
+
+  @override
+  String get refresh => 'Aktualisieren';
+
+  @override
+  String get paired_watches_label => 'Verbundene Uhren verwalten';
 }

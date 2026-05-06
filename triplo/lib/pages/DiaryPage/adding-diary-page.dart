@@ -756,11 +756,13 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
@@ -842,9 +844,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
     final picked = await _picker.pickMultiImage(maxWidth: 800, maxHeight: 800);
     if (picked.isNotEmpty) {
       setState(() {
-        _images
-          ..clear()
-          ..addAll(picked.map((x) => File(x.path)));
+        _images.addAll(picked.map((x) => File(x.path)));  // addAll invece di clear + addAll
       });
     }
   }

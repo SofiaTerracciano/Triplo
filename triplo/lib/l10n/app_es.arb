@@ -245,5 +245,34 @@
   "no_weather_alerts": "No hay rutas con alertas meteorológicas activas",
   "weather_alert_removed": "Alerta meteorológica eliminada",
   "open_button": "Abrir",
-  "remove_button": "Eliminar"
+  "remove_button": "Eliminar",
+
+  "provider_google": "Para las cuentas de Google, el correo electrónico es gestionado por el proveedor de autenticación.",
+  "sign_in_again_label": "Inicia sesión de nuevo con el nuevo correo electrónico",
+  "email_change_error": "Error al cambiar el correo electrónico",
+  "wrong_password": "La contraseña actual no es correcta",
+  "email_already_in_use": "Este correo electrónico ya está en uso",
+  "invalid_email": "La dirección de correo electrónico no es válida",
+  "requires_recent_login": "Debes iniciar sesión de nuevo antes de cambiar el correo electrónico",
+  "not_authenticated": "Ningún usuario autenticado",
+  "email_change_success_label": "¡Correo electrónico cambiado con éxito! Te hemos enviado un enlace de confirmación al nuevo correo electrónico. Después de confirmarlo, inicia sesión de nuevo con el nuevo correo electrónico.",
+
+  "connected_watches_title": "Relojes conectados",
+  "no_watches": "No se encontraron relojes conectados.",
+  "error_loading_watches": "Error al cargar los relojes conectados",
+  "watch_id": "ID del reloj",
+  "status": "Estado",
+  "platform": "Plataforma",
+  "remote_logout": "Cierre remoto",
+  "enabled": "activado",
+  "disabled": "desactivado",
+  "enable_remote_logout": "Activar cierre remoto",
+  "disable_remote_logout": "Desactivar cierre remoto",
+  "remote_logout_enabled": "Cierre remoto activado.",
+  "remote_logout_cleared": "Cierre remoto desactivado.",
+  "remote_logout_enable_error": "Error al activar",
+  "remote_logout_clear_error": "Error al desactivar",
+  "refresh": "Actualizar",
+
+  "paired_watches_label": "Gestionar relojes emparejados"
 }

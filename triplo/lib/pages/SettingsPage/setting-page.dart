@@ -247,8 +247,8 @@ class _SettingPageState extends State<SettingPage> {
               onTap: () async {
                 if (context.read<UserController>().isGoogleUser) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Per gli account Google l'email è gestita dal provider di accesso."),
+                    SnackBar(
+                      content: Text(local.provider_google),
                     ),
                   );
                   return;
@@ -263,7 +263,7 @@ class _SettingPageState extends State<SettingPage> {
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   icon: const Icon(Icons.login),
-                  label: const Text("Sign in again with the new email"),
+                  label: Text(local.sign_in_again_label),
                   onPressed: () async {
                     await context.read<UserController>().logout();
                     if (!context.mounted) return;
@@ -275,10 +275,6 @@ class _SettingPageState extends State<SettingPage> {
                   },
                 ),
               ),
-
-            //const SizedBox(height: 6),
-
-
 
             const Divider(height: 1),
             ListTile(
@@ -310,13 +306,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
 
               const SizedBox(height: 8),
-              //
-              //Text(
-              //  local.password_message_label,
-              //  style: TextStyle(fontSize: 13, color: Colors.black54),
-              //),
-
-              const SizedBox(height: 12),
 
               SizedBox(
                 width: double.infinity,
@@ -358,7 +347,7 @@ class _SettingPageState extends State<SettingPage> {
                   );
                 },
                 icon: const Icon(Icons.watch),
-                label: const Text("Manage paired watches"),
+                label: Text(local.paired_watches_label),
               ),
             ),
             const SizedBox(height: 12),
@@ -393,7 +382,6 @@ class _SettingPageState extends State<SettingPage> {
               label: Text(local.weather_alerts_label),
             ),
 
-            //messo per non far sovrapporre i bottoni alla navbar di android
             SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
           ],
         ),
@@ -603,25 +591,25 @@ class _SettingPageState extends State<SettingPage> {
 
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text(
-                            "Ti abbiamo inviato un link di conferma alla nuova email. Dopo averla confermata, accedi di nuovo con la nuova email.",
+                            local.email_change_success_label,
                           ),
                         ),
                       );
                     } on ChangeEmailException catch (e) {
-                      String msg = "Errore durante il cambio email";
+                      String msg = local.email_change_error;
 
                       if (e.code == "wrong-password") {
-                        msg = "La password attuale non è corretta";
+                        msg = local.wrong_password;
                       } else if (e.code == "email-already-in-use") {
-                        msg = "Questa email è già in uso";
+                        msg = local.email_already_in_use;
                       } else if (e.code == "invalid-email") {
-                        msg = "L'indirizzo email non è valido";
+                        msg = local.invalid_email;
                       } else if (e.code == "requires-recent-login") {
-                        msg = "Devi autenticarti di nuovo prima di cambiare email";
+                        msg = local.requires_recent_login;
                       } else if (e.code == "not-authenticated") {
-                        msg = "Nessun utente autenticato";
+                        msg = local.not_authenticated;
                       }
 
                       if (!mounted) return;

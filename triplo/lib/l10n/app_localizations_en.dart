@@ -637,4 +637,82 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remove_button => 'Remove';
+
+  @override
+  String get provider_google => 'For Google accounts, the email is managed by the authentication provider.';
+
+  @override
+  String get sign_in_again_label => 'Sign in again with the new email';
+
+  @override
+  String get email_change_error => 'Error changing email';
+
+  @override
+  String get wrong_password => 'The current password is incorrect';
+
+  @override
+  String get email_already_in_use => 'This email is already in use';
+
+  @override
+  String get invalid_email => 'The email address is not valid';
+
+  @override
+  String get requires_recent_login => 'You need to sign in again before changing email';
+
+  @override
+  String get not_authenticated => 'No authenticated user';
+
+  @override
+  String get email_change_success_label => 'We sent a confirmation link to the new email. After confirming it, sign in again with the new email.';
+
+  @override
+  String get connected_watches_title => 'Connected watches';
+
+  @override
+  String get no_watches => 'No connected watches found.';
+
+  @override
+  String get error_loading_watches => 'Error loading connected watches';
+
+  @override
+  String get watch_id => 'Watch ID';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get platform => 'Platform';
+
+  @override
+  String get remote_logout => 'Remote logout';
+
+  @override
+  String get enabled => 'enabled';
+
+  @override
+  String get disabled => 'disabled';
+
+  @override
+  String get enable_remote_logout => 'Enable remote logout';
+
+  @override
+  String get disable_remote_logout => 'Disable remote logout';
+
+  @override
+  String get remote_logout_enabled => 'Remote logout enabled.';
+
+  @override
+  String get remote_logout_cleared => 'Remote logout cleared.';
+
+  @override
+  String get remote_logout_enable_error => 'Error enabling remote logout';
+
+  @override
+  String get remote_logout_clear_error => 'Error disabling remote logout';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get paired_watches_label => 'Manage paired watches';
 }

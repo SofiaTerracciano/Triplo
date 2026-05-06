@@ -13,8 +13,12 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:triplo/model/diary.dart';
 import 'package:triplo/model/trekking.dart';
 import 'package:triplo/model/user.dart';
+import 'package:triplo/pages/DiaryPage/diary-page.dart';
 import 'package:triplo/pages/SearchPage/search-page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page-public.dart';
+import 'package:triplo/pages/trekkingPage/trekking-page.dart';
 import 'search_page_test.mocks.dart';
+import 'dart:async';
 
 @GenerateMocks([UserController, DiaryController, TrekkingController, Language])
 
@@ -575,6 +579,343 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(Drawer), findsNothing);
+    });
+
+    testWidgets('svuotare TextField dopo ricerca resetta risultati',
+        (tester) async {
+      final foundUser = _buildUser(uid: 'u2', username: 'luigi');
+      when(mockUserController.searchUsers(any))
+          .thenAnswer((_) async => [foundUser]);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'luigi');
+      await tester.pumpAndSettle();
+
+      expect(find.text('luigi'), findsWidgets);
+
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pump();
+
+      expect(find.text('mario@test.it'), findsNothing);
+    });
+
+    testWidgets('_DiaryCoverImage mostra broken_image se trekkingId è null',
+        (tester) async {
+      final diary = _buildDiary();
+      SearchCache.randomDiaries = [diary];
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId(any)).thenReturn(null);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.broken_image), findsWidgets);
+    });
+
+    testWidgets('_isSearching mostra CircularProgressIndicator durante ricerca',
+        (tester) async {
+      final completer = Completer<List<Users>>();
+      when(mockUserController.searchUsers(any))
+          .thenAnswer((_) async => completer.future);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'mario');
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      completer.complete([]);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('mostra CircularProgressIndicator durante il caricamento',
+    (tester) async {
+      final completer = Completer<List<String>>();
+      when(mockUserController.getFollowingIds(any))
+          .thenAnswer((_) async => completer.future);
+      SearchCache.randomDiaries = null;
+
+      await tester.pumpWidget(buildPage());
+      await tester.pump(); 
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      completer.complete([]);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('tap su utente nei risultati chiama Navigator (verifica onTap)',
+        (tester) async {
+      final foundUser = _buildUser(uid: 'u2', username: 'luigi');
+      when(mockUserController.searchUsers(any))
+          .thenAnswer((_) async => [foundUser]);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'luigi');
+      await tester.pumpAndSettle();
+
+      expect(find.text('luigi'), findsWidgets);
+      expect(find.text('mario@test.it'), findsOneWidget);
+
+      final tile = tester.widget<ListTile>(find.byType(ListTile).first);
+      expect(tile.onTap, isNotNull);
+    });
+
+    testWidgets('tap su trekking nei risultati: ListTile ha onTap',
+        (tester) async {
+      final trek = _buildTrekking(name: 'Monte Rosa');
+      when(mockTrekkingController.searchTrekking(any))
+          .thenAnswer((_) async => [trek]);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SearchPage)),
+      )!;
+      await tester.tap(find.text(local.trekking_label));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'monte');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Monte Rosa'), findsOneWidget);
+      final tile = tester.widget<ListTile>(find.byType(ListTile).first);
+      expect(tile.onTap, isNotNull);
+    });
+
+    testWidgets('tap su diary nella GridView: InkWell ha onTap',
+        (tester) async {
+      final diary = _buildDiary();
+      SearchCache.randomDiaries = [diary];
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId(any)).thenReturn(null);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GridView), findsOneWidget);
+      final inkwells = find.byType(InkWell);
+      expect(inkwells, findsWidgets);
+
+      final inkWell = tester.widget<InkWell>(inkwells.first);
+      expect(inkWell.onTap, isNotNull);
+    });
+
+    testWidgets('dispose resetta SearchCache.randomDiaries', (tester) async {
+      SearchCache.randomDiaries = [_buildDiary()];
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId(any)).thenReturn(null);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      await tester.pumpAndSettle();
+
+      expect(SearchCache.randomDiaries, isNull);
+    });
+
+    testWidgets('Drawer tutti i ListTile hanno onTap non null', (tester) async {
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      final scaffold = tester.firstState(find.byType(Scaffold)) as ScaffoldState;
+      scaffold.openDrawer();
+      await tester.pumpAndSettle();
+
+      final tiles = tester.widgetList<ListTile>(find.byType(ListTile)).toList();
+      expect(tiles.length, greaterThanOrEqualTo(5));
+      for (final tile in tiles) {
+        expect(tile.onTap, isNotNull);
+      }
+    });
+
+    testWidgets('_DiaryCoverImage con foto nel diary mostra _StorageImage',
+        (tester) async {
+      final diary = Diary(
+        diaryId: 'd1',
+        userId: 'u1',
+        trekkigName: 'Monte Bianco',
+        date: '2024-01-01',
+        duration: 3.0,
+        friends: [],
+        photos: ['path/to/photo.jpg'], 
+        challenges: [],
+        refreshmentPoint: '',
+        mood: [],
+        notes: '',
+        isPublic: true,
+      );
+      SearchCache.randomDiaries = [diary];
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId(any)).thenReturn(null);
+      when(mockDiaryController.getDownloadUrlChild(any))
+          .thenAnswer((_) async => 'https://example.com/photo.jpg');
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GridView), findsOneWidget);
+      verify(mockDiaryController.getDownloadUrlChild('path/to/photo.jpg'))
+          .called(greaterThan(0));
+    });
+
+    testWidgets('_StorageImage usa cache se URL già presente', (tester) async {
+      ImageUrlCache.set('cached/photo.jpg', 'https://example.com/cached.jpg');
+
+      final diary = Diary(
+        diaryId: 'd1',
+        userId: 'u1',
+        trekkigName: 'Monte Bianco',
+        date: '2024-01-01',
+        duration: 3.0,
+        friends: [],
+        photos: ['cached/photo.jpg'],
+        challenges: [],
+        refreshmentPoint: '',
+        mood: [],
+        notes: '',
+        isPublic: true,
+      );
+      SearchCache.randomDiaries = [diary];
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId(any)).thenReturn(null);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      verifyNever(mockDiaryController.getDownloadUrlChild(any));
+      expect(find.byType(GridView), findsOneWidget);
+    });
+
+    testWidgets('_DiaryCoverImage con trekkingId valido e mapPhoto non vuoto',
+        (tester) async {
+      final diary = _buildDiary(trekkingName: 'Monte Bianco');
+      SearchCache.randomDiaries = [diary];
+
+      final trek = Trekking(
+        documentId: 'trek-1',
+        name: 'Monte Bianco',
+        mapPhoto: 'path/to/map.jpg', 
+        difficultyLevel: 'easy',
+        distance: 10.0,
+        estimatedTime: 3.0,
+        elevationGain: 500,
+        upGain: true,
+        downGain: true,
+        startingPoint: const LatLng(45.0, 7.0),
+        endingPoint: const LatLng(45.1, 7.1),
+        points: [],
+        startingPointName: 'Start',
+        endingPointName: 'End',
+        info: [],
+        endingPointPhoto: '',
+        description: [],
+        picNicArea: false,
+        familyFirendly: false,
+      );
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId('Monte Bianco'))
+          .thenReturn('trek-1');
+      when(mockTrekkingController.getTrekkingById('trek-1'))
+          .thenReturn(trek);
+      when(mockDiaryController.getDownloadUrlChild(any))
+          .thenAnswer((_) async => 'https://example.com/map.jpg');
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(GridView), findsOneWidget);
+      verify(mockDiaryController.getDownloadUrlChild('path/to/map.jpg'))
+          .called(greaterThan(0));
+    });
+
+    testWidgets('_DiaryCoverImage con trekkingId valido e mapPhoto vuoto mostra broken_image',
+        (tester) async {
+      final diary = _buildDiary(trekkingName: 'Monte Bianco');
+      SearchCache.randomDiaries = [diary];
+
+      final trek = _buildTrekking(name: 'Monte Bianco'); 
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId('Monte Bianco'))
+          .thenReturn('trek-1');
+      when(mockTrekkingController.getTrekkingById('trek-1'))
+          .thenReturn(trek);
+
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.broken_image), findsWidgets);
+    });
+
+    testWidgets('_DiaryCoverImage mostra loading mentre FutureBuilder trekking risolve',
+    (tester) async {
+      final diary = _buildDiary(trekkingName: 'Monte Bianco');
+      SearchCache.randomDiaries = [diary];
+
+      final urlCompleter = Completer<String?>(); 
+
+      final trek = Trekking(
+        documentId: 'trek-1',
+        name: 'Monte Bianco',
+        mapPhoto: 'path/map.jpg',
+        difficultyLevel: 'easy',
+        distance: 10.0,
+        estimatedTime: 3.0,
+        elevationGain: 500,
+        upGain: true,
+        downGain: true,
+        startingPoint: const LatLng(45.0, 7.0),
+        endingPoint: const LatLng(45.1, 7.1),
+        points: [],
+        startingPointName: 'Start',
+        endingPointName: 'End',
+        info: [],
+        endingPointPhoto: '',
+        description: [],
+        picNicArea: false,
+        familyFirendly: false,
+      );
+
+      when(mockUserController.getUserById(any))
+          .thenAnswer((_) async => fakeUser);
+      when(mockTrekkingController.getTrekkingId('Monte Bianco'))
+          .thenReturn('trek-1');
+      when(mockTrekkingController.getTrekkingById('trek-1'))
+          .thenReturn(trek);
+      when(mockDiaryController.getDownloadUrlChild(any))
+          .thenAnswer((_) => urlCompleter.future); 
+
+      await tester.pumpWidget(buildPage());
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsWidgets);
+
+      urlCompleter.complete('https://example.com/map.jpg');
+      await tester.pumpAndSettle();
     });
   });
 }

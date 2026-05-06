@@ -245,9 +245,34 @@
   "no_weather_alerts": "Keine Routen mit aktiven Wetterwarnungen",
   "weather_alert_removed": "Wetterwarnung entfernt",
   "open_button": "Öffnen",
-  "remove_button": "Entfernen"
+  "remove_button": "Entfernen",
+
+  "provider_google": "Für Google-Konten wird die E-Mail vom Authentifizierungsanbieter verwaltet.",
+  "sign_in_again_label": "Melde dich erneut mit der neuen E-Mail an",
+  "email_change_error": "Fehler beim Ändern der E-Mail",
+  "wrong_password": "Das aktuelle Passwort ist falsch",
+  "email_already_in_use": "Diese E-Mail wird bereits verwendet",
+  "invalid_email": "Die E-Mail-Adresse ist ungültig",
+  "requires_recent_login": "Du musst dich erneut anmelden, bevor du die E-Mail ändernn kannst",
+  "not_authenticated": "Kein authentifizierter Benutzer",
+  "email_change_success_label": "Wir haben einen Bestätigungslink an die neue E-Mail gesendet. Nachdem du sie bestätigt hast, melde dich erneut mit der neuen E-Mail an.",
+
+  "connected_watches_title": "Verbundene Uhren",
+  "no_watches": "Keine verbundenen Uhren gefunden.",
+  "error_loading_watches": "Fehler beim Laden der verbundenen Uhren",
+  "watch_id": "Uhren-ID",
+  "status": "Status",
+  "platform": "Plattform",
+  "remote_logout": "Remote-Logout",
+  "enabled": "aktiviert",
+  "disabled": "deaktiviert",
+  "enable_remote_logout": "Remote-Logout aktivieren",
+  "disable_remote_logout": "Remote-Logout deaktivieren",
+  "remote_logout_enabled": "Remote-Logout aktiviert.",
+  "remote_logout_cleared": "Remote-Logout deaktiviert.",
+  "remote_logout_enable_error": "Fehler beim Aktivieren",
+  "remote_logout_clear_error": "Fehler beim Deaktivieren",
+  "refresh": "Aktualisieren",
+
+  "paired_watches_label": "Verbundene Uhren verwalten"
 }
-
-
-
-

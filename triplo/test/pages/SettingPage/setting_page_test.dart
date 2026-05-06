@@ -59,6 +59,276 @@ void main() {
       ),
     );
 
+    testWidgets('Drawer tap Settings chiude il drawer (pop)', (tester) async {
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final ScaffoldState scaffold =
+          tester.firstState(find.byType(Scaffold));
+      scaffold.openDrawer();
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      // Tap su "Settings" nel drawer → chiama Navigator.pop
+      final settingsTiles = find.text(local.settings_page_title);
+      // Il secondo è quello nel drawer
+      await tester.tap(settingsTiles.last);
+      await tester.pumpAndSettle();
+ 
+      expect(find.byType(Drawer), findsNothing);
+    });
+ 
+    // ── Password visibility toggle ─────────────────────────────────────────
+ 
+    testWidgets('toggle visibilità password nel dialog cambio email', (tester) async {
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.email_label));
+      await tester.pumpAndSettle();
+ 
+      // Inizialmente il campo password è oscurato → icona visibility
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+ 
+      // Tap sull'icona per mostrare la password
+      await tester.tap(find.byIcon(Icons.visibility));
+      await tester.pumpAndSettle();
+ 
+      // Ora dovrebbe esserci l'icona visibility_off
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+ 
+      // Tap di nuovo per nascondere
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pumpAndSettle();
+ 
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+    });
+ 
+    // ── DatePicker annullato ───────────────────────────────────────────────
+ 
+    testWidgets('annullare il DatePicker non chiama updateBirthdate', (tester) async {
+      when(mockUserController.updateBirthdate(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.birthdate_field_label));
+      await tester.pumpAndSettle();
+ 
+      // Tap su CANCEL invece di OK
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+ 
+      verifyNever(mockUserController.updateBirthdate(any));
+    });
+ 
+    // ── photoProfile non vuoto: icona person assente nel CircleAvatar ──────
+ 
+    testWidgets('photoProfile vuota mostra icona person nel CircleAvatar', (tester) async {
+      final userEmptyPhoto = Users(
+        uid: 'user1',
+        username: 'mario',
+        name: 'Mario',
+        surname: 'Rossi',
+        email: 'mario@test.it',
+        birthdate: DateTime(2000, 6, 1),
+        followers: [],
+        following: [],
+        publicDiaryPages: [],
+        privateDiaryPages: [],
+        savedTrekkings: [],
+        level: 'beginner',
+        advanced: 0,
+        intermediate: 0,
+        photoProfile: '',
+      );
+      when(mockUserController.currentUser).thenReturn(userEmptyPhoto);
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      // Con photoProfile vuota → child del CircleAvatar è Icon(Icons.person)
+      expect(find.byIcon(Icons.person), findsWidgets);
+    });
+ 
+    // ── _editField: dialog rimane aperto se valore non cambia ─────────────
+ 
+    testWidgets('salva cognome con stringa vuota non chiama updateSurname', (tester) async {
+      when(mockUserController.updateSurname(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.surname_field_label));
+      await tester.pumpAndSettle();
+ 
+      // Svuota il campo e salva
+      await tester.enterText(find.byType(TextField), '');
+      await tester.tap(find.text(local.save_trekking_button_label));
+      await tester.pumpAndSettle();
+ 
+      verifyNever(mockUserController.updateSurname(any));
+    });
+ 
+    // ── not_logged: tap login naviga a /login ─────────────────────────────
+ 
+    testWidgets('tap bottone login nella schermata not-logged naviga a /login',
+        (tester) async {
+      when(mockUserController.currentUser).thenReturn(null);
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(Scaffold).first),
+      )!;
+ 
+      await tester.tap(find.text(local.please_login_label));
+      await tester.pumpAndSettle();
+ 
+      expect(find.text('Login Page'), findsOneWidget);
+    });
+ 
+    // ── Gestione watch_pair / weather_alert: pulsanti presenti ─────────────
+ 
+    testWidgets('mostra bottone Manage paired watches', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      expect(find.text('Manage paired watches'), findsOneWidget);
+      expect(find.byIcon(Icons.watch), findsOneWidget);
+    });
+ 
+    // ── _emailChangeRequested: isPasswordUser true mostra TextButton ───────
+ 
+    testWidgets('dopo cambio email riuscito isPasswordUser true mostra sign-in button',
+        (tester) async {
+      when(mockUserController.changeEmail(
+        newEmail: anyNamed('newEmail'),
+        currentPassword: anyNamed('currentPassword'),
+      )).thenAnswer((_) async {});
+      when(mockUserController.isPasswordUser).thenReturn(true);
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.email_label));
+      await tester.pumpAndSettle();
+ 
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), 'nuova@email.it');
+      await tester.enterText(fields.at(1), 'password123');
+      await tester.tap(find.text(local.save_trekking_button_label));
+      await tester.pumpAndSettle();
+ 
+      // Il TextButton "Sign in again" appare perché isPasswordUser=true e
+      // _emailChangeRequested=true
+      expect(find.text('Sign in again with the new email'), findsOneWidget);
+      expect(find.byIcon(Icons.login), findsOneWidget);
+    });
+ 
+    // ── LanguageDialog: chiusura dopo selezione ────────────────────────────
+ 
+    testWidgets('selezione lingua chiude il LanguageDialog', (tester) async {
+      when(mockLanguage.setLocale(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.language_field_label));
+      await tester.pumpAndSettle();
+ 
+      expect(find.byType(LanguageDialog), findsOneWidget);
+ 
+      await tester.tap(find.text('Deutsch'));
+      await tester.pumpAndSettle();
+ 
+      expect(find.byType(LanguageDialog), findsNothing);
+    });
+ 
+    testWidgets('selezione Français chiama setLocale con fr', (tester) async {
+      when(mockLanguage.setLocale(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.language_field_label));
+      await tester.pumpAndSettle();
+ 
+      await tester.tap(find.text('Français'));
+      await tester.pumpAndSettle();
+ 
+      verify(mockLanguage.setLocale(const Locale('fr'))).called(1);
+    });
+ 
+    testWidgets('selezione Español chiama setLocale con es', (tester) async {
+      when(mockLanguage.setLocale(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.language_field_label));
+      await tester.pumpAndSettle();
+ 
+      await tester.tap(find.text('Español'));
+      await tester.pumpAndSettle();
+ 
+      verify(mockLanguage.setLocale(const Locale('es'))).called(1);
+    });
+ 
+    testWidgets('selezione Deutsch chiama setLocale con de', (tester) async {
+      when(mockLanguage.setLocale(any)).thenAnswer((_) async {});
+ 
+      await tester.pumpWidget(buildPage());
+      await tester.pumpAndSettle();
+ 
+      final local = AppLocalizations.of(
+        tester.element(find.byType(SettingPage)),
+      )!;
+ 
+      await tester.tap(find.text(local.language_field_label));
+      await tester.pumpAndSettle();
+ 
+      await tester.tap(find.text('Deutsch'));
+      await tester.pumpAndSettle();
+ 
+      verify(mockLanguage.setLocale(const Locale('de'))).called(1);
+    });
+    
     testWidgets('mostra titolo nella AppBar', (tester) async {
       await tester.pumpWidget(buildPage());
       await tester.pumpAndSettle();

@@ -637,4 +637,82 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get remove_button => 'Supprimer';
+
+  @override
+  String get provider_google => 'Pour les comptes Google, l\'email est géré par le fournisseur d\'identification.';
+
+  @override
+  String get sign_in_again_label => 'Reconnectez-vous avec le nouvel email';
+
+  @override
+  String get email_change_error => 'Erreur lors du changement d\'email';
+
+  @override
+  String get wrong_password => 'Le mot de passe actuel n\'est pas correct';
+
+  @override
+  String get email_already_in_use => 'Cet email est déjà utilisé';
+
+  @override
+  String get invalid_email => 'L\'adresse email n\'est pas valide';
+
+  @override
+  String get requires_recent_login => 'Vous devez vous reconnecter avant de changer d\'email';
+
+  @override
+  String get not_authenticated => 'Aucun utilisateur authentifié';
+
+  @override
+  String get email_change_success_label => 'Nous vous avons envoyé un lien de confirmation à votre nouvel email. Après l\'avoir confirmé, reconnectez-vous avec le nouvel email.';
+
+  @override
+  String get connected_watches_title => 'Montres connectées';
+
+  @override
+  String get no_watches => 'Aucune montre connectée trouvée.';
+
+  @override
+  String get error_loading_watches => 'Erreur lors du chargement des montres connectées';
+
+  @override
+  String get watch_id => 'ID montre';
+
+  @override
+  String get status => 'Statut';
+
+  @override
+  String get platform => 'Plateforme';
+
+  @override
+  String get remote_logout => 'Déconnexion à distance';
+
+  @override
+  String get enabled => 'activé';
+
+  @override
+  String get disabled => 'désactivé';
+
+  @override
+  String get enable_remote_logout => 'Activer la déconnexion à distance';
+
+  @override
+  String get disable_remote_logout => 'Désactiver la déconnexion à distance';
+
+  @override
+  String get remote_logout_enabled => 'Déconnexion activée.';
+
+  @override
+  String get remote_logout_cleared => 'Déconnexion désactivée.';
+
+  @override
+  String get remote_logout_enable_error => 'Erreur d’activation';
+
+  @override
+  String get remote_logout_clear_error => 'Erreur de désactivation';
+
+  @override
+  String get refresh => 'Actualiser';
+
+  @override
+  String get paired_watches_label => 'Gérer les montres associées';
 }
