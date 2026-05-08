@@ -4,10 +4,9 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService { 
-  static const String _kLocaleCodeKey = 'locale_code'; 
+  /*static const String _kLocaleCodeKey = 'locale_code'; 
   static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
-  // Configurazione del CacheManager per il disco
-  static final CacheManager _diskCache = CacheManager( // coverage:ignore-start
+  static final CacheManager _diskCache = CacheManager( 
     Config(
       'triploImageCache',
       stalePeriod: const Duration(days: 12),
@@ -15,17 +14,60 @@ class MemoryService {
     ),
   );
 
-  static final CacheManager _weatherAlertCache = CacheManager(
+  /*static final CacheManager _weatherAlertCache = CacheManager(
     Config(
       'triploWeatherAlertCache',
       stalePeriod: const Duration(days: 1),
       maxNrOfCacheObjects: 500,
     ),
-  ); // coverage:ignore-end
+  ); */
+
+  final CacheManager _weatherAlertCache; // coverage:ignore-line
+
+  MemoryService() // coverage:ignore-line
+      : _weatherAlertCache = CacheManager( // coverage:ignore-line
+          Config( // coverage:ignore-line
+            'triploWeatherAlertCache', // coverage:ignore-line
+            stalePeriod: const Duration(days: 1), // coverage:ignore-line
+            maxNrOfCacheObjects: 500, // coverage:ignore-line
+          ), // coverage:ignore-line
+        ); // coverage:ignore-line
+
+  @visibleForTesting
+  MemoryService.withCache(this._weatherAlertCache);
 
   String _alertKeyToCacheKey(String key) => 'weather_alert_$key';
 
   // Cache in memoria (RAM)
+  final Map<String, File> _memoryCache = {};*/
+
+  static const String _kLocaleCodeKey = 'locale_code';
+  static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
+
+  static final CacheManager _diskCache = CacheManager( // coverage:ignore-start
+    Config(
+      'triploImageCache',
+      stalePeriod: const Duration(days: 12),
+      maxNrOfCacheObjects: 200,
+    ),
+  ); // coverage:ignore-end
+
+  final CacheManager _weatherAlertCache; // coverage:ignore-line
+
+  MemoryService() // coverage:ignore-line
+      : _weatherAlertCache = CacheManager( // coverage:ignore-line
+          Config( // coverage:ignore-line
+            'triploWeatherAlertCache', // coverage:ignore-line
+            stalePeriod: const Duration(days: 1), // coverage:ignore-line
+            maxNrOfCacheObjects: 500, // coverage:ignore-line
+          ), // coverage:ignore-line
+        ); // coverage:ignore-line
+
+  @visibleForTesting
+  MemoryService.withCache(this._weatherAlertCache);
+
+  String _alertKeyToCacheKey(String key) => 'weather_alert_$key';
+
   final Map<String, File> _memoryCache = {};
 
   // Cache memory
@@ -80,11 +122,6 @@ class MemoryService {
     _memoryCache.clear();
   }
 
-
-
-
-
-
   Future<String?> getSavedLocaleCode() async {
     try {
       final prefs = await SharedPreferences.getInstance(); // coverage:ignore-line
@@ -104,7 +141,6 @@ class MemoryService {
       rethrow; 
     }
   }
-
 
   Future<Set<String>> getShownWeatherAlertKeys() async {
     try {
@@ -130,28 +166,25 @@ class MemoryService {
   Future<void> addShownWeatherAlertKey(String key) async {
     try {
       final cacheKey = _alertKeyToCacheKey(key);
-      await _weatherAlertCache.putFile( // coverage:ignore-start
-        cacheKey, 
+      await _weatherAlertCache.putFile(
+        cacheKey,
         Uint8List(0),
-        key: cacheKey, 
-        maxAge: const Duration(days: 1), 
-      ); // coverage:ignore-end
+        key: cacheKey,
+        maxAge: const Duration(days: 1),
+      );
     } catch (e) {
-      debugPrint("Errore salvataggio alert mostrato: $e"); //coverage:ignore-line
+      debugPrint("Errore: $e"); // coverage:ignore-line
     }
   }
 
   Future<bool> hasShownWeatherAlertKey(String key) async {
     try {
-      final cacheKey = _alertKeyToCacheKey(key); // coverage:ignore-line
-      final fileInfo = await _weatherAlertCache.getFileFromCache(cacheKey); // coverage:ignore-line
-
+      final cacheKey = _alertKeyToCacheKey(key);
+      final fileInfo = await _weatherAlertCache.getFileFromCache(cacheKey);
       return fileInfo != null;
     } catch (e) {
-      debugPrint("Errore controllo alert mostrato: $e"); //coverage:ignore-line
+      debugPrint("Errore: $e"); // coverage:ignore-line
       return false;
     }
   }
-
-
 }

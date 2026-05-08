@@ -104,6 +104,12 @@ class MockNotificationService extends _i1.Mock
           as _i8.Future<void>);
 
   @override
+  void handleNotificationTapForTest(String? payload) => super.noSuchMethod(
+    Invocation.method(#handleNotificationTapForTest, [payload]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   _i8.Future<void> showTrekkingNotification({
     required int? id,
     required String? title,
@@ -3203,6 +3209,17 @@ class MockAppLocalizations extends _i1.Mock implements _i12.AppLocalizations {
             returnValue: _i10.dummyValue<String>(
               this,
               Invocation.getter(#refresh),
+            ),
+          )
+          as String);
+
+  @override
+  String get paired_watches_label =>
+      (super.noSuchMethod(
+            Invocation.getter(#paired_watches_label),
+            returnValue: _i10.dummyValue<String>(
+              this,
+              Invocation.getter(#paired_watches_label),
             ),
           )
           as String);

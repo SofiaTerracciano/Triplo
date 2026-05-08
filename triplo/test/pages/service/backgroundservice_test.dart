@@ -12,7 +12,6 @@ import 'package:triplo/service/memory.dart';
 import 'package:triplo/service/notification.dart';
 import 'backgroundservice_test.mocks.dart' show MockTrekkingController, MockServiceController, MockNotificationService, MockMemoryService;
 
-
 @GenerateMocks([
   TrekkingController,
   ServiceController,

@@ -435,6 +435,12 @@ class MockNotificationService extends _i1.Mock
           as _i7.Future<void>);
 
   @override
+  void handleNotificationTapForTest(String? payload) => super.noSuchMethod(
+    Invocation.method(#handleNotificationTapForTest, [payload]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   _i7.Future<void> showTrekkingNotification({
     required int? id,
     required String? title,

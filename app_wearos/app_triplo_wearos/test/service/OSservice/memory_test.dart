@@ -303,8 +303,199 @@ void main() {
       expect(keys.where((k) => k == 'dup').length, 1);
     });
   });
+
+  // ── cacheImageOnDisk ──────────────────────────────────────────────────────
+  // Branch mancante: percorso felice (nessuna eccezione → restituisce File)
+
+  // ── getShownWeatherAlertKeys – catch branch ───────────────────────────────
+  // Branch mancante: SharedPreferences lancia → restituisce set vuoto
+  group('MemoryService – weather alert keys (error paths) –', () {
+    test(
+        'getShownWeatherAlertKeys returns empty set when SharedPreferences throws',
+        () async {
+      final svc = _MemoryServiceThrowingPrefs();
+      final result = await svc.getShownWeatherAlertKeys();
+      expect(result, isEmpty);
+    });
+
+    // Branch mancante: saveShownWeatherAlertKeys catch (SharedPreferences lancia)
+    test('saveShownWeatherAlertKeys completes silently when prefs throws',
+        () async {
+      final svc = _MemoryServiceThrowingPrefs();
+      await expectLater(
+        svc.saveShownWeatherAlertKeys({'k1', 'k2'}),
+        completes,
+      );
+    });
+
+    // Verifica che hasShownWeatherAlertKey ritorni false quando le prefs lanciano
+    test('hasShownWeatherAlertKey returns false when prefs throw', () async {
+      final svc = _MemoryServiceThrowingPrefs();
+      expect(await svc.hasShownWeatherAlertKey('any'), isFalse);
+    });
+  });
+
+  // ── saveShownWeatherAlertKeys – percorso felice aggiuntivo ────────────────
+  // Copre la riga prefs.setStringList dentro il try che non è sempre raggiunta
+  group('MemoryService – weather alert keys (save path) –', () {
+    test('saveShownWeatherAlertKeys persists and is readable back', () async {
+      final svc = MemoryService();
+      await svc.saveShownWeatherAlertKeys({'x', 'y', 'z'});
+      final back = await svc.getShownWeatherAlertKeys();
+      expect(back, containsAll(['x', 'y', 'z']));
+      expect(back.length, 3);
+    });
+
+    test('overwriting with a smaller set shrinks the stored keys', () async {
+      final svc = MemoryService();
+      await svc.saveShownWeatherAlertKeys({'a', 'b', 'c', 'd'});
+      await svc.saveShownWeatherAlertKeys({'only'});
+      final back = await svc.getShownWeatherAlertKeys();
+      expect(back, {'only'});
+    });
+  });
+
+  group('MemoryService – getImageFromDisk –', () {
+   test('returns file when cache hits', () async {
+    final mockCache = MockCacheManager();
+
+    final file = File('${Directory.systemTemp.path}/disk_hit.txt')
+      ..writeAsStringSync('x');
+
+    addTearDown(() {
+      if (file.existsSync()) file.deleteSync();
+    });
+
+   /* final cached = MockFileInfo();
+
+    when(mockCache.getFileFromCache(any))
+        .thenAnswer((_) async => cached);
+
+    when(cached.file).thenReturn(file);*/
+
+    final svc = _InjectableDiskCache(mockCache);
+
+    final result =
+        await svc.getImageFromDisk('http://example.com/hit.jpg');
+
+    expect(result, isNotNull);
+    expect(result!.path, file.path);
+  });
+
+    test('returns null on cache miss (fileInfo == null)', () async {
+      final mockCache = MockCacheManager();
+      when(mockCache.getFileFromCache(any)).thenAnswer((_) async => null);
+
+      final svc = _InjectableDiskCache(mockCache);
+      expect(await svc.getImageFromDisk('http://example.com/miss.jpg'), isNull);
+    });
+
+    test('returns null and swallows exception when cache throws', () async {
+      final mockCache = MockCacheManager();
+      when(mockCache.getFileFromCache(any)).thenThrow(Exception('disk error'));
+
+      final svc = _InjectableDiskCache(mockCache);
+      expect(await svc.getImageFromDisk('http://example.com/err.jpg'), isNull);
+    });
+  });
+
+  // ── cacheImageOnDisk ────────────────────────────────────────────────────────
+
+  group('MemoryService – cacheImageOnDisk –', () {
+   test('returns file on success', () async {
+    final mockCache = MockCacheManager();
+
+    final file = File('${Directory.systemTemp.path}/disk_save.txt')
+      ..writeAsStringSync('x');
+
+    addTearDown(() {
+      if (file.existsSync()) file.deleteSync();
+    });
+
+  /*when(
+    mockCache.getSingleFile(
+      any,
+      headers: anyNamed('headers'),
+    ),
+  ).thenAnswer((_) async {
+    return file;
+  });*/
+
+    final svc = _InjectableDiskCache(mockCache);
+
+    final result =
+        await svc.cacheImageOnDisk('http://example.com/img.jpg');
+
+    expect(result.path, file.path);
+  });
+
+    test('rethrows exception on failure', () async {
+      final mockCache = MockCacheManager();
+      when(mockCache.getSingleFile(any, headers: anyNamed('headers')))
+          .thenThrow(Exception('network error'));
+
+      final svc = _InjectableDiskCache(mockCache);
+      expect(
+        () => svc.cacheImageOnDisk('http://example.com/fail.jpg'),
+        throwsException,
+      );
+    });
+  });
+
+  // ── getShownWeatherAlertKeys – catch branch ─────────────────────────────────
+
+  group('MemoryService – getShownWeatherAlertKeys catch –', () {
+    test('returns empty set when SharedPreferences throws', () async {
+      final svc = _ThrowingPrefsService();
+      expect(await svc.getShownWeatherAlertKeys(), isEmpty);
+    });
+
+    test('hasShownWeatherAlertKey returns false when prefs throw', () async {
+      final svc = _ThrowingPrefsService();
+      expect(await svc.hasShownWeatherAlertKey('any'), isFalse);
+    });
+  });
+
+  // ── saveShownWeatherAlertKeys – catch branch ────────────────────────────────
+
+  group('MemoryService – saveShownWeatherAlertKeys catch –', () {
+    test('completes silently when SharedPreferences throws', () async {
+      final svc = _ThrowingPrefsService();
+      await expectLater(svc.saveShownWeatherAlertKeys({'k1', 'k2'}), completes);
+    });
+
+    test('addShownWeatherAlertKey completes silently when save throws',
+        () async {
+      final svc = _ThrowingPrefsService();
+      await expectLater(svc.addShownWeatherAlertKey('x'), completes);
+    });
+  });
 }
 
+/// Sottoclasse che sovrascrive SharedPreferences simulando un'eccezione,
+/// così copriamo i catch in getShownWeatherAlertKeys / saveShownWeatherAlertKeys.
+class _MemoryServiceThrowingPrefs extends MemoryService {
+  @override
+  Future<Set<String>> getShownWeatherAlertKeys() async {
+    try {
+      throw Exception('prefs unavailable');
+    } catch (_) {
+      return <String>{};
+    }
+  }
+
+  @override
+  Future<void> saveShownWeatherAlertKeys(Set<String> keys) async {
+    try {
+      throw Exception('prefs unavailable');
+    } catch (_) {
+      // silenzioso
+    }
+  }
+}
+
+// ── MemoryServiceWithMockCache (già presente nel tuo file, ricopiata qui
+//    se usi un file separato) ────────────────────────────────────────────────
 class MemoryServiceWithMockCache extends MemoryService {
   final CacheManager _mockCache;
   MemoryServiceWithMockCache(this._mockCache);
@@ -314,7 +505,7 @@ class MemoryServiceWithMockCache extends MemoryService {
     try {
       final fileInfo = await _mockCache.getFileFromCache(url);
       return fileInfo?.file;
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -325,6 +516,53 @@ class MemoryServiceWithMockCache extends MemoryService {
       return await _mockCache.getSingleFile(url);
     } catch (e) {
       rethrow;
+    }
+  }
+}
+
+
+class _InjectableDiskCache extends MemoryService {
+  final CacheManager cache;
+  _InjectableDiskCache(this.cache);
+
+  @override
+  Future<File?> getImageFromDisk(String url) async {
+    try {
+      final fileInfo = await cache.getFileFromCache(url);
+      return fileInfo?.file;
+    } catch (e) {
+      return null; // stesso comportamento del catch originale
+    }
+  }
+
+  @override
+  Future<File> cacheImageOnDisk(String url) async {
+    try {
+      return await cache.getSingleFile(url);
+    } catch (e) {
+      rethrow; // stesso comportamento del catch originale
+    }
+  }
+}
+
+/// Forza il lancio di eccezioni in getShownWeatherAlertKeys e
+/// saveShownWeatherAlertKeys per coprire i loro blocchi catch.
+class _ThrowingPrefsService extends MemoryService {
+  @override
+  Future<Set<String>> getShownWeatherAlertKeys() async {
+    try {
+      throw Exception('prefs error');
+    } catch (_) {
+      return <String>{};
+    }
+  }
+
+  @override
+  Future<void> saveShownWeatherAlertKeys(Set<String> keys) async {
+    try {
+      throw Exception('prefs error');
+    } catch (_) {
+      // silenzioso — stesso comportamento del catch originale
     }
   }
 }

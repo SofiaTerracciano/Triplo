@@ -4,10 +4,14 @@ import 'package:triplo/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notifications =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications /*= FlutterLocalNotificationsPlugin()*/;
 
   GlobalKey<NavigatorState>? _navKey;
+
+  NotificationService() : _notifications = FlutterLocalNotificationsPlugin();
+
+  @visibleForTesting
+  NotificationService.withPlugin(this._notifications);
 
   void setNavKey(GlobalKey<NavigatorState> key) {
     _navKey = key;
@@ -93,6 +97,11 @@ class NotificationService {
         ],
       ),
     );
+  }
+
+  @visibleForTesting
+  void handleNotificationTapForTest(String payload) {
+    _handleNotificationTap(payload);
   }
 
   Future<void> showTrekkingNotification({

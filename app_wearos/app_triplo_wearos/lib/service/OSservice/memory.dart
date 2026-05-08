@@ -5,8 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService {
-  // --- 1. CONFIGURAZIONE CACHE DISCO ---
-  // Definito come static final così esiste una sola istanza in tutta l'app
+
   static final CacheManager _diskCache = CacheManager(
     Config(
       'triploImageCache',
@@ -15,9 +14,7 @@ class MemoryService {
     ),
   );
 
-  // --- 2. secondary storage (SharedPreferences and flutter secure storage) ---
   static const _kLocaleKey = "user_locale";
-  //static const _kFirstRunKey = "is_first_run";
   static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';
   static const String _kWatchIdKey = 'watch_id';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
@@ -31,8 +28,6 @@ class MemoryService {
     return prefs.getString(_kLocaleKey);
   }
 
-
-
   Future<void> saveWatchId(String watchId) async {
     await _secureStorage.write(key: _kWatchIdKey, value: watchId);
   }
@@ -41,17 +36,6 @@ class MemoryService {
     return _secureStorage.read(key: _kWatchIdKey);
   }
 
-  //Future<bool> isFirstRun() async {
-  //  final prefs = await SharedPreferences.getInstance();
-  //  return prefs.getBool(_kFirstRunKey) ?? true;
-  //}
-
-  //Future<void> setFirstRunDone() async {
-  //  final prefs = await SharedPreferences.getInstance();
-  //  await prefs.setBool(_kFirstRunKey, false);
-  //}
-
-  // --- 3. MEMORIA VOLATILE (RAM Cache) ---
   final Map<String, dynamic> _internalRamCache = {};
 
   void saveImageToMemory(String key, File file) {
@@ -73,9 +57,6 @@ class MemoryService {
     debugPrint("Memory: RAM pulita"); // coverage:ignore-line
   }
 
-  // --- 4. GESTIONE DISCO (Metodi usati dal Controller) ---
-
-  /// Recupera un'immagine dalla cache su disco
   Future<File?> getImageFromDisk(String url) async {
     try {
       final fileInfo = await _diskCache.getFileFromCache(url);
@@ -85,8 +66,7 @@ class MemoryService {
       return null;
     }
   }
-
-  /// Scarica e salva un'immagine nella cache su disco
+  
   Future<File> cacheImageOnDisk(String url) async {
     try {
       return await _diskCache.getSingleFile(url);

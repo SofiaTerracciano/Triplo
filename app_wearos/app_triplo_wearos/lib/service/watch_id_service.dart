@@ -3,13 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-
 import 'OSservice/memory.dart';
 
-
 class WatchIdService {
-  static final MemoryService _memoryService = MemoryService();
+  //static final MemoryService _memoryService = MemoryService();
   static const _uuid = Uuid();
+
+  static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static FirebaseAuth auth = FirebaseAuth.instance;
+  static MemoryService memoryService = MemoryService();
 
   static Future<void> _anonymousAuth() async {
     if (FirebaseAuth.instance.currentUser == null) {
@@ -19,7 +21,7 @@ class WatchIdService {
 
   static Future<String> getOrCreateWatchId() async {
     await _anonymousAuth();
-    final local = await _memoryService.getWatchId();
+    final local = await memoryService.getWatchId();
     if (local != null && local.isNotEmpty) {
       debugPrint("WatchIdService: usando watchId locale=$local"); //coverage:ignore-line
 
@@ -30,12 +32,12 @@ class WatchIdService {
     try {
       final watchId = await _createWatchDocOnFirestore()
           .timeout(const Duration(seconds: 4));
-      await _memoryService.saveWatchId(watchId);
+      await memoryService.saveWatchId(watchId);
       return watchId;
     } catch (e) {
       debugPrint("WatchIdService: Firestore non disponibile ($e). Uso UUID locale."); //coverage:ignore-line
       final fallback = _uuid.v4();
-      await _memoryService.saveWatchId(fallback);
+      await memoryService.saveWatchId(fallback);
 
       unawaited(_ensureWatchDoc(fallback));
       return fallback;
@@ -43,7 +45,7 @@ class WatchIdService {
   }
 
   static Future<String> _createWatchDocOnFirestore() async {
-    final db = FirebaseFirestore.instance;
+    final db = firestore;
     debugPrint("WatchIdService: creo doc su /watch ..."); //coverage:ignore-line
     final ref = await db.collection('watch').add({
       'platform': 'wearos',
@@ -56,7 +58,7 @@ class WatchIdService {
 
   static Future<void> _ensureWatchDoc(String watchId) async {
     try {
-      final db = FirebaseFirestore.instance;
+      final db = firestore;
       final ref = db.collection('watch').doc(watchId);
 
       final snap = await ref.get();
@@ -74,5 +76,14 @@ class WatchIdService {
     } catch (e) {
       debugPrint("WatchIdService ensureWatchDoc failed: $e"); //coverage:ignore-line
     }
+  }
+
+  @visibleForTesting
+  static Future<void> ensureWatchDocForTest(
+    FirebaseFirestore db,
+    String watchId,
+  ) async {
+    firestore = db;
+    await _ensureWatchDoc(watchId);
   }
 }
