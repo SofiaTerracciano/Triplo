@@ -6,13 +6,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MemoryService {
 
-  static final CacheManager _diskCache = CacheManager(
+  final CacheManager _diskCache;
+
+  MemoryService({CacheManager? diskCache})
+      : _diskCache = diskCache ??
+            CacheManager(Config(
+              'triploImageCache',
+              stalePeriod: const Duration(days: 7),
+              maxNrOfCacheObjects: 100,
+            ));
+
+  /*static final CacheManager _diskCache = CacheManager(
     Config(
       'triploImageCache',
       stalePeriod: const Duration(days: 7),
       maxNrOfCacheObjects: 100,
     ),
-  );
+  );*/
 
   static const _kLocaleKey = "user_locale";
   static const String _kShownWeatherAlertsKey = 'shown_weather_alert_keys';

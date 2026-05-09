@@ -23,26 +23,21 @@ void main() {
     mockAuth = MockFirebaseAuth();
     mockUserCredential = MockUserCredential();
 
-    // Inietta le dipendenze nel service
     WatchIdService.firestore = fakeDb;
     WatchIdService.memoryService = memory;
     WatchIdService.auth = mockAuth;
   });
 
-  // Helper: simula utente già autenticato (evita Firebase.initializeApp)
   void givenUserAlreadyAuthenticated() {
     final mockUser = MockUser();
     when(mockAuth.currentUser).thenReturn(mockUser);
   }
 
-  // Helper: simula login anonimo riuscito
   void givenAnonymousSignInSucceeds() {
     when(mockAuth.currentUser).thenReturn(null);
     when(mockAuth.signInAnonymously())
         .thenAnswer((_) async => mockUserCredential);
   }
-
-  // ── getOrCreateWatchId ──────────────────────────────────────────────────
 
   group('WatchIdService – getOrCreateWatchId –', () {
     test('returns local watchId when already saved locally', () async {
@@ -82,7 +77,6 @@ void main() {
       when(memory.getWatchId()).thenAnswer((_) async => null);
       when(memory.saveWatchId(any)).thenAnswer((_) async {});
 
-      // Sostituisci firestore con uno lento che fa scattare il timeout
       WatchIdService.firestore = _SlowFirestore();
 
       final result = await WatchIdService.getOrCreateWatchId();
@@ -128,8 +122,6 @@ void main() {
     });
   });
 
-  // ── _ensureWatchDoc ─────────────────────────────────────────────────────
-
   group('WatchIdService – ensureWatchDoc –', () {
     test('creates document when it does not exist', () async {
       await WatchIdService.ensureWatchDocForTest(fakeDb, 'watch-new');
@@ -155,7 +147,6 @@ void main() {
     });
 
     test('does not throw when firestore fails', () async {
-      // ensureWatchDoc swallows exceptions internamente
       await expectLater(
         WatchIdService.ensureWatchDocForTest(
           _ThrowingFirestore(),
@@ -165,8 +156,6 @@ void main() {
       );
     });
   });
-
-  // ── anonymous auth ──────────────────────────────────────────────────────
 
   group('WatchIdService – anonymous auth –', () {
     test('skips signInAnonymously when user already exists', () async {
@@ -188,10 +177,6 @@ void main() {
     });
   });
 }
-
-// ── Firestore fakes ─────────────────────────────────────────────────────────
-
-/// Firestore che non risponde mai → fa scattare il timeout da 4 s
 class _SlowFirestore extends Fake implements FirebaseFirestore {
   @override
   CollectionReference<Map<String, dynamic>> collection(String path) =>
@@ -208,7 +193,6 @@ class _SlowCollectionReference extends Fake
   }
 }
 
-/// Firestore che lancia subito un'eccezione
 class _ThrowingFirestore extends Fake implements FirebaseFirestore {
   @override
   CollectionReference<Map<String, dynamic>> collection(String path) =>
