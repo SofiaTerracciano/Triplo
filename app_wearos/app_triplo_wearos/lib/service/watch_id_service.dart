@@ -13,9 +13,15 @@ class WatchIdService {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static MemoryService memoryService = MemoryService();
 
-  static Future<void> _anonymousAuth() async {
+  /*static Future<void> _anonymousAuth() async {
     if (FirebaseAuth.instance.currentUser == null) {
       await FirebaseAuth.instance.signInAnonymously();
+    }
+  }*/
+
+  static Future<void> _anonymousAuth() async {
+    if (auth.currentUser == null) {
+      await auth.signInAnonymously();
     }
   }
 

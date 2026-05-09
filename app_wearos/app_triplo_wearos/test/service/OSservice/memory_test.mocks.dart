@@ -11,6 +11,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart' as _i2;
 import 'package:flutter_cache_manager/src/cache_store.dart' as _i3;
 import 'package:flutter_cache_manager/src/web/web_helper.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -49,6 +50,11 @@ class _FakeFile_3 extends _i1.SmartFake implements _i5.File {
 
 class _FakeFileInfo_4 extends _i1.SmartFake implements _i2.FileInfo {
   _FakeFileInfo_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeDateTime_5 extends _i1.SmartFake implements DateTime {
+  _FakeDateTime_5(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -289,4 +295,53 @@ class MockCacheManager extends _i1.Mock implements _i2.CacheManager {
             returnValueForMissingStub: _i6.Future<void>.value(),
           )
           as _i6.Future<void>);
+}
+
+/// A class which mocks [FileInfo].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFileInfo extends _i1.Mock implements _i2.FileInfo {
+  MockFileInfo() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.File get file =>
+      (super.noSuchMethod(
+            Invocation.getter(#file),
+            returnValue: _FakeFile_3(this, Invocation.getter(#file)),
+          )
+          as _i5.File);
+
+  @override
+  _i2.FileSource get source =>
+      (super.noSuchMethod(
+            Invocation.getter(#source),
+            returnValue: _i2.FileSource.NA,
+          )
+          as _i2.FileSource);
+
+  @override
+  DateTime get validTill =>
+      (super.noSuchMethod(
+            Invocation.getter(#validTill),
+            returnValue: _FakeDateTime_5(this, Invocation.getter(#validTill)),
+          )
+          as DateTime);
+
+  @override
+  int get statusCode =>
+      (super.noSuchMethod(Invocation.getter(#statusCode), returnValue: 0)
+          as int);
+
+  @override
+  String get originalUrl =>
+      (super.noSuchMethod(
+            Invocation.getter(#originalUrl),
+            returnValue: _i8.dummyValue<String>(
+              this,
+              Invocation.getter(#originalUrl),
+            ),
+          )
+          as String);
 }

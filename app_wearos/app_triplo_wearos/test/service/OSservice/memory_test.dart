@@ -1,15 +1,15 @@
 import 'dart:io';
-
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:app_triplo_wearos/service/OSservice/memory.dart';
+import 'package:file/file.dart' as pkg_file;
+import 'package:file/local.dart';
 
-@GenerateMocks([CacheManager])
+@GenerateMocks([CacheManager, FileInfo])
 import 'memory_test.mocks.dart';
 
 File _tempFile(String name) {
@@ -44,7 +44,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
   group('MemoryService – watchId –', () {
     test('saveWatchId and getWatchId round-trip', () async {
       final svc = MemoryService();
@@ -64,7 +63,6 @@ void main() {
     });
   });
 
-  // -------------------------------------------------------------------------
   group('MemoryService – RAM cache –', () {
     test('saveImageToMemory and getImageFromMemory return the same file',
         () async {
@@ -84,13 +82,11 @@ void main() {
         'getImageFromMemory returns null and evicts entry when file does not exist',
         () async {
       final svc = MemoryService();
-      // File che creiamo e poi eliminiamo subito così exists() → false
       final file = _tempFile('ram_miss.txt');
       file.deleteSync();
 
       svc.saveImageToMemory('key2', file);
       expect(await svc.getImageFromMemory('key2'), isNull);
-      // Seconda chiamata: chiave rimossa dalla cache interna
       expect(await svc.getImageFromMemory('key2'), isNull);
     });
 
@@ -154,7 +150,7 @@ void main() {
 
     test('cacheImageOnDisk rethrows on failure', () async {
       final mockCache = MockCacheManager();
-      when(mockCache.getSingleFile(any, headers: anyNamed('headers')))
+      when(mockCache.getSingleFile(any, key: anyNamed('key'), headers: anyNamed('headers')))
           .thenThrow(Exception('network error'));
 
       final svc = MemoryServiceWithMockCache(mockCache);
@@ -251,7 +247,7 @@ void main() {
       final m = MemoryService();
       final file =
           File('${Directory.systemTemp.path}/ghost_${DateTime.now().millisecondsSinceEpoch}.png');
-      m.saveImageToMemory('ghost', file); // file non creato su disco
+      m.saveImageToMemory('ghost', file); 
       final result = await m.getImageFromMemory('ghost');
       expect(result, isNull);
     });
@@ -304,11 +300,6 @@ void main() {
     });
   });
 
-  // ── cacheImageOnDisk ──────────────────────────────────────────────────────
-  // Branch mancante: percorso felice (nessuna eccezione → restituisce File)
-
-  // ── getShownWeatherAlertKeys – catch branch ───────────────────────────────
-  // Branch mancante: SharedPreferences lancia → restituisce set vuoto
   group('MemoryService – weather alert keys (error paths) –', () {
     test(
         'getShownWeatherAlertKeys returns empty set when SharedPreferences throws',
@@ -318,7 +309,6 @@ void main() {
       expect(result, isEmpty);
     });
 
-    // Branch mancante: saveShownWeatherAlertKeys catch (SharedPreferences lancia)
     test('saveShownWeatherAlertKeys completes silently when prefs throws',
         () async {
       final svc = _MemoryServiceThrowingPrefs();
@@ -328,15 +318,12 @@ void main() {
       );
     });
 
-    // Verifica che hasShownWeatherAlertKey ritorni false quando le prefs lanciano
     test('hasShownWeatherAlertKey returns false when prefs throw', () async {
       final svc = _MemoryServiceThrowingPrefs();
       expect(await svc.hasShownWeatherAlertKey('any'), isFalse);
     });
   });
 
-  // ── saveShownWeatherAlertKeys – percorso felice aggiuntivo ────────────────
-  // Copre la riga prefs.setStringList dentro il try che non è sempre raggiunta
   group('MemoryService – weather alert keys (save path) –', () {
     test('saveShownWeatherAlertKeys persists and is readable back', () async {
       final svc = MemoryService();
@@ -356,31 +343,7 @@ void main() {
   });
 
   group('MemoryService – getImageFromDisk –', () {
-   test('returns file when cache hits', () async {
-    final mockCache = MockCacheManager();
 
-    final file = File('${Directory.systemTemp.path}/disk_hit.txt')
-      ..writeAsStringSync('x');
-
-    addTearDown(() {
-      if (file.existsSync()) file.deleteSync();
-    });
-
-   /* final cached = MockFileInfo();
-
-    when(mockCache.getFileFromCache(any))
-        .thenAnswer((_) async => cached);
-
-    when(cached.file).thenReturn(file);*/
-
-    final svc = _InjectableDiskCache(mockCache);
-
-    final result =
-        await svc.getImageFromDisk('http://example.com/hit.jpg');
-
-    expect(result, isNotNull);
-    expect(result!.path, file.path);
-  });
 
     test('returns null on cache miss (fileInfo == null)', () async {
       final mockCache = MockCacheManager();
@@ -399,39 +362,11 @@ void main() {
     });
   });
 
-  // ── cacheImageOnDisk ────────────────────────────────────────────────────────
-
   group('MemoryService – cacheImageOnDisk –', () {
-   test('returns file on success', () async {
-    final mockCache = MockCacheManager();
-
-    final file = File('${Directory.systemTemp.path}/disk_save.txt')
-      ..writeAsStringSync('x');
-
-    addTearDown(() {
-      if (file.existsSync()) file.deleteSync();
-    });
-
-  /*when(
-    mockCache.getSingleFile(
-      any,
-      headers: anyNamed('headers'),
-    ),
-  ).thenAnswer((_) async {
-    return file;
-  });*/
-
-    final svc = _InjectableDiskCache(mockCache);
-
-    final result =
-        await svc.cacheImageOnDisk('http://example.com/img.jpg');
-
-    expect(result.path, file.path);
-  });
 
     test('rethrows exception on failure', () async {
       final mockCache = MockCacheManager();
-      when(mockCache.getSingleFile(any, headers: anyNamed('headers')))
+      when(mockCache.getSingleFile(any, key: anyNamed('key'), headers: anyNamed('headers')))
           .thenThrow(Exception('network error'));
 
       final svc = _InjectableDiskCache(mockCache);
@@ -442,7 +377,6 @@ void main() {
     });
   });
 
-  // ── getShownWeatherAlertKeys – catch branch ─────────────────────────────────
 
   group('MemoryService – getShownWeatherAlertKeys catch –', () {
     test('returns empty set when SharedPreferences throws', () async {
@@ -456,7 +390,6 @@ void main() {
     });
   });
 
-  // ── saveShownWeatherAlertKeys – catch branch ────────────────────────────────
 
   group('MemoryService – saveShownWeatherAlertKeys catch –', () {
     test('completes silently when SharedPreferences throws', () async {
@@ -470,10 +403,134 @@ void main() {
       await expectLater(svc.addShownWeatherAlertKey('x'), completes);
     });
   });
+
+  group('MemoryService – getImageFromDisk happy path –', () {
+    test('returns file when CacheManager returns a valid FileInfo', () async {
+      final mockCache = MockCacheManager();
+      final mockFileInfo = MockFileInfo();
+
+      final fs = LocalFileSystem();
+      final pkgFile = fs.file('${Directory.systemTemp.path}/disk_hit_real.txt');
+      await pkgFile.writeAsString('hello');
+      addTearDown(() async {
+        if (await pkgFile.exists()) await pkgFile.delete();
+      });
+
+      when(mockCache.getFileFromCache(any))
+          .thenAnswer((_) async => mockFileInfo);
+      when(mockFileInfo.file).thenReturn(pkgFile);
+
+      final svc = _InjectableDiskCache(mockCache);
+      final result = await svc.getImageFromDisk('http://example.com/hit.jpg');
+
+      expect(result, isNotNull);
+      expect(result!.path, pkgFile.path);
+    });
+  });
+
+  group('MemoryService – cacheImageOnDisk happy path –', () {
+    test('returns file on successful getSingleFile', () async {
+      final mockCache = MockCacheManager();
+
+      final fs = LocalFileSystem();
+      final pkgFile = fs.file('${Directory.systemTemp.path}/disk_cache_ok.txt');
+      await pkgFile.writeAsString('data');
+      addTearDown(() async {
+        if (await pkgFile.exists()) await pkgFile.delete();
+      });
+
+      // Matcha tutti i named params opzionali esplicitamente
+      when(mockCache.getSingleFile(
+        any,
+        key: anyNamed('key'),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async => pkgFile);
+
+      final svc = _InjectableDiskCache(mockCache);
+      final result = await svc.cacheImageOnDisk('http://example.com/img.jpg');
+
+      expect(result.path, pkgFile.path);
+    });
+  });
+
+  group('MemoryService – watchId edge cases –', () {
+    test('saveWatchId then getWatchId returns empty string', () async {
+      final svc = MemoryService();
+      await svc.saveWatchId('');
+      expect(await svc.getWatchId(), '');
+    });
+
+    test('saveWatchId with special characters round-trips correctly', () async {
+      final svc = MemoryService();
+      await svc.saveWatchId('watch-!@#\$%^&*()');
+      expect(await svc.getWatchId(), 'watch-!@#\$%^&*()');
+    });
+  });
+
+  group('MemoryService – hasShownWeatherAlertKey full flow –', () {
+    test('returns false before add, true after add', () async {
+      final svc = MemoryService();
+      expect(await svc.hasShownWeatherAlertKey('new-key'), isFalse);
+      await svc.addShownWeatherAlertKey('new-key');
+      expect(await svc.hasShownWeatherAlertKey('new-key'), isTrue);
+    });
+
+    test('addShownWeatherAlertKey preserves existing keys', () async {
+      final svc = MemoryService();
+      await svc.addShownWeatherAlertKey('first');
+      await svc.addShownWeatherAlertKey('second');
+      expect(await svc.hasShownWeatherAlertKey('first'), isTrue);
+      expect(await svc.hasShownWeatherAlertKey('second'), isTrue);
+    });
+  });
+
+  group('MemoryService – locale edge cases –', () {
+    test('saveLocale with empty string round-trips', () async {
+      final svc = MemoryService();
+      await svc.saveLocale('');
+      expect(await svc.getLocale(), '');
+    });
+
+    test('saveLocale with long locale code round-trips', () async {
+      final svc = MemoryService();
+      await svc.saveLocale('zh-Hans-CN');
+      expect(await svc.getLocale(), 'zh-Hans-CN');
+    });
+  });
+
+  group('MemoryService – RAM cache edge cases –', () {
+    test('overwriting a key updates the stored file', () async {
+      final svc = MemoryService();
+      final fileA = _tempFile('overwrite_a.txt');
+      final fileB = _tempFile('overwrite_b.txt');
+      addTearDown(fileA.deleteSync);
+      addTearDown(fileB.deleteSync);
+
+      svc.saveImageToMemory('same-key', fileA);
+      svc.saveImageToMemory('same-key', fileB);
+
+      final result = await svc.getImageFromMemory('same-key');
+      expect(result, same(fileB));
+    });
+
+    test('getImageFromMemory after clearAllRam returns null for all keys',
+        () async {
+      final svc = MemoryService();
+      final fileA = _tempFile('clear_a.txt');
+      final fileB = _tempFile('clear_b.txt');
+      addTearDown(fileA.deleteSync);
+      addTearDown(fileB.deleteSync);
+
+      svc.saveImageToMemory('ka', fileA);
+      svc.saveImageToMemory('kb', fileB);
+      svc.clearAllRam();
+
+      expect(await svc.getImageFromMemory('ka'), isNull);
+      expect(await svc.getImageFromMemory('kb'), isNull);
+    });
+  });
 }
 
-/// Sottoclasse che sovrascrive SharedPreferences simulando un'eccezione,
-/// così copriamo i catch in getShownWeatherAlertKeys / saveShownWeatherAlertKeys.
 class _MemoryServiceThrowingPrefs extends MemoryService {
   @override
   Future<Set<String>> getShownWeatherAlertKeys() async {
@@ -489,13 +546,10 @@ class _MemoryServiceThrowingPrefs extends MemoryService {
     try {
       throw Exception('prefs unavailable');
     } catch (_) {
-      // silenzioso
-    }
+      }
   }
 }
 
-// ── MemoryServiceWithMockCache (già presente nel tuo file, ricopiata qui
-//    se usi un file separato) ────────────────────────────────────────────────
 class MemoryServiceWithMockCache extends MemoryService {
   final CacheManager _mockCache;
   MemoryServiceWithMockCache(this._mockCache);
@@ -531,7 +585,7 @@ class _InjectableDiskCache extends MemoryService {
       final fileInfo = await cache.getFileFromCache(url);
       return fileInfo?.file;
     } catch (e) {
-      return null; // stesso comportamento del catch originale
+      return null; 
     }
   }
 
@@ -540,13 +594,11 @@ class _InjectableDiskCache extends MemoryService {
     try {
       return await cache.getSingleFile(url);
     } catch (e) {
-      rethrow; // stesso comportamento del catch originale
+      rethrow;
     }
   }
 }
 
-/// Forza il lancio di eccezioni in getShownWeatherAlertKeys e
-/// saveShownWeatherAlertKeys per coprire i loro blocchi catch.
 class _ThrowingPrefsService extends MemoryService {
   @override
   Future<Set<String>> getShownWeatherAlertKeys() async {
@@ -562,7 +614,6 @@ class _ThrowingPrefsService extends MemoryService {
     try {
       throw Exception('prefs error');
     } catch (_) {
-      // silenzioso — stesso comportamento del catch originale
     }
   }
 }
