@@ -11,7 +11,6 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 @GenerateMocks([CacheManager, FileInfo])
 import 'memory_test.mocks.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -112,7 +111,6 @@ void main() {
     });
   });
 
-  // ── RAM cache ─────────────────────────────────────────────────────────────
   group('MemoryService – RAM cache –', () {
     test('saveImageToMemory and getImageFromMemory return the same file',
         () async {
@@ -136,7 +134,6 @@ void main() {
 
       svc.saveImageToMemory('key2', file);
       expect(await svc.getImageFromMemory('key2'), isNull);
-      // seconda chiamata: chiave già rimossa
       expect(await svc.getImageFromMemory('key2'), isNull);
     });
 
@@ -193,7 +190,6 @@ void main() {
     });
   });
 
-  // ── disk cache (codice ORIGINALE coperto tramite DI) ──────────────────────
   group('MemoryService – getImageFromDisk –', () {
     test('returns file when cache hits', () async {
       final mockCache = MockCacheManager();
@@ -211,7 +207,6 @@ void main() {
           .thenAnswer((_) async => mockFileInfo);
       when(mockFileInfo.file).thenReturn(pkgFile);
 
-      // Usa il codice ORIGINALE di MemoryService con cache iniettata
       final svc = MemoryService(diskCache: mockCache);
       final result =
           await svc.getImageFromDisk('http://example.com/hit.jpg');
@@ -280,7 +275,6 @@ void main() {
     });
   });
 
-  // ── weather alert keys ────────────────────────────────────────────────────
   group('MemoryService – weather alert keys –', () {
     test('getShownWeatherAlertKeys returns empty set when nothing saved',
         () async {
@@ -348,7 +342,6 @@ void main() {
     });
   });
 
-  // ── error paths (catch branches) ──────────────────────────────────────────
   group('MemoryService – weather alert keys error paths –', () {
     test('getShownWeatherAlertKeys returns empty set when prefs throws',
         () async {
@@ -375,8 +368,6 @@ void main() {
     });
   });
 }
-
-// ── helper classes ────────────────────────────────────────────────────────────
 
 class _ThrowingPrefsService extends MemoryService {
   @override

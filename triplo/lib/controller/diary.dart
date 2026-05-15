@@ -220,7 +220,6 @@ class DiaryController extends ChangeNotifier {
           ]),
         });
       }
-
       notifyListeners();
     }
   }

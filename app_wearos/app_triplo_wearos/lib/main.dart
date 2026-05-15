@@ -1,4 +1,3 @@
-
 import 'package:app_triplo_wearos/controller/challenge.dart';
 import 'package:app_triplo_wearos/controller/diary.dart';
 import 'package:app_triplo_wearos/controller/language.dart';
@@ -17,6 +16,7 @@ import 'package:app_triplo_wearos/service/watch_id_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,70 +25,85 @@ import 'package:app_triplo_wearos/controller/user.dart';
 
 final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint(".env file not found — continuing without it."); //coverage:ignore-line
+// Testabile: contiene tutta la logica di avvio
+@visibleForTesting
+Future<void> initializeApp({
+  Future<String> Function()? watchIdFactory,
+  Future<void> Function()? permissionsFactory,
+  Future<void> Function()? notificationInit,
+  void Function(Widget)? runAppFn,
+  MemoryService Function()? memoryServiceFactory,
+  GeoService Function()? geoServiceFactory,
+  FirebaseFirestore? firestore,
+}) async {
+  final resolvedWatchId = watchIdFactory != null
+      ? await watchIdFactory()
+      : await WatchIdService.getOrCreateWatchId(); // coverage:ignore-line
+
+  if (permissionsFactory != null) {
+    await permissionsFactory();
+  } else {
+    await PermissionService.askPermissionsOnce(); // coverage:ignore-line
   }
 
-  try {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    } catch (e) {
-      debugPrint("Firebase init failed (GMS non disponibile su emulatore x86): $e"); //coverage:ignore-line
-}
+  final memoryService = memoryServiceFactory != null
+      ? memoryServiceFactory()
+      : MemoryService(); // coverage:ignore-line
 
-  final watchId = await WatchIdService.getOrCreateWatchId();
-
-  /*Init NotificationService centralizzato
-  final notificationService = NotificationService();
-  await notificationService.init();
-  notificationService.setNavKey(navKey); // <- passa il navKey
-
-  // Crea i canali Android
-  final androidPlugin = notificationService
-      // ignore: invalid_use_of_visible_for_testing_member
-      .plugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-
-  await androidPlugin?.createNotificationChannel(
-    const AndroidNotificationChannel(
-      'notifications_channel',
-      'Notifications',
-      importance: Importance.high,
-    ),
-  );
-
-  await androidPlugin?.createNotificationChannel(
-    const AndroidNotificationChannel(
-      'arrival_channel',
-      'Arrivo Trekking',
-      importance: Importance.high,
-    ),
-  );*/
-  
-  final memoryService = MemoryService();
-  final geoService= GeoService();
+  final geoService = geoServiceFactory != null
+      ? geoServiceFactory()
+      : GeoService(); // coverage:ignore-line
 
   final language = Language();
   await language.loadSavedLocale();
 
-  await PermissionService.askPermissionsOnce();
-
   final notification = NotificationService();
   notification.setNavKey(navKey);
-  await notification.init();
 
-  runApp(
-    TriploWatchApp(
-      watchId: watchId,
-      memoryService: memoryService,
-      geoService: geoService,
-      language: language,
-      notification: notification,
-    )
+  if (notificationInit != null) {
+    await notificationInit();
+  } else {
+    await notification.init(); // coverage:ignore-line
+  }
+
+  final app = TriploWatchApp(
+    watchId: resolvedWatchId,
+    memoryService: memoryService,
+    geoService: geoService,
+    language: language,
+    notification: notification,
+    firestore: firestore,
   );
+
+  if (runAppFn != null) {
+    runAppFn(app);
+  } else {
+    runApp(app); // coverage:ignore-line
+  }
+}
+
+// Punto di ingresso reale — tutto ignorato dalla copertura
+Future<void> main() async { // coverage:ignore-line
+  WidgetsFlutterBinding.ensureInitialized(); // coverage:ignore-line
+  try { // coverage:ignore-line
+    await dotenv.load(fileName: ".env"); // coverage:ignore-line
+  } catch (e) { // coverage:ignore-line
+    debugPrint(".env file not found"); // coverage:ignore-line
+  } // coverage:ignore-line
+  try { // coverage:ignore-line
+    await Firebase.initializeApp( // coverage:ignore-line
+        options: DefaultFirebaseOptions.currentPlatform); // coverage:ignore-line
+  } catch (e) { // coverage:ignore-line
+    debugPrint("Firebase init failed: $e"); // coverage:ignore-line
+  } // coverage:ignore-line
+  await initializeApp(); // coverage:ignore-line
+} // coverage:ignore-line
+
+class AppBootstrap {
+  static Future<String> Function() getWatchId =
+      WatchIdService.getOrCreateWatchId;
+  static Future<void> Function() askPermissions =
+      PermissionService.askPermissionsOnce;
 }
 
 class TriploWatchApp extends StatelessWidget {
@@ -97,121 +112,67 @@ class TriploWatchApp extends StatelessWidget {
   final GeoService geoService;
   final Language language;
   final NotificationService notification;
+  final FirebaseFirestore? firestore; // ← iniettabile per i test
+
   const TriploWatchApp({
-    super.key, 
-    required this.watchId, 
+    super.key,
+    required this.watchId,
     required this.memoryService,
     required this.geoService,
     required this.language,
     required this.notification,
+    this.firestore,
   });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // 1. Inietta prima i servizi base (Provider semplici)
         Provider<MemoryService>.value(value: memoryService),
         Provider<GeoService>.value(value: geoService),
         Provider<NotificationService>.value(value: notification),
         ChangeNotifierProvider.value(value: language),
-
-        // 2. Inietta i controller che dipendono dai servizi
         ChangeNotifierProvider(create: (_) => DiaryController()),
-        ChangeNotifierProvider(
+        /*ChangeNotifierProvider(
           create: (_) => PairingService(watchId: watchId),
+        ),*/
+        ChangeNotifierProvider(
+          create: (_) => firestore != null
+              ? PairingService.withFirestore(watchId: watchId, db: firestore!)
+              : PairingService(watchId: watchId), // coverage:ignore-line
         ),
-
-
         ChangeNotifierProxyProvider<PairingService, UserController>(
           create: (context) => UserController(context.read<PairingService>()),
           update: (context, pairingService, previous) =>
-          previous ?? UserController(pairingService),
+              previous ?? UserController(pairingService),
         ),
-
-        // API (Provider semplice perché non è un ChangeNotifier)
-        Provider<ServiceController>(create: (context) => ServiceController(
-          geo: context.read<GeoService>(), 
-          memory: context.read<MemoryService>(),
-          //notification: context.read<NotificationService>(),
-        )),
+        Provider<ServiceController>(
+          create: (context) => ServiceController(
+            geo: context.read<GeoService>(),
+            memory: context.read<MemoryService>(),
+          ),
+        ),
         ChangeNotifierProvider(
           create: (context) => InternetService(
             servicecontroller: context.read<ServiceController>(),
           )..start(),
         ),
-
-        // TrekkingController con le dipendenze passate correttamente
-        ChangeNotifierProvider(create: (context) => TrekkingController(
-          geo: context.read<GeoService>(),
-          memory: context.read<MemoryService>(),
-          notification: context.read<NotificationService>(),
-          pairingService: context.read<PairingService>(),
-          trekkings: [],
-          db: FirebaseFirestore.instance
-        )),
-
-        // ChallengesController con le dipendenze passate correttamente
-        ChangeNotifierProvider(create: (context) => ChallengesController(
-          memory: context.read<MemoryService>(),
-          notification: context.read<NotificationService>(),
-        )),
-        
-        /*ChangeNotifierProvider(create: (_) => DiaryController()),
-        ChangeNotifierProvider.value(value: language),
-        Provider<MemoryService>.value(value: memoryService),
-        Provider<GeoService>.value(value: geoService),
-        Provider<NotificationService>.value(value: notification),
-        ChangeNotifierProxyProvider3<GeoService, MemoryService, NotificationService, TrekkingController>(
+        ChangeNotifierProvider(
           create: (context) => TrekkingController(
             geo: context.read<GeoService>(),
             memory: context.read<MemoryService>(),
             notification: context.read<NotificationService>(),
+            pairingService: context.read<PairingService>(),
             trekkings: [],
+            db: firestore ?? FirebaseFirestore.instance, // ← usa fake in test
           ),
-          update: (context, geo, memory, notification, previous) {
-            if (previous != null) {
-              previous.geo = geo;
-              previous.memory = memory;
-              previous.notification = notification;
-              return previous;
-            }
-            return TrekkingController(
-              geo: geo,
-              memory: memory,
-              notification: notification,
-              trekkings: [],
-            );
-          },
         ),
-        ChangeNotifierProvider(create: (_) => UserController(watchId: widget.watchId)),
-        ProxyProvider2<GeoService, MemoryService, API>(
-          update: (context, geo, memory, previous) => 
-              API(geo: geo, memory: memory),
-        ),
-        ChangeNotifierProxyProvider<API>(
-          create: (context) =>
-              InternetService(api: context.read<API>())..start(),
-          update: (context, api, old) =>
-              old ?? InternetService(api: api)..start(),
-        ),
-        ChangeNotifierProxyProvider<MemoryService, ChallengesController>(
+        ChangeNotifierProvider(
           create: (context) => ChallengesController(
             memory: context.read<MemoryService>(),
             notification: context.read<NotificationService>(),
           ),
-          update: (context, memory, previous) {
-            if (previous != null) {
-              previous.memory = memory;
-              previous.notification = context.read<NotificationService>();
-              return previous;
-            }
-            return ChallengesController(
-              memory: memory, 
-              notification: context.read<NotificationService>(),
-            );
-          },
-        ),*/
+        ),
       ],
       child: Consumer<Language>(
         builder: (context, lang, child) {
@@ -220,7 +181,8 @@ class TriploWatchApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             navigatorKey: navKey,
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+              colorScheme:
+                  ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
               useMaterial3: true,
             ),
             locale: lang.locale,
@@ -239,7 +201,6 @@ class TriploWatchApp extends StatelessWidget {
             ],
             builder: (context, child) {
               final isOnline = context.watch<InternetService>().isOnline;
-
               return Stack(
                 children: [
                   if (child != null) child,
@@ -248,8 +209,6 @@ class TriploWatchApp extends StatelessWidget {
               );
             },
             home: const NavigationPage(),
-
-
           );
         },
       ),

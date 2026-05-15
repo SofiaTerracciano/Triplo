@@ -10,20 +10,17 @@ import '../model/user.dart';
 import '../service/authservice.dart';
 
 class UserController extends ChangeNotifier {
-
   //final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseFirestore _db;
   final AuthService _authService;
 
-
   //UserController(this._authService);
-
 
   String? get uid => _authService.currentUid;
   bool _isLoading = true;
   bool get isLoading => _isLoading;
   UserController(this._authService) // coverage:ignore-start
-      : _db = FirebaseFirestore.instance {
+    : _db = FirebaseFirestore.instance {
     _init();
   } // coverage:ignore-end
 
@@ -43,7 +40,7 @@ class UserController extends ChangeNotifier {
         await loadUserCore(uid);
       }
     } catch (e) {
-      debugPrint("Errore inizializzazione: $e");  // coverage:ignore-line
+      debugPrint("Errore inizializzazione: $e"); // coverage:ignore-line
     } finally {
       // IMPORTANTE: Questo interrompe il caricamento infinito
       _isLoading = false;
@@ -89,26 +86,36 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> loginWithGoogle() async {
-    debugPrint("UserController: loginWithGoogle() start");  //coverage:ignore-line
+    debugPrint(
+      "UserController: loginWithGoogle() start",
+    ); //coverage:ignore-line
     _isLoading = true;
     notifyListeners();
 
     try {
       await _authService.loginWithGoogle();
-      debugPrint("UserController: AuthService.loginWithGoogle() completed"); //coverage:ignore-line
+      debugPrint(
+        "UserController: AuthService.loginWithGoogle() completed",
+      ); //coverage:ignore-line
 
       _currentUser = _authService.currentUser;
-      debugPrint("UserController: _currentUser uid = ${_currentUser?.uid}"); //coverage:ignore-line
+      debugPrint(
+        "UserController: _currentUser uid = ${_currentUser?.uid}",
+      ); //coverage:ignore-line
 
       notifyListeners();
-      debugPrint("UserController: notifyListeners() called"); //coverage:ignore-line
+      debugPrint(
+        "UserController: notifyListeners() called",
+      ); //coverage:ignore-line
     } catch (e, st) {
-      debugPrint("UserController: loginWithGoogle() failed"); //coverage:ignore-line
+      debugPrint(
+        "UserController: loginWithGoogle() failed",
+      ); //coverage:ignore-line
       debugPrint("UserController ERROR: $e"); //coverage:ignore-line
       debugPrintStack(stackTrace: st);
       rethrow;
     } finally {
-      _isLoading = false; 
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -230,10 +237,6 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
-
-
   Future<void> updateName(String name) async {
     final uid = _authService.currentUid;
     if (uid == null) return;
@@ -241,8 +244,6 @@ class UserController extends ChangeNotifier {
     _currentUser?.name = name;
     notifyListeners();
   }
-
-
 
   Future<void> updateSurname(String surname) async {
     final uid = _authService.currentUid;
@@ -267,7 +268,8 @@ class UserController extends ChangeNotifier {
 
     if (uid == null) return;
 
-    final ref = FirebaseStorage.instance // coverage:ignore-start
+    final ref = FirebaseStorage
+        .instance // coverage:ignore-start
         .ref()
         .child("profile_photos")
         .child(uid)
@@ -309,7 +311,6 @@ class UserController extends ChangeNotifier {
 
     if (uid == null || photoUrl == null || photoUrl.isEmpty) return;
 
-
     await _db.collection("users").doc(uid).update({
       "Photo_profile": _authService.currentPhotoUrl,
     });
@@ -325,13 +326,14 @@ class UserController extends ChangeNotifier {
     int intermediate = _currentUser?.intermediate ?? 0;
     int advanced = _currentUser?.advanced ?? 0;
 
-    if (difficulty == "Intermediate") intermediate++;
-    if (difficulty == "Advanced") advanced++;
+    if (difficulty == "intermediate")
+      intermediate++;
+    if (difficulty == "advanced") advanced++;
 
     String level = "Beginner";
     if (advanced >= 5)
       level = "Advanced";
-    else if (intermediate >= 5)
+    else if (intermediate >= 5) 
       level = "Intermediate";
 
     final uid = _authService.currentUid;
@@ -414,7 +416,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-
   ({String watchId, String token}) extractWatchPair(String raw) {
     return _authService.extractWatchPair(raw);
   }
@@ -442,9 +443,6 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
-
   Future<List<Map<String, dynamic>>> getConnectedWatches() async {
     return _authService.getConnectedWatches();
   }
@@ -456,5 +454,4 @@ class UserController extends ChangeNotifier {
   Future<void> clearRemoteLogoutForWatch(String watchId) async {
     await _authService.clearRemoteLogoutForWatch(watchId);
   }
-
 }

@@ -688,12 +688,13 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                                 "${selectedDay.toString().padLeft(2, '0')}/${selectedMonth.toString().padLeft(2, '0')}/$selectedYear";
                             final duration =
                                 selectedHours * 60 + selectedMinutes;
+
                             final photos = await diaryController
                                 .uploadDiaryImages(_images);
 
                             diaryController.currentUser =
                                 userController.currentUser!;
-
+                                
                             await diaryController.addDiary(
                               trekking.name,
                               isPublic,

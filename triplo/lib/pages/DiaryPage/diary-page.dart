@@ -65,6 +65,8 @@ class _DiaryPageState extends State<DiaryPage> {
           }
         }
 
+        print(diary.diaryId);
+
         return FutureBuilder<Users?>(
           future: userController.getUserById(diary.userId),
           builder: (context, snapshot) {
@@ -303,7 +305,9 @@ class _DiaryPageState extends State<DiaryPage> {
                       ),
                     ],
                     //messo per non far sovrapporre i bottoni alla navbar di android
-                    SizedBox(height: MediaQuery.of(context).padding.bottom + 36),
+                    SizedBox(
+                      height: MediaQuery.of(context).padding.bottom + 36,
+                    ),
                   ],
                 ),
               ),
@@ -352,7 +356,7 @@ Widget infoRow(IconData icon, String text) {
 Widget imageScroller(
   List<String> images,
   Future<String?> Function(String) loader, {
-  bool isBadge = false, 
+  bool isBadge = false,
 }) {
   double height = isBadge ? 60 : 120;
   double width = isBadge ? 60 : 160;
