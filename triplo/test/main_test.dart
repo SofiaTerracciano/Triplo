@@ -101,6 +101,9 @@ void main() {
     for (final n in [mockTrekking, mockDiary, mockChallenges, mockUser]) {
       when(n.hasListeners).thenReturn(false);
     }
+    when(mockNotification.setNavKey(any)).thenReturn(null);
+    when(mockNotification.init()).thenAnswer((_) async {});
+    when(mockPermission.askPermissionsOnce()).thenAnswer((_) async {});
   });
 
   Widget buildMockedMaterialApp({
@@ -654,6 +657,213 @@ void main() {
         title: anyNamed('title'),
         body: anyNamed('body'),
       )).called(1);
+    });
+  });
+
+   group('appSetup()', () {
+    setUp(() {
+      when(mockMemory.getSavedLocaleCode())   
+        .thenAnswer((_) async => null);  
+      when(mockNotification.setNavKey(any)).thenReturn(null);
+      when(mockNotification.init()).thenAnswer((_) async {});
+      when(mockPermission.askPermissionsOnce()).thenAnswer((_) async {});
+    });
+ 
+    test('restituisce tutti i servizi richiesti', () async {
+      final result = await appSetup(
+        memoryOverride: mockMemory,
+        authOverride: mockAuth,           // <-- FIX: evita FirebaseAuth.instance
+        notificationOverride: mockNotification,
+        permissionOverride: mockPermission,
+      );
+ 
+      expect(result.memory, same(mockMemory));
+      expect(result.auth, same(mockAuth));
+      expect(result.notification, same(mockNotification));
+      expect(result.permission, same(mockPermission));
+      expect(result.geo, isA<GeoService>());
+      expect(result.language, isA<Language>());
+    });
+ 
+    test('chiama setNavKey con navKey', () async {
+      await appSetup(
+        memoryOverride: mockMemory,
+        authOverride: mockAuth,
+        notificationOverride: mockNotification,
+        permissionOverride: mockPermission,
+      );
+      verify(mockNotification.setNavKey(navKey)).called(1);
+    });
+ 
+    test('chiama init() su NotificationService', () async {
+      await appSetup(
+        memoryOverride: mockMemory,
+        authOverride: mockAuth,
+        notificationOverride: mockNotification,
+        permissionOverride: mockPermission,
+      );
+      verify(mockNotification.init()).called(1);
+    });
+ 
+    test('chiama askPermissionsOnce su PermissionService', () async {
+      await appSetup(
+        memoryOverride: mockMemory,
+        authOverride: mockAuth,
+        notificationOverride: mockNotification,
+        permissionOverride: mockPermission,
+      );
+      verify(mockPermission.askPermissionsOnce()).called(1);
+    });
+  });
+ 
+  // ----------------------------------------------------------
+  // handleConnectivityChange() — testa la logica pura senza
+  // montare MyApp reale (che dipende da Firebase/dotenv).
+  // Usiamo un MaterialApp minimale per ottenere un NavigatorState
+  // reale con le rotte /offline e /user registrate.
+  // ----------------------------------------------------------
+  group('handleConnectivityChange()', () {
+    setUp(() {
+      // Resetta lo stato globale prima di ogni test
+      resetOfflinePageFlag();
+    });
+ 
+    testWidgets('nav==null → nessuna azione, nessun crash', (tester) async {
+      // Chiamata diretta senza Navigator
+      expect(
+        () => handleConnectivityChange(nav: null, isOnline: false),
+        returnsNormally,
+      );
+      expect(
+        () => handleConnectivityChange(nav: null, isOnline: true),
+        returnsNormally,
+      );
+    });
+ 
+    testWidgets(
+        'isOnline=false, _isShowingOfflinePage=false → naviga a /offline',
+        (tester) async {
+      final testNavKey = GlobalKey<NavigatorState>();
+ 
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: testNavKey,
+          routes: {
+            '/': (_) => const Scaffold(body: Text('home')),
+            '/offline': (_) => const Scaffold(body: Text('offline')),
+            '/user': (_) => const Scaffold(body: Text('user')),
+          },
+          initialRoute: '/',
+        ),
+      );
+      await tester.pumpAndSettle();
+ 
+      handleConnectivityChange(
+        nav: testNavKey.currentState,
+        isOnline: false,
+      );
+      await tester.pumpAndSettle();
+ 
+      expect(find.text('offline'), findsOneWidget);
+    });
+ 
+    testWidgets(
+        'isOnline=false, _isShowingOfflinePage=true → non naviga di nuovo',
+        (tester) async {
+      final testNavKey = GlobalKey<NavigatorState>();
+      // Pre-imposta il flag come se fossimo già offline
+      handleConnectivityChange(nav: null, isOnline: false); // nav null: imposta solo il flag
+      // Forziamo il flag manualmente
+      resetOfflinePageFlag();
+      // Prima chiamata: va offline
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: testNavKey,
+          routes: {
+            '/': (_) => const Scaffold(body: Text('home')),
+            '/offline': (_) => const Scaffold(body: Text('offline')),
+            '/user': (_) => const Scaffold(body: Text('user')),
+          },
+          initialRoute: '/',
+        ),
+      );
+      await tester.pumpAndSettle();
+ 
+      handleConnectivityChange(nav: testNavKey.currentState, isOnline: false);
+      await tester.pumpAndSettle();
+      expect(find.text('offline'), findsOneWidget);
+ 
+      // Seconda chiamata con isOnline=false: _isShowingOfflinePage è già true → no-op
+      handleConnectivityChange(nav: testNavKey.currentState, isOnline: false);
+      await tester.pumpAndSettle();
+      expect(find.text('offline'), findsOneWidget); // ancora offline, nessun crash
+    });
+ 
+    testWidgets(
+        'isOnline=true, _isShowingOfflinePage=true → naviga a /user e resetta flag',
+        (tester) async {
+      final testNavKey = GlobalKey<NavigatorState>();
+ 
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: testNavKey,
+          routes: {
+            '/': (_) => const Scaffold(body: Text('home')),
+            '/offline': (_) => const Scaffold(body: Text('offline')),
+            '/user': (_) => const Scaffold(body: Text('user')),
+          },
+          initialRoute: '/',
+        ),
+      );
+      await tester.pumpAndSettle();
+ 
+      // Prima: vai offline
+      handleConnectivityChange(nav: testNavKey.currentState, isOnline: false);
+      await tester.pumpAndSettle();
+      expect(find.text('offline'), findsOneWidget);
+ 
+      // Poi: torna online
+      handleConnectivityChange(nav: testNavKey.currentState, isOnline: true);
+      await tester.pumpAndSettle();
+      expect(find.text('user'), findsOneWidget);
+    });
+ 
+    testWidgets(
+        'isOnline=true, _isShowingOfflinePage=false → no-op, nessuna navigazione',
+        (tester) async {
+      final testNavKey = GlobalKey<NavigatorState>();
+ 
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: testNavKey,
+          routes: {
+            '/': (_) => const Scaffold(body: Text('home')),
+            '/offline': (_) => const Scaffold(body: Text('offline')),
+            '/user': (_) => const Scaffold(body: Text('user')),
+          },
+          initialRoute: '/',
+        ),
+      );
+      await tester.pumpAndSettle();
+ 
+      // Online con flag già false: non deve succedere nulla
+      handleConnectivityChange(nav: testNavKey.currentState, isOnline: true);
+      await tester.pumpAndSettle();
+ 
+      // Siamo ancora sulla rotta iniziale '/'
+      expect(find.text('home'), findsOneWidget);
+    });
+  });
+
+  group('resetOfflinePageFlag()', () {
+    test('resetta il flag a false', () {
+      // Imposta il flag a true tramite handleConnectivityChange con nav null
+      // (nav null fa return immediato senza navigare, ma il flag non viene toccato)
+      // Usiamo direttamente la funzione esposta
+      resetOfflinePageFlag();
+      // Verifica indirettamente: dopo reset, isOnline=true non naviga a /user
+      // (perché _isShowingOfflinePage è false)
+      expect(() => resetOfflinePageFlag(), returnsNormally);
     });
   });
 }

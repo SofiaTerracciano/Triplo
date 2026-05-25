@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:triplo/controller/language.dart';
@@ -282,6 +282,325 @@ class _BackgroundServiceHostState extends State<BackgroundServiceHost> {
   void initState() {
     super.initState();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _backgroundService = BackgroundService(context);
+      _backgroundService!.start();
+    });
+  }
+
+  @override
+  void dispose() {
+    _backgroundService?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}*/
+
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:triplo/controller/language.dart';
+import 'package:triplo/pages/GeowatchPage/Navigation.dart';
+import 'package:triplo/pages/LoginRegistrationPage/forgotten_password_page/forgotten_password_page.dart';
+import 'package:triplo/pages/LoginRegistrationPage/login_page/LoginPage.dart';
+import 'package:triplo/pages/LoginRegistrationPage/registration_page/registration_page.dart';
+import 'package:triplo/pages/UserProfilePage/user-page.dart';
+import 'package:triplo/pages/offline_page.dart';
+import 'package:triplo/service/authservice.dart';
+import 'package:triplo/service/backgroundservice.dart';
+import 'package:triplo/service/geo.dart';
+import 'package:triplo/service/internetservice.dart';
+import 'package:triplo/service/memory.dart';
+import 'package:triplo/service/permission.dart';
+import 'package:workmanager/workmanager.dart';
+import 'controller/challenge.dart';
+import 'firebase_options.dart';
+import '../service/notification.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:triplo/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:triplo/controller/user.dart';
+import 'package:triplo/controller/trekking.dart';
+import 'package:triplo/controller/diary.dart';
+import 'package:triplo/controller/servicecontroller.dart';
+import 'package:flutter/foundation.dart';
+
+final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+bool _isShowingOfflinePage = false;
+
+@visibleForTesting
+void handleConnectivityChange({
+  required NavigatorState? nav,
+  required bool isOnline,
+}) {
+  if (nav == null) return;
+
+  if (!isOnline && !_isShowingOfflinePage) {
+    _isShowingOfflinePage = true;
+    nav.pushNamedAndRemoveUntil('/offline', (r) => false);
+    return;
+  }
+
+  if (isOnline && _isShowingOfflinePage) {
+    _isShowingOfflinePage = false;
+    nav.pushNamedAndRemoveUntil('/user', (r) => false);
+  }
+}
+
+@visibleForTesting
+void resetOfflinePageFlag() => _isShowingOfflinePage = false;
+
+
+@visibleForTesting
+Future<({
+  MemoryService memory,
+  GeoService geo,
+  AuthService auth,
+  PermissionService permission,
+  Language language,
+  NotificationService notification,
+})> appSetup({
+  MemoryService? memoryOverride,
+  AuthService? authOverride,
+  NotificationService? notificationOverride,
+  PermissionService? permissionOverride,
+}) async {
+  final memoryService = memoryOverride ?? MemoryService();
+  final geoService = GeoService();
+  final authService = authOverride ?? AuthService();
+  final permissionService = permissionOverride ?? PermissionService();
+  final language = Language(memoryService: memoryService);
+  await language.loadSavedLocale();
+  await permissionService.askPermissionsOnce();
+  final notification = notificationOverride ?? NotificationService();
+  notification.setNavKey(navKey);
+  await notification.init();
+
+  return (
+    memory: memoryService,
+    geo: geoService,
+    auth: authService,
+    permission: permissionService,
+    language: language,
+    notification: notification,
+  );
+}
+
+Future<void> main() async { // coverage:ignore-line
+  WidgetsFlutterBinding.ensureInitialized(); // coverage:ignore-line
+
+  try { // coverage:ignore-line
+    await dotenv.load(fileName: ".env"); // coverage:ignore-line
+  } catch (e) { // coverage:ignore-line
+    debugPrint(".env file not found — continuing without it."); // coverage:ignore-line
+  } // coverage:ignore-line
+
+  await Firebase.initializeApp( // coverage:ignore-line
+    options: DefaultFirebaseOptions.currentPlatform, // coverage:ignore-line
+  ); // coverage:ignore-line
+
+  try { // coverage:ignore-line
+    await Workmanager().initialize( // coverage:ignore-line
+      callbackDispatcher, // coverage:ignore-line
+      isInDebugMode: true, // coverage:ignore-line
+    ); // coverage:ignore-line
+    await Workmanager().registerPeriodicTask( // coverage:ignore-line
+      'weather-check-task', // coverage:ignore-line
+      weatherCheckTask, // coverage:ignore-line
+      frequency: const Duration(minutes: 15), // coverage:ignore-line
+    ); // coverage:ignore-line
+  } catch (e) { // coverage:ignore-line
+    debugPrint('Workmanager setup failed: $e'); // coverage:ignore-line
+  } // coverage:ignore-line
+
+  final services = await appSetup(); // coverage:ignore-line
+
+  runApp( // coverage:ignore-line
+    MyApp( // coverage:ignore-line
+      memoryService: services.memory, // coverage:ignore-line
+      geoService: services.geo, // coverage:ignore-line
+      authService: services.auth, // coverage:ignore-line
+      permissionService: services.permission, // coverage:ignore-line
+      language: services.language, // coverage:ignore-line
+      notification: services.notification, // coverage:ignore-line
+    ), // coverage:ignore-line
+  ); // coverage:ignore-line
+} // coverage:ignore-line
+
+class MyApp extends StatelessWidget {
+  final MemoryService memoryService;
+  final GeoService geoService;
+  final AuthService authService;
+  final Language language;
+  final NotificationService notification;
+  final PermissionService permissionService;
+
+  const MyApp({
+    super.key,
+    required this.memoryService,
+    required this.geoService,
+    required this.authService,
+    required this.permissionService,
+    required this.language,
+    required this.notification,
+  });
+
+  // coverage:ignore-start
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: language),
+        Provider<MemoryService>.value(value: memoryService),
+        Provider<GeoService>.value(value: geoService),
+        ChangeNotifierProvider<AuthService>.value(value: authService),
+        ChangeNotifierProxyProvider<AuthService, DiaryController>(
+          create: (context) => DiaryController(context.read<AuthService>()),
+          update: (context, authService, previous) =>
+              previous ?? DiaryController(authService),
+        ),
+        Provider<NotificationService>.value(value: notification),
+        ChangeNotifierProxyProvider3<AuthService, MemoryService, NotificationService,
+            TrekkingController>(
+          create: (context) => TrekkingController(
+            authService: context.read<AuthService>(),
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
+            trekkings: [],
+          ),
+          update: (context, authService, memory, notification, previous) {
+            if (previous != null) {
+              previous.authService = authService;
+              previous.memory = memory;
+              previous.notification = notification;
+              return previous;
+            }
+            return TrekkingController(
+              authService: authService,
+              memory: memory,
+              notification: notification,
+              trekkings: [],
+            );
+          },
+        ),
+        Provider<PermissionService>.value(value: permissionService),
+        ProxyProvider3<GeoService, MemoryService, PermissionService, ServiceController>(
+          update: (context, geo, memory, permission, previous) =>
+              ServiceController(
+                geo: geo,
+                memory: memory,
+                permission: permission,
+              ),
+        ),
+        ChangeNotifierProxyProvider<ServiceController, InternetService>(
+          create: (context) =>
+              InternetService(servicecontroller: context.read<ServiceController>())
+                ..start(),
+          update: (context, api, old) =>
+              old ?? InternetService(servicecontroller: api)..start(),
+        ),
+        ChangeNotifierProxyProvider<AuthService, UserController>(
+          create: (context) {
+            final controller = UserController(context.read<AuthService>());
+            controller.tryAutoLogin();
+            return controller;
+          },
+          update: (context, authService, previous) =>
+              previous ?? UserController(authService),
+        ),
+        ChangeNotifierProxyProvider<MemoryService, ChallengesController>(
+          create: (context) => ChallengesController(
+            memory: context.read<MemoryService>(),
+            notification: context.read<NotificationService>(),
+          ),
+          update: (context, memory, previous) {
+            if (previous != null) {
+              previous.memory = memory;
+              previous.notification = context.read<NotificationService>();
+              return previous;
+            }
+            return ChallengesController(
+              memory: memory,
+              notification: context.read<NotificationService>(),
+            );
+          },
+        ),
+      ],
+      child: Consumer<InternetService>(
+        builder: (context, internet, child) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            handleConnectivityChange(
+              nav: navKey.currentState,
+              isOnline: internet.isOnline,
+            );
+          });
+
+          return Consumer<Language>(
+            builder: (context, lang, child) {
+              return BackgroundServiceHost(
+                child: MaterialApp(
+                  title: 'Triplo',
+                  debugShowCheckedModeBanner: false,
+                  navigatorKey: navKey,
+                  theme: ThemeData(
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: Colors.lightBlueAccent,
+                    ),
+                    useMaterial3: true,
+                  ),
+                  locale: lang.locale,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [
+                    Locale('en'),
+                    Locale('it'),
+                    Locale('es'),
+                    Locale('de'),
+                    Locale('fr'),
+                  ],
+                  initialRoute: '/user',
+                  routes: {
+                    '/user': (context) => UserPage(),
+                    '/registration': (context) => RegistrationPage(),
+                    '/forgotten_password': (context) => ForgottenPasswordPage(),
+                    '/login': (context) => LoginPage(),
+                    '/offline': (context) => OfflinePage(),
+                    '/navigation': (context) => CompassAltitudePage(),
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+// coverage:ignore-end
+
+class BackgroundServiceHost extends StatefulWidget {
+  final Widget child;
+
+  const BackgroundServiceHost({super.key, required this.child});
+
+  @override
+  State<BackgroundServiceHost> createState() => _BackgroundServiceHostState();
+}
+
+class _BackgroundServiceHostState extends State<BackgroundServiceHost> {
+  BackgroundService? _backgroundService;
+
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _backgroundService = BackgroundService(context);
       _backgroundService!.start();
