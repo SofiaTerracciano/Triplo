@@ -267,7 +267,11 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                     Icons.notes,
                     TextField(
                       controller: _notesController,
-                      maxLines: 3,
+                        minLines: 1,
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        enableSuggestions: true,
+                        autocorrect: true,
                       style: const TextStyle(fontSize: 14),
                       decoration: _input(
                         local.notes_placeholder_trekking_label,
@@ -305,6 +309,11 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                           const SizedBox(height: 8),
                           TextField(
                             controller: _refreshmentController,
+                              minLines: 1,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              enableSuggestions: true,
+                              autocorrect: true,
                             style: const TextStyle(fontSize: 14),
                             decoration: _input(
                               local.refreshment_point_trekking_label,
@@ -579,6 +588,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                               separatorBuilder: (_, __) =>
                                   const SizedBox(width: 6),
                               itemBuilder: (_, i) => Stack(
+                                key: ValueKey(_images[i].path),
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
