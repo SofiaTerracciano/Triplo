@@ -27,7 +27,7 @@ void main() {
   Trekking makeTrekking({
     String id = 'trek-1',
     String name = 'Monte Rosa',
-    String difficulty = 'hard',
+    String difficulty = 'advanced',
     LatLng? startingPoint,
     LatLng? endingPoint,
   }) =>

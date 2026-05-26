@@ -91,13 +91,13 @@ void main() {
       expect(difficultyToColor('Intermediate'), Colors.red);
     });
 
-    test('hard -> viola', () {
-      expect(difficultyToColor('hard'),
+    test('advanced -> viola', () {
+      expect(difficultyToColor('advanced'),
           const Color.fromARGB(255, 135, 1, 162));
     });
 
-    test('HARD maiuscolo -> viola (case-insensitive)', () {
-      expect(difficultyToColor('HARD'),
+    test('ADVANCED maiuscolo -> viola (case-insensitive)', () {
+      expect(difficultyToColor('ADVANCED'),
           const Color.fromARGB(255, 135, 1, 162));
     });
 
@@ -186,7 +186,7 @@ void main() {
       when(mockTrekkingController.allTrekkings).thenReturn([
         makeTrekking(id: 't1', difficulty: 'easy'),
         makeTrekking(id: 't2', difficulty: 'intermediate'),
-        makeTrekking(id: 't3', difficulty: 'hard'),
+        makeTrekking(id: 't3', difficulty: 'advanced'),
       ]);
 
       await tester.pumpWidget(buildWidget());

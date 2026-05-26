@@ -217,8 +217,8 @@ void main() {
 
       test('difficulty_level setter updates value', () {
         final t = makeTrekking();
-        t.difficulty_level = 'hard';
-        expect(t.difficulty_level, 'hard');
+        t.difficulty_level = 'advanced';
+        expect(t.difficulty_level, 'advanced');
       });
     });
 

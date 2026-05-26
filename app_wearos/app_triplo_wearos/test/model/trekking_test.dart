@@ -125,8 +125,8 @@ void main() {
 
     test('difficulty_level setter works', () {
       final t = buildTrekking();
-      t.difficulty_level = 'Hard';
-      expect(t.difficulty_level, 'Hard');
+      t.difficulty_level = 'advanced';
+      expect(t.difficulty_level, 'advanced');
     });
 
     test('distance setter works', () {
