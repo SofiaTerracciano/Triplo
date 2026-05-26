@@ -417,19 +417,19 @@ Future<void> main() async { // coverage:ignore-line
     debugPrint('Workmanager setup failed: $e'); // coverage:ignore-line
   } // coverage:ignore-line
 
-  final services = await appSetup(); // coverage:ignore-line
+  final services = await appSetup();
 
-  runApp( // coverage:ignore-line
-    MyApp( // coverage:ignore-line
-      memoryService: services.memory, // coverage:ignore-line
-      geoService: services.geo, // coverage:ignore-line
-      authService: services.auth, // coverage:ignore-line
-      permissionService: services.permission, // coverage:ignore-line
-      language: services.language, // coverage:ignore-line
-      notification: services.notification, // coverage:ignore-line
-    ), // coverage:ignore-line
-  ); // coverage:ignore-line
-} // coverage:ignore-line
+  runApp( 
+    MyApp( 
+      memoryService: services.memory, 
+      geoService: services.geo,
+      authService: services.auth,
+      permissionService: services.permission,
+      language: services.language,
+      notification: services.notification,
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   final MemoryService memoryService;
@@ -583,8 +583,9 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+  // coverage:ignore-end
 }
-// coverage:ignore-end
+
 
 class BackgroundServiceHost extends StatefulWidget {
   final Widget child;

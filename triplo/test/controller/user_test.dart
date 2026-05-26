@@ -396,45 +396,45 @@ void main() {
     test('increments intermediate counter on "Intermediate" difficulty',
         () async {
       final ctrl = await ctrlWithUser(intermediate: 2);
-      await ctrl.updateUserLevel('Intermediate');
+      await ctrl.updateUserLevel('intermediate');
       expect(ctrl.currentUser!.intermediate, 3);
     });
 
     test('increments advanced counter on "Advanced" difficulty', () async {
       final ctrl = await ctrlWithUser(advanced: 2);
-      await ctrl.updateUserLevel('Advanced');
+      await ctrl.updateUserLevel('advanced');
       expect(ctrl.currentUser!.advanced, 3);
     });
 
     test('level becomes "Intermediate" at 5 intermediate completions',
         () async {
       final ctrl = await ctrlWithUser(intermediate: 4);
-      await ctrl.updateUserLevel('Intermediate');
+      await ctrl.updateUserLevel('intermediate');
       expect(ctrl.currentUser!.level, 'Intermediate');
     });
 
     test('level becomes "Advanced" at 5 advanced completions', () async {
       final ctrl = await ctrlWithUser(advanced: 4);
-      await ctrl.updateUserLevel('Advanced');
+      await ctrl.updateUserLevel('advanced');
       expect(ctrl.currentUser!.level, 'Advanced');
     });
 
     test('Advanced takes priority over Intermediate for level assignment',
         () async {
       final ctrl = await ctrlWithUser(advanced: 4, intermediate: 5);
-      await ctrl.updateUserLevel('Advanced');
+      await ctrl.updateUserLevel('advanced');
       expect(ctrl.currentUser!.level, 'Advanced');
     });
 
     test('level stays "Beginner" below thresholds', () async {
       final ctrl = await ctrlWithUser(advanced: 1, intermediate: 1);
-      await ctrl.updateUserLevel('Intermediate');
+      await ctrl.updateUserLevel('intermediate');
       expect(ctrl.currentUser!.level, 'Beginner');
     });
 
     test('persists updated values in Firestore', () async {
       final ctrl = await ctrlWithUser(intermediate: 4);
-      await ctrl.updateUserLevel('Intermediate');
+      await ctrl.updateUserLevel('intermediate');
 
       final snap = await fakeDb.collection('users').doc('uid_1').get();
       expect(snap.data()!['Intermediate'], 5);
@@ -444,7 +444,7 @@ void main() {
     test('does nothing when uid is null', () async {
       when(mockAuth.currentUid).thenReturn(null);
       final ctrl = await buildController();
-      await ctrl.updateUserLevel('Advanced'); 
+      await ctrl.updateUserLevel('advanced'); 
     });
   });
 

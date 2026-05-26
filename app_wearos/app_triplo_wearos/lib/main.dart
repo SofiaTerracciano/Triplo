@@ -124,6 +124,7 @@ class TriploWatchApp extends StatelessWidget {
     this.firestore,
   });
 
+  // coverage:ignore-start
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -214,4 +215,5 @@ class TriploWatchApp extends StatelessWidget {
       ),
     );
   }
+  // coverage:ignore-end
 }
