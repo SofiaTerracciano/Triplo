@@ -16,13 +16,13 @@
 
 
 
-Triplo is a cross-platform mobile application for smartphones and smartwatches, conceived as a digital logbook for trekking activities. \\
-The application aims to enhance the experience of hiking in mountain environments by combining route information, environmental data, and recording of personal activity. \\
+Triplo is a cross-platform mobile application for smartphones and smartwatches, designed to function as a digital logbook for trekking activities. \\
+The application aims to enhance the experience of hiking in mountain environments by combining route information, environmental data and recording of personal activity. \\
 Users can explore predefined trekking routes and access useful information about the paths, including navigation support and contextual data such as weather conditions.  \\
-At the same time, the application allows hikers to document their experiences by creating logbook entries enriched with photos and personal diary notes. \\
-The platform also enables users to discover and follow other hikers, and to browse selected entries from their trekking diaries, enhancing the sharing of experiences and inspiration for future hikes. 
-During a hike, users can optionally complete challenges, such as time-based goals designed to enrich the trekking experience. \\
-The following sections describe the system architecture, the main functionalities of the application, and the technological choices adopted in its development.
+The application also allows hikers to document their experiences by creating logbook entries enriched with photos and personal diary notes. \\
+Users can discover and follow other hikers and read selected entries from their trekking diaries. In this way, they can share experiences and get ideas for future hikes. 
+Users can also join optional challenges to make the experience more engaging. \\
+The following sections describe the app architecture, its main features and the technologies used to build it.
 
 
 
@@ -36,13 +36,13 @@ The following sections describe the system architecture, the main functionalitie
 
 \section{Scope}
 
-Triplo supports users during trekking activities by providing guidance, contextual information, and tools to document their experiences in mountain environments. \\
-The application focuses on the Madonna di Campiglio area and offers a set of predefined trekking routes with different levels of difficulty. \\
+Triplo supports users during trekking activities by giving guidance, contextual information and tools to document their experiences in mountain environments. \\
+Users can explore a number of predefined trekking routes with different levels of difficulty located in the Madonna di Campiglio area. \\
 During a hike, users can access information related to the selected route, including navigation support and environmental conditions that may influence the trekking experience.  \\
 The application also encourages engagement through optional challenges that users may complete along the route.
-Each trekking activity can be recorded in a personal digital logbook, where users can document their experience by adding photos and diary notes. 
-Users can also browse selected entries from the logbooks of other hikers they follow, allowing them to discover new routes and gain inspiration from shared experiences. \\
-The application aims to support outdoor exploration while enabling users to record, revisit, and share meaningful moments from their trekking activities.
+Triplo fosters community participation. Each trekking activity can be recorded in a personal digital logbook, where users can document their experience by adding photos and diary notes. 
+Users can also read selected logbook entries from the hikers they follow, helping them discover new routes and get inspiration from shared experiences.  \\
+The app supports outdoor exploration by helping users to record, revisit and share meaningful moments from their hikes.
 
 
 
@@ -60,7 +60,7 @@ In the context of the Triplo application, the term \textit{friends} refers to us
 In the context of the Triplo application, \textit{pairing} refers to the process of associating a smartwatch with a user account through the smartphone application. This association allows the wearable device to access user-related information and functionalities, enabling a personalized experience on the smartwatch.
 \subsection{Acronyms and Abbreviations}
 \begin{itemize}
-    \item \label{GPS} \textbf{GPS:} Generic term used in this document to indicate GNSS satellite-based positioning systems available on the device (such as GPS, Galileo, and others)
+    \item \label{GPS} \textbf{GPS:} Generic term used in this document to indicate GNSS satellite-based positioning systems available on the device (such as GPS, Galileo and others)
     \item \label{LTE} \textbf{LTE:} Long Term Evolution is a mobile communication standard. LTE is also referred to as “4G”, the fourth generation of mobile communication technology. LTE consists of a number of enhancements to the “Universal Mobile Telecommunications System” (UMTS) – the third generation of mobile communications.
     \item \label{URI} \textbf{URI:} A Uniform Resource Identifier is a string of characters used to identify or name a resource on the internet. The pairing mechanism between smartphone and smartwatch is based on a custom URI scheme. The general format of the URI in this application is: \\ 
                 \begin{center}
@@ -72,10 +72,10 @@ In the context of the Triplo application, \textit{pairing} refers to the process
                     \item a temporary token (\texttt{token}) used to validate the pairing request
                 \end{itemize}
                 The URI is embedded into a QR code displayed on the smartwatch.
-    \item \label{API} \textbf{API:} An Application Programming Interface (API) is a set of rules, protocols, and tools that allows different software components to communicate with each other. In the context of the Triplo application, APIs are used to interact with external services, for example weather providers, and backend platforms.
-    \item \label{rest api} \textbf{REST API:} A Representational State Transfer API is a type of Application Programming Interface that follows the architectural principles of Representational State Transfer, known as REST. It enables communication between client and server systems over HTTP, using standard methods such as \texttt{GET}, \texttt{POST}, \texttt{PUT}, and \texttt{DELETE} to operate on resources identified by URLs. REST APIs are stateless, no session state is stored on the server and responses are typically returned in lightweight formats such as JSON. In the context of the Triplo application, REST APIs are used when interacting with external services, for example weather providers, while Firebase services are generally accessed through SDK abstractions rather than direct REST calls.
-    \item \label{SDK} \textbf{SDK:} An SDK is a collection of libraries, tools, and APIs that enables developers to interact with a specific platform or service. In the context of the Triplo application, the term SDK refers in particular to the Firebase SDK, which provides high-level functions to access backend services such as authentication, cloud database, and storage without directly using low-level REST APIs.
-    \item \label{BaaS} \textbf{BaaS:} Backend as a Service is a cloud service model in which developers outsource the backend functionality of an application to a third-party provider. This allows to focus on implementing the frontend logic while relying on pre-built backend services such as authentication, database management, storage, and notifications, typically accessed through APIs and SDKs. In this document, the term \textit{BaaS} is used to refer to platforms such as Firebase, which provide integrated backend capabilities for mobile and web applications. The term \textit{MBaaS} (Mobile Backend as a Service) is sometimes used in the literature to emphasize mobile-specific backend services. However, some sources consider BaaS and MBaaS to be basically interchangeable terms, as modern platforms support both mobile and web applications. For this reason, the term \textit{BaaS} is used throughout this document.            
+    \item \label{API} \textbf{API:} An Application Programming Interface (API) is a set of rules, protocols and tools that allows different software components to communicate with each other. In the context of the Triplo application, APIs are used to interact with external services, for example weather providers and backend platforms.
+    \item \label{rest api} \textbf{REST API:} A Representational State Transfer API is a type of Application Programming Interface that follows the architectural principles of Representational State Transfer, known as REST. It enables communication between client and server systems over HTTP, using standard methods such as \texttt{GET}, \texttt{POST}, \texttt{PUT} and \texttt{DELETE} to operate on resources identified by URLs. REST APIs are stateless, no session state is stored on the server and responses are typically returned in lightweight formats such as JSON. In the context of the Triplo application, REST APIs are used when interacting with external services, for example weather providers, while Firebase services are generally accessed through SDK abstractions rather than direct REST calls.
+    \item \label{SDK} \textbf{SDK:} An SDK is a collection of libraries, tools and APIs that enables developers to interact with a specific platform or service. In the context of the Triplo application, the term SDK refers in particular to the Firebase SDK, which provides high-level functions to access backend services such as authentication, cloud database and storage without directly using low-level REST APIs.
+    \item \label{BaaS} \textbf{BaaS:} Backend as a Service is a cloud service model in which developers outsource the backend functionality of an application to a third-party provider. This allows to focus on implementing the frontend logic while relying on pre-built backend services such as authentication, database management, storage and notifications, typically accessed through APIs and SDKs. In this document, the term \textit{BaaS} is used to refer to platforms such as Firebase, which provide integrated backend capabilities for mobile and web applications. The term \textit{MBaaS} (Mobile Backend as a Service) is sometimes used in the literature to emphasize mobile-specific backend services. However, some sources consider BaaS and MBaaS to be basically interchangeable terms, as modern platforms support both mobile and web applications. For this reason, the term \textit{BaaS} is used throughout this document.            
 \end{itemize}
 \newpage
 \section{References}
@@ -150,11 +150,11 @@ In the context of the Triplo application, \textit{pairing} refers to the process
 
 This document is organized into five main chapters, each addressing a specific aspect of the Triplo application design and implementation.
 \begin{itemize}
-\item chapter \ref{Introduction} introduces the purpose and scope of the document, together with definitions, acronyms, and references used throughout the report.
-\item chapter \ref{Architectural Design} focuses on the architectural design of the system. It presents the overall architecture, including high-level components, component views for both smartphone and smartwatch applications, database management, deployment and runtime views. It also includes sequence diagrams for key use cases, component interfaces, architectural patterns, and design decisions.
-\item chapter \ref{User Interface} describes the user interface of the application. It provides a detailed overview of the smartphone and smartwatch UI components, including individual pages and interaction patterns. The section concludes with general UI design considerations and a mapping between UI components and application pages.
-\item chapter \ref{Functional Requirements} presents the functional requirements of the system. Requirements are organized separately for the smartphone and smartwatch applications, covering features such as account management, route exploration, diary management, weather information, and offline mode. A mapping between requirements and architectural components is also provided.
-\item chapter \ref{Implementation and Integration} describes the implementation and integration process. It outlines the development strategy, component integration, and testing activities, including unit, widget, integration, and user testing, as well as the test environment used.
+\item chapter \ref{Introduction} introduces the purpose and scope of the document, together with definitions, acronyms and references used throughout the report.
+\item chapter \ref{Architectural Design} focuses on the architectural design of the system. It presents the overall architecture, including high-level components, component views for both smartphone and smartwatch applications, database management, deployment and runtime views. It also includes sequence diagrams for key use cases, component interfaces, architectural patterns and design decisions.
+\item chapter \ref{User Interface} describes the user interface of the application. It provides a detailed overview of the smartphone and smartwatch UI components, including individual pages and interaction patterns. The last part of the section provides general UI design considerations and a mapping between UI components and application pages.
+\item chapter \ref{Functional Requirements} presents the functional requirements of the system. Requirements are organized separately for the smartphone and smartwatch applications, covering features such as account management, route exploration, diary management, weather information and offline mode. The chapter also includes a mapping between requirements and architectural components is also provided.
+\item chapter \ref{Implementation and Integration} describes the implementation and integration process. It outlines the development strategy, component integration and testing activities, including unit, widget, integration and user testing, as well as the test environment used.
 
 
 
