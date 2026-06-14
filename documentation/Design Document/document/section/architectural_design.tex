@@ -502,10 +502,10 @@ To conclude, the control returns to the \texttt{DiaryPage}, which updates the us
 
 \newpage
 \subsection{Explore Trekkings on Map Sequence Diagram}
-The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. The page retrieves the tile URL template and the corresponding subdomains used by the map provider.
-Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are then rendered differently depending on the zoom level and the rendering logic uses the trekking information, such as route points, starting point and difficulty level, in order to determine the visual representation.
-The diagram  shows the dynamic behavior of the map. When the user adjust the position, the page updates the current zoom and checks if the visible area is still in the bounds. If the user moves outside the expected area, a recenter button is shown.
-Finally, when the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is displayed. 
+quiqui The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. The page retrieves the tile URL template and the corresponding subdomains used by the map provider.
+Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are displayed differently depending on the zoom level. The rendering logic uses trekking information, such as route points, starting point and difficulty level, to decide how each route should appear on the map.
+The diagram also shows how the map reacts to user interaction. When the user uses the map, the page updates the current zoom level and center and checks if the visible area is still within the expected bounds. If the user moves outside the area, the map view displays a recenter button.
+When the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is shown. 
 \label{Explore Trekkings on Map Sequence Diagram}
 \begin{figure}[H]
     \centering
@@ -606,7 +606,7 @@ Weather alerts are obtained from two sources:
     \item \texttt{mockAlerts()} for testing purposes.
 \end{itemize}
 
-quiquiquiqui The results are merged within the UI layer to provide a unified alert visualization.\\
+The results are merged within the UI layer to provide a unified alert visualization.\\
 The \texttt{GoogleSatellitePage}, part of the \texttt{Geowatch} component, provides an alternative map visualization using satellite imagery. The page retrieves tile URLs through the \texttt{ServiceController} and optionally overlays weather layers, such as pressure, rain and others using OpenWeather tile services.
 Weather data is handled using \texttt{Map<String, dynamic>} structures. This allows flexible interaction with JSON responses, avoiding the need for rigid model definitions.
 
@@ -703,9 +703,10 @@ The request is delegated to the \texttt{searchTrekking(query)} method of the Tre
     \item the \texttt{trekking\_index} collection is queried using a normalized string,
     \item each resulting trekking identifier is resolved into a full trekking object.
 \end{itemize}
-Before querying Firestore, the controller checks whether the trekking is already available in the local list. If the object is found locally, it is reused; otherwise, it is fetched from Firestore.
-This approach reduces network overhead and improves performance.
-Once the results are collected, they are returned to the SearchPage, which updates its internal state and rebuilds the UI using \texttt{setState}.
+Before sending query to Firestore, the controller checks if the trekking is in the local list. If it is found, it is reused; otherwise, it is fetched from Firestore.
+This decreases network traffic, improving performance.
+
+After having the results, the system returns them to the SearchPage, which updates its state and rebuilds the UI using \texttt{setState}.
 
 %As in the user search, this mechanism does not rely on \texttt{FutureBuilder}, but instead uses explicit state management.
 
@@ -722,20 +723,20 @@ When the user selects a trekking, the application navigates to the corresponding
 
 The \texttt{Geowatch} component displays compass, altitude and current position information. This functionality is implemented through the interaction between the page, the \texttt{servicecontroller}, the \texttt{geoservice} and the \texttt{permissionservice}.
 When the navigation page is opened, the initialization starts in \texttt{initState()}, where the page registers itself as an app lifecycle observer and schedules the execution of \texttt{\_initLocation()}. The observer is used to detect when the application returns to the foreground, for example after the user has changed GPS or permission settings.
-The method \texttt{\_initLocation()} delegates the preliminary checks to the \texttt{servicecontroller} through \\ \texttt{loadNavigationLocation()}. This method verifies whether the location permission has been granted and whether the GPS service is enabled. If one of these conditions is not satisfied, the page enters an error state and shows a dedicated message to the user.
-If permission is denied, the returned state contains the error \texttt{PERMISSION\_DENIED}. If the GPS service is disabled, the returned state contains the error \texttt{GPS\_DISABLED}. In both cases, the page updates its local state through \texttt{setState()} and displays an error instead of the navigation information.
-Only when both checks are successful does the page subscribe to the position stream. The stream is obtained through the \texttt{servicecontroller}, which delegates the request to the \texttt{geoservice}. Every new \texttt{Position} object received from the stream is used to update altitude, latitude, longitude.
-The compass information is handled through a separated stream. In the architecture, the UI does not access the \texttt{FlutterCompass} library. Instead, it requests the compass stream through the \texttt{servicecontroller}, which delegates the operation to the \texttt{geoservice}. The UI then receives heading values and converts them into cardinal directions through the helper method \texttt{\_direction()}.
+The method \texttt{\_initLocation()} asks the \texttt{servicecontroller} the preliminary checks through \\ \texttt{loadNavigationLocation()}. 
+The method verifies that location permission has been granted and that the GPS service is enabled. If either check fails, the page enters an error state and shows the appropriate message to the user.
+When permission is denied, the returned state contains the  \texttt{PERMISSION\_DENIED} error. If the GPS service is disabled, the returned state contains the error \texttt{GPS\_DISABLED}. In both cases, the page updates its local state through \texttt{setState()} and displays an error instead of the navigation information.
+Only after both checks are successful does the page subscribe to the position stream. The stream is obtained through the  \texttt{servicecontroller}, which forwards the request to the \texttt{geoservice}. Each new \texttt{Position} object received from the stream is used to update altitude, latitude, longitude.
+Compass data is handled through a separated stream. In the architecture, the UI does not access the \texttt{FlutterCompass} library. Instead, it asks the \texttt{servicecontroller} for the compass stream. The \texttt{servicecontroller} delegates the operation to the \texttt{geoservice}. The UI then receives heading values and converts them into cardinal directions through the helper method \texttt{\_direction()}.
 When an error state is shown, the page also provides a button that helps the user solve the problem. If the GPS is disabled, the button invokes \texttt{openGpsSettings()}, which is delegated through the \texttt{servicecontroller} to the \texttt{geoservice}. If the problem is related to permissions, the page instead invokes \texttt{openPermissionSettings()}, which is delegated to the \texttt{permissionservice}. In this way, the UI does not directly interact with operating system APIs.
 The diagram also includes the handling of lifecycle changes. When the app returns to the foreground, it handles the app state change through method \texttt{didChangeAppLifecycleState()}. The page sets the checking state again and re-runs \texttt{\_initLocation()}. This is useful, for example, when the user comes back from the system settings after enabling GPS or granting permissions.
-Finally, when the page is closed, the observer and the active position stream subscription are disposed through the \texttt{dispose()} method. This avoids unnecessary updates when the page is no longer visible.
+Finally, when the page is closed, the observer and the active position stream subscription are disposed through the \texttt{dispose()} method. This stops the app from updating the page when it is no longer visible.
 
 \subsubsection{Application Lifecycle in Flutter}
 
 The \textbf{application lifecycle in Flutter} refers to the sequence of states an app goes through during its execution, such as \textit{resumed}, \textit{inactive}, \textit{paused} and \textit{detached} and the mechanisms provided to handle transitions between these states.
-Flutter provides a platform-independent abstraction of the lifecycle through the \texttt{AppLifecycleState} enum. Developers can monitor these changes by implementing the \texttt{WidgetsBindingObserver}, which allows the application to listen for lifecycle updates.
-In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState state)} is overridden to react to state transitions, enabling behaviors such as pausing tasks, saving data, or managing background operations when the app moves between foreground and background.
-
+Flutter provides a platform-independent abstraction of the lifecycle through the \texttt{AppLifecycleState} enum. 
+The application can listen for lifecycle changes through the \texttt{WidgetsBindingObserver}. The \texttt{didChangeAppLifecycleState(AppLifecycleState state)} method is then overridden to react when the app moves between states, such as foreground and background. This can be used to pause tasks, save data or manage background operations.
 
 
 
@@ -752,7 +753,6 @@ The two error conditions shown in the diagram represent different problems.
 The \texttt{PERMISSION\_DENIED} state means that the application is not allowed to access the device location. In this case, the problem is related to the application permission, so the user must enable the permission from the app settings.
 The \texttt{GPS\_DISABLED} state means that the application has permission to access location, but the location service of the device is currently turned off. In this case, the problem is not related to the app permission, but to the system location service, so the user must enable GPS from the device settings.
 For this reason, the page provides two different actions: opening the application settings in the case of denied permission and opening the location settings in the case of disabled GPS.
-
 
 
 
@@ -788,14 +788,14 @@ After authentication, the system invokes \texttt{loadUserCore()}, which retrieve
 \item Level and statistics
 \end{itemize}
 
-This method intentionally avoids loading relational or large data such as followers, following, or diaries. This design prevents blocking the UI during login and improves perceived performance.
-Instead, additional data is loaded lazily in the UserPage using \texttt{FutureBuilder}, enabling asynchronous and incremental UI updates.
-After successful login, the application navigates to the UserPage, whose loading behavior is described in a separate sequence diagram.
+This method does not load large relational data, such as followers or diaries. This helps to make the app feel faster by making it looks like the UI is faster.
+Instead, additional data is then loaded in the UserPage using \texttt{FutureBuilder}, so the UI can make asynchronous and incremental updates.
+After successful login, the application opens the UserPage, whose behavior is described in a separate diagram.
 
 \paragraph{Google login}
-When the user presses the Google Sign-In button, the page executes \texttt{\_loginGoogle(context)}. The request is delegated to \texttt{userController.loginWithGoogle()}, which calls the corresponding method in the \texttt{AuthService}.
-The Google login flow first forces a sign-out from the previous Google session and then opens the Google account interface. If the user does not select a profile, the flow terminates with an error message shown in the UI.
-If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed and the page navigates to the \texttt{UserPage}.
+After pressing the Google Sign-In button, the page runs  \texttt{\_loginGoogle(context)}. The request then goes to \texttt{userController.loginWithGoogle()}, which calls the method in the \texttt{AuthService}.
+The Google login flow first forces sign-out from the previous Google session and then opens the Google account interface. If the user does not select a profile, the flow stops showing an error in the UI.
+If the user selects a Google account, the \texttt{AuthService} loads the Google authentication tokens and uses them to create Firebase credentials through \texttt{signInWithCredential()}, then if Firebase authentication succeeds, the service checks if the user already has a Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed and the page navigates to the \texttt{UserPage}.
 \newpage
 \label{Login Sequence Diagram 1}
 \begin{figure}[H]
@@ -821,19 +821,19 @@ If the user selects a Google account, the \texttt{AuthService} retrieves the Goo
 
 
 The UserPage can be opened either as the landing page after a successful login or through the normal application navigation. Once the page is displayed, it retrieves the current authenticated user from the UserController.
-During initialization, the page schedules the invocation of \texttt{loadTrekking()} through \texttt{Future.microtask()}, instead of calling it directly inside \texttt{initState()}. This choice postpones the trekking load operation until the initialization phase is completed, keeping the widget initialization lighter.
-Although trekking loading is not strictly part of the core profile information, this preload can still be justified for the following reasons
+The page schedules the invocation of \texttt{loadTrekking()} through \texttt{Future.microtask()}, instead of calling it directly inside \texttt{initState()}. This means that trekking loading operation starts only if the initialization phase is completed, keeping the widget startup light.
+Although trekking data is not part of the core profile information, this preloading is useful for the following reasons
 \begin{itemize}
-    \item the UserPage is often the first page shown after login, so loading trekking data here can anticipate work that will likely be needed shortly afterward by pages such as the HomePage, TrekkingPage, SearchPage and the saved trekking tab itself
-    \item the UserPage allows navigation toward saved trekkings and trekking detail pages, so having the trekking cache already populated may reduce subsequent loading work
-    \item \texttt{loadTrekking()} acts as a warm-up step for the controller-side cache, because it populates the local \texttt{\_trekkings} list and makes data immediately available for methods such as \texttt{getTrekkingById()}, \texttt{getTrekkingId()}, using Firestore only as secondary solution
+    \item the UserPage is often the first page shown after login, so loading trekking data here can prepare work that will likely be needed  afterward by pages such as the HomePage, TrekkingPage, SearchPage and the saved trekking tab itself
+    \item the UserPage allows navigation toward saved trekkings and trekking detail pages, so having the cache already populated may reduce work to load these pages
+    \item \texttt{loadTrekking()} acts as a warm up step for the controller side cache, because it populates the local \texttt{\_trekkings} list and makes data immediately available for methods such as \texttt{getTrekkingById()}, \texttt{getTrekkingId()}, using Firestore only as secondary solution
 \end{itemize}
 The main profile information shown in the page is obtained from the current user already available in the UserController. Additional information is retrieved lazily through \texttt{FutureBuilder}. This applies to followers, following users, diary counters, public diaries, private diaries and saved trekkings.
 For followers and following, the UserController first retrieves the current user document from Firestore in order to obtain the identifiers stored in the \texttt{Followers} and \texttt{Following} fields. Then, for each identifier, the controller invokes \texttt{getUserById()}, which retrieves the corresponding Firestore document and builds a \texttt{Users} object through \texttt{Users.fromMap()}.
 The total diary count is computed through the helper method \texttt{\_loadAllDiaries(context, uid)} defined in the UserPage. This method invokes both \texttt{getPublicDiaries(uid)} and \texttt{getPrivateDiaries(uid)} from the DiaryController, then merges the two returned lists into a single collection. 
 For the diary tabs, the DiaryController queries Firestore and converts each result document into a \texttt{Diary} object through \texttt{Diary.fromMap()}.
 For the saved trekking tab, the TrekkingController first retrieves the current user document to obtain the identifiers stored in \texttt{Saved\_trekkings}. Then, for each identifier, it loads the corresponding trekking document and converts it into a \texttt{Trekking} object through \texttt{Trekking.fromMap()}.
-This design combines a lightweight preload of trekking data with lazy loading of profile-related collections, keeping the UserPage responsive while still preparing application data that is likely to be useful immediately after login.
+This choice consists of light preload of trekking data with lazy loading of profile-related collections, keeping the UserPage responsive while still preparing application data that is likely to be useful immediately after login.
 
 
 
@@ -856,10 +856,10 @@ This design combines a lightweight preload of trekking data with lazy loading of
 \subsection{Registration Sequence Diagram}
 
 The registration functionality is handled by the \texttt{RegistrationPage}, which delegates the creation of the new account to the \texttt{UserController} and the \texttt{AuthService}.
-When the user presses the register button, the page executes the method \texttt{\_register(context)}. The method first validates the input fields. If one or more fields are empty, the UI shows a \texttt{SnackBar} requesting the user to fill all fields. If the password and confirmation password do not match, another \texttt{SnackBar} is shown.
-If the data is valid, the page activates the loading state and calls \texttt{userController.register(email, password)}. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which creates the account in Firebase Authentication through \texttt{createUserWithEmailAndPassword()}.
-After the account is successfully created, the \texttt{AuthService} derives a default username from the email prefix and creates the corresponding Firestore documents in the \texttt{users} and \texttt{users\_index} collections. The first document stores the full user profile data, while the second supports search functionality through a normalized username representation.
-Once the Firestore documents have been created, the \texttt{AuthService} loads the newly created user profile through \texttt{loadUserCore(uid)}. The resulting user object is returned to the \texttt{UserController}, which updates its internal state.
+When the user presses the register button, the page runs  the method \texttt{\_register(context)}. The method first checks the input fields. If one or more fields are empty, the UI shows a \texttt{SnackBar} asking the user to fill in all required fields. If the password and confirmation password do not match, another \texttt{SnackBar}.
+If the data is valid, the page activates the loading state and calls \texttt{userController.register(email, password)}. The \texttt{UserController} forwards the operation to the \texttt{AuthService}, which creates the account in Firebase Authentication through \texttt{createUserWithEmailAndPassword()}.
+After creating it, the \texttt{AuthService} derives a default username from the email prefix and creates the related Firestore documents in the \texttt{users} and \texttt{users\_index} collections. The first document contains the full user profile data, while the second one supports search by storing a normalized version of the username.
+Once the Firestore documents have been created, the \texttt{AuthService} loads the new user profile through \texttt{loadUserCore(uid)}. The resulting user object is returned to the \texttt{UserController}, which updates its internal state.
 Finally, the \texttt{RegistrationPage} shows a success message and navigates to the \texttt{SettingPage}. The loading indicator is then disabled.
 It is important to note that, in the current implementation, the registration page only supports the traditional email/password flow. Google-based account creation is not handled by the registration page itself, but is implicitly managed during the first successful Google login through the creation of the Firestore profile documents.
 
@@ -875,7 +875,7 @@ It is important to note that, in the current implementation, the registration pa
 \subsection{Update User Information Sequence Diagram}
 
 The update of user information is handled by the \texttt{SettingPage}, which allows the user to modify several profile attributes such as username, name, surname, birthdate, profile image and email. The page delegates saving user information to the \texttt{UserController}, which uploads the local user state to Firestore.
-When the page is opened, it executes an initialization step by invoking \texttt{refreshEmailFromAuth()}, in order to check that the email stored in Firestore is aligned with the current value available in Firebase Authentication. Infact, if the user has requested to change its email and has verified the new one by clicking the link in the mail inbox, Firebase Auth may have registered that the user is associated to a new email, so this reference shall be updated also in the Firestore user record.  The \texttt{AuthService} first reloads the authenticated Firebase user, loads the updated email, updates the Firestore user document and finally rebuilds the local \texttt{User} through the method \texttt{loadUserCore()}.
+When the page is opened, it executes an initialization step by invoking \texttt{refreshEmailFromAuth()}, in order to check that the email stored in Firestore is aligned with the current value available in Firebase Authentication. Infact, if the user has requested to change its email and has verified the new one by clicking the link in the mail inbox, Firebase Auth may have registered that the user is associated to a new email, so this reference shall be updated also in the Firestore user record.  The \texttt{AuthService} first reloads the authenticated Firebase user, loads the updated email, updates the Firestore user document and finally rebuilds the local \texttt{User} through the method \texttt{loadUserCore()}. 
 The update of textual profile fields, such as username, name and surname, follows a common pattern. The UI opens a dialog through \texttt{\_editField()}, the user enters a new value and the page delegates the save to Firestore operation to the \texttt{UserController}. The controller then updates the Firestore document and synchronizes the corresponding field inside the local \texttt{\_currentUser} object. The username update also requires an update of the \texttt{users\_index} collection, so that the user remains searchable through the normalized username.
 The birthdate update is handled similarly, but the input is collected through \texttt{showDatePicker()} instead of a text dialog. Once the user selects a date, the \texttt{UserController} updates Firestore and updates the local model field.
 The profile image update uses the image picker to let the user select a file from the gallery. The \texttt{UserController} uploads the file to Firebase Storage, obtains the public download URL, stores that URL inside the Firestore user document and updates the local \texttt{\_currentUser.photoProfile} field. In this way, the UI can show the new profile image after the operation completes.
@@ -941,7 +941,7 @@ The MemoryService stores the selected language code locally using shared prefere
 \subsection{Phone Watch Pair}
 \label{Phone Watch Pair}
 \subsubsection{High level description of the pairing mechanism}
-The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
+quiquixxxxx  The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
 
 \subsubsection{Device Identity}
 Each watch either makes or restores from memory a \texttt{watchId}, stored securely on-device.  
@@ -1171,7 +1171,7 @@ For these reasons, the interface view complements the component decomposition by
 
 
 
-
+quiquiquixxxxxxxxxxxxxxxxxxxx
 
 
 

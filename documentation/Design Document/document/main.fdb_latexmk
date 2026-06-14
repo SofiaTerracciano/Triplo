@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1776802956.46739 "main.bcf" "main.bbl" "main" 1781365605.19463 0
+["biber main"] 1776802956.46739 "main.bcf" "main.bbl" "main" 1781450428.77766 0
   "bibliography.bib" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "main.bcf" 1781365604 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
+  "main.bcf" 1781450428 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1781365599.71159 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1781365605.1953 0
+["pdflatex"] 1781450423.27768 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1781450428.77832 0
   "./images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "./images/logo.png" 1776469417 159243 2d67b935335b282b2cf1d69bcca999cc ""
   "C:/Users/giuli/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1780416220 83609 ebbc432e6cbbb238d39535255db2c8bd ""
@@ -436,13 +436,13 @@
   "images/smartwatch/TRIPLO SMARTWATCH UI_page-0013.jpg" 1776268684 200412 562f4d5a6a3441ad831ef7ea12e0d3b4 ""
   "images/smartwatch/TRIPLO SMARTWATCH UI_page-0014.jpg" 1776268684 310783 36f500ab24432261a92256ec60d0e863 ""
   "images/smartwatch3.png" 1776268684 307139 62c594e723d59c688e685c307470798d ""
-  "main.aux" 1781365604 71039 68750eddc8e285858dc08374034e88be "pdflatex"
+  "main.aux" 1781450428 71039 0503b9bbe965b99c3ab153445e5b1c23 "pdflatex"
   "main.bbl" 1776802997 486 ee04f40f768daeed26442158e95aba61 "biber main"
-  "main.run.xml" 1781365604 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
+  "main.run.xml" 1781450428 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
   "main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
-  "main.toc" 1781365604 14887 5b4d4a5f0bd530f8b78f7588a415db15 "pdflatex"
+  "main.toc" 1781450428 14887 5b4d4a5f0bd530f8b78f7588a415db15 "pdflatex"
   "preamble.sty" 1771292682 25286 6754b688c001e6e75b4838b421f3b4d9 ""
-  "section/architectural_design.tex" 1781365593 114408 e98e089148f8c9df93d9101adaca40da ""
+  "section/architectural_design.tex" 1781450409 114054 b1be160296104322099b571fe4ec4647 ""
   "section/effort_spent.tex" 1771292682 94 08ce874b714f77532f8163eb8296a33b ""
   "section/implementation_integration_testplan.tex" 1776469418 9274 f65fc0a22ff2d30af5cb40f782b34094 ""
   "section/introduction.tex" 1781365075 12457 85bdd61fe347e51742ec274178063de4 ""
