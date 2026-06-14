@@ -15,12 +15,12 @@
 
 
 
-The Triplo system is designed according to a modular architecture in which the main application logic is implemented on the client side, while backend functionalities are delegated to managed services and external APIs, as illustrated in Figures \ref{Overview Diagram 1} and \ref{Overview Diagram 2}. \\
+The Triplo system has a modular architecture in which the main application logic is implemented on the client side, while backend functionalities are carried out by  managed services and external APIs, as illustrated in Figures \ref{Overview Diagram 1} and \ref{Overview Diagram 2}. \\
 \begin{figure}[H]
     \label{Overview Diagram 1}
     \centering
     \includegraphics[width=0.8\linewidth]{./images/Overview.png}
-    \caption{Overview Diagram: Blue lines denote the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines denote the smartwatch application’s connectivity, which is limited to selected Firebase services, Firestore and Storage and specific external services, for example OpenTopoMap. The smartphone and smartwatch applications access the network independently, reflecting their ability to operate as standalone clients, while still relying on a shared set of backend services for data and functionality.}
+    \caption{Overview Diagram: Blue lines represent the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines show the smartwatch application’s connectivity, OpenTopoMap. The smartphone and smartwatch applications access the network independently, reflecting their ability to operate as standalone clients, while still relying on a shared set of backend services for data and functionality.}
 \end{figure}
 \newpage
 
@@ -34,14 +34,12 @@ The Triplo system is designed according to a modular architecture in which the m
     \includegraphics[width=0.68\linewidth]{./images/overview diagram 2.png}
     \caption{Detailed Overview Diagram}
 \end{figure}
-The system separates concerns between presentation, application logic, and data management by adopting a Model–View–Controller (MVC) architectural pattern, as explained in section \ref{Architectural Patterns Model View controller with mediator and observer}. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. 
+qui The system separates concerns between presentation, application logic and data management by adopting a Model–View–Controller (MVC) architectural pattern, as explained in section \ref{Architectural Patterns Model View controller with mediator and observer}. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. 
 In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources.
-User interactions are handled by the View layer, while business logic and coordination between components are delegated to Controllers, which act as the central mediation layer between the user interface and the underlying data models.
-Data management and authentication are handled through Firebase services, specifically Firebase Authentication, Cloud Firestore, and Firebase Storage. The system leverages Firebase as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
-The adoption of Backend-as-a-Service (BaaS) solutions enables the system to replace a traditional custom server-side layer with a more lightweight and scalable architecture. By delegating data management, authentication, and storage to managed services, architectural complexity is reduced by eliminating the need for maintaining a dedicated custom backend infrastructure, as explained in section \ref{Firebase as Backend-as-a-Service}.
-In addition to Firebase, the system integrates external third-party services, for example weather, map, and satellite APIs, which are accessed via RESTful APIs over HTTPS. 
-This architectural approach emphasizes a client-driven design, reduces backend complexity, and enables scalability by leveraging managed cloud services.
-This approach removes the need for a dedicated backend gateway or custom server-side components, allowing the application to directly orchestrate interactions with backend services and external resources. \\
+The View layer deals with user interactions. Controllers manage the app logic and keep the UI connected to the data models.
+Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
+Using Backend-as-a-Service (BaaS) solutions, the system can replace a traditional custom server-side layer with a more lightweight and scalable architecture. Data management, authentication and storage are handled by managed services; see section \ref{Firebase as Backend-as-a-Service}.
+The system connects directly to external services, so the application does not need a custom backend gateway to communicate with backend services and external resources. \\
 
 
 
@@ -56,10 +54,10 @@ This approach removes the need for a dedicated backend gateway or custom server-
 
 
 
-%The mobile application represents the entry point of the system and runs on the user's device. It is responsible for handling user interaction, application logic, and coordination between components according to an MVC-inspired architecture. \\
+%The mobile application represents the entry point of the system and runs on the user's device. It is responsible for handling user interaction, application logic and coordination between components according to an MVC-inspired architecture. \\
 %The system relies on different application components to interact with the required services. \\
 %In particular, domain controllers, for example the \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, \texttt{ChallengeController} coordinate access to data and backend resources, while specialized components such as the \texttt{APIController} manage communication with external third-party APIs. \\
-%Data persistence, authentication, and file storage are handled through Firebase, which is adopted as a Backend-as-a-Service (BaaS) platform. Interaction with Firebase services (Authentication, Cloud Firestore, and Storage) is performed through platform-specific SDKs rather than through explicitly defined REST APIs. \\
+%Data persistence, authentication and file storage are handled through Firebase, which is adopted as a Backend-as-a-Service (BaaS) platform. Interaction with Firebase services (Authentication, Cloud Firestore and Storage) is performed through platform-specific SDKs rather than through explicitly defined REST APIs. \\
 %Communication with external third-party services (e.g., weather, map, or satellite APIs) is instead performed using RESTful APIs over HTTPS. \\
 
 \begin{landscape}
@@ -79,20 +77,18 @@ This approach removes the need for a dedicated backend gateway or custom server-
 
 \end{landscape}
 \newpage
-The high-level component diagram provides an overview of the main architectural elements of the system and their interactions. The system is composed of two client applications, namely the smartphone application and the smartwatch application, both relying on a shared set of backend services and external resources. \\
-The graphical user interfaces (GUIs) are represented following the convention adopted in the \textit{UML Distilled} book quoted in the references. In this context, each GUI represents a group of related pages or a major functional area of the application, rather than a single page. \\
-The diagram highlights the presence of two versions of the application. The smartphone application represents the main client and provides the full set of functionalities. It is implemented using Flutter, which enables cross-platform development and allows the application to run on both Android and iOS devices, as explained in section \ref{Flutter as Application Framework}. \\
+The high-level component diagram provides an overview of the main architectural elements of the system and their interactions. The system is composed of two client applications: the smartphone application and the smartwatch application. They both rely on a shared set of backend services and external resources. \\
+The graphical user interfaces (GUIs) represented follow the convention adopted in the \textit{UML Distilled} book quoted in the references. In this context, each GUI represents a group of related pages or a major functional area of the application, rather than a single page. \\
+The diagram presents two versions of the application. The smartphone application represents the main client and provides the full set of functionalities. It is implemented using Flutter, which enables cross-platform development and allows the application to run on both Android and iOS devices, see section \ref{Flutter as Application Framework}. \\
 The smartwatch application represents a lightweight extension of the system and is deployed on Wear OS, as discussed in section \ref{Network connectivity requirements and smartwatch platform} .
 It provides a subset of functionalities adapted to the constraints of wearable devices. \\
-Both applications interact with a common set of backend services and selected external resources. In particular, both the smartphone and smartwatch applications access Firestore for data storage and Firebase Storage for media management, as well as shared external services such as OpenTopoMap for map visualization. However, the smartwatch application is intentionally restricted to a subset of services, reflecting its role as a lightweight client and the constraints of wearable devices. \\
-An architectural difference regards authentication. While the smartphone application directly relies on Firebase Authentication, the smartwatch application does not perform authentication independently. Instead, it adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
-This design choice provides several advantages, detailed in section \ref{Phone Smartwatch Pairing}
-Access to backend resources such as Firestore, Firebase Storage, and selected external services is otherwise shared between the smartphone and smartwatch applications. The diagram explicitly shows which services are accessible from each client, clarifying the distribution of responsibilities. \\
-The system also integrates multiple external services, for example map providers such as OpenTopoMap and Google Satellite View, as well as external authentication providers. Weather alert functionalities rely on both Weatherbit and a Demo Meteo Server. The latter is used exclusively for demonstration purposes, allowing the simulation of weather alerts without depending on real external conditions. \\
-The operating system interfaces are modeled as platform components, Smartphone OS and Watch OS. These platforms are not accessed directly by the application; instead, access is mediated through Flutter packages that provide abstractions over native operating system services. The specific packages used to interact with such services are detailed in the diagrams of the smartphone application components, section \ref{Mobile Smartphone App component view} and of the smartwatch application components, section \ref{Mobile Smartwatch App component view}. \\
-The interfaces associated with Firebase services, Firebase Authentication, Firestore, and Firebase Storage are based on the SDKs provided by the Backend-as-a-Service platform. These SDKs abstract the underlying communication mechanisms and offer a structured way to access backend functionalities, as documented in the Firebase official documentation. \\
-In contrast, the remaining external interfaces, such as Weather API, Weather Alert API, Satellite API, are accessed through RESTful communication. In these cases, the application uses HTTP-based requests via Flutter libraries, handling data exchange in JSON format and performing client-side decoding. \\
-The token verification API is not directly managed within the application logic but is represented the complete authentication flow. In particular, when authentication is performed through an external provider, Google, the application obtains an authentication token which is then passed to Firebase Authentication. Firebase subsequently validates this token with the external provider as part of the OAuth2-based authentication process. This additional interaction is abstracted by the SDK but is included in the diagram to provide a more accurate representation of the overall system behavior. \\
+Both applications interact with a common set of backend services and selected external resources. Both the smartphone and smartwatch applications access Firestore for data storage and Firebase Storage for media management, as well as shared external services such as OpenTopoMap for map visualization. However, the smartwatch application only applies to a subset of services, reflecting its role as a lightweight client and the constraints of wearable devices. \\
+Access to backend resources such as Firestore, Firebase Storage and selected external services is otherwise shared between the smartphone and smartwatch applications. The diagram indicates which services are accessible from each client. \\
+The application uses several external services, for example map providers such as OpenTopoMap and Google Satellite View, as well as external authentication providers. Weather alert functionalities rely on both Weatherbit and a Demo Meteo Server. The latter is used exclusively for demonstration purposes, allowing the simulation of weather alerts without depending on real external conditions. \\
+Smartphone OS and Watch OS represent the operating system interfaces. The application accesses platform features through Flutter packages instead of communicating with the operating systems directly. The specific packages used to interact with such services are described in the diagrams of the smartphone application components, section \ref{Mobile Smartphone App component view} and of the smartwatch application components, section \ref{Mobile Smartwatch App component view}. \\
+The interfaces associated with Firebase services, Firebase Authentication, Firestore and Firebase Storage are based on the SDKs provided by the Backend-as-a-Service platform. These SDKs hide the details of the underlying communication mechanisms and offer a structured way to access backend functionalities, as documented in the Firebase official documentation. \\
+For the other external interfaces, such as Weather API, Weather Alert API, Satellite API, the application relies on RESTful communication. In these cases, the application uses HTTP-based requests via Flutter libraries, handling data exchange in JSON format and performing client-side decoding. \\
+When authentication is performed through an external provider, Google, the application obtains an authentication token which is then passed to Firebase Authentication. Firebase verifies the token with the external provider as part of the OAuth2-based authentication process. The SDK handles this additional interaction, but it is included in the diagram to provide a more accurate representation of the overall system behavior. \\
 \newpage
 \begin{landscape}
 \subsection{Mobile Smartphone App component view} \label{Mobile Smartphone App component view}
@@ -116,49 +112,49 @@ The token verification API is not directly managed within the application logic 
 
 
 \subsubsection{View Components}
-The UI of the application is organized into components that group together multiple views related to the same functionality, rather than representing isolated pages. This choice reflects how users interact with the system, as each View component encapsulates a complete feature.
-The \texttt{GeoWatch Page component} includes all functionalities related to navigation and environmental awareness during a trekking activity. It is responsible for presenting weather information along the route, weather alerts, and a satellite map with meteorological layers. It also provides navigation support through compass heading, altitude, and user position.
-The \texttt{Home Page component} represents the main map-based point of the application. It displays trekking routes on an OpenTopoMap layer and allows users to explore available paths geographically.
-The \texttt{Trekking Page component} provides detailed information about a selected route, including a description and photos. It also allows users to access the component that handles the creation of a diary associated with the route and to save the route to their profile, the \texttt{Diary Page component}.
-The \texttt{Diary Page component} handles the creation and modification of diary entries related to trekking experiences, including notes, images, and activity-related data.
-The \texttt{User Profile Page component} is responsible for displaying user information, including saved trekkings, diary related, follower and following users' data.
-The \texttt{Settings Page component} allows users to manage application and account settings, including profile information, security options such as password updates, smartwatch pairing, and weather notification preferences.
-The \texttt{LoginRegistration Page component} manages login and registration workflows. It supports authentication via email and password, performs simple format validation operations, supports Google authentication, and password recovery.
-The \texttt{Search Page component} enables users to search for other users and access their public profiles or to search for a trekking by its name.
+The UI of the application is organized by functionality. Components group together views related to the same feature, rather than representing isolated pages.
+The \texttt{GeoWatch Page component} includes all functionalities related to navigation and environmental awareness during a trekking activity. It displays the useful weather information to the user: weather alerts and a satellite map with meteo. It also provides navigation support through compass heading, altitude and user position.
+The \texttt{Home Page component} represents the main map-based point of the application. It displays trekking routes on an OpenTopoMap layer and allows users to explore available paths.
+The \texttt{Trekking Page component} provides information routes, including a description and photos. Users can also access the component that handles the creation of a diary associated with the route and to save the route to their profile, the \texttt{Diary Page component}.
+The \texttt{Diary Page component} handles the creation and modification of diary entries related to trekking experiences, including notes, images and activity-related data.
+The \texttt{User Profile Page component} is displays user information including saved trekkings, diary related, follower and following users' data.
+The \texttt{Settings Page component} allows users to manage application and account settings, including profile information, security options such as password updates, smartwatch pairing and weather notification preferences.
+The \texttt{LoginRegistration Page component} handles login and registration workflows. It supports authentication via email and password, performs simple format validation operations, supports Google authentication and password recovery.
+Users can use the \texttt{Search Page component} to search for other users and access their public profiles or to search for a trekking by its name.
 
 \subsubsection{Controller components}
-The controller package coordinates the application logic and mediates interactions between UI components, models, and backend services.
-Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController},\\ and \texttt{ChallengeController}, are responsible for handling use cases specific to their domain. They orchestrate data flow between the UI and Firebase services.
-The \texttt{ServiceController} acts as a unified facade for functionalities that do not belong to an application domain defined in the model, such as access to external APIs and operating system services, reducing coupling between UI components and low-level implementations.
-The \texttt{LanguageController} is responsible for managing localization and language-related logic.
+The controller package manages the application logic and the interactions between UI components and backend services. 
+ \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController} and \texttt{ChallengeController} handle use cases specific to their domain. They orchestrate data flow between the UI and Firebase services.
+The \texttt{ServiceController} is a single interface for functionalities that do not belong to an application domain defined in the model, such as access to external APIs and operating system services. This reduces coupling between UI components and low-level implementations.
+The \texttt{LanguageController} manages localization and language-related logic.
 
 \subsubsection{OSservice Package components}
-The OSService package contains services that directly interact with Flutter libraries responsible to communicate with system APIs and services managed by the operating system.
-These include components such as \texttt{GeoService}, \texttt{PermissionService}, \texttt{MemoryService}, and \texttt{NotificationService}, each encapsulating a specific interaction with the operating system, such as location access, permission handling, local storage, and notifications.
-This package isolates dependencies on external libraries and platform APIs. If a library needs to be replaced or updated, the changes are confined to the corresponding service, without affecting the rest of the application.
+The OSService package contains services that interact with Flutter libraries that handle communication with system APIs and services managed by the operating system.
+These include components such as \texttt{GeoService}, \texttt{PermissionService}, \texttt{MemoryService} and \texttt{NotificationService}, each including a specific interaction with the operating system, such as location access, permission handling, local storage and notifications.
+This package isolates dependencies on external libraries and platform APIs. If a library needs to be replaced or updated, the changes are limited to the corresponding service. 
 
 \subsubsection{Internet Service}
-The \texttt{InternetService} is responsible for monitoring network connectivity. It periodically relies on the ServiceController to attempt connections to external endpoints (e.g., Google services). Based on the outcome, the application switches between offline and online modes, ensuring consistent behavior in varying network conditions.
+The \texttt{InternetService} monitors network connectivity. It periodically uses the ServiceController to attempt connections to external endpoints (e.g., Google services). Depending on the outcome, the application switches between offline and online modes.
 
 \subsubsection{Background Service}
 
-The \texttt{BackgroundService} enables the execution of tasks even when the application is not actively open, depending on operating system constraints.
-It is used to perform periodic operations such as checking weather conditions and generating notifications. These tasks are scheduled through the mechanisms WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed based on system availability.
+The \texttt{BackgroundService} executes tasks even when the application is not actively open, depending on operating system constraints.
+Periodically, it checks weather conditions and generates notifications. The  application schedule these tasks through WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed depending on system availability.
 
 \subsubsection{AuthService}
 
-The AuthService is responsible not only for authentication but also for managing the smartwatch pairing process.
-It handles user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
+The AuthService handles not only authentication but also the smartwatch pairing process.
+It manages user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
 
 \subsubsection{Backend and External Services}
 
-The application relies on Firebase as a Backend-as-a-Service, including Authentication, Firestore, and Storage.
-External services are used for specific functionalities, such as OpenTopoMap for map visualization, OpenWeather and Weatherbit for weather data and alerts, and Google services for authentication and connectivity verification.
+The application relies on Firebase as a Backend-as-a-Service, including Authentication, Firestore and Storage.
+External services are used for specific functionalities such as OpenTopoMap for map visualization, OpenWeather and Weatherbit for weather data and alerts and Google services for authentication and connectivity verification.
 
 \subsubsection{Architectural Summary}
 
-The architecture is organized in packages that separate concerns clearly. Domain controllers manage application logic and backend interaction, the ServiceController provides a unified access point to external and system services, and OSService components encapsulate platform dependencies. This structure improves modularity, maintainability, and adaptability of the system.
-Domain controllers, such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController}, and \texttt{ChallengeController}, are responsible for coordinating the application logic related to their respective functional domains. These controllers manage interactions between the View layer and the Model layer, and they also mediate access to backend resources such as Firebase services.
+Each component of the architecture has a specific role. Domain controllers manage application logic and backend interaction, the ServiceController gives unified access point to external and system services and OSService components contain platform dependencies. This structure improves modularity and of the system.
+Domain controllers such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController} and \texttt{ChallengeController}  coordinate the application logic related to their respective functional domains. These controllers connect the View layer to the Model layer and manage access to backend resources, such as Firebase services.
 
 
 
@@ -176,7 +172,7 @@ Therefore, in the proposed architecture:
     \item Firebase is modeled as a set of backend services used by the application, rather than as a custom backend.
 \end{itemize}
 
-\textbf{Note:} the GeoWatch component lightly depends on the InternetService to determine the current connectivity state, only the \textit{Navigation Page} with the compass and altimeter depends on it just for hiding the drawer menu in offline mode. This interaction is not based on direct method invocation, but the InternetService exposes a boolean connectivity state, which is observed by the UI through a provider-based mechanism. When the connectivity status changes, the service notifies listeners, and the UI updates accordingly. Since it is not a method invocation,  this has not been modelled as an interface but just as a light dependency with a dashed line in the diagram.
+\textbf{Note:} the GeoWatch component to some extent depends on the InternetService to determine the current connectivity state, only the \textit{Navigation Page} with the compass and altimeter depends on it just for hiding the drawer menu in offline mode. This interaction is not built on on direct method invocation, but the InternetService exposes a boolean connectivity state, which is observed by the UI through a provider-based mechanism. When the connectivity status changes, the service notifies listeners and the UI updates based on the new status. Since it is not a method invocation,  this has not been structured as an interface but just as a light dependency with a dashed line in the diagram.
 
 %\paragraph{Smartphone Application External Libraries}
 
@@ -273,28 +269,26 @@ cupertino\_icons & iOS-style icon set \\
 
 
 
-The component diagram of the smartwatch application closely follows the structure introduced for the smartphone application. The design intentionally mirrors the architectural organization of the mobile application, in order to promote consistency, reuse of design patterns, and easier maintainability across the two platforms.
-This alignment ensures that the smartwatch application remains coherent with the overall system architecture, despite its reduced scope and more lightweight nature.
-The main differences with respect to the smartphone application regard the authentication and pairing mechanisms. In the smartwatch application, the \textit{AuthService} component is not present. This is due to the fact that the smartwatch does not directly interact with Firebase Authentication. In the smartphone application, the \textit{AuthService} was responsible for handling user authentication and, in particular, for managing the approval phase of the pairing process.
-In the smartwatch application, this functionality is replaced by two dedicated components:
+The smartwatch component diagram follows the same structure as the smartphone application. This keeps the two platforms consistent, supports the reuse of the same design patterns and makes the system easier to maintain. Although the smartwatch application has limited scope, it remains coherent with system architecture.
+The smartwatch application mainly differs from the smartphone application in authentication and pairing. Unlike the smartphone app, it does not include the \textit{AuthService} component. In the smartphone application, the \textit{AuthService} authenticated the user. However, there are two components that handle the anonymous authentication, watch id management and pairing process, detailed below. The PairingService uses Firebase anonymous authentication only as a technical step, while the actual pairing logic is handled through a Firestore listener. This functionality is replaced by two dedicated components:
 
 \begin{itemize}
-    \item \textbf{WatchIdService}: responsible for managing the unique identifier of the smartwatch. It ensures that each device is associated with a unique ID, retrieving it if already present or making and storing a new one otherwise.
-    \item \textbf{PairingService}: responsible for handling the pairing process with the smartphone application. This component manages the communication and synchronization required to establish the association between the smartwatch and the user account, relying on the approval process performed on the smartphone side.
+    \item \textbf{WatchIdService}: handles the unique identifier of the smartwatch. It ensures that each device is associated with a unique ID, retrieving it if already present or making and storing a new one otherwise.
+    \item \textbf{PairingService}: manages the pairing process with the smartphone application. This component manages the communication and synchronization required to establish the association between the smartwatch and the user account, relying on the approval process performed on the smartphone side.
 \end{itemize}
-The \texttt{PermissionService} is only used during application initialization and is therefore not connected to other components in the diagram. This reflects its limited and specific role.
+The \texttt{PermissionService} is only used during application initialization. For this reason, the diagram does not link it to other components. This shows that it has a small and specific role.
 
 
  \subsubsection{Note on UI Components}
-In both the smartphone and smartwatch applications, the UI components, referred to as \textit{Pages} in the diagrams, represent logical groupings of user interface screens related to specific functionalities. Each \textit{Page} component may therefore encapsulate multiple concrete UI elements that are functionally connected.
-For a detailed mapping between UI components and the actual user interface elements, the reader is referred to the table \ref{tab:ui-components-pages} presented in the User Interface chapter, where the internal composition of each \textit{Page} is explicitly described.
+In both the smartphone and smartwatch applications, the UI components, referred to as \textit{Pages} in the diagrams, represent logical groupings of user interface screens related to specific functionalities. Each \textit{Page} component may therefore include multiple concrete UI elements that are functionally connected.
+For a detailed mapping between UI components and the actual user interface elements, see table \ref{tab:ui-components-pages} presented in the User Interface chapter. It describes the internal composition of each \textit{Page}.
 
 \subsubsection{Navigation Page Disambiguation}
 
-The term \textit{Navigation Page} is used in both the smartphone and smartwatch applications, but it refers to different UIs with distinct responsibilities.
-In the smartphone application, the Navigation Page corresponds to a view within the \texttt{GeoWatchPage} component. It provides sensor-based navigation functionalities, such as compass orientation and altitude information, supporting the user during outdoor activities.
-In the smartwatch application, the Navigation Page is a standalone component (\texttt{NavigationPage}) that acts as a central access point for the main features of the wearable app. It allows the user to navigate to the Home Page, User Page, and language-related functionalities, serving primarily as a presentation hub.
-This distinction is important to avoid ambiguity when referring to navigation-related components across the two platforms.
+The term \textit{Navigation Page}, that is used both in smartphone and smartwatch applications, refers to different UIs with distinct responsibilities.
+In the smartphone application, the Navigation Page refers to a view within the \texttt{GeoWatchPage} component. It provides navigation support such as compass direction and altitude information.
+In the smartwatch application, the Navigation Page is a standalone component (\texttt{NavigationPage}) that acts as a central access point for the main features of the watch app. The user can use it to navigate to the Home Page, User Page and language-related functionalities, serving primarily as a presentation hub.
+This distinction is important to remove possible ambiguity when referring to navigation-related components across the two platforms.
 \newpage
 
 
@@ -328,7 +322,7 @@ flutter\_map & Map rendering using OpenStreetMap tiles \\
 \hline
 flutter\_map\_cancellable\_tile\_provider & Tile loading with cancellable requests for improved map performance \\
 \hline
-flutter\_map\_tappable\_polyline & Interactive polylines for route visualization on the map \\
+flutter\_map\_tappable\_polyline & Clickable path lines for route visualization on the map \\
 \hline
 flutter\_map\_marker\_popup & Popup support for markers displayed on the map \\
 \hline
@@ -374,11 +368,12 @@ cupertino\_icons & iOS-style icon set \\
 \end{figure}
 
 
-The database adopted for the Triplo application is based on a NoSQL approach using Firebase Firestore. Unlike traditional relational databases, Firestore stores data as collections of JSON-like documents, where each document can contain nested structures and arrays.
-For documentation purposes, the database structure has been represented using a diagram similar to a relational schema. This representation has been introduced for clarity and readability, allowing an easier understanding of entities and their relationships, even though the underlying data model is document-oriented rather than relational. 
-The main collections include user, diary, trekking, challenge, and auxiliary collections such as user\_index and trekking\_index, which are used to support efficient search operations. Additional collections such as watch, watch\_pair, handle device pairing functionalities, while the weather\_notification collection handles the paths for which the user wishes to be notified about weather updates.\\
-From an infrastructure perspective, the Firestore database is deployed in the \textit{europe-west 8} region, while Firebase Storage is currently hosted in the United States. This configuration may introduce additional latency when retrieving large media assets such as images. A potential improvement would be to migrate storage resources to a European region, which is supported by Firebase through paid plans, in order to reduce latency and improve performance. \\
-To mitigate latency issues, especially for images retrieved from Firebase Storage, a caching strategy has been adopted. Some images are locally cached on the device, reducing repeated network requests and improving user experience. This design decision is further discussed in Section~\ref{Image cache design decision}. \\
+The database adopted for the Triplo application follows a NoSQL approach using Firebase Firestore. Differently from traditional relational databases, Firestore stores data as collections of JSON-like documents, where each document can contain nested structures and arrays.
+The database structure is shown through a diagram similar to a relational schema. This choice makes the entities and their relationships easier to read, even if the data model follows a document-oriented model rather than a relational one.
+The main collections include user, diary, trekking, challenge and auxiliary collections such as user\_index and trekking\_index, which are used to support efficient search operations. Additional collections such as watch, watch\_pair, handle device pairing functionalities, while the weather\_notification collection handles the paths for which the user would like to receive notifications about weather updates.\\
+From an infrastructure point of view, Firestore database is deployed in the \textit{europe-west 8} region, while Firebase Storage is currently hosted in the United States. Because of this, loading large files may take slightly longer.
+This configuration may introduce additional latency when retrieving large media assets such as images. A possible future improvement would be to migrate storage resources to a European region, which is supported by Firebase through paid plans, in order to reduce latency and improve performance. \\
+To reduce latency when loading images from Firebase Storage, the application caches some images locally on the device. This avoids downloading the same files repeatedly. This design choice is discussed further inSection~\ref{Image cache design decision}. \\
 
 \newpage
 
@@ -398,21 +393,20 @@ To mitigate latency issues, especially for images retrieved from Firebase Storag
 The deployment diagram is consistent with the UML deployment notation described in chapther 8 of the UML Distilled book listed in the references. \\
 Physical hardware units are modeled through the \texttt{<<device>>} stereotype, while software platforms and runtime contexts are represented through the \texttt{<<executionEnvironment>>} stereotype.  \\
 The deployed software elements are shown as \texttt{<<artifact>>}. \\
-Communication paths are represented by links annotated with the corresponding protocol or interaction type, such as HTTPS, REST/HTTPS, and OAuth/HTTPS. \\
-In particular, the diagram distinguishes the mobile deployment on Android and iOS devices, while the smartwatch deployment is limited to Wear OS. \\
-The cloud side is modeled as a device containing different execution environments, namely Firebase and the set of external providers, which host the artifacts used by the applications. \\
-The deployment diagram represents the distribution of the application artifacts across different execution environments. In particular, the smartphone application is deployed as an artifact on both iOS and Android execution environments, while the smartwatch application is deployed separately on a Wear OS execution environment. \\
-Although the smartphone application is shown as deployed on two distinct platforms, it is important to note that it is based on a single shared codebase. The application is developed using Flutter, a cross-platform framework that allows the same source code to be compiled and executed on both iOS and Android devices. As a result, the two deployments correspond to different execution environments of the same application, rather than distinct implementations. \\
-In contrast, the smartwatch application is implemented as a separate artifact. While it shares the same backend services and part of the architectural structure, it is specifically designed for the Wear OS environment and provides a reduced set of functionalities for wearable devices. Therefore, it is represented as a distinct deployment unit in the diagram. \\
+Communication paths are represented by links annotated with the corresponding protocol or interaction type, such as HTTPS, REST/HTTPS and OAuth/HTTPS. \\
+The diagram distinguishes the mobile deployment on Android and iOS devices, while the smartwatch deployment is limited to Wear OS. \\
+The cloud side is structured as a device containing different execution environments, namely Firebase and the set of external providers, which host the artifacts the applications use. \\
+The deployment diagram shows how the application artifacts are distributed across the different execution environments. The smartphone application is deployed on both iOS and Android, while the smartwatch application is deployed separately on Wear OS.  \\
+Even if the diagram shows the smartphone application on two different platforms, it is based on a single shared codebase. The application uses Flutter, a cross-platform framework that enables the same source code to run on both iOS and Android devices. So, the two deployments represent different execution environments of the same application and not two separate implementations. \\
+The smartwatch application uses the same backend services and follows part of the architectural structure, but it is  a separate artifact designed specifically for Wear OS and includes a smaller set of features for wearable devices. The diagram shows it as a distinct unit. \\
 
 \newpage
 
 \section{Runtime view} \label{Runtime view} 
 
-
-The identified use cases provide an abstract representation of the interactions between the user and the system. They have been selected to capture the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
-These set of use cases is representative of the main system capabilities and supports a clear understanding of the services offered to the user. \\
-The reported use cases are twelve in total. Some of them include sub-diagrams to represent important phases of the respective use case or to provide a more detailed view of key processes. Although these sub-diagrams are not always strictly use cases, they are intended as supporting diagrams to improve the clarity of the system’s runtime behavior within the documentation
+The identified use cases give a high level view of the interactions between the user and the system. These use cases cover the essential functionalities of the application and to model its observable behavior from the user’s perspective. \\
+These set of use cases reflect the main system capabilities and supports a clear understanding of the services offered to the user. \\
+The reported use cases are twelve in total. Some of them include sub-diagrams to represent important phases of the respective use case or to provide a more detailed view of key processes. Although these sub-diagrams are not always strictly use cases, they provide complementary diagrams to improve the clarity of the system’s runtime behavior within the documentation
 \begin{enumerate}
     \item Add Diary Page - Section \ref{Add Diary Page use case sequence diagram}
     \item Explore trekkings on Map - Section \ref{Explore Trekkings on Map Sequence Diagram}
@@ -486,12 +480,12 @@ Update User Information & Smartphone & Profile management handled on smartphone 
 
 \subsection{Add Diary Page use case sequence diagram} 
 \label{Add Diary Page use case sequence diagram}
-The most important part of the \textit{Add Diary Page} sequence diagram is the save phase, where the data entered by the user is stored in the system.
+The most important part of the \textit{Add Diary Page} sequence diagram is the save phase, where the system stores the data entered by the user.
 When the user presses the save button, the \texttt{DiaryPage} starts the process by showing a loading page and then it formats the date, computing the duration from hours and minutes. If the user has selected photos, the page calls the \texttt{DiaryController} to upload them to \texttt{FirebaseStorage}. The controller uploads each image and returns a list of paths, which will be stored in the diary instance. \\
-After this step, the \texttt{DiaryPage} calls the \texttt{addDiary()} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary, and creates a \texttt{Diary} object. \\
-Before saving the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is necessary because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists. \\
-Once converted, the map is stored in the \texttt{diary} collection in Firestore. At the same time, the controller updates the user document, adding the diary identifier to either the public or private diary list, depending on the selected visibility. \\
-Finally, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation.  \\
+Following this step, the \texttt{DiaryPage} calls the \texttt{addDiary()} method of the \texttt{DiaryController}, passing all the collected data. The controller retrieves the current user identifier from \texttt{FirebaseAuth}, generates a new unique identifier for the diary and creates a \texttt{Diary} object. \\
+Before recording the diary in \texttt{FirebaseFirestore}, the object is converted into a \texttt{Map<String, dynamic>}. This is needed because Firestore stores data in a JSON-like format, which is based on key-value pairs. The map represents the diary as a set of fields (such as date, duration, notes, etc.), where each field is associated with a value. The type \texttt{dynamic} is used because these values can have different types, such as strings, numbers, booleans, or lists. \\
+Once converted, the map is stored in the \texttt{diary} collection in Firestore. In parallel, the controller updates the user document, inserting the diary identifier to either the public or private diary list, depending on the selected visibility. \\
+To conclude, the control returns to the \texttt{DiaryPage}, which updates the user level through the \texttt{UserController} and navigates to the \texttt{UserPage}, completing the operation.  \\
 
 
 \newpage
@@ -508,10 +502,10 @@ Finally, the control returns to the \texttt{DiaryPage}, which updates the user l
 
 \newpage
 \subsection{Explore Trekkings on Map Sequence Diagram}
-The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. In particular, the page retrieves the tile URL template and the corresponding subdomains used by the map provider.
-Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are then rendered differently depending on the zoom level and the rendering logic uses the trekking information, such as route points, starting point, and difficulty level, in order to determine the visual representation.
-The diagram also highlights the dynamic behavior of the map during user interaction. When the user drags or zooms the map, the page updates the current zoom and center, and checks whether the visible area is still inside the bounds. If the user moves outside the expected area, a recenter button is shown.
-Finally, when the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is displayed.
+The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. The page retrieves the tile URL template and the corresponding subdomains used by the map provider.
+Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are then rendered differently depending on the zoom level and the rendering logic uses the trekking information, such as route points, starting point and difficulty level, in order to determine the visual representation.
+The diagram  shows the dynamic behavior of the map. When the user adjust the position, the page updates the current zoom and checks if the visible area is still in the bounds. If the user moves outside the expected area, a recenter button is shown.
+Finally, when the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is displayed. 
 \label{Explore Trekkings on Map Sequence Diagram}
 \begin{figure}[H]
     \centering
@@ -524,22 +518,22 @@ Finally, when the user selects a trekking, the system navigates from the \texttt
 \newpage
 \subsection{View Trekking Information Sequence Diagram}
 The sequence diagram for the \textit{View Trekking Information} use case describes how the system presents the details of a selected trekking. The interaction starts when the user opens the \texttt{trekkingPage}. The page initializes its internal state and verifies which user is authenticated through the \texttt{UserController}. \\
-The trekking data is then retrieved through the \texttt{trekkingController}. In particular, the controller attempts to search in its local collection. \\
+The trekking data is then retrieved through the \texttt{trekkingController}. The controller attempts to search in its local collection. \\
 After the trekking has been obtained, the page checks whether the route is already saved by the current user. \\
 The page also requests weather information near the trail through the \texttt{servicecontroller}.  \\
-A further part of the interaction regards the trekking images, such as the map photo, the ending point photo, and the challenge images. In the main sequence diagram, this step is represented at a high level through calls from the \texttt{trekkingPage} to the \texttt{trekkingController}. The detailed behavior of the cache mechanism used for image retrieval is described separately in a separate diagram, in order to keep the main diagram focused on the overall interaction flow. \\
-Finally, the page allows the user to perform additional actions related to the trekking. The route can be saved or removed from the saved list, a diary entry can be created through the \texttt{DiaryPage}, and the user can navigate to other trekking-related views such as the route details page or the geowatch and map page. In this way, the \texttt{trekkingPage} acts as the central entry point for the main information and actions associated with a trekking.  \\
+Another part of the interaction concerns the trekking images, such as the map photo, the ending point photo and the challenge images. In the main sequence diagram, this step is represented at a high level through calls from the \texttt{trekkingPage} to the \texttt{trekkingController}. The separate cache diagram explains how image retrieval works with caching. This keeps the main diagram focused on the overall interaction flow. \\
+Finally, the page allows the user to perform additional actions related to the trekking. The route can be saved or removed from the saved list, a diary entry can be created through the \texttt{DiaryPage} and the user can navigate to other trekking-related views such as the route details page or the geowatch and map page. In this way, the \texttt{trekkingPage} works as the main entry point for the information and actions related to a trekking.  \\
 
 
 
 \subsubsection{Image Caching for Trekking Images Sequence Diagram}
 \label{Image Caching for Trekking Images Sequence Diagram}
-This sequence diagram illustrates, through a representative example, how the image caching mechanism is implemented within the application. Its purpose is not to introduce a new use case, but rather to clarify the internal behavior of image retrieval, which is abstracted in the main sequence diagram describing the trekking visualization flow. \\
-The process starts when the \texttt{trekkingPage} requests an image through the \texttt{trekkingController}. The controller delegates the retrieval to the \texttt{memoryservice}, which implements a multi-level caching strategy. \\
-First, the system attempts to retrieve the image from the in-memory RAM cache, using a \texttt{Map<String, File>} structure. If the image is found, it is immediately returned to the page, ensuring minimal latency. \\
-If the image is not available in memory, the system checks the disk cache through the \texttt{CacheManager}. This involves interacting with the underlying operating system to load a previously stored file. If the image is found on disk, it is reinserted into the in-memory cache and returned to the UI, improving performance for subsequent accesses. \\
-If the image is not available in either RAM or disk cache, the system performs a download from \texttt{FirebaseStorage}. In the case of paths expressed using the \texttt{gs://} protocol, the controller first resolves them into a downloadable URL. The image is then downloaded, stored on disk, and finally cached in memory before being returned to the page. \\
-The same logic is applied in a batched manner when multiple images, for example trekking challenges, are requested. In this case, the controller iterates over all image paths and applies the same caching strategy to each element. \\
+This sequence diagram illustrates, through a representative example, how the image caching mechanism works within the application.  It does not introduce a new use case; instead it explains the internal image retrieval process, which is summarized in the main sequence diagram describing the trekking visualization.  \\
+The process starts when the \texttt{trekkingPage} requests an image through the \texttt{trekkingController}. The controller then asks the    \texttt{memoryservice}, which uses a caching strategy to make image loading faster.   \\
+First, the system attempts to retrieve the image from the in-memory RAM cache, using a  \texttt{Map<String, File>} structure.  If the image is already available, it is immediately returned to the page, with very low latency.  \\
+If the image is not available in memory, the system checks the disk cache through the \texttt{CacheManager}. This requires to interact with the underlying operating system to load a previously stored file. If the image is found on disk, it is added back to the in-memory cache and returned to the UI, making future accesses faster. \\
+If the image is not available in either RAM or disk cache, the system performs a download from \texttt{FirebaseStorage}. In the case of paths expressed using the \texttt{gs://} protocol, the controller first resolves them into a downloadable URL. The image is then downloaded, stored on disk and finally cached in memory before being returned to the page. \\
+This logic is also used in a batched manner when multiple images are requested, for example in challenges. Here, the controller repeats over all image paths and applies the same caching strategy to each element. \\
 \newpage
 \label{View Trekking Information Sequence Diagram}
 \begin{figure}[H]
@@ -557,15 +551,15 @@ The same logic is applied in a batched manner when multiple images, for example 
 \newpage
 \subsection{View Weather Information Sequence Diagram}
 \label{View Weather Information Sequence Diagram}
-The \texttt{Geowatch} component is responsible for retrieving, processing, and displaying weather information related to a trekking route or the user’s current position. This functionality is implemented through the \texttt{ServiceController}, which acts as a facade for external APIs.
-The main logic is handled by the method \texttt{\_loadAll()}, which is responsible for orchestrating the full weather retrieval process. This method:
+The \texttt{Geowatch} component retrieves, processes and displays weather information of a trekking route or the user’s current position. The application provides this functionality through the \texttt{ServiceController}, which gives access to external APIs.
+The main logic is handled by the method \texttt{\_loadAll()}, which manages the full weather retrieval process. This method:
 \begin{itemize}
     \item determines the target location (trekking route or user GPS position),
     \item retrieves current weather data,
     \item retrieves forecast data,
     \item parses the forecast into a simplified structure,
     \item retrieves weather alerts.
-\end{itemize}
+\end{itemize} 
 The method is invoked:
 
 
@@ -580,7 +574,7 @@ The method is invoked:
     \item periodically through a timer (every 5 minutes),
     \item when the user switches between trail-based and GPS-based weather.
 \end{itemize}
-The method \texttt{\_loadAlertState()} is responsible for retrieving the current notification status for the selected trekking route. It queries the \texttt{TrekkingController}, which:
+The method \texttt{\_loadAlertState()} retrieves the current notification status for the selected trekking route. It queries the \texttt{TrekkingController}, which:
 
 \begin{itemize}
     \item retrieves the current user identifier through \texttt{AuthService},
@@ -612,7 +606,7 @@ Weather alerts are obtained from two sources:
     \item \texttt{mockAlerts()} for testing purposes.
 \end{itemize}
 
-The results are merged within the UI layer to provide a unified alert visualization.\\
+quiquiquiqui The results are merged within the UI layer to provide a unified alert visualization.\\
 The \texttt{GoogleSatellitePage}, part of the \texttt{Geowatch} component, provides an alternative map visualization using satellite imagery. The page retrieves tile URLs through the \texttt{ServiceController} and optionally overlays weather layers, such as pressure, rain and others using OpenWeather tile services.
 Weather data is handled using \texttt{Map<String, dynamic>} structures. This allows flexible interaction with JSON responses, avoiding the need for rigid model definitions.
 
@@ -636,7 +630,7 @@ Since weather data is loaded asynchronously, it may happen that:
     \item the user leaves the page,
     \item the request completes afterward.
 \end{itemize}
-If \texttt{setState} is called after the page has been removed, the application would crash.
+If \texttt{setState} is invoked after the page has been deleted, the application would crash.
 For this reason, the code checks \texttt{if (!mounted) return;} before updating the UI,
 ensuring that updates are performed only when the page is still active.
 \paragraph{Google Satellite integration}
@@ -647,7 +641,7 @@ Instead, it delegates the construction of the tile URL to the ServiceController.
 
 The base map is not a single image but is composed of multiple small image tiles.
 The ServiceController provides a URL template for the map provider, for example Google Satellite for Geowatch or OpenTopoMap for the HomePage.
-This URL contains placeholders such as \texttt{\{z\}}, \texttt{\{x\}}, and \texttt{\{y\}}, which represent:
+This URL contains placeholders such as \texttt{\{z\}}, \texttt{\{x\}} and \texttt{\{y\}}, which represent:
 \begin{itemize}
     \item the zoom level (\texttt{z})
     \item the horizontal tile index (\texttt{x})
@@ -678,10 +672,9 @@ as the application logic does not manage these requests.
 \end{figure}
 \newpage
 \subsection{Search Users Sequence Diagram}
-The SearchPage component is responsible for handling user search interactions. The UI elements belong to the SearchPage component and communicate with the UserController.
+The SearchPage componenthandles user search interactions. The UI elements belong to the SearchPage component and communicate with the UserController.
 When the user types a query, the method \texttt{\_runSearch(query)} is run by the \texttt{User controller}. Before performing the search, the UI state is updated using \texttt{setState} to indicate that a search operation is in progress.
 The method \texttt{searchUsers(query)} is then invoked in the UserController.
-The search process is performed in two steps:
 \begin{itemize}
     \item a query is executed on the \texttt{users\_index} collection using a normalized version of the input string,
     \item for each result, the corresponding user document is retrieved from the \texttt{users} collection.
@@ -704,9 +697,8 @@ The results are returned as a list of \texttt{Users} objects. The SearchPage upd
 \subsection{Search Trekking Sequence Diagram}
 
 The trekking search functionality follows a similar structure but introduces an additional optimization layer through local caching.
-When the user enters a query, the method \texttt{\_runSearch(query)} is executed, and the UI is updated using \texttt{setState} to reflect the loading state.
+When the user enters a query, the method \texttt{\_runSearch(query)} is executed and the UI is updated using \texttt{setState} to reflect the loading state.
 The request is delegated to the \texttt{searchTrekking(query)} method of the TrekkingController.
-The search is performed in two phases:
 \begin{itemize}
     \item the \texttt{trekking\_index} collection is queried using a normalized string,
     \item each resulting trekking identifier is resolved into a full trekking object.
@@ -728,7 +720,7 @@ When the user selects a trekking, the application navigates to the corresponding
 \newpage
 \subsection{View Compass and Altitude Information Sequence Diagram}
 
-The \texttt{Geowatch} component is responsible for displaying compass, altitude, and current position information. This functionality is implemented through the interaction between the page, the \texttt{servicecontroller}, the \texttt{geoservice}, and the \texttt{permissionservice}.
+The \texttt{Geowatch} component displays compass, altitude and current position information. This functionality is implemented through the interaction between the page, the \texttt{servicecontroller}, the \texttt{geoservice} and the \texttt{permissionservice}.
 When the navigation page is opened, the initialization starts in \texttt{initState()}, where the page registers itself as an app lifecycle observer and schedules the execution of \texttt{\_initLocation()}. The observer is used to detect when the application returns to the foreground, for example after the user has changed GPS or permission settings.
 The method \texttt{\_initLocation()} delegates the preliminary checks to the \texttt{servicecontroller} through \\ \texttt{loadNavigationLocation()}. This method verifies whether the location permission has been granted and whether the GPS service is enabled. If one of these conditions is not satisfied, the page enters an error state and shows a dedicated message to the user.
 If permission is denied, the returned state contains the error \texttt{PERMISSION\_DENIED}. If the GPS service is disabled, the returned state contains the error \texttt{GPS\_DISABLED}. In both cases, the page updates its local state through \texttt{setState()} and displays an error instead of the navigation information.
@@ -740,7 +732,7 @@ Finally, when the page is closed, the observer and the active position stream su
 
 \subsubsection{Application Lifecycle in Flutter}
 
-The \textbf{application lifecycle in Flutter} refers to the sequence of states an app goes through during its execution, such as \textit{resumed}, \textit{inactive}, \textit{paused}, and \textit{detached} and the mechanisms provided to handle transitions between these states.
+The \textbf{application lifecycle in Flutter} refers to the sequence of states an app goes through during its execution, such as \textit{resumed}, \textit{inactive}, \textit{paused} and \textit{detached} and the mechanisms provided to handle transitions between these states.
 Flutter provides a platform-independent abstraction of the lifecycle through the \texttt{AppLifecycleState} enum. Developers can monitor these changes by implementing the \texttt{WidgetsBindingObserver}, which allows the application to listen for lifecycle updates.
 In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState state)} is overridden to react to state transitions, enabling behaviors such as pausing tasks, saving data, or managing background operations when the app moves between foreground and background.
 
@@ -759,7 +751,7 @@ In particular, the method \texttt{didChangeAppLifecycleState(AppLifecycleState s
 The two error conditions shown in the diagram represent different problems.
 The \texttt{PERMISSION\_DENIED} state means that the application is not allowed to access the device location. In this case, the problem is related to the application permission, so the user must enable the permission from the app settings.
 The \texttt{GPS\_DISABLED} state means that the application has permission to access location, but the location service of the device is currently turned off. In this case, the problem is not related to the app permission, but to the system location service, so the user must enable GPS from the device settings.
-For this reason, the page provides two different actions: opening the application settings in the case of denied permission, and opening the location settings in the case of disabled GPS.
+For this reason, the page provides two different actions: opening the application settings in the case of denied permission and opening the location settings in the case of disabled GPS.
 
 
 
@@ -803,7 +795,7 @@ After successful login, the application navigates to the UserPage, whose loading
 \paragraph{Google login}
 When the user presses the Google Sign-In button, the page executes \texttt{\_loginGoogle(context)}. The request is delegated to \texttt{userController.loginWithGoogle()}, which calls the corresponding method in the \texttt{AuthService}.
 The Google login flow first forces a sign-out from the previous Google session and then opens the Google account interface. If the user does not select a profile, the flow terminates with an error message shown in the UI.
-If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed, and the page navigates to the \texttt{UserPage}.
+If the user selects a Google account, the \texttt{AuthService} retrieves the Google authentication tokens and exchanges them for Firebase credentials through \texttt{signInWithCredential()}. Once Firebase authentication succeeds, the service verifies whether the user already has a corresponding Firestore profile through \texttt{\_ensureUserFirestoreDocs(user)}. If the profile does not exist, the service creates the required documents in both the \texttt{users} and \texttt{users\_index} collections. After that, the method \texttt{loadUserCore(uid)} is executed and the page navigates to the \texttt{UserPage}.
 \newpage
 \label{Login Sequence Diagram 1}
 \begin{figure}[H]
@@ -832,11 +824,11 @@ The UserPage can be opened either as the landing page after a successful login o
 During initialization, the page schedules the invocation of \texttt{loadTrekking()} through \texttt{Future.microtask()}, instead of calling it directly inside \texttt{initState()}. This choice postpones the trekking load operation until the initialization phase is completed, keeping the widget initialization lighter.
 Although trekking loading is not strictly part of the core profile information, this preload can still be justified for the following reasons
 \begin{itemize}
-    \item the UserPage is often the first page shown after login, so loading trekking data here can anticipate work that will likely be needed shortly afterward by pages such as the HomePage, TrekkingPage, SearchPage, and the saved trekking tab itself
+    \item the UserPage is often the first page shown after login, so loading trekking data here can anticipate work that will likely be needed shortly afterward by pages such as the HomePage, TrekkingPage, SearchPage and the saved trekking tab itself
     \item the UserPage allows navigation toward saved trekkings and trekking detail pages, so having the trekking cache already populated may reduce subsequent loading work
     \item \texttt{loadTrekking()} acts as a warm-up step for the controller-side cache, because it populates the local \texttt{\_trekkings} list and makes data immediately available for methods such as \texttt{getTrekkingById()}, \texttt{getTrekkingId()}, using Firestore only as secondary solution
 \end{itemize}
-The main profile information shown in the page is obtained from the current user already available in the UserController. Additional information is retrieved lazily through \texttt{FutureBuilder}. This applies to followers, following users, diary counters, public diaries, private diaries, and saved trekkings.
+The main profile information shown in the page is obtained from the current user already available in the UserController. Additional information is retrieved lazily through \texttt{FutureBuilder}. This applies to followers, following users, diary counters, public diaries, private diaries and saved trekkings.
 For followers and following, the UserController first retrieves the current user document from Firestore in order to obtain the identifiers stored in the \texttt{Followers} and \texttt{Following} fields. Then, for each identifier, the controller invokes \texttt{getUserById()}, which retrieves the corresponding Firestore document and builds a \texttt{Users} object through \texttt{Users.fromMap()}.
 The total diary count is computed through the helper method \texttt{\_loadAllDiaries(context, uid)} defined in the UserPage. This method invokes both \texttt{getPublicDiaries(uid)} and \texttt{getPrivateDiaries(uid)} from the DiaryController, then merges the two returned lists into a single collection. 
 For the diary tabs, the DiaryController queries Firestore and converts each result document into a \texttt{Diary} object through \texttt{Diary.fromMap()}.
@@ -882,11 +874,11 @@ It is important to note that, in the current implementation, the registration pa
 \newpage
 \subsection{Update User Information Sequence Diagram}
 
-The update of user information is handled by the \texttt{SettingPage}, which allows the user to modify several profile attributes such as username, name, surname, birthdate, profile image, and email. The page delegates saving user information to the \texttt{UserController}, which is responsible for uploading the local user state to Firestore.
-When the page is opened, it executes an initialization step by invoking \texttt{refreshEmailFromAuth()}, in order to check that the email stored in Firestore is aligned with the current value available in Firebase Authentication. Infact, if the user has requested to change its email and has verified the new one by clicking the link in the mail inbox, Firebase Auth may have registered that the user is associated to a new email, so this reference shall be updated also in the Firestore user record.  The \texttt{AuthService} first reloads the authenticated Firebase user, loads the updated email, updates the Firestore user document, and finally rebuilds the local \texttt{User} through the method \texttt{loadUserCore()}.
-The update of textual profile fields, such as username, name, and surname, follows a common pattern. The UI opens a dialog through \texttt{\_editField()}, the user enters a new value, and the page delegates the save to Firestore operation to the \texttt{UserController}. The controller then updates the Firestore document and synchronizes the corresponding field inside the local \texttt{\_currentUser} object. The username update also requires an update of the \texttt{users\_index} collection, so that the user remains searchable through the normalized username.
+The update of user information is handled by the \texttt{SettingPage}, which allows the user to modify several profile attributes such as username, name, surname, birthdate, profile image and email. The page delegates saving user information to the \texttt{UserController}, which uploads the local user state to Firestore.
+When the page is opened, it executes an initialization step by invoking \texttt{refreshEmailFromAuth()}, in order to check that the email stored in Firestore is aligned with the current value available in Firebase Authentication. Infact, if the user has requested to change its email and has verified the new one by clicking the link in the mail inbox, Firebase Auth may have registered that the user is associated to a new email, so this reference shall be updated also in the Firestore user record.  The \texttt{AuthService} first reloads the authenticated Firebase user, loads the updated email, updates the Firestore user document and finally rebuilds the local \texttt{User} through the method \texttt{loadUserCore()}.
+The update of textual profile fields, such as username, name and surname, follows a common pattern. The UI opens a dialog through \texttt{\_editField()}, the user enters a new value and the page delegates the save to Firestore operation to the \texttt{UserController}. The controller then updates the Firestore document and synchronizes the corresponding field inside the local \texttt{\_currentUser} object. The username update also requires an update of the \texttt{users\_index} collection, so that the user remains searchable through the normalized username.
 The birthdate update is handled similarly, but the input is collected through \texttt{showDatePicker()} instead of a text dialog. Once the user selects a date, the \texttt{UserController} updates Firestore and updates the local model field.
-The profile image update uses the image picker to let the user select a file from the gallery. The \texttt{UserController} uploads the file to Firebase Storage, obtains the public download URL, stores that URL inside the Firestore user document, and updates the local \texttt{\_currentUser.photoProfile} field. In this way, the UI can show the new profile image after the operation completes.
+The profile image update uses the image picker to let the user select a file from the gallery. The \texttt{UserController} uploads the file to Firebase Storage, obtains the public download URL, stores that URL inside the Firestore user document and updates the local \texttt{\_currentUser.photoProfile} field. In this way, the UI can show the new profile image after the operation completes.
 The email update is more complex because it involves Firebase Authentication. This operation is available only for password-based accounts, since Google profiles are managed by the external auth provider GoogleAuth. The page opens a dedicated dialog where the user enters the new email and the current password. The \texttt{UserController} delegates the operation to the \texttt{AuthService}, which first reauthenticates the current user through \texttt{reauthenticateWithCredential()} because, according to Firebase documentation, some security sensitive actions such as setting a new email address require that the user has recently signed in, then invokes \texttt{verifyBeforeUpdateEmail(newEmail)}. Firebase Authentication sends a verification link to the new email address. If the request succeeds, the page records that an email change has been requested and informs the user through a confirmation message. If Firebase returns an error, the exception is shown through a \texttt{SnackBar}.
 
 
@@ -915,9 +907,9 @@ The email update is more complex because it involves Firebase Authentication. Th
 \newpage
 \subsubsection{Change Language Sequence Diagram}
 
-The language change process is handled by the \texttt{Language} controller, and saving the preference on the phone memory is delegated to the \texttt{MemoryService}.
+The language change process is handled by the \texttt{Language} controller and saving the preference on the phone memory is delegated to the \texttt{MemoryService}.
 When the user selects the language field in the SettingPage, the application opens a dialog that displays the list of available locales. Once the user chooses a language, the dialog invokes \texttt{setLocale(locale)} on the Language controller.
-The controller first checks if the selected locale is already active. If so, no further action is needed. Otherwise, it updates the internal \texttt{\_locale} field, calls \texttt{notifyListeners()}, and then delegates the saving the preference to the \texttt{MemoryService} through \texttt{saveLocaleCode(locale.languageCode)}.
+The controller first checks if the selected locale is already active. If so, no further action is needed. Otherwise, it updates the internal \texttt{\_locale} field, calls \texttt{notifyListeners()} and then delegates the saving the preference to the \texttt{MemoryService} through \texttt{saveLocaleCode(locale.languageCode)}.
 The MemoryService stores the selected language code locally using shared preferences. This allows the application to restore the previously selected language when it is reopened, using the method \texttt{loadSavedLocale()}.
 
 
@@ -1046,7 +1038,7 @@ If a valid raw payload is available, \texttt{SettingPage} delegates the parsing 
 \texttt{triplo://watch-pair/<watchId>?t=<token>}\\ 
 The service also validates the presence of both the smartwatch identifier and the temporary QR token in the URI payload. If the payload is malformed, the page shows an error message and enables a new scan by resetting \texttt{\_handled}. \\
 If the QR payload is valid, the page shows a confirmation dialog to the user. If the user does not confirm the operation, the page allows the next scan. If the user confirms, the page invokes \texttt{UserController.approveWatchPair()}, which forwards the request to \texttt{AuthService.approveWatchPair()}. \\
-The actual approval is performed inside \texttt{AuthService}, since this step depends on the currently authenticated phone user and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}. The transaction reads the document snapshot, denoted as \texttt{snap}, and validates the pairing request by checking four conditions: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code, and the expiration timestamp must still be valid. \\
+The actual approval is performed inside \texttt{AuthService}, since this step depends on the currently authenticated phone user and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}. The transaction reads the document snapshot, denoted as \texttt{snap} and validates the pairing request by checking four conditions: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code and the expiration timestamp must still be valid. \\
 Only if all these conditions hold, the transaction updates the pairing document by setting \texttt{status = approved} and by storing the UID of the authenticated phone user. From an architectural perspective, the transaction is important because it makes validation and approval atomic. This reduces the risk of inconsistent state transitions. The page itself does not directly interact with Firestore or Firebase Authentication; it only reacts to success or failure by updating local UI state. \\
 
 
@@ -1085,14 +1077,14 @@ If the pairing document is already in \texttt{approved} state and contains a non
 At this point, \texttt{PairingGateway} requests \texttt{UserController.loadCurrentPairedUser()}. This step is necessary because the pairing service only knows which user UID is associated with the watch, but it does not load the complete user profile. The actual profile loading is delegated to \texttt{UserController}, which reads the corresponding document from the \texttt{User} collection by calling \texttt{loadUserCore(uid)}. The returned Firestore snapshot, denoted as \texttt{snap}, is converted into a \texttt{User} domain object through \texttt{Users.fromMap()} and stored in \texttt{UserController} as \texttt{\_currentUser}. When \texttt{loadUserCore()} completes, \texttt{UserController} also calls \texttt{notifyListeners()}. \\
 Here again, the listeners are the widgets that observe \texttt{UserController} through Provider and the \texttt{PairingGateway} is a listener. \\
 Then the UI is rebuilt because the \texttt{PairingGateway} returns the widget child that was set by the \texttt{Navigation Page} through \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. The \texttt{UserPage} is then able to see that a paired UID is available. \\
-In this sense, the pairing service is responsible for determining whether the watch is associated with a user, whereas the user controller is responsible for loading the actual user data needed by \texttt{UserPage}. \\
+In this sense, the pairing service determines if the watch is associated with a user, whereas the user controller loads the actual user data needed by \texttt{UserPage}. \\
 
 \subsubsection{Pair the watch if the user has not paired it}
-If no approved pairing is found, the \texttt{PairingService} starts a new pairing cycle through \\\texttt{PairingService.startWatchPairing()}. In this branch, the service makes a new QR token, stores it in local state, writes the Firestore document \texttt{watch\_pair/<watchId>} with status \texttt{waiting}, a null UID, an expiration timestamp, and a new token, and then installs a snapshot listener on that document. A local expiration timer is also started. The \texttt{PairingService} then renders \texttt{LoginPage}, which reads the QR payload exposed by \texttt{PairingService} and displays it to the user. The \texttt{LoginPage} is only the visual pairing screen, it does not control the pairing itself. \\
+If no approved pairing is found, the \texttt{PairingService} starts a new pairing cycle through \\\texttt{PairingService.startWatchPairing()}. In this branch, the service makes a new QR token, stores it in local state, writes the Firestore document \texttt{watch\_pair/<watchId>} with status \texttt{waiting}, a null UID, an expiration timestamp and a new token and then installs a snapshot listener on that document. A local expiration timer is also started. The \texttt{PairingService} then renders \texttt{LoginPage}, which reads the QR payload exposed by \texttt{PairingService} and displays it to the user. The \texttt{LoginPage} is only the visual pairing screen, it does not control the pairing itself. \\
 The most relevant transition regards the phone approving the QR code. This operation updates the Firestore document \texttt{watch\_pair/<watchId>} by setting its status to \texttt{approved} and assigning the corresponding user UID. The update is received by the active snapshot listener previously installed by \\\texttt{PairingService.startWatchPairing()} through \texttt{docRef.snapshots().listen()}. \\
-Inside the listener, the service reads the updated document and retrieves the fields \texttt{status}, \texttt{uid}, and \texttt{qrToken}. At this point, the service compares the token stored in Firestore with the locally active token (\texttt{\_qrToken}). This comparison is performed inside the listener itself through the instruction \texttt{if (tokenOnDb != \_qrToken) return;} and ensures that only updates referring to the currently displayed QR code are accepted. If the tokens do not match, the update is ignored, in order not to approve stale QR codes. \\
-If the token matches and the status is \texttt{approved}, \texttt{PairingService} stores the paired UID in \texttt{\_pairedUid}, stops the expiration timer, and calls \texttt{notifyListeners()}. This notification is sent over to the \texttt{PairingGateway}, that rebuilds the UI. The \texttt{PairingGateway} reacts to the new state by invoking \\ \texttt{UserController.loadCurrentPairedUser()}, which loads the corresponding user document from Firestore and reconstructs the \texttt{Users} model. As a result, the UI transitions from the pairing screen to \texttt{UserPage}. \\
-The logout and re-pairing flow clarifies an additional architectural point. When the user logs out from the smartwatch user page, \texttt{PairingService.logoutWatch()} clears the active timer, stops the current Firestore pairing subscription, resets the pairing document by making a new QR token and restoring the \texttt{waiting} state, and clears the locally paired UID. However, the reset of the backend document alone is not sufficient, the observation of the pairing document must be reinstalled through a new call to \texttt{restoreWatchPairing()}. This step is crucial because otherwise the watch could display a new QR code while failing to display the UserPage correctly after the first approval performed by the phone. \\
+Inside the listener, the service reads the updated document and retrieves the fields \texttt{status}, \texttt{uid} and \texttt{qrToken}. At this point, the service compares the token stored in Firestore with the locally active token (\texttt{\_qrToken}). This comparison is performed inside the listener itself through the instruction \texttt{if (tokenOnDb != \_qrToken) return;} and ensures that only updates referring to the currently displayed QR code are accepted. If the tokens do not match, the update is ignored, in order not to approve stale QR codes. \\
+If the token matches and the status is \texttt{approved}, \texttt{PairingService} stores the paired UID in \texttt{\_pairedUid}, stops the expiration timer and calls \texttt{notifyListeners()}. This notification is sent over to the \texttt{PairingGateway}, that rebuilds the UI. The \texttt{PairingGateway} reacts to the new state by invoking \\ \texttt{UserController.loadCurrentPairedUser()}, which loads the corresponding user document from Firestore and reconstructs the \texttt{Users} model. As a result, the UI transitions from the pairing screen to \texttt{UserPage}. \\
+The logout and re-pairing flow clarifies an additional architectural point. When the user logs out from the smartwatch user page, \texttt{PairingService.logoutWatch()} clears the active timer, stops the current Firestore pairing subscription, resets the pairing document by making a new QR token and restoring the \texttt{waiting} state and clears the locally paired UID. However, the reset of the backend document alone is not sufficient, the observation of the pairing document must be reinstalled through a new call to \texttt{restoreWatchPairing()}. This step is crucial because otherwise the watch could display a new QR code while failing to display the UserPage correctly after the first approval performed by the phone. \\
 
 
 
@@ -1153,10 +1145,10 @@ The diagram includes a first group of interfaces associated with the core applic
 Finally, \texttt{Language\_i} defines the minimal contract required to manage the application locale.\\
 A second group of interfaces regards infrastructure and platform interaction. 
 \texttt{Service\_i} acts as the unified access point for a heterogeneous set of services that are not strictly tied to a single domain entity. 
-As shown in the diagram, this interface includes operations for weather retrieval, forecast parsing, weather alerts, navigation-related location handling, access to map tiles, and redirection to system configuration components such as GPS and permission settings. 
+As shown in the diagram, this interface includes operations for weather retrieval, forecast parsing, weather alerts, navigation-related location handling, access to map tiles and redirection to system configuration components such as GPS and permission settings. 
 For this reason, \texttt{Service\_i} can be interpreted as a façade-oriented interface, collecting in a single access point the functionalities needed by the UI when interacting with external services and operating-system-level capabilities.
 
-The operating system services are further represented through dedicated interfaces, namely \texttt{Permission\_i}, \texttt{Notification\_i}, \texttt{Memory\_i}, and \texttt{geo\_i}. 
+The operating system services are further represented through dedicated interfaces, namely \texttt{Permission\_i}, \texttt{Notification\_i}, \texttt{Memory\_i} and \texttt{geo\_i}. 
 These interfaces isolate the logic that depends on Flutter packages that communicate with device APIs or with the operating system. 
 This design choice is particularly relevant from a maintenance point of view: if a package or platform-specific integration must be replaced, the impact can be limited to the corresponding service implementation, without requiring modifications in the rest of the application, as explained in section \ref{OSService Package Design}. 
 In this sense, the interfaces shown in Figure~\ref{Interface Diagram Smartphone Application} contribute to preserving a clear separation between application logic and platform-dependent concerns.
@@ -1164,17 +1156,17 @@ More specifically, \texttt{Permission\_i} encapsulates permission requests.\\
 \texttt{geo\_i} abstracts location-service availability and position streaming\\
 \texttt{Notification\_i} defines the operations needed to issue local notifications \\
  and \texttt{Memory\_i} centralizes local storage concerns, including image caching, saving the preferred locale.
-The diagram also contains a set of lightweight model-oriented interfaces, namely \texttt{qi}, \texttt{dmi}, \texttt{expi}, and \texttt{umi}. 
+The diagram also contains a set of lightweight model-oriented interfaces, namely \texttt{qi}, \texttt{dmi}, \texttt{expi} and \texttt{umi}. 
 These define conversion contracts based on \texttt{toMap()} and \texttt{fromMap()} operations. 
 Their purpose is to standardize the serialization and deserialization logic used to map application objects to and from Firestore representations. 
 In addition to the previously described interfaces, Figure~\ref{Interface Diagram Smartphone Application} also includes the \texttt{authservice\_i} interface, which encapsulates the operations related to user authentication and credential management.
-This interface defines a dedicated contract for handling authentication workflows, including registration, login (both with email/password and Google Sign-In), logout, password reset, and automatic session restoration. 
+This interface defines a dedicated contract for handling authentication workflows, including registration, login (both with email/password and Google Sign-In), logout, password reset and automatic session restoration. 
 Furthermore, it includes operations for account-related updates, such as email changes and smartwatch pairing approval.
 From an architectural perspective, \texttt{authservice\_i} plays a key role in separating authentication from the higher-level domain logic exposed by \texttt{User\_i}. 
-While \texttt{User\_i} provides user-related functionalities at the application level, \texttt{authservice\_i} is responsible for interacting with the underlying authentication provider (e.g., Firebase Authentication), thus centralizing all authentication-related operations in a single component.
+While \texttt{User\_i} provides user-related functionalities at the application level, \texttt{authservice\_i} interacts with the underlying authentication provider (e.g., Firebase Authentication), thus centralizing all authentication operations in a single component.
 This design choice improves modularity and maintainability, as it prevents other components from directly depending on authentication mechanisms and allows the authentication logic to be modified or extended with minimal impact on the rest of the system.
 Overall, the interfaces represented in Figure~\ref{Interface Diagram Smartphone Application} document a design in which each major responsibility is accessed through a clearly delimited contract. 
-This improves readability of the architecture, supports separation of concerns, and makes explicit which services are expected from each component without exposing internal implementation details. 
+This improves readability of the architecture, supports separation of concerns and makes explicit which services are expected from each component without exposing internal implementation details. 
 For these reasons, the interface view complements the component decomposition by showing not only which elements exist in the system, but also how their responsibilities are formally made available to the rest of the application.
 
 
@@ -1197,7 +1189,7 @@ For these reasons, the interface view complements the component decomposition by
 
 The interfaces diagram of the smartwatch application is largely consistent with the one introduced for the smartphone application. The same set of interfaces is preserved, reflecting the architectural choice of maintaining a uniform interaction layer between \textit{View} components and the underlying \textit{Controller} logic across both platforms.
 This design ensures a high degree of reuse and coherence, allowing the smartwatch application to leverage the same abstraction principles adopted in the smartphone application, while adapting them to its more lightweight and specialized context.
-The main difference that can be observed regards the pairing and authentication mechanisms. In the smartwatch application, the \textit{AuthService} is not present. In the smartphone application, such component was responsible for managing authentication and for handling the approval phase of the pairing process.
+The main difference that can be observed regards the pairing and authentication mechanisms. In the smartwatch application, the \textit{AuthService} is not present. In the smartphone application, such component managed authentication and handled the approval phase of the pairing process.
 In this context, the pairing logic is primarily managed by the \textit{PairingService}, so the dedicated interface \textit{Pairing\_i} is introduced, exposing the operations required to handle the the pairing process.
 
 
@@ -1213,12 +1205,12 @@ In this context, the pairing logic is primarily managed by the \textit{PairingSe
     \includegraphics[width=0.6\linewidth]{./images/modelviewcontroller.png}
     \caption{Model view controller pattern, adapted from Apple and Oracle documentation}
 \end{figure}
-The system adopts the Model--View--Controller (MVC) architectural pattern to separate presentation, application logic, and data management. Within this structure, each role is assigned a specific responsibility in order to improve modularity, maintainability, and clarity of interactions.
-The \textbf{Model} represents the knowledge and expertise related to the application domain. It includes the core data structures of the system, such as \texttt{Diary}, \texttt{Trekking}, and \texttt{User}. The Model is independent from the user interface and does not handle user interactions directly.
-The \textbf{View} is responsible for rendering the user interface and collecting user input. Its role is limited to presentation and interaction handling, without directly applying business logic or modifying domain data.
-The \textbf{Controller} manages the application logic and coordinates the interaction between View and Model. In the adopted variant of MVC, consistent with the interpretation described in both Apple and Oracle documentation, the Controller also plays the role of a \emph{Mediator}. More precisely, the View does not directly manipulate the Model; instead, user actions are forwarded to the Controller, which interprets them, executes the required logic, and updates the corresponding Model data. In this way, the Controller acts as the central coordination point of the interaction, reducing direct dependencies between presentation and domain data.
+The system adopts the Model--View--Controller (MVC) architectural pattern to separate presentation, application logic and data management. Within this structure, each role is assigned a specific responsibility in order to improve modularity, maintainability and clarity of interactions.
+The \textbf{Model} represents the knowledge and expertise related to the application domain. It includes the core data structures of the system, such as \texttt{Diary}, \texttt{Trekking} and \texttt{User}. The Model is independent from the user interface and does not handle user interactions directly.
+The \textbf{View} renders the user interface and collects user input. Its role is limited to presentation and interaction handling, without directly applying business logic or modifying domain data.
+The \textbf{Controller} manages the application logic and coordinates the interaction between View and Model. In the adopted variant of MVC, consistent with the interpretation described in both Apple and Oracle documentation, the Controller also plays the role of a \emph{Mediator}. More precisely, the View does not directly manipulate the Model; instead, user actions are forwarded to the Controller, which interprets them, executes the required logic and updates the corresponding Model data. In this way, the Controller acts as the central coordination point of the interaction, reducing direct dependencies between presentation and domain data.
 In addition, the architecture relies on the \textbf{Observer pattern} to keep the user interface consistent with state changes. When the state managed by a Controller is updated, the interested Views are notified through the listener mechanism provided by the Flutter framework, based on ChangeNotifier, integrated via Provider, so that they can refresh their representation accordingly. This notification-based interaction avoids tight coupling and supports consistency across multiple dependent Views.
-Therefore, the adopted solution combines the structural organization of MVC with the use of the Mediator pattern in the Controller and the Observer pattern. This combination is particularly suitable for the Flutter-based implementation of the system, where the presentation layer, the application logic, and the domain data remain clearly separated while still cooperating through a well-defined interaction model.
+Therefore, the adopted solution combines the structural organization of MVC with the use of the Mediator pattern in the Controller and the Observer pattern. This combination is particularly suitable for the Flutter-based implementation of the system, where the presentation layer, the application logic and the domain data remain clearly separated while still cooperating through a well-defined interaction model.
 
 
 
@@ -1237,7 +1229,7 @@ Furthermore, the facade allows internal changes to the underlying services witho
 
 \subsection{Flutter as Application Framework} \label{Flutter as Application Framework}
 
-Flutter was selected for the implementation of the client applications because it provides an effective balance between cross-platform development, interface consistency, and maintainability. A primary requirement of the project was the possibility of deploying the smartphone application on both Android and iOS while preserving the same visual structure and interaction style across platforms. In this respect, Flutter offers a significant advantage, since it enables the development of a single shared codebase while also providing a uniform UI across platforms.
+Flutter was selected for the implementation of the client applications because it provides an effective balance between cross-platform development, interface consistency and maintainability. A primary requirement of the project was the possibility of deploying the smartphone application on both Android and iOS while preserving the same visual structure and interaction style across platforms. In this respect, Flutter offers a significant advantage, since it enables the development of a single shared codebase while also providing a uniform UI across platforms.
 Compared with native alternatives such as Kotlin and Swift, Flutter avoids the need to maintain two separate implementations for Android and iOS, thus reducing duplication of development effort and simplifying maintenance. Compared with other cross-platform solutions, the choice of Flutter was particularly suitable for this project because it supports the construction of a coherent and controlled UI layer, which was important for preserving the same application identity and user experience on both mobile platforms.
 
 
@@ -1246,10 +1238,10 @@ Compared with native alternatives such as Kotlin and Swift, Flutter avoids the n
 
 
 \subsection{Firebase as Backend-as-a-Service} \label{Firebase as Backend-as-a-Service}
-The adoption of a Backend-as-a-Service solution represents a strategic architectural decision aimed at improving maintainability, scalability, and integration.  \\
+The adoption of a Backend-as-a-Service solution represents a strategic architectural decision aimed at improving maintainability, scalability and integration.  \\
 Firebase was adopted as the backend solution to support a scalable and robust system architecture while maintaining a clear separation between client-side logic and backend responsibilities. Rather than introducing a custom server-side layer, the system relies on a Backend-as-a-Service approach, where core functionalities are delegated to managed cloud services.
-This choice allows the architecture to focus on the coordination of application logic on the client side, while relying on well-established and production-ready services for critical backend responsibilities such as authentication, data persistence, and media storage, integrating with the client applications through platform-specific SDKs.
-From an architectural perspective, this approach improves modularity and reduces system complexity by eliminating the need to design and maintain a dedicated backend infrastructure. This approach presents notable advantages, including scalability, reliability, and security, through managed services that are designed to handle distributed workloads and concurrent access patterns.
+This choice allows the architecture to focus on the coordination of application logic on the client side, while relying on well-established and production-ready services for critical backend responsibilities such as authentication, data persistence and media storage, integrating with the client applications through platform-specific SDKs.
+From an architectural perspective, this approach improves modularity and reduces system complexity by eliminating the need to design and maintain a dedicated backend infrastructure. This approach presents notable advantages, including scalability, reliability and security, through managed services that are designed to handle distributed workloads and concurrent access patterns.
 Furthermore, the use of Firebase aligns well with the multi-platform nature of the system, as both smartphone and smartwatch applications can interact with the same backend services in a consistent and unified manner. This contributes to maintaining a coherent data model across different devices.
 \newpage
 
@@ -1275,14 +1267,14 @@ This design choice provides several advantages:
 \end{itemize}
 For these reasons, the interaction is intentionally defined as a pairing process rather than a traditional login, reflecting its role within the overall system architecture. \\
 \subsubsection{Pairing Strategy and Architectural Trade-offs}
-The application adopts a custom QR-based pairing mechanism instead of relying on the Wear OS companion communication mechanisms, the Data Layer API. This design choice is motivated by architectural, cross-platform, and implementation considerations.
+The application adopts a custom QR-based pairing mechanism instead of relying on the Wear OS companion communication mechanisms, the Data Layer API. This design choice is motivated by architectural, cross-platform and implementation considerations.
 \subsubsection{Rationale for custom pairing}
 The implemented pairing mechanism is based on a QR code made by the smartwatch and scanned by the smartphone. The QR encodes a temporary token that is used to associate the smartwatch with a user account through a backend document stored in Firestore.
 This approach provides the following advantages:
 \begin{itemize}
     \item \textbf{Standalone smartwatch application}: once the pairing is completed, the smartwatch can operate independently by directly communicating with the backend, without requiring the smartphone to be connected, following the \textit{Android Developers Documentation} Google guidelines:\\ \textit{"We recommend that Wear OS apps work independently of a phone so users can complete tasks on a watch without access to an Android or iOS phone. If your watch app requires phone interaction, you must mark your Wear OS app as non-standalone and take steps to ensure that the user has the phone app available"}.
     \item \textbf{Platform independence}: the solution does not rely on Android-specific communication layers such as the Data Layer API. Further insights about this choice are stated in the Data Layer API limitations section.
-    \item \textbf{No third party dependencies}: the pairing logic is implemented entirely at the application level using Firestore, avoiding the need for native platform bridges or third-party plugins in Flutter. The only dependencies that are needed in order for the custom pairing to work are Firebase Auth for Anonymous Auth, and the dependencies for handling UUIDs and QR codes.
+    \item \textbf{No third party dependencies}: the pairing logic is implemented entirely at the application level using Firestore, avoiding the need for native platform bridges or third-party plugins in Flutter. The only dependencies that are needed in order for the custom pairing to work are Firebase Auth for Anonymous Auth and the dependencies for handling UUIDs and QR codes.
     \item \textbf{Backend-centric design}: the smartwatch behaves as a client of backend services instead of relying on the phone to transfer the informations that it needs, aliging with the principle of a standalone client as indicated by the \textit{Android Developers Documentation}
 \end{itemize} \newpage
 \subsubsection{Limitations of the Data Layer API Approach}
@@ -1302,7 +1294,7 @@ However, adopting this approach would introduce several limitations:
 
 In order to securely enable communication between the smartwatch and the backend, the system relies on Firebase Anonymous Authentication.
 Through this mechanism, each smartwatch instance authenticates with Firebase at startup and obtains a unique identifier (\texttt{request.auth.uid}). This authenticated context is then used by Firestore security rules to regulate access to backend resources. As a result, data access is restricted to authenticated clients only, preventing arbitrary external entities from interacting with the database.
-This design maintains the \emph{standalone nature} of the smartwatch application, avoids introducing additional authentication steps on the wearable, which would negatively impact usability due to device constraints, and allows the backend to enforce a basic level of access control.
+This design maintains the \emph{standalone nature} of the smartwatch application, avoids introducing additional authentication steps on the wearable, which would negatively impact usability due to device constraints and allows the backend to enforce a basic level of access control.
 It improves the protection of backend resources while preserving the lightweight and autonomous design of the wearable application. Further improvements could involve strengthening the link between the authenticated device identity and the paired user to enable more fine-grained access control policies.
 
 
@@ -1315,10 +1307,10 @@ For these reasons, a custom solution using an URI embedded in QR codes was prefe
 As shown in the smartphone component diagram (see Figure~\ref{Mobile Smartphone App component view}), the OSService package has been introduced to isolate all interactions with operating system functionalities and external libraries.
 In particular, this package includes the following services:
 \begin{itemize}
-    \item \texttt{PermissionService}, responsible for handling runtime permissions;
-    \item \texttt{GeoService}, responsible for accessing device location;
-    \item \texttt{MemoryService}, responsible for local storage and caching;
-    \item \texttt{NotificationService}, responsible for managing local notifications;
+    \item \texttt{PermissionService} handles runtime permissions;
+    \item \texttt{GeoService} device location access;
+    \item \texttt{MemoryService} local storage and caching;
+    \item \texttt{NotificationService} manages local notifications;
 \end{itemize}
 
 Each service encapsulates the interaction with specific Flutter packages and platform APIs, such as geolocation, local storage, or notification systems. These dependencies correspond to external libraries, packages available on \textit{pub.dev}, that internally communicate with the underlying operating system.
@@ -1351,9 +1343,9 @@ The main motivation behind this decision is maintainability. If a library or und
 \label{Use od External Service Providers}
 
 The application relies on a set of external service providers to implement functionalities related to weather information and map visualization, which are required by several functional requirements of the system. 
-In particular, these providers support the fulfillment of requirements related to the visualization of weather conditions associated with trekking routes, the detection of weather alerts, and the display of geographical information on maps.
+In particular, these providers support the fulfillment of requirements related to the visualization of weather conditions associated with trekking routes, the detection of weather alerts and the display of geographical information on maps.
 From an architectural perspective, the \texttt{Service\_i} interface acts as the main entry point for all operations involving third-party providers. 
-It exposes methods such as \texttt{weather()}, \texttt{forecast()}, \texttt{weatherbitAlerts()}, and map-related operations like \texttt{openTopoMapTile()}.
+It exposes methods such as \texttt{weather()}, \texttt{forecast()}, \texttt{weatherbitAlerts()} and map-related operations like \texttt{openTopoMapTile()}.
 This design follows a facade-oriented approach: a single interface lets other components access the required functionalities. 
 As a result, other components interact only with abstract operations, without depending on the specific provider for the data.
 This approach improves modularity and ensures that changes in external services can be handled locally within the service layer, without affecting the rest of the application.
@@ -1371,7 +1363,7 @@ However, this approach was discarded due to limitations in the quality, availabi
 In particular, while OpenWeather provides reliable general weather information, its alert coverage is not always sufficient for the requirements of the application.
 The chosen solution, based on multiple providers integrated through a unified interface, such as \texttt{Service\_i}, represents a trade-off between flexibility and architectural simplicity. 
 It allows the system to leverage the strengths of different providers while keeping responsibilities well separated and interactions with higher level components stable.
-Overall, the use of external service providers, combined with the abstraction introduced by the \texttt{Service\_i} interface, enables the system to satisfy the relevant functional requirements while preserving modularity, maintainability, and extensibility of the architecture.
+Overall, the use of external service providers, combined with the abstraction introduced by the \texttt{Service\_i} interface, enables the system to satisfy the relevant functional requirements while preserving modularity, maintainability and extensibility of the architecture.
 
 
 
@@ -1426,9 +1418,8 @@ A caching mechanism has been introduced to reduce latency in loading images from
 This decision is particularly relevant given the geographical separation between the database and storage services, as discussed in Section \ref{Firebase BaaS Management}. By minimizing repeated downloads, the caching layer reduces both latency and network usage.
 
 \subsection{Firebase BaaS and GDPR compliance}
-From a data protection perspective, Firebase can be made compliant with GDPR regulations by offering secure data handling, encryption in transit and at rest, and configurable security rules. These features are important because they allow to enforce access control policies and protect user data, ensuring that personal information is handled according to European data protection standards.
-If the application is distributed commercially or made publicly available, users must be clearly informed about data processing practices through a privacy policy, and explicit consent may be required, especially when analytics services are involved or data is transferred and stored outside of the EU.
-
+From a data protection perspective, Firebase can be made compliant with GDPR regulations by offering secure data handling, encryption in transit and at rest and configurable security rules. These features are important because they allow to enforce access control policies and protect user data, ensuring that personal information is handled according to European data protection standards.
+If the application is distributed commercially or made publicly available, users must be clearly informed about data processing practices through a privacy policy and explicit consent may be required, especially when analytics services are involved or data is transferred and stored outside of the EU.
 
 
 \end{document}
