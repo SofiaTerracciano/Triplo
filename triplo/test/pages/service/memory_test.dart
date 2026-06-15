@@ -11,22 +11,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'memory_test.mocks.dart';
 
+
 @GenerateMocks([CacheManager, FileInfo])
 void main() {
+
   TestWidgetsFlutterBinding.ensureInitialized();
+  // Start with empty fake preferences
   SharedPreferences.setMockInitialValues({});
 
+  // tests the RAM image cache
   group('Cache RAM', () {
     late MemoryService service;
 
     setUp(() {
-      // USA withCache per evitare che CacheManager reale tenti
-      // di accedere a path_provider (richiede Flutter binding)
+      // We inject a fake cache manager so the real plugin is never used
       service = MemoryService.withCache(MockCacheManager());
     });
 
     group('saveImageToMemory() + getImageFromMemory()', () {
       test('salva e recupera un file esistente', () async {
+        // Create a temporary file, store it in RAM, and read it back
         final file = await File(
           '${Directory.systemTemp.path}/test_img.jpg',
         ).create();
@@ -38,10 +42,12 @@ void main() {
       });
 
       test('restituisce null per chiave inesistente', () async {
+        // If the key was never saved, the service should return null
         expect(await service.getImageFromMemory('no_key'), isNull);
       });
 
       test('restituisce null e rimuove chiave se file eliminato', () async {
+        // The cache remembers the key, but the real file is gone
         final file = File('${Directory.systemTemp.path}/deleted.jpg');
         await file.create();
         service.saveImageToMemory('deleted', file);
@@ -53,6 +59,7 @@ void main() {
       });
 
       test('sovrascrive file con stessa chiave', () async {
+        // Saving twice with the same key should keep the latest file
         final f1 = await File('${Directory.systemTemp.path}/v1.jpg').create();
         final f2 = await File('${Directory.systemTemp.path}/v2.jpg').create();
         service.saveImageToMemory('key', f1);
@@ -78,6 +85,7 @@ void main() {
 
     group('removeImageFromMemory()', () {
       test('rimuove chiave esistente', () async {
+        // After removing the key, a lookup should return null.
         final file = await File(
           '${Directory.systemTemp.path}/rem.jpg',
         ).create();
@@ -89,6 +97,7 @@ void main() {
       });
 
       test('non lancia eccezioni per chiave inesistente', () {
+        // Removing a missing key should still be harmless.
         expect(() => service.removeImageFromMemory('ghost'), returnsNormally);
       });
 
@@ -108,6 +117,7 @@ void main() {
 
     group('clearMemoryCache()', () {
       test('svuota tutte le chiavi', () async {
+        // clearMemoryCache should wipe every saved RAM entry.
         final fA = await File('${Directory.systemTemp.path}/cA.jpg').create();
         final fB = await File('${Directory.systemTemp.path}/cB.jpg').create();
         service.saveImageToMemory('a', fA);
@@ -144,6 +154,7 @@ void main() {
     late File mockFile;
 
     setUp(() async {
+      // checks how the service remembers already shown alerts
       mockCache = MockCacheManager();
       service = MemoryService.withCache(mockCache);
       mockFile = await File('${Directory.systemTemp.path}/mock_alert.jpg').create();
@@ -175,6 +186,7 @@ void main() {
     });
 
     test('non propaga eccezioni se putFile lancia', () async {
+      // Cache write errors should not crash the app flow.
       when(mockCache.putFile(
         any,
         any,
@@ -223,11 +235,9 @@ void main() {
     test('restituisce true se fileInfo non è null', () async {
       when(mockCache.getFileFromCache(any))
           .thenAnswer((_) async => mockFileInfo);
-
       final result = await service.hasShownWeatherAlertKey('trek_123');
       expect(result, isTrue);
     });
-
     test('restituisce false se fileInfo è null', () async {
       when(mockCache.getFileFromCache(any)).thenAnswer((_) async => null);
 
@@ -328,7 +338,6 @@ void main() {
       final saved = prefs.getStringList('shown_weather_alert_keys');
       expect(saved, containsAll(['alert_a', 'alert_b']));
     });
-
     test('sovrascrive le chiavi precedenti', () async {
       SharedPreferences.setMockInitialValues({
         'shown_weather_alert_keys': ['old_key'],

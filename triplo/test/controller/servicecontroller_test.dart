@@ -14,31 +14,38 @@ import 'package:triplo/service/geo.dart';
 import 'package:triplo/service/permission.dart';
 import 'servicecontroller_test.mocks.dart';
 
+// external services replaced with Mockito fakes
 @GenerateMocks([MemoryService, GeoService, PermissionService])
 
 void main() {
+  // Fake dependencies used by the controller
   late MockGeoService mockGeo;
   late MockPermissionService mockPermission;
   late MockMemoryService mockMemory;
 
+  // "ctrl" is the controller under test.
   late ServiceController ctrl;
+  // Fake HTTP client so we can return custom JSON without real network calls.
   late http.Client mockClient;
+
 
   setUp(() {
     mockGeo = MockGeoService();
     mockPermission = MockPermissionService();
     mockMemory = MockMemoryService();
 
-
+    // By default, every HTTP request gets back an empty success response.
     mockClient = MockClient((request) async {
       return http.Response('{}', 200);
     });
 
-  dotenv.testLoad(fileInput: '''
+    // Load fake API keys because the real controller expects them to exist.
+    dotenv.testLoad(fileInput: '''
     OPENWEATHER_API_KEY=test
     WEATHERBIT_API_KEY=test
     ''');
 
+    // Build the controller with test doubles instead of real services.
     ctrl = ServiceController.test(
       memory: mockMemory,
       geo: mockGeo,
@@ -47,8 +54,10 @@ void main() {
     );
   });
 
+  // test helper methods: URLs, ids, and mappings
   group('Gestione Layer e URL', () {
     test('weatherTile() costruisce URL corretta', () {
+      // The URL should contain both the selected layer and the fake API key
       final url = ctrl.weatherTile('temp_new');
       expect(url, contains('temp_new'));
       expect(url, contains('test'));
@@ -68,8 +77,10 @@ void main() {
     });
   });
 
+  // test parsing logic that transforms raw API data into cleaner data.
   group('Parsing Meteo', () {
     test('parseForecastItem() normalizza dati', () {
+      // This map looks like a small piece of a real weather API response.
       final raw = {
         "dt_txt": "2026-07-01 12:00:00",
         "main": {"temp": 22.8},
@@ -80,6 +91,7 @@ void main() {
 
       final res = ctrl.parseForecastItem(raw);
 
+      // The controller rounds temperature and lowercases the description.
       expect(res['temp'], 23);
       expect(res['description'], 'broken clouds');
     });
@@ -99,6 +111,7 @@ void main() {
     });
   });
 
+  // tests focusing on GPS state, permissions, and compass data
   group('Geolocalizzazione', () {
     test('userLocation delega GeoService', () async {
       final pos = LatLng(45.0, 9.0);
@@ -107,6 +120,7 @@ void main() {
 
       final result = await ctrl.userLocation();
 
+      // the controller should forward the call.
       expect(result, pos);
       verify(mockGeo.userLocation()).called(1);
     });
@@ -118,6 +132,7 @@ void main() {
       when(mockGeo.isLocationServiceEnabled())
           .thenAnswer((_) async => false);
 
+      // If permissions are fine but GPS is off, the controller should expose that error
       final state = await ctrl.loadNavigationLocation();
 
       expect(state.error, 'GPS_DISABLED');
@@ -126,6 +141,7 @@ void main() {
     test('permission denied', () async {
       when(mockPermission.isLocationGranted())
           .thenAnswer((_) async => false);
+
 
       final state = await ctrl.loadNavigationLocation();
 
@@ -136,6 +152,7 @@ void main() {
       final stream = Stream<double?>.value(180);
 
       when(mockGeo.compassStream()).thenAnswer((_) => stream);
+
 
       expect(ctrl.compassStream(), stream);
     });
@@ -158,6 +175,7 @@ void main() {
 
     final res = await ctrl.weather(45.0, 9.0, 'en');
 
+    // A 200 response with JSON should produce a non-null result
     expect(res, isNotNull);
   });
 
@@ -204,11 +222,11 @@ void main() {
     );
 
     final res = await ctrl.forecast(45.0, 9.0, 'en');
-
-    expect(res!.length, 2); // 16 / 8
+    expect(res!.length, 2);
   });
 
   test('weatherbitAlerts() parse alerts correttamente', () async {
+    // This payload imitates the alert API and lets us check the parsed output.
     final client = MockClient((request) async {
       return http.Response(jsonEncode({
         "alerts": [

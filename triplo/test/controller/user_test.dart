@@ -8,7 +8,9 @@ import 'package:triplo/model/user.dart';
 import 'package:triplo/service/authservice.dart';
 import 'user_test.mocks.dart';
 
+//AuthService is mocked
 @GenerateMocks([AuthService])
+
 
 
 Map<String, dynamic> fakeUserDoc({
@@ -42,6 +44,8 @@ Map<String, dynamic> fakeUserDoc({
   };
 }
 
+
+// Create a user document in FakeFirestore and build a Users object from it
 Future<Users> seedUser(
   FakeFirebaseFirestore db, {
   String uid = 'uid_1',
@@ -56,6 +60,7 @@ void main() {
   late MockAuthService mockAuth;
   late FakeFirebaseFirestore fakeDb;
 
+  // Build the controller with fake auth and fake database state
   Future<UserController> buildController({
     String? currentUid,
     Users? currentUser,
@@ -63,7 +68,7 @@ void main() {
     when(mockAuth.currentUid).thenReturn(currentUid);
     when(mockAuth.currentUser).thenReturn(currentUser);
 
-    final ctrl = UserController.withDb(mockAuth, fakeDb); 
+    final ctrl = UserController.withDb(mockAuth, fakeDb);
     await Future.delayed(Duration.zero);
     return ctrl;
   }
@@ -72,6 +77,7 @@ void main() {
     mockAuth = MockAuthService();
     fakeDb = FakeFirebaseFirestore();
 
+    // Default auth state: nobody is logged in
     when(mockAuth.currentUid).thenReturn(null);
     when(mockAuth.currentUser).thenReturn(null);
     when(mockAuth.isGoogleUser).thenReturn(false);
@@ -101,6 +107,7 @@ void main() {
     });
   });
 
+  // Registration tests check the bridge between controller and AuthService
   group('register()', () {
     test('calls authService.register and sets currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -111,6 +118,7 @@ void main() {
       final ctrl = await buildController();
       await ctrl.register('mario@example.com', 'password123');
 
+      // Verify the controller delegates the actual auth work.
       verify(mockAuth.register('mario@example.com', 'password123')).called(1);
       expect(ctrl.currentUser, isNotNull);
       expect(ctrl.currentUser!.uid, 'uid_1');
@@ -127,6 +135,7 @@ void main() {
     });
   });
 
+  // Login follows the same pattern as registration
   group('login()', () {
     test('calls authService.login and sets currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -152,6 +161,7 @@ void main() {
     });
   });
 
+  // Google login has its own method but should update controller state in the same way
   group('loginWithGoogle()', () {
     test('calls authService.loginWithGoogle and sets currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -178,6 +188,7 @@ void main() {
     });
   });
 
+  // Logout should clear the controller copy of the current user.
   group('logout()', () {
     test('calls authService.logout and clears currentUser', () async {
       final user = await seedUser(fakeDb);
@@ -193,6 +204,7 @@ void main() {
     });
   });
 
+  // loadUserCore reads the user profile from FakeFirestore.
   group('loadUserCore()', () {
     test('populates _currentUser from Firestore', () async {
       await seedUser(fakeDb, uid: 'uid_1');

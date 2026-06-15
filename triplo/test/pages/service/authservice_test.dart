@@ -7,6 +7,7 @@ import 'package:triplo/exception/change_email_exception.dart';
 import 'package:triplo/service/authservice.dart';
 import 'authservice_test.mocks.dart';
 
+// Firebase and Firestore are mocked
 @GenerateMocks([
   FirebaseAuth,
   FirebaseFirestore,
@@ -20,6 +21,7 @@ import 'authservice_test.mocks.dart';
   QueryDocumentSnapshot
 ])
 void main() {
+  // Fake Firebase objects used by AuthService
   late MockFirebaseAuth mockAuth;
   late MockFirebaseFirestore mockFirestore;
   late MockUser mockUser;
@@ -32,6 +34,7 @@ void main() {
   late MockQuerySnapshot<Map<String, dynamic>> mockQuerySnap;
 
   setUp(() {
+    // Build all the mocks used by this file
     mockAuth = MockFirebaseAuth();
     mockFirestore = MockFirebaseFirestore();
     mockUser = MockUser();
@@ -42,13 +45,16 @@ void main() {
     mockQuery = MockQuery();
     mockQuerySnap = MockQuerySnapshot();
 
+    // "sut" means system under test
     sut = AuthService(auth: mockAuth, firestore: mockFirestore);
 
+    // Standard fake user returned by many auth operations.
     when(mockUserCredential.user).thenReturn(mockUser);
     when(mockUser.uid).thenReturn('test-uid');
     when(mockUser.email).thenReturn('test@example.com');
     when(mockUser.photoURL).thenReturn(null);
     when(mockUser.displayName).thenReturn(null);
+
 
     when(mockFirestore.collection(any)).thenReturn(mockCollectionRef);
     when(mockCollectionRef.doc(any)).thenReturn(mockDocRef);
@@ -56,12 +62,14 @@ void main() {
     when(mockDocRef.update(any)).thenAnswer((_) async {});
   });
 
+  //helper: make doc.get() return an existing or missing user document
   void stubDocGet({bool exists = true}) {
     when(mockDocSnap.exists).thenReturn(exists);
     if (exists) when(mockDocSnap.data()).thenReturn(_fakeUserData());
     when(mockDocRef.get()).thenAnswer((_) async => mockDocSnap);
   }
 
+  // Registration tests focus on user creation and the first Firestore setup
   group('register()', () {
     setUp(() {
       when(mockAuth.createUserWithEmailAndPassword(
@@ -74,11 +82,13 @@ void main() {
       stubDocGet();
       await sut.register('test@example.com', 'password123');
 
+      // The service should ask FirebaseAuth to create the user
       verify(mockAuth.createUserWithEmailAndPassword(
         email: 'test@example.com',
         password: 'password123',
       )).called(1);
 
+      // It should also touch both user collections used by the project
       verify(mockFirestore.collection('users')).called(greaterThanOrEqualTo(1));
       verify(mockFirestore.collection('users_index'))
           .called(greaterThanOrEqualTo(1));
@@ -88,6 +98,7 @@ void main() {
     });
 
     test('deriva lo username dal prefisso email', () async {
+      // The username is expected to come from the email part before "@".
       stubDocGet();
       await sut.register('mario.rossi@example.com', 'pwd');
 
@@ -109,6 +120,7 @@ void main() {
     });
   });
 
+  // Login tests are similar, but they start from an existing account
   group('login()', () {
     setUp(() {
       when(mockAuth.signInWithEmailAndPassword(
@@ -118,6 +130,7 @@ void main() {
     });
 
     test('chiama signInWithEmailAndPassword e carica l\'utente', () async {
+      // Successful login should also populate currentUser.ù
       stubDocGet();
       await sut.login('test@example.com', 'password123');
 
@@ -128,8 +141,8 @@ void main() {
 
       expect(sut.currentUser, isNotNull);
     });
-
     test('propaga l\'eccezione su credenziali errate', () async {
+      // Wrong credentials should bubble up as FirebaseAuthException.
       when(mockAuth.signInWithEmailAndPassword(
         email: anyNamed('email'),
         password: anyNamed('password'),
@@ -142,10 +155,12 @@ void main() {
     });
   });
 
+  // Logout sign outs and clear local state.
   group('logout()', () {
     setUp(() => when(mockAuth.signOut()).thenAnswer((_) async {}));
 
     test('fa signOut e azzera currentUser', () async {
+      // First load a fake user, then make sure logout removes it.
       stubDocGet();
       await sut.loadUserCore('test-uid');
       expect(sut.currentUser, isNotNull);
@@ -157,6 +172,7 @@ void main() {
     });
 
     test('notifica i listener al logout', () async {
+      // AuthService is a notifier, so listeners should hear about the change
       bool notified = false;
       sut.addListener(() => notified = true);
 
@@ -166,6 +182,7 @@ void main() {
     });
   });
 
+  // check how the service reads the user profile from Firestore
   group('loadUserCore()', () {
     test('popola currentUser dal doc Firestore', () async {
       stubDocGet();
@@ -178,7 +195,10 @@ void main() {
       expect(sut.currentUser!.level, 'Beginner');
     });
 
+
+
     test('non fa nulla quando il doc non esiste', () async {
+      // Missing doc should leave currentUser unchanged/null
       stubDocGet(exists: false);
       await sut.loadUserCore('ghost-uid');
 
@@ -196,6 +216,7 @@ void main() {
     });
   });
 
+  // Auto-login depends on whether FirebaseAuth already has a current user
   group('tryAutoLogin()', () {
     test('carica l\'utente se Firebase ha un utente corrente', () async {
       when(mockAuth.currentUser).thenReturn(mockUser);
@@ -516,7 +537,6 @@ void main() {
         throwsA(isA<Exception>()),
       );
     });
- 
     test('successo: aggiorna Firestore e ricarica utente', () async {
       when(mockAuth.currentUser).thenReturn(mockUser);
       when(mockUser.reload()).thenAnswer((_) async {});
@@ -819,7 +839,6 @@ void main() {
         password: anyNamed('password'),
       )).thenAnswer((_) async => mockUserCredential);
     });
- 
     test('usa il prefisso email come username quando displayName è null',
         () async {
       when(mockUser.displayName).thenReturn(null);
@@ -908,14 +927,12 @@ void main() {
  
       final fakeBatch = _FakeBatch();
       when(mockFirestore.batch()).thenReturn(fakeBatch);
- 
       await sut.ensureUserFirestoreDocsPublic(mockUser);
- 
       expect(fakeBatch.setPayloads, isEmpty);
     });
   });
 }
- 
+
 Map<String, dynamic> _fakeWatchData({
   required String status,
   required String token,
