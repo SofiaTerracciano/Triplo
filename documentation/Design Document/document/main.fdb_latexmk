@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1776802956.46739 "main.bcf" "main.bbl" "main" 1781560025.34775 0
+["biber main"] 1776802956.46739 "main.bcf" "main.bbl" "main" 1781562895.93234 0
   "bibliography.bib" 1771292682 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "main.bcf" 1781560024 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
+  "main.bcf" 1781562895 107770 2fc635d330bd3f03d7c840e8ff0159f8 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1781560019.7745 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1781560025.34844 0
+["pdflatex"] 1781562890.40079 "c:/Users/giuli/Desktop/DIMA/App/mainrepo/documentation/Design Document/document/main.tex" "main.pdf" "main" 1781562895.93316 0
   "./images/PolitecnicoDiMilanoLogo/PolitecnicoDiMilanoLogo.png" 1772414897 55242 1f502c5ee0910b8aa503910cd720457c ""
   "./images/logo.png" 1776469417 159243 2d67b935335b282b2cf1d69bcca999cc ""
   "C:/Users/giuli/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1780416220 83609 ebbc432e6cbbb238d39535255db2c8bd ""
@@ -438,16 +438,16 @@
   "images/smartwatch3.png" 1776268684 307139 62c594e723d59c688e685c307470798d ""
   "images/test smartphone.jpg" 1781547557 166812 2e4369138b854be1e86885c4f522104a ""
   "images/test smartwatch.jpg" 1781547581 113656 6e5c4a876bdc1915b9b56182d158f2d0 ""
-  "main.aux" 1781560024 72089 5a7a85b2b55598280b57c415be0dea6f "pdflatex"
+  "main.aux" 1781562895 72090 a46db733ed54d3f5fe1d83245b54f737 "pdflatex"
   "main.bbl" 1776802997 486 ee04f40f768daeed26442158e95aba61 "biber main"
-  "main.run.xml" 1781560024 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
+  "main.run.xml" 1781562895 2307 ac2ce71e5aa17739084a4395f6c0648f "pdflatex"
   "main.tex" 1771292682 2625 a8de7440722b9b5f6e07eb08c6bb058e ""
-  "main.toc" 1781560024 15188 aae05f92ca8ff7e3f92b6e1e7a9e32bc "pdflatex"
+  "main.toc" 1781562895 15188 8672994ea54ddab7086b57210f3af88b "pdflatex"
   "preamble.sty" 1771292682 25286 6754b688c001e6e75b4838b421f3b4d9 ""
-  "section/architectural_design.tex" 1781560019 114052 19db92d71715b6fa3535f829aefd8951 ""
+  "section/architectural_design.tex" 1781562727 106043 b3791604545908f9786204d50d4753a3 ""
   "section/effort_spent.tex" 1771292682 94 08ce874b714f77532f8163eb8296a33b ""
-  "section/implementation_integration_testplan.tex" 1781548693 12365 e05f1f15a2489bb47b7cbcb3e52d3ca4 ""
-  "section/introduction.tex" 1781365075 12457 85bdd61fe347e51742ec274178063de4 ""
+  "section/implementation_integration_testplan.tex" 1781562884 11949 753e347f4a47d05a31015bab94892340 ""
+  "section/introduction.tex" 1781562654 12457 85bdd61fe347e51742ec274178063de4 ""
   "section/requirements_traceability.tex" 1776469418 18147 3a3201aea39bbb8723fdb8ec142d3500 ""
   "section/user_interface_design.tex" 1776469418 20423 b1a3e22dcffa9d181e9b7284f7deea62 ""
   "title.tex" 1776469418 1626 ae40fb229a460eec7eb5b8c97e6a4cd2 ""

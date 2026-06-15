@@ -40,7 +40,7 @@ The View layer deals with user interactions. Controllers manage the app logic an
 Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
 Using Backend-as-a-Service (BaaS) solutions, the system can replace a traditional custom server-side layer with a more lightweight and scalable architecture. Data management, authentication and storage are handled by managed services; see section \ref{Firebase as Backend-as-a-Service}.
 The system connects directly to external services, so the application does not need a custom backend gateway to communicate with backend services and external resources. \\
-  
+
 
 
 
@@ -142,6 +142,7 @@ The \texttt{BackgroundService} executes tasks even when the application is not a
 Periodically, it checks weather conditions and generates notifications. The  application schedule these tasks through WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed depending on system availability.
 
 \subsubsection{AuthService}
+
 The AuthService handles not only authentication but also the smartwatch pairing process.
 It manages user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
 
@@ -940,13 +941,11 @@ The MemoryService stores the selected language code locally using shared prefere
 \subsection{Phone Watch Pair}
 \label{Phone Watch Pair}
 \subsubsection{High level description of the pairing mechanism}
-quiquixxxxx  The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
-
-
+quiquixxxxx  The pairing mechanism links a Wear OS device to an authenticated mobile user through an approval process by the backend. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
 
 \subsubsection{Device Identity}
-Each watch either makes or restores from memory a \texttt{watchId}, stored securely on-device.  
-A corresponding document exists in Firestore:
+Each watch either creates a new  \texttt{watchId} or restores an existing one from secure on device storage.  
+A document is also in Firestore:
 \begin{verbatim}
 watch/{watchId}
 \end{verbatim}
@@ -1001,12 +1000,12 @@ watch_pair/{watchId}
 \end{verbatim}
 If the document is already approved, the session is restored.
 \subsubsection{Logout}
-Logout does not delete the device identity. Instead, the watch resets:
+Logout does not delete the device identity. On the contrary, the watch resets:
 \begin{itemize}
     \item \texttt{status = "waiting"}
     \item \texttt{uid = null}
 \end{itemize}
-This preserves device identity while removing user association.
+This saves device identity while removing user association.
 \subsubsection{Security Properties}
 \begin{itemize}
     \item Only the watch may create/reset pairing in \texttt{waiting} state.
@@ -1014,7 +1013,7 @@ This preserves device identity while removing user association.
     \item QR tokens are random and time-limited.
     \item The smartphone application allows the user to remotely disable or re-enable an existing pairing through a backend flag
 \end{itemize}
-This design separates device identity from user authentication while minimizing credential exposure on the wearable device.
+This design separates the watch identity from user authentication and helps avoid exposure of credentials on the device.
 
 
 
@@ -1023,24 +1022,24 @@ This design separates device identity from user authentication while minimizing 
 
 \subsubsection{Remote Pairing Management and Anti-Theft Property}
 
-The system provides a remote management mechanism that allows users to enable or disable the usability of a paired wearable device directly from the smartphone application.
+The system provides a remote management mechanism that allows users to enable or disable a paired wearable device directly from the smartphone application.
 Instead of removing the association between the user and the device, the system maintains the pairing information in the backend and relies on a dedicated status flag to control whether the pairing can be effectively used by the watch.
 If the pairing is disabled, the wearable device cannot access or display the associated user profile. However, the underlying association remains stored in the backend.
-If the pairing is re-enabled, the wearable device regains access to the associated user profile without requiring a new pairing procedure.
-This design introduces an anti-theft and safety property: in case of device loss or unauthorized access, the user can quickly disable the pairing, effectively blocking access to personal data while preserving the association for future recovery.
-
+If the pairing is reenabled, the wearable device regains access to the associated user profile without requiring a new pairing procedure.
+This design introduces an antitheft and safety property: in case of device loss or unauthorized access, the user can quickly disable the pairing, effectively blocking access to personal data while preserving the association for future recovery.
 
 \newpage
 \subsubsection{Phone-side smartwatch pairing approval from the SettingPage component}
-\textit{Phone-side smartwatch pairing sequence diagram} illustrates the phone-side portion of the smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component.  \\
+\textit{Phone-side smartwatch pairing sequence diagram} illustrates the phone side smartwatch pairing. In the phone UI implementation, the QR scanning interaction belongs to the \texttt{SettingPage} component.  \\
 The interaction starts when the user opens the pairing section and scans the QR code on the smartwatch. Once a QR code is detected, the page extracts the raw payload and checks if that code has already been processed. This behaviour is handled by the boolean flag \texttt{\_handled}. \\
 This flag is used to not allow repeated processing of the same scanner detection while the page is still active. \\
-If a valid raw payload is available, \texttt{SettingPage} delegates the parsing step to \\\texttt{UserController.extractWatchPair()}, which delegates the actual logic of the phone side pairing process to \texttt{AuthService.extractWatchPair()}. This service parses the scanned URI and verifies that it matches the following structure: \\
+If a valid raw payload is available, \texttt{SettingPage} leaves the parsing step to \\\texttt{UserController.extractWatchPair()}, which delegates the actual logic of the phone side pairing process to \texttt{AuthService.extractWatchPair()}. This service parses the scanned URI and verifies that it matches the following structure: \\
 \texttt{triplo://watch-pair/<watchId>?t=<token>}\\ 
 The service also validates the presence of both the smartwatch identifier and the temporary QR token in the URI payload. If the payload is malformed, the page shows an error message and enables a new scan by resetting \texttt{\_handled}. \\
-If the QR payload is valid, the page shows a confirmation dialog to the user. If the user does not confirm the operation, the page allows the next scan. If the user confirms, the page invokes \texttt{UserController.approveWatchPair()}, which forwards the request to \texttt{AuthService.approveWatchPair()}. \\
-The actual approval is performed inside \texttt{AuthService}, since this step depends on the currently authenticated phone user and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}. The transaction reads the document snapshot, denoted as \texttt{snap} and validates the pairing request by checking four conditions: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code and the expiration timestamp must still be valid. \\
-Only if all these conditions hold, the transaction updates the pairing document by setting \texttt{status = approved} and by storing the UID of the authenticated phone user. From an architectural perspective, the transaction is important because it makes validation and approval atomic. This reduces the risk of inconsistent state transitions. The page itself does not directly interact with Firestore or Firebase Authentication; it only reacts to success or failure by updating local UI state. \\
+Conversely, if it is valid, the page shows a confirmation dialog to the user, who shall choose if to confirm. After this confirmation phase by the user, the page invokes \texttt{UserController.approveWatchPair()}, which forwards the request to \texttt{AuthService.approveWatchPair()}. \\
+
+The approval is performed inside \texttt{AuthService}, since this step depends on the user that is authenticated on the phone application and on the pairing state stored in Firestore. The service executes a Firestore transaction on the document \texttt{watch\_pair/<watchId>}, which reads the document snapshot, denoted as \texttt{snap} and validates the pairing request by checking if the following conditions are satisfied: the document must exist, its status must be \texttt{waiting}, the token stored in Firestore must match the token contained in the scanned QR code and the expiration timestamp must still be valid. \\
+If so, the service uses a transaction to update the pairing document by setting \texttt{status = approved} and by storing the UID of the authenticated phone user.  \\
 
 
 
@@ -1052,10 +1051,11 @@ Only if all these conditions hold, the transaction updates the pairing document 
 
 
 
-\subsubsection{Watch bootstrap and initialization of the pairing-aware user flow}
-When the smartwatch application starts, it first executes a lightweight bootstrap phase whose purpose is to restore a stable device identity and initialize the user-related flow in a pairing-aware way, as illustrated in the \textit{Watch bootstrap sequence diagram}. This bootstrap does not directly perform the pairing itself, but it prepares the conditions under which the pairing logic can later determine whether the watch should show the QR-based login screen or the actual user area.
-The first relevant step regards the retrieval of the watch identifier. During application startup, the watch obtains a \texttt{watchId} through \texttt{WatchIdService.getOrCreateWatchId()}. If a valid identifier is already available in secure local storage, that value is reused. Otherwise, the application makes or retrieves a new identifier and stores it locally so that the same watch can be recognized across future executions. This mechanism ensures that the pairing protocol is tied to a stable device identity.
-Once the \texttt{watchId} is available, the application initializes the services and controllers involved in the watch-side user flow. In particular, \texttt{PairingService} is created with the current \texttt{watchId}, while \texttt{UserController} is connected to the pairing service so that it can later load the profile corresponding to the paired user. The entry point for the user-related interaction is not the pairing screen itself, but \texttt{NavigationPage}. When the user selects the user area from the navigation menu, the application pushes \texttt{PairingGateway(child: UserPage())}.
+\subsubsection{Watch bootstrap and initialization of the pairing aware user flow}
+At startup, it first runs a light bootstrap phase. This phase restores a stable watch identity and prepares the user pairing flow, as shown in the  \textit{Watch bootstrap sequence diagram}. This bootstrap does not pair the device yet: it only lets the app decide if to show the QR login screen or the user area.
+
+The first step is to load the watch identifier. During application startup, the watch gets a \texttt{watchId} through \texttt{WatchIdService.getOrCreateWatchId()}. If a valid identifier is already stored in secure local storage, the app reuses it. Otherwise, the app creates or retrieves a new identifier and stores it locally, so the same watch can be recognized in future executions. In this way, the pairing process is linked to a stable device identity.
+Once the \texttt{watchId} is available, the application initializes the services and controllers used in the watch-side user flow. In particular, \texttt{PairingService} is created with the current \texttt{watchId}, while \texttt{UserController} is connected to the pairing service so that it can later load the profile of the paired user. The entry point for the user interaction is not the pairing screen itself, but \texttt{NavigationPage}. When the user selects the user area from the navigation menu, the application pushes \texttt{PairingGateway(child: UserPage())}.
 At this point, \texttt{PairingGateway} performs the bootstrap of the pairing route.
 
 
@@ -1069,34 +1069,41 @@ At this point, \texttt{PairingGateway} performs the bootstrap of the pairing rou
 
 
 \subsubsection{Pairing Gateway}
-From an architectural perspective, \texttt{PairingGateway} should not be interpreted as an autonomous functional component, it is considered part of the PairingService and its role is to decide whether the watch should render the QR-based pairing screen or the actual \texttt{UserPage}. \\
-The pairing bootstrap starts in the state of \texttt{PairingGateway}, which is the widget pushed when the user opens the user area from \texttt{NavigationPage}. Its responsibility is not to implement the pairing itself, but to bootstrap the pairing state and decide which page should be rendered, either the \texttt{LoginPage} or \texttt{UserPage}. \\
+The  \texttt{PairingGateway}  is not a separate functional component. It is considered belonging to the PairingService. 
+Its role is to decide whether the watch should render the QR based pairing screen or the actual \texttt{UserPage}. \\
+The pairing bootstrap starts in the state of \texttt{PairingGateway}, which is the widget pushed when the user opens the user area from \texttt{NavigationPage}. It does not implement the pairing itself, but prepares the pairing state and decides which page should be rendered, either the \texttt{LoginPage} or \texttt{UserPage}. \\
 
 \subsubsection{Restoring the session if the user has already paired the watch}
-The pairing logic relies on two complementary mechanisms. First, \texttt{PairingService.restoreWatchPairing()} performs a read of the Firestore document \texttt{watch\_pair/<watchId>} in order to determine the current pairing state. Second, the service installs a real-time subscription through \texttt{docRef.snapshots().listen()}, so that later updates to the same Firestore document, such as approval from the phone or a reset to the \texttt{waiting} state, are seen by the watch without requiring to implement a more complicated ping-like mechanism to listen to updates of the document on Firestore. \\
-If the pairing document is already in \texttt{approved} state and contains a non-empty UID, \texttt{PairingService} stores that UID in its internal variable \texttt{\_pairedUid} and calls \texttt{notifyListeners()}. In this context, the listeners are the Flutter widgets that observe \texttt{PairingService} through Provider, notably \texttt{PairingGateway}. \\
-At this point, \texttt{PairingGateway} requests \texttt{UserController.loadCurrentPairedUser()}. This step is necessary because the pairing service only knows which user UID is associated with the watch, but it does not load the complete user profile. The actual profile loading is delegated to \texttt{UserController}, which reads the corresponding document from the \texttt{User} collection by calling \texttt{loadUserCore(uid)}. The returned Firestore snapshot, denoted as \texttt{snap}, is converted into a \texttt{User} domain object through \texttt{Users.fromMap()} and stored in \texttt{UserController} as \texttt{\_currentUser}. When \texttt{loadUserCore()} completes, \texttt{UserController} also calls \texttt{notifyListeners()}. \\
-Here again, the listeners are the widgets that observe \texttt{UserController} through Provider and the \texttt{PairingGateway} is a listener. \\
+The pairing logic uses two mechanisms that complements each other; the \texttt{PairingService.restoreWatchPairing()} performs a read of the Firestore document \texttt{watch\_pair/<watchId>} to determine the current pairing state, the other consists of the service installing a real-time subscription through \texttt{docRef.snapshots().listen()}. So that later updates to the same Firestore document, such as approval from the phone or a reset to the \texttt{waiting} state, are seen by the watch without requiring a more complicated ping like mechanism to listen to updates of the document on Firestore. \\
+If the pairing document is already in \texttt{approved} state and contains a non-empty UID, \texttt{PairingService} stores that UID in its internal variable \texttt{\_pairedUid} and calls \texttt{notifyListeners()}. In this context, the listeners are the Flutter widgets that observe \texttt{PairingService} through Provider, especially  \texttt{PairingGateway}. \\
+Then, \texttt{PairingGateway} requests \texttt{UserController.loadCurrentPairedUser()}. This step is mandatory because the pairing service only knows which user UID is linked to the watch, but it does not load the full user profile. The profile loading is handled by \texttt{UserController}, which reads the corresponding document from the \texttt{User} collection by calling \texttt{loadUserCore(uid)}. The returned Firestore snapshot, referred to as \texttt{snap}, is converted into a \texttt{User} domain object through \texttt{Users.fromMap()} and stored in \texttt{UserController} as \texttt{\_currentUser}. When \texttt{loadUserCore()} completes, \texttt{UserController} also calls \texttt{notifyListeners()}. \\
+Again, the listeners are the widgets that observe \texttt{UserController} through Provider and the \texttt{PairingGateway} is a listener. \\
 Then the UI is rebuilt because the \texttt{PairingGateway} returns the widget child that was set by the \texttt{Navigation Page} through \texttt{Navigator.push()} toward \texttt{PairingGateway(child: UserPage())}. The \texttt{UserPage} is then able to see that a paired UID is available. \\
 In this sense, the pairing service determines if the watch is associated with a user, whereas the user controller loads the actual user data needed by \texttt{UserPage}. \\
 
 \subsubsection{Pair the watch if the user has not paired it}
-If no approved pairing is found, the \texttt{PairingService} starts a new pairing cycle through \\\texttt{PairingService.startWatchPairing()}. In this branch, the service makes a new QR token, stores it in local state, writes the Firestore document \texttt{watch\_pair/<watchId>} with status \texttt{waiting}, a null UID, an expiration timestamp and a new token and then installs a snapshot listener on that document. A local expiration timer is also started. The \texttt{PairingService} then renders \texttt{LoginPage}, which reads the QR payload exposed by \texttt{PairingService} and displays it to the user. The \texttt{LoginPage} is only the visual pairing screen, it does not control the pairing itself. \\
-The most relevant transition regards the phone approving the QR code. This operation updates the Firestore document \texttt{watch\_pair/<watchId>} by setting its status to \texttt{approved} and assigning the corresponding user UID. The update is received by the active snapshot listener previously installed by \\\texttt{PairingService.startWatchPairing()} through \texttt{docRef.snapshots().listen()}. \\
-Inside the listener, the service reads the updated document and retrieves the fields \texttt{status}, \texttt{uid} and \texttt{qrToken}. At this point, the service compares the token stored in Firestore with the locally active token (\texttt{\_qrToken}). This comparison is performed inside the listener itself through the instruction \texttt{if (tokenOnDb != \_qrToken) return;} and ensures that only updates referring to the currently displayed QR code are accepted. If the tokens do not match, the update is ignored, in order not to approve stale QR codes. \\
-If the token matches and the status is \texttt{approved}, \texttt{PairingService} stores the paired UID in \texttt{\_pairedUid}, stops the expiration timer and calls \texttt{notifyListeners()}. This notification is sent over to the \texttt{PairingGateway}, that rebuilds the UI. The \texttt{PairingGateway} reacts to the new state by invoking \\ \texttt{UserController.loadCurrentPairedUser()}, which loads the corresponding user document from Firestore and reconstructs the \texttt{Users} model. As a result, the UI transitions from the pairing screen to \texttt{UserPage}. \\
-The logout and re-pairing flow clarifies an additional architectural point. When the user logs out from the smartwatch user page, \texttt{PairingService.logoutWatch()} clears the active timer, stops the current Firestore pairing subscription, resets the pairing document by making a new QR token and restoring the \texttt{waiting} state and clears the locally paired UID. However, the reset of the backend document alone is not sufficient, the observation of the pairing document must be reinstalled through a new call to \texttt{restoreWatchPairing()}. This step is crucial because otherwise the watch could display a new QR code while failing to display the UserPage correctly after the first approval performed by the phone. \\
+Without an approved pairing, the \texttt{PairingService} starts a new pairing through \\\texttt{PairingService.startWatchPairing()}. In this branch, the service makes a new QR token, stores it in local state and writes the Firestore document \texttt{watch\_pair/<watchId>} with status \texttt{waiting}, a null UID, an expiration timestamp and a new token. The service then installs a snapshot listener on that document and starts an expiration timer. The \texttt{PairingService} then shows \texttt{LoginPage}, which reads the QR payload in  \texttt{PairingService} and displays it to the user. The \texttt{LoginPage} is only the pairing UI, so it does not control the pairing itself. \\
+The key transition is the phone approval of the QR code, which updates the Firestore document \texttt{watch\_pair/<watchId>} by setting its status to \texttt{approved} and assigns the corresponding user UID. The snapshot listener that \\\texttt{PairingService.startWatchPairing()} through \texttt{docRef.snapshots().listen()} had already installed then receives the update.\\
 
+The service, through the listener, reads the updated document and reads the fields \texttt{status}, \texttt{uid}, \texttt{qrToken} and compares the token stored in Firestore with the local active token (\texttt{\_qrToken}) through the instruction \texttt{if (tokenOnDb != \_qrToken) return;}. If the tokens do not match, the update is ignored, so that an old QR code cannot be approved by mistake.\\
+If the token matches and the status is \texttt{approved}, \texttt{PairingService} stores the paired UID in \texttt{\_pairedUid}, stops the expiration timer and calls \texttt{notifyListeners()}. This notification is sent over to the \texttt{PairingGateway}, that rebuilds the UI. The \texttt{PairingGateway} reacts to the new state by invoking \\ \texttt{UserController.loadCurrentPairedUser()}, which loads the corresponding user document from Firestore and reconstructs the \texttt{Users} model.  The UI then moves from the pairing screen to \texttt{UserPage}. \\
 
+The logout and re-pairing flow shows, that during logout from the smartwatch user page: \texttt{PairingService.logoutWatch()}  clears the active timer, stops the current Firestore pairing subscription, resets the pairing document by making a new QR token and restoring the \texttt{waiting} state and clears the locally paired UID. However, backend reset alone does not complete the flow. 
+The watch must call \texttt{restoreWatchPairing()} again to listen to the pairing document. Without this listener, the watch may show a new QR code but fail to move to UserPage  after phone approval. \\
 
 
 \subsubsection{Phone-side management of connected watches and remote logout}
 
-\textit{Phone-side view paired watches and remote logout management sequence diagram} describes the phone-side flow used to inspect the currently connected smartwatch devices and manage the remote logout flag associated with them. This functionality does not replace the ordinary pairing protocol; rather, it provides an additional management layer on top of the live pairing state already stored in Firestore. \\
-The interaction starts from \texttt{SettingPage} component, where the user opens the dedicated paired watches page. Once the route is pushed, \texttt{PairedWatchesPage}, which is part of the \texttt{SettingPage} component requests the list of paired watches through \\ \texttt{UserController.getConnectedWatches()}, that invokes \texttt{AuthService.getConnectedWatches()}. \\ \texttt{AuthService} then queries the \texttt{watch\_pair} collection by selecting the documents whose \texttt{uid} matches the authenticated user and whose \texttt{status} is \texttt{approved}. The result is returned to the page and rendered as a list of paired smartwatch devices. \\
-It is important to clarify the semantics of this page. The data shown here does not represent a historical registry of every device ever associated with the account. Instead, it reflects the current pairing state stored in Firestore, according to the active content of the \texttt{watch\_pair} documents. \\
-For each listed watch, the page also provides an operation to enable or disable remote logout. These actions are again delegated through \texttt{UserController} to \texttt{AuthService}. When the user enables remote logout, the phone updates the selected \texttt{watch\_pair/<watchId>} document by writing a timestamp into the optional field \texttt{remoteLogoutAt}. When the user clears remote logout, the same field is set back to \texttt{null}. From the phone-side perspective, these operations are intentionally simple and do not alter the ordinary pairing fields such as \texttt{status}, \texttt{uid}, or \texttt{qrToken}. \\
-This design choice is architecturally relevant because it keeps the original pairing protocol unchanged. The field \texttt{remoteLogoutAt} acts as an additional control flag, not as a replacement for the existing pairing state. The watch continues to observe the same \texttt{watch\_pair} document through its existing Firestore listener and may interpret the presence or absence of \texttt{remoteLogoutAt} as a condition that temporarily blocks or restores access to the user area. In this way, remote logout can be managed from the phone while leaving the main pairing flow conceptually intact. \\
+\textit{Phone-side view paired watches and remote logout management sequence diagram} describes the phone side flow for viewing the currently connected smartwatch and handling their remote logout flag. This feature does not replace the normal pairing protocol. It adds a management option on top of the pairing state already stored in Firestore. \\
+The interaction starts from \texttt{SettingPage} component. The user opens the dedicated paired watches page and once the route is pushed, \texttt{PairedWatchesPage}, which is part of the \texttt{SettingPage} component asks the list of paired watches through \\ \texttt{UserController.getConnectedWatches()}, that invokes \texttt{AuthService.getConnectedWatches()}. \\ \texttt{AuthService} then queries the \texttt{watch\_pair} collection by selecting the documents whose \texttt{uid} matches the authenticated user and whose \texttt{status} is \texttt{approved}. The page then shows the paired smartwatches in a list. \\
+
+This page does not show the full history of the every device linked to the account. It only shows the watches that are paired at that moment, using the data storedin Firestore, according to the active content of the \texttt{watch\_pair} documents. \\
+
+For each watch in the list, the user can enable or clear remote logout. The page sends this action to \texttt{AuthService} through \texttt{UserController}. To enable remote logout, the phone updates the selected \texttt{watch\_pair/<watchId>} document by writing a timestamp into  \texttt{remoteLogoutAt} field. To clear it, this field is set back to \texttt{null}. The normal pairing data, such as \texttt{status}, \texttt{uid}, or \texttt{qrToken} does not change. \\
+This design keeps the original pairing protocol unchanged. 
+
+The field \texttt{remoteLogoutAt} works as an extra flag in the existing pairing document. The watch reads the same \texttt{watch\_pair} document through the same Firestore listener and uses it to block or restore access to the user area, without changing the main pairing flow.\\
+
 
 \newpage
 \label{Phone watch pair sequence diagram 1}
@@ -1133,48 +1140,43 @@ This design choice is architecturally relevant because it keeps the original pai
     \caption{Interface diagram smartphone application}
 \end{figure}
 
-The interfaces shown in the diagram of section \ref{Interface Diagram Smartphone Application} should not be interpreted as direct one-to-one representations of language-level constructs. 
-Rather, they are used as an architectural abstraction to explicitly model the set of operations that each component exposes to the rest of the system. 
-Figure in section \ref{Interface Diagram Smartphone Application} presents the main interfaces exposed by the application components. 
-These interfaces define the contracts through which the different parts of the system interact, making the architecture more modular.
+The interfaces shown in Section  \ref{Interface Diagram Smartphone Application} should not be read as exact language-level interfaces. In this diagram, they describe the operations that each component offers to the rest of the application.
 
-The diagram includes a first group of interfaces associated with the core application domains.
-\texttt{User\_i} defines the operations related to user profile management, following and followers data.\\
-\texttt{Trekking\_i} groups the operations required to retrieve trekking data, search routes, manage saved treks.\\
-\texttt{Diary\_i} exposes the operations related to diary retrieval and visualization.\\
+The first group of interfaces covers core application domains.
+\texttt{User\_i} contains the operations for user profile management, following and followers data.\\
+\texttt{Trekking\_i} groups the operations for trekking data, search routes, manage saved treks.\\
+\texttt{Diary\_i} exposes the operations for diary retrieval and visualization.\\
 \texttt{Challenge\_i} provides access to challenge data.\\
-Finally, \texttt{Language\_i} defines the minimal contract required to manage the application locale.\\
-A second group of interfaces regards infrastructure and platform interaction. 
-\texttt{Service\_i} acts as the unified access point for a heterogeneous set of services that are not strictly tied to a single domain entity. 
-As shown in the diagram, this interface includes operations for weather retrieval, forecast parsing, weather alerts, navigation-related location handling, access to map tiles and redirection to system configuration components such as GPS and permission settings. 
-For this reason, \texttt{Service\_i} can be interpreted as a façade-oriented interface, collecting in a single access point the functionalities needed by the UI when interacting with external services and operating-system-level capabilities.
+Finally, \texttt{Language\_i} defines basic operations to manage the application locale.\\
 
-The operating system services are further represented through dedicated interfaces, namely \texttt{Permission\_i}, \texttt{Notification\_i}, \texttt{Memory\_i} and \texttt{geo\_i}. 
-These interfaces isolate the logic that depends on Flutter packages that communicate with device APIs or with the operating system. 
-This design choice is particularly relevant from a maintenance point of view: if a package or platform-specific integration must be replaced, the impact can be limited to the corresponding service implementation, without requiring modifications in the rest of the application, as explained in section \ref{OSService Package Design}. 
-In this sense, the interfaces shown in Figure~\ref{Interface Diagram Smartphone Application} contribute to preserving a clear separation between application logic and platform-dependent concerns.
-More specifically, \texttt{Permission\_i} encapsulates permission requests.\\
-\texttt{geo\_i} abstracts location-service availability and position streaming\\
-\texttt{Notification\_i} defines the operations needed to issue local notifications \\
- and \texttt{Memory\_i} centralizes local storage concerns, including image caching, saving the preferred locale.
-The diagram also contains a set of lightweight model-oriented interfaces, namely \texttt{qi}, \texttt{dmi}, \texttt{expi} and \texttt{umi}. 
-These define conversion contracts based on \texttt{toMap()} and \texttt{fromMap()} operations. 
-Their purpose is to standardize the serialization and deserialization logic used to map application objects to and from Firestore representations. 
-In addition to the previously described interfaces, Figure~\ref{Interface Diagram Smartphone Application} also includes the \texttt{authservice\_i} interface, which encapsulates the operations related to user authentication and credential management.
-This interface defines a dedicated contract for handling authentication workflows, including registration, login (both with email/password and Google Sign-In), logout, password reset and automatic session restoration. 
-Furthermore, it includes operations for account-related updates, such as email changes and smartwatch pairing approval.
-From an architectural perspective, \texttt{authservice\_i} plays a key role in separating authentication from the higher-level domain logic exposed by \texttt{User\_i}. 
-While \texttt{User\_i} provides user-related functionalities at the application level, \texttt{authservice\_i} interacts with the underlying authentication provider (e.g., Firebase Authentication), thus centralizing all authentication operations in a single component.
-This design choice improves modularity and maintainability, as it prevents other components from directly depending on authentication mechanisms and allows the authentication logic to be modified or extended with minimal impact on the rest of the system.
-Overall, the interfaces represented in Figure~\ref{Interface Diagram Smartphone Application} document a design in which each major responsibility is accessed through a clearly delimited contract. 
-This improves readability of the architecture, supports separation of concerns and makes explicit which services are expected from each component without exposing internal implementation details. 
-For these reasons, the interface view complements the component decomposition by showing not only which elements exist in the system, but also how their responsibilities are formally made available to the rest of the application.
+A second group of interfaces is about infrastructure and platform interaction. 
+\texttt{Service\_i} gives a unified access point for a heterogeneous set of services that do not belong to a single domain entity. 
+It includes operations for weather retrieval, forecast parsing, weather alerts, navigation related location handling, access to map tiles and redirection to system configuration components such as GPS and permission settings. 
+So, \texttt{Service\_i} gives the UI a single place to access external services and platform features.
 
+The operating system services are also represented via dedicated interfaces: \texttt{Permission\_i}, \texttt{Notification\_i}, \texttt{Memory\_i} and \texttt{geo\_i}. 
+These interfaces keep the logic based on  Flutter packages separated from device APIs or operating system. 
+A package or platform integration can be substituted by modifying the related service implementation, without affecting the rest of the app, as explained in Section  \ref{OSService Package Design}. 
+
+So,the interfaces shown in Figure~\ref{Interface Diagram Smartphone Application} contribute to preserving a clear separation between application logic and platform concerns:
+\texttt{Permission\_i} handles permission requests.\\
+\texttt{geo\_i} manages location service availability and position streams\\
+\texttt{Notification\_i} covers the operations to issue local notifications \\
+ \texttt{Memory\_i} centralizes local storage operations, including image caching, saving the preferred locale.
+The diagram also includes a set of light model oriented interfaces, such as  \texttt{qi}, \texttt{dmi}, \texttt{expi} and \texttt{umi}. 
+These interfaces define conversion operations based on \texttt{toMap()} and \texttt{fromMap()} operations. 
+Their purpose is to serialize and deserialize application objects to and from Firestore representations. 
+In addition, Figure~\ref{Interface Diagram Smartphone Application} also includes the \texttt{authservice\_i} interface, which includes the operations for user authentication and credential management.
+This interface includes registration, email/password login, Google Sign-In, logout, password reset and automatic session restoration. 
+It also includes operations for account updates, such as email changes and smartwatch pairing approval.
+
+ \texttt{authservice\_i} keeps authentication separate from the user logic exposed by \texttt{User\_i}. 
+While \texttt{User\_i} manages user features at the application level, \texttt{authservice\_i} communicates with the authentication provider (e.g., Firebase Authentication).
+This improves modularity and maintainability, keeping authentication in one place only, so other components do not depend on the details of the authentication mechanism. Changes to authentication can therefore remain limited to the authentication implementation.
+As a whole, the interfaces in Figure~\ref{Interface Diagram Smartphone Application} show what each main component offers to the rest of the application, without exposing its internal implementation. In this way, it complements the component diagram by making the responsibilities of each part clearer.
 
 
 quiquiquixxxxxxxxxxxxxxxxxxxx
-
-
 
 
 \newpage
@@ -1188,10 +1190,11 @@ quiquiquixxxxxxxxxxxxxxxxxxxx
 
 \subsection{Smartwatch Interfaces Diagram}
 
-The interfaces diagram of the smartwatch application is largely consistent with the one introduced for the smartphone application. The same set of interfaces is preserved, reflecting the architectural choice of maintaining a uniform interaction layer between \textit{View} components and the underlying \textit{Controller} logic across both platforms.
-This design ensures a high degree of reuse and coherence, allowing the smartwatch application to leverage the same abstraction principles adopted in the smartphone application, while adapting them to its more lightweight and specialized context.
-The main difference that can be observed regards the pairing and authentication mechanisms. In the smartwatch application, the \textit{AuthService} is not present. In the smartphone application, such component managed authentication and handled the approval phase of the pairing process.
-In this context, the pairing logic is primarily managed by the \textit{PairingService}, so the dedicated interface \textit{Pairing\_i} is introduced, exposing the operations required to handle the the pairing process.
+The interfaces diagram of the smartwatch application follow those of the smartphone application. Most interfaces are unchanged, so is maintained an interaction layer between \textit{View} components and the  \textit{Controller} logic across both platforms.
+
+This guarantees reuse and coherence: the smartwatch application has the same principles in the smartphone application, but adapted to a more focussed context.
+The main difference is the pairing and authentication mechanisms. In the smartwatch application, the \textit{AuthService} is not present. In the smartphone application, this component manages authentication and approves the pairing process.
+In this case,  pairing is managed by the \textit{PairingService}, so the dedicated interface \textit{Pairing\_i} is introduced, defining the operations required to handle the the pairing process.
 
 
 
@@ -1206,222 +1209,170 @@ In this context, the pairing logic is primarily managed by the \textit{PairingSe
     \includegraphics[width=0.6\linewidth]{./images/modelviewcontroller.png}
     \caption{Model view controller pattern, adapted from Apple and Oracle documentation}
 \end{figure}
-The system adopts the Model--View--Controller (MVC) architectural pattern to separate presentation, application logic and data management. Within this structure, each role is assigned a specific responsibility in order to improve modularity, maintainability and clarity of interactions.
-The \textbf{Model} represents the knowledge and expertise related to the application domain. It includes the core data structures of the system, such as \texttt{Diary}, \texttt{Trekking} and \texttt{User}. The Model is independent from the user interface and does not handle user interactions directly.
-The \textbf{View} renders the user interface and collects user input. Its role is limited to presentation and interaction handling, without directly applying business logic or modifying domain data.
-The \textbf{Controller} manages the application logic and coordinates the interaction between View and Model. In the adopted variant of MVC, consistent with the interpretation described in both Apple and Oracle documentation, the Controller also plays the role of a \emph{Mediator}. More precisely, the View does not directly manipulate the Model; instead, user actions are forwarded to the Controller, which interprets them, executes the required logic and updates the corresponding Model data. In this way, the Controller acts as the central coordination point of the interaction, reducing direct dependencies between presentation and domain data.
-In addition, the architecture relies on the \textbf{Observer pattern} to keep the user interface consistent with state changes. When the state managed by a Controller is updated, the interested Views are notified through the listener mechanism provided by the Flutter framework, based on ChangeNotifier, integrated via Provider, so that they can refresh their representation accordingly. This notification-based interaction avoids tight coupling and supports consistency across multiple dependent Views.
-Therefore, the adopted solution combines the structural organization of MVC with the use of the Mediator pattern in the Controller and the Observer pattern. This combination is particularly suitable for the Flutter-based implementation of the system, where the presentation layer, the application logic and the domain data remain clearly separated while still cooperating through a well-defined interaction model.
-
-
-
-
-
-
-
+The system adopts the Model--View--Controller (MVC) architecture separates presentation, application logic and data management, thus improving modularity, maintainability of interactions.
+The \textbf{Model} represents the knowledge of the application domain. It includes the core data structures of the system, such as \texttt{Diary}, \texttt{Trekking} and \texttt{User}. The Model is independent from the user interface and does not directly handle user interactions.
+The \textbf{View} shows the user interface and collects user input, without applying business logic or changing domain data directly.
+The \textbf{Controller} manages the application logic and acts as a \emph{Mediator} between View and Model. User actions are sent to the Controller, which interprets them, runs the required logic, and updates the related Model data.
+The architecture also uses \textbf{Observer pattern} to keep the UI aligned with state changes. Controllers notify the interested Views through the listener mechanism provided by Flutter, based on ChangeNotifier and integrated through Provider, so the UI can update when the state changes.
+In this way, the adopted solution combines MVC with the Mediator role of the Controller and the Observer pattern, keeping presentation, application logic and domain data separated but still cooperating.
 
 \subsection{ServiceController as a Facade}
-The ServiceController is designed following the Facade pattern.
-It provides a unified interface that aggregates multiple underlying services, including external APIs and OS-level services. Instead of interacting directly with heterogeneous components, UI components and controllers rely on a single access point.
-This design reduces coupling and simplifies the interaction model of the system. It also improves readability and consistency, as all non-domain-specific functionalities are accessed through a centralized component.
-Furthermore, the facade allows internal changes to the underlying services without impacting the rest of the application, thus increasing flexibility and maintainability.
+The ServiceController follows the Facade pattern. It gives the application a single point to access different services, including external APIs and OS-level services.
+
+Instead of making UI components and controllers interact with many different services, the application can route these requests through the ServiceController. This makes the code organized and reduces the dependencies between the UI and the service implementations.
+
+It also makes future changes easier to manage. If one of the internal services changes, the rest of the application can continue to use the same access point. 
 
 \section{Other Design Decisions} \label{Other Design Decisions}
 
 \subsection{Flutter as Application Framework} \label{Flutter as Application Framework}
 
-Flutter was selected for the implementation of the client applications because it provides an effective balance between cross-platform development, interface consistency and maintainability. A primary requirement of the project was the possibility of deploying the smartphone application on both Android and iOS while preserving the same visual structure and interaction style across platforms. In this respect, Flutter offers a significant advantage, since it enables the development of a single shared codebase while also providing a uniform UI across platforms.
-Compared with native alternatives such as Kotlin and Swift, Flutter avoids the need to maintain two separate implementations for Android and iOS, thus reducing duplication of development effort and simplifying maintenance. Compared with other cross-platform solutions, the choice of Flutter was particularly suitable for this project because it supports the construction of a coherent and controlled UI layer, which was important for preserving the same application identity and user experience on both mobile platforms.
+Flutter was selected for the client applications because it offers a good balance between cross platform development, UI consistency, and maintainability. The project required the smartphone application to run on both Android and iOS while keeping the same visual structure and interaction style on the two platforms.
 
+Flutter makes this easier because the same codebase can run on both Android and iOS, with a consistent UI on the two platforms. Compared with Kotlin and Swift native development, it avoids two separate implementations and reduces duplicated work.
 
-
-
-
+Flutter was also suitable for this project because it gives good control over the UI layer. This was useful to keep the same application identity and user experience across the supported mobile platforms.
 
 \subsection{Firebase as Backend-as-a-Service} \label{Firebase as Backend-as-a-Service}
-The adoption of a Backend-as-a-Service solution represents a strategic architectural decision aimed at improving maintainability, scalability and integration.  \\
-Firebase was adopted as the backend solution to support a scalable and robust system architecture while maintaining a clear separation between client-side logic and backend responsibilities. Rather than introducing a custom server-side layer, the system relies on a Backend-as-a-Service approach, where core functionalities are delegated to managed cloud services.
-This choice allows the architecture to focus on the coordination of application logic on the client side, while relying on well-established and production-ready services for critical backend responsibilities such as authentication, data persistence and media storage, integrating with the client applications through platform-specific SDKs.
-From an architectural perspective, this approach improves modularity and reduces system complexity by eliminating the need to design and maintain a dedicated backend infrastructure. This approach presents notable advantages, including scalability, reliability and security, through managed services that are designed to handle distributed workloads and concurrent access patterns.
-Furthermore, the use of Firebase aligns well with the multi-platform nature of the system, as both smartphone and smartwatch applications can interact with the same backend services in a consistent and unified manner. This contributes to maintaining a coherent data model across different devices.
+The adoption of a Backend-as-a-Service solution is an important architectural choice for the project. \
+
+Firebase was used as the backend solution to support authentication, data storage and media storage without adding a custom server side layer. The system relies on managed cloud services, while the client applications focus on the coordination of the application logic.
+
+This keeps the architecture simpler, because the project does not need a dedicated backend infrastructure to design and maintain. Core backend functions, such as authentication, data persistence and media storage, are handled through production ready services and integrated into the client applications through specific SDKs.
+
+Firebase also fits the multi-platform nature of the system. Both the smartphone and smartwatch applications can access the same backend services and share the same data model in a consistent way.
 \newpage
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 \subsection{Phone Smartwatch Pairing} \label{Phone Smartwatch Pairing}
-While the smartphone application directly relies on Firebase Authentication, the smartwatch application adopts a pairing mechanism based on QR code scanning. Through this process, the smartphone securely associates an authenticated user with the smartwatch by storing the corresponding identifier in Firestore. \\
-This design choice provides several advantages:
+The smartphone application uses Firebase Authentication directly, while the smartwatch application follows a QR-based pairing mechanism. The phone then associates an authenticated user with the watch by storing the related identifier in Firestore. \
+
+This choice has two main advantages:
 \begin{itemize}
-\item avoids handling user credentials on the smartwatch or to enforce specific authentication methods, such as Google Sign-In, reducing the exposure of sensitive data on a constrained and potentially less secure device 
-\item simplifies the user interaction model, eliminating the need for credential input on devices where text entry is inherently limited and less user-friendly
+\item it avoids handling user credentials on the smartwatch or forcing authentication methods such as Google Sign-In, reducing the exposure of sensitive data on a constrained device;
+\item it simplifies the interaction for the user, since entering credentials on a smartwatch would be limited and not very comfortable.
 \end{itemize}
-For these reasons, the interaction is intentionally defined as a pairing process rather than a traditional login, reflecting its role within the overall system architecture. \\
+
+For these reasons, the interaction is described as a pairing process rather than as a traditional login. The watch is linked to an already authenticated user, but it does not perform the same login flow as the smartphone. \
+
 \subsubsection{Pairing Strategy and Architectural Trade-offs}
-The application adopts a custom QR-based pairing mechanism instead of relying on the Wear OS companion communication mechanisms, the Data Layer API. This design choice is motivated by architectural, cross-platform and implementation considerations.
+The application uses a custom QR-based pairing mechanism instead of the Wear OS companion communication mechanisms, such as the Data Layer API. This choice is mainly related to cross-platform support, independence of the smartwatch application, and implementation simplicity.
+
 \subsubsection{Rationale for custom pairing}
-The implemented pairing mechanism is based on a QR code made by the smartwatch and scanned by the smartphone. The QR encodes a temporary token that is used to associate the smartwatch with a user account through a backend document stored in Firestore.
+The pairing mechanism starts from a QR code generated by the smartwatch and scanned by the smartphone. The QR code contains a temporary token, which is then used to associate the smartwatch with a user account through a backend document stored in Firestore.
+
 This approach provides the following advantages:
 \begin{itemize}
-    \item \textbf{Standalone smartwatch application}: once the pairing is completed, the smartwatch can operate independently by directly communicating with the backend, without requiring the smartphone to be connected, following the \textit{Android Developers Documentation} Google guidelines:\\ \textit{"We recommend that Wear OS apps work independently of a phone so users can complete tasks on a watch without access to an Android or iOS phone. If your watch app requires phone interaction, you must mark your Wear OS app as non-standalone and take steps to ensure that the user has the phone app available"}.
-    \item \textbf{Platform independence}: the solution does not rely on Android-specific communication layers such as the Data Layer API. Further insights about this choice are stated in the Data Layer API limitations section.
-    \item \textbf{No third party dependencies}: the pairing logic is implemented entirely at the application level using Firestore, avoiding the need for native platform bridges or third-party plugins in Flutter. The only dependencies that are needed in order for the custom pairing to work are Firebase Auth for Anonymous Auth and the dependencies for handling UUIDs and QR codes.
-    \item \textbf{Backend-centric design}: the smartwatch behaves as a client of backend services instead of relying on the phone to transfer the informations that it needs, aliging with the principle of a standalone client as indicated by the \textit{Android Developers Documentation}
+\item \textbf{Standalone smartwatch application}: once the pairing is completed, the smartwatch can work independently and communicate with the backend without requiring the phone to stay connected. This follows the \textit{Android Developers Documentation} guidelines:\ \textit{"We recommend that Wear OS apps work independently of a phone so users can complete tasks on a watch without access to an Android or iOS phone. If your watch app requires phone interaction, you must mark your Wear OS app as non-standalone and take steps to ensure that the user has the phone app available"}.
+\item \textbf{Platform independence}: the solution does not depend on Android-specific communication layers such as the Data Layer API. Further details about this choice are discussed in the Data Layer API limitations section.
+\item \textbf{No third party dependencies}: the pairing logic is implemented at application level using Firestore. This avoids native platform bridges or third-party Flutter plugins for phone-watch communication. The only required dependencies are Firebase Anonymous Authentication and the libraries used to manage UUIDs and QR codes.
+\item \textbf{Backend-centric design}: the smartwatch acts as a backend client instead of depending on the phone to transfer the data it needs. This is aligned with the idea of a standalone wearable application described in the \textit{Android Developers Documentation}.
 \end{itemize} \newpage
+
 \subsubsection{Limitations of the Data Layer API Approach}
-An alternative to the custom pairing mechanism would be to use the Wear OS Data Layer API, a mechanism to exchange data between a smartwatch and its paired smartphone. It supports message passing and data synchronization, including authentication token transfer.
-However, adopting this approach would introduce several limitations:
+An alternative solution would be to use the Wear OS Data Layer API, which allows data exchange between a smartwatch and its paired smartphone. It supports message passing, data synchronization, and also the transfer of authentication tokens.
+
+However, this approach would introduce some limitations:
 \begin{itemize}
-    \item \textbf{Android-only compatibility}: the Data Layer API does not function when the smartwatch is paired with an iPhone, limiting cross-platform support.  
-    \item \textbf{Designed for native APIs, Flutter requires integration}: in Flutter, the Data Layer API is not natively available and requires either third-party plugins or custom native bridges.
-    \item \textbf{Companion-dependent architecture}: the smartwatch becomes tightly coupled with the smartphone, reducing its ability to operate independently and, as already stated, it is recommended to build a standalone wearable application.
-    \item \textbf{Different pairing strategies required}: supporting both Android and iOS would require different pairing mechanisms or fallback solutions.
+\item \textbf{Android-only compatibility}: the Data Layer API does not work when the smartwatch is paired with an iPhone, so it would limit cross-platform support.
+\item \textbf{Designed for native APIs, Flutter requires integration}: in Flutter, the Data Layer API is not available directly and requires third-party plugins or custom native bridges.
+\item \textbf{Companion-dependent architecture}: the smartwatch would depend more strongly on the smartphone, reducing its ability to work as an independent device.
+\item \textbf{Different pairing strategies required}: supporting both Android and iOS would require different pairing mechanisms or fallback solutions.
 \end{itemize}
-
-
-
 
 \subsubsection{Security Considerations for Watch Pairing}
 
-In order to securely enable communication between the smartwatch and the backend, the system relies on Firebase Anonymous Authentication.
-Through this mechanism, each smartwatch instance authenticates with Firebase at startup and obtains a unique identifier (\texttt{request.auth.uid}). This authenticated context is then used by Firestore security rules to regulate access to backend resources. As a result, data access is restricted to authenticated clients only, preventing arbitrary external entities from interacting with the database.
-This design maintains the \emph{standalone nature} of the smartwatch application, avoids introducing additional authentication steps on the wearable, which would negatively impact usability due to device constraints and allows the backend to enforce a basic level of access control.
-It improves the protection of backend resources while preserving the lightweight and autonomous design of the wearable application. Further improvements could involve strengthening the link between the authenticated device identity and the paired user to enable more fine-grained access control policies.
+To allow the smartwatch to communicate with the backend, the system uses Firebase Anonymous Authentication.
 
+Each smartwatch instance authenticates with Firebase at startup and receives a unique identifier, represented by \texttt{request.auth.uid}. Firestore security rules can then use this authenticated context to control access to backend resources. So, only authenticated clients can interact with the database, while arbitrary external access is blocked.
+
+This solution keeps the smartwatch application standalone and avoids adding a full authentication flow on the wearable device. This is useful because extra login steps would make the user experience worse on a small device. At the same time, the backend can still enforce a basic level of access control.
+
+The approach improves the protection of backend resources while keeping the wearable application lightweight and autonomous. A possible improvement would be to strengthen the link between the authenticated device identity and the paired user, so that more fine-grained access rules could be defined.
 
 \subsubsection{Summary of the Wear OS Pairing Approach}
-For these reasons, a custom solution using an URI embedded in QR codes was preferred over the data layer API, as it offers a good trade-off between cross-platform compatibility, data security, implementation complexity and usability.
+For these reasons, the application uses a custom solution based on a URI embedded in a QR code. This approach offers a good trade-off between cross-platform compatibility, security, implementation complexity, and usability.
 \newpage
 
 \subsection{OSservice Package Design}
 \label{OSService Package Design}
-As shown in the smartphone component diagram (see Figure~\ref{Mobile Smartphone App component view}), the OSService package has been introduced to isolate all interactions with operating system functionalities and external libraries.
-In particular, this package includes the following services:
+As shown in the smartphone component diagram (see Figure~\ref{Mobile Smartphone App component view}), the OSService package isolates the interactions with operating system features and external libraries.
+
+This package includes the following services:
 \begin{itemize}
-    \item \texttt{PermissionService} handles runtime permissions;
-    \item \texttt{GeoService} device location access;
-    \item \texttt{MemoryService} local storage and caching;
-    \item \texttt{NotificationService} manages local notifications;
+\item \texttt{PermissionService} handles runtime permissions;
+\item \texttt{GeoService} manages device location access;
+\item \texttt{MemoryService} manages local storage and caching;
+\item \texttt{NotificationService} manages local notifications.
 \end{itemize}
 
-Each service encapsulates the interaction with specific Flutter packages and platform APIs, such as geolocation, local storage, or notification systems. These dependencies correspond to external libraries, packages available on \textit{pub.dev}, that internally communicate with the underlying operating system.
-This design ensures that the rest of the application does not directly depend on platform-specific APIs or external libraries. Instead, all such dependencies are confined within the OSService package.
-The main motivation behind this decision is maintainability. If a library or underlying implementation needs to be replaced, only the corresponding service must be modified, without requiring changes in the rest of the system. This significantly reduces the impact of technological changes.
+Each service contains the logic needed to interact with specific Flutter packages and platform APIs, such as geolocation, local storage, or notifications. These dependencies are external libraries, often available on \textit{pub.dev}, that communicate with the operating system.
+
+The rest of the application does not depend on these platform specific APIs directly. Instead, the OSService package keeps this logic in one place.
+
+The main reason for this choice is maintainability. If a library or platform specific implementation has to be replaced, only the related service should need to change, without modifying all the rest of the system.
 
 %Moreover, this approach improves testability, as services can be mocked or replaced during testing without affecting higher-level components.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \newpage
 \subsection{Use of External Service Providers}
 \label{Use od External Service Providers}
 
+The application uses external service providers for weather information and map visualization. These services are needed by several functional requirements, such as showing weather conditions for trekking routes, detecting weather alerts, and displaying geographical information on maps.
 
-The application relies on a set of external service providers to implement functionalities related to weather information and map visualization, which are required by several functional requirements of the system. 
-In particular, these providers support the fulfillment of requirements related to the visualization of weather conditions associated with trekking routes, the detection of weather alerts and the display of geographical information on maps.
-From an architectural perspective, the \texttt{Service\_i} interface acts as the main entry point for all operations involving third-party providers. 
-It exposes methods such as \texttt{weather()}, \texttt{forecast()}, \texttt{weatherbitAlerts()} and map-related operations like \texttt{openTopoMapTile()}.
-This design follows a facade-oriented approach: a single interface lets other components access the required functionalities. 
-As a result, other components interact only with abstract operations, without depending on the specific provider for the data.
-This approach improves modularity and ensures that changes in external services can be handled locally within the service layer, without affecting the rest of the application.
-Regarding weather data, two different providers have been adopted based on their respective strengths. 
-Standard weather information and forecasts are obtained through OpenWeather, accessed via the \texttt{weather()} and \texttt{forecast()} methods. 
-These operations are used to satisfy the functional requirements related to the visualization of current weather conditions and short-term forecasts for trekking locations.
-Conversely, weather alerts are handled through Weatherbit, accessed via the \texttt{weatherbitAlerts()} operation. 
-This choice is motivated by the availability and reliability of alert-specific data provided by Weatherbit, which are essential to fulfill the functional requirements related to user notification of critical weather conditions. 
-Map visualization is supported through external tile providers, such as OpenTopoMap, accessed via dedicated operations in \texttt{Service\_i}. 
-These functionalities are required to satisfy the functional requirements related to the visualization of trekking routes and geographical context. 
-Delegating this responsibility to external providers avoids the need to manage map data internally and significantly reduces system complexity.
-Alternative solutions were considered during the design phase. 
-A first option consisted in adopting a single weather provider for both standard weather data and alerts. 
-However, this approach was discarded due to limitations in the quality, availability, or completeness of alert data offered by individual providers. 
-In particular, while OpenWeather provides reliable general weather information, its alert coverage is not always sufficient for the requirements of the application.
-The chosen solution, based on multiple providers integrated through a unified interface, such as \texttt{Service\_i}, represents a trade-off between flexibility and architectural simplicity. 
-It allows the system to leverage the strengths of different providers while keeping responsibilities well separated and interactions with higher level components stable.
-Overall, the use of external service providers, combined with the abstraction introduced by the \texttt{Service\_i} interface, enables the system to satisfy the relevant functional requirements while preserving modularity, maintainability and extensibility of the architecture.
+The \texttt{Service\_i} interface is the main access point for operations involving third-party providers. It exposes methods such as \texttt{weather()}, \texttt{forecast()}, \texttt{weatherbitAlerts()}, and map-related operations such as \texttt{openTopoMapTile()}.
 
+This gives the application a single interface for these external services. Other components call abstract operations without depending on the specific provider used to retrieve the data. This keeps the service layer easier to change if an external provider is replaced or modified.
 
+For weather data, the application uses two providers. OpenWeather provides standard weather information and forecasts through the \texttt{weather()} and \texttt{forecast()} methods. These operations support the requirements related to current weather conditions and short-term forecasts for trekking locations.
 
+The application uses Weatherbit for weather alerts through the \texttt{weatherbitAlerts()} operation. Weatherbit was chosen because its alert data was more suitable for the needs of the application.
 
+Map visualization is supported through external tile providers, such as OpenTopoMap, accessed through dedicated operations in \texttt{Service\_i}. This avoids managing map data inside the application and reduces system complexity.
 
+Other solutions were considered during the design phase. One option was to use a single weather provider for both standard weather data and alerts. This solution was discarded because a single provider did not offer alert data with the required quality, availability, or completeness. In particular, OpenWeather provides reliable general weather information, but its alert coverage was not sufficient for the application requirements.
 
+The selected solution uses multiple providers behind a common interface, such as \texttt{Service\_i}. This allows the application to use the strengths of different services while keeping the interaction with the rest of the system stable.
 
-
-
-
-
+External service providers are used for the features that need data from outside the application, while \texttt{Service\_i} keeps their use organized and easier to maintain.
 
 \newpage
 \subsection{Madonna di Campiglio as Application Area}
 \label{Mappa lte}
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{./images/mappa lte.png}
-    \caption{eNodeB LTE Radio Sites in the area, courtesy of lteitaly.it}
+\centering
+\includegraphics[width=\linewidth]{./images/mappa lte.png}
+\caption{eNodeB LTE Radio Sites in the area, courtesy of lteitaly.it}
 \end{figure}
-The application has been evaluated for the area of \textit{Madonna di Campiglio}. This location was selected due to its relatively good LTE network coverage compared to other mountainous regions.
-Reliable connectivity is an important factor for an application that relies on external services such as map and weather APIs and cloud storage. The chosen area provides a realistic but favorable scenario, allowing the system to be tested under conditions that are representative of real trekking environments while still ensuring acceptable performance.
+The application has been evaluated in the area of \textit{Madonna di Campiglio}. This location was selected because it has relatively good LTE coverage compared with other mountain areas.
 
-
-
-
-
-
+Reliable connectivity matters for an application that uses external services, such as map APIs, weather APIs, and cloud storage. The selected area gives a realistic but favorable test scenario, because it represents an actual trekking environment while still offering acceptable network conditions.
 
 \newpage
 \subsection{Network Connectivity Requirements and smartwatch Platform}
 \label{Network connectivity requirements and smartwatch platform}
-The smartwatch application requires reliable access to internet connectivity in order to provide a complete and consistent user experience. 
-In particular, network access is necessary for several core functionalities of the system.
-The application relies on external services to retrieve real-time data, such as maps, which are essential for trekking activities. 
-Internet access enables communication with backend services and APIs, allowing the application to fetch dynamic content and maintain updated information.
-Given these requirements, the choice of Wear OS as the target platform is appropriate and justified. 
-Wear OS supports multiple network communication modes, including:
+The smartwatch application needs reliable internet access to provide the full user experience. Network connectivity is required for several core features, including maps, backend communication, and access to external APIs.
+
+Wear OS is suitable for this scenario because it supports different connectivity options:
 \begin{itemize}
-    \item \textbf{Bluetooth connectivity}: allows the smartwatch to access the internet indirectly through a paired smartphone.
-    \item \textbf{Wi-Fi connectivity}: enables the device to connect directly to wireless networks, allowing standalone operation in specific scenarios.
-    \item \textbf{Cellular connectivity (LTE with eSIM)}: available on selected devices, providing full independence from the smartphone and ensuring continuous connectivity during outdoor activities.
+\item \textbf{Bluetooth connectivity}: allows the smartwatch to access the internet through a paired smartphone.
+\item \textbf{Wi-Fi connectivity}: allows the smartwatch to connect directly to wireless networks and work independently in some situations.
+\item \textbf{Cellular connectivity (LTE with eSIM)}: available on selected devices, allowing the smartwatch to work without the phone during outdoor activities.
 \end{itemize}
-This flexibility ensures that the application can operate under different conditions, ranging from smartphone-assisted usage to fully autonomous scenarios. 
-In particular, the availability of LTE-enabled devices makes Wear OS especially suitable for outdoor and trekking contexts, where the user may not always have access to their smartphone.
 
-
+With these options, the application can work in different conditions, from phone-assisted usage to more autonomous scenarios. LTE-enabled Wear OS devices are especially useful for trekking contexts, where the user may not always have the smartphone available or connected.
 
 \subsection{Image caching strategy}
 \label{Image cache design decision}
-A caching mechanism has been introduced to reduce latency in loading images from Firebase Storage. Since images represent one of the most bandwidth-intensive resources in the application, caching them locally significantly improves performance and responsiveness.
-This decision is particularly relevant given the geographical separation between the database and storage services, as discussed in Section \ref{Firebase BaaS Management}. By minimizing repeated downloads, the caching layer reduces both latency and network usage.
+The application uses image caching to reduce latency when loading images from Firebase Storage. Images are among the most bandwidth-intensive resources in the application, so storing them locally improves loading time and responsiveness.
+
+This is important because the database and storage services may be hosted in different geographical locations, as discussed in Section \ref{Firebase BaaS Management}. By avoiding repeated downloads of the same images, the cache reduces both latency and network usage.
 
 \subsection{Firebase BaaS and GDPR compliance}
-From a data protection perspective, Firebase can be made compliant with GDPR regulations by offering secure data handling, encryption in transit and at rest and configurable security rules. These features are important because they allow to enforce access control policies and protect user data, ensuring that personal information is handled according to European data protection standards.
-If the application is distributed commercially or made publicly available, users must be clearly informed about data processing practices through a privacy policy and explicit consent may be required, especially when analytics services are involved or data is transferred and stored outside of the EU.
+Firebase includes security features that help with GDPR compliance, such as encryption in transit and at rest, and configurable security rules. These features make it possible to define access control policies and protect user data according to European data protection standards.
+
+A commercial or public release of the application requires clear information about data processing. The project should provide this information through a privacy policy and, where needed, collect explicit consent, especially for analytics services or for data transferred and stored outside the EU.
 
 
 \end{document}
