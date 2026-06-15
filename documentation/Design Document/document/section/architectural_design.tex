@@ -34,7 +34,7 @@ The Triplo system has a modular architecture in which the main application logic
     \includegraphics[width=0.68\linewidth]{./images/overview diagram 2.png}
     \caption{Detailed Overview Diagram}
 \end{figure}
-qui The system separates concerns between presentation, application logic and data management by adopting a Model–View–Controller (MVC) architectural pattern, as explained in section \ref{Architectural Patterns Model View controller with mediator and observer}. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. 
+The system separates concerns between presentation, application logic and data management by adopting a Model–View–Controller (MVC) architectural pattern, as explained in section \ref{Architectural Patterns Model View controller with mediator and observer}. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. 
 In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources.
 The View layer deals with user interactions. Controllers manage the app logic and keep the UI connected to the data models.
 Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
@@ -502,7 +502,7 @@ To conclude, the control returns to the \texttt{DiaryPage}, which updates the us
 
 \newpage
 \subsection{Explore Trekkings on Map Sequence Diagram}
-quiqui The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. The page retrieves the tile URL template and the corresponding subdomains used by the map provider.
+The sequence diagram for the \textit{Explore Trekkings on Map} use case describes how the user interacts with the main map interface in order to visualize the available trekking routes. The interaction starts when the user opens the \texttt{HomePage}, which initializes the map component and requests the information needed to render the map background through the \texttt{servicecontroller}. The page retrieves the tile URL template and the corresponding subdomains used by the map provider.
 Once the map has been initialized, the \texttt{HomePage} accesses the trekking data exposed by the \texttt{trekkingController}. The available trekkings are displayed differently depending on the zoom level. The rendering logic uses trekking information, such as route points, starting point and difficulty level, to decide how each route should appear on the map.
 The diagram also shows how the map reacts to user interaction. When the user uses the map, the page updates the current zoom level and center and checks if the visible area is still within the expected bounds. If the user moves outside the area, the map view displays a recenter button.
 When the user selects a trekking, the system navigates from the \texttt{HomePage} to the \texttt{trekkingPage}, where the detailed trekking information is shown. 
@@ -937,11 +937,13 @@ The MemoryService stores the selected language code locally using shared prefere
 
 
 
+
+
 \newpage
 \subsection{Phone Watch Pair}
 \label{Phone Watch Pair}
 \subsubsection{High level description of the pairing mechanism}
-quiquixxxxx  The pairing mechanism links a Wear OS device to an authenticated mobile user through an approval process by the backend. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
+The pairing mechanism links a Wear OS device to an authenticated mobile user through an approval process by the backend. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
 
 \subsubsection{Device Identity}
 Each watch either creates a new  \texttt{watchId} or restores an existing one from secure on device storage.  
@@ -1176,7 +1178,7 @@ This improves modularity and maintainability, keeping authentication in one plac
 As a whole, the interfaces in Figure~\ref{Interface Diagram Smartphone Application} show what each main component offers to the rest of the application, without exposing its internal implementation. In this way, it complements the component diagram by making the responsibilities of each part clearer.
 
 
-quiquiquixxxxxxxxxxxxxxxxxxxx
+
 
 
 \newpage
