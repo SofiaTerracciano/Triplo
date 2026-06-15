@@ -65,19 +65,57 @@ The integration process was incremental: core backend functionality was integrat
 \newpage
 \section{Testing}
 
-The testing strategy is defined according to the testing levels recommended in the Flutter documentation.
+\subsection{Objectives}
+The purpose of the tests written for this application is to verify logical correctness of the components and their behavior, both normal behavior and error handling.
+In order to test the behavior of components that use backend funcitonalities or external APIs, those functionalities have been mocked through the \textit{Mockito} library, allowing the tests to run offline without the need of a network connection: furthermore, this choice allows to test the application logic independently from the backend and the APIs. \\
+The UI, the models and the controller and services funcitonalities are tested using a mixed approach, mostly by the use of unit and widget tests. 
+The widget tests are useful in order to verify the correct behavior of the UI, the navigation and response to user input.
+The tests of the model components verify the correct behavior of the serialization and deserialization of the objects.
+The tests of the controllers verify the bahavior of the application logic without the need of the backend or APIs. 
 
-\subsection{Unit Tests}
+\subsection{Application tests coverage}
 
-Unit tests (also referred to as module tests) focus on verifying the correctness of individual components in isolation. In the context of the Triplo application, unit tests target models, controllers, and services, ensuring that each component behaves as expected when provided with controlled inputs.
+\begin{figure}[H]
+    \label{test smartphone}
+    \centering
+    \includegraphics[width=\linewidth]{./images/test smartphone.jpg}
+    \caption{test smartphone application}
+\end{figure}
+
+
+\newpage
+\begin{figure}[H]
+    \label{test smartwatch}
+    \centering
+    \includegraphics[width=0.8\linewidth]{./images/test smartwatch.jpg}
+    \caption{test smartwatch application}
+\end{figure}
+
 
 \subsection{Widget Tests}
+The widget tests were used to check if the UI interface behaves in the correct way. In this appliaction they are very important, because many pages contain buttons, dialogs and content that changes depending on the app state.
+These tests aim to verify if a page is rendered correctly and if the user is moved to the right page in response to the user's taps. 
+For example, the tests for the search page on the smartphone application, among the graphical elements of the page, check the search field, the user and trekking filters. 
+Other widget tests, like the ones for the settings page or the trekking page, check forms, dialogs, profile actions and screen navigation.
+\subsection{Module Tests}
+The module tests are used to verify larger parts of the application logic, not only a single small function. In this project, they are mainly used for controllers and services, because these components manage many operations together.
+A module test usually checks if one component works correctly when it receives some input and interacts with mocked dependencies. For example, the authentication service tests of the smartphone application verify registration, login, logout, password reset and watch connection procedures, the user controller tests check if the controller updates the internal state correctly after login, profile update or follower actions.
+These tests are important because they show if one application module behaves well as a whole, even without using the real backend.
 
-Widget tests are specific to Flutter and are used to verify the behavior of individual UI components. These tests simulate user interactions and validate the rendering and state changes of widgets without requiring a full application runtime. Widget tests are particularly useful to ensure that UI components correctly interact with controllers and display the expected data.
+\subsubsection{Model Tests}
+The model tests are focused on data structures. Their goal is to verify if the application reads, stores and converts data in the right way.
+For example, the tests for the model check constructors, getters, setters, default values and especially the methods \texttt{toMap()} and \texttt{fromMap()}. In many cases the tests also verify what happens if a field is missing, null or written with an old key name.
+\subsubsection{Controller Tests}
+The controller tests are among the most useful ones in the whole project, because the controllers contain a big part of the application logic.
+For example, the trekking controller tests verify trekking loading, search, saved routes. The diary controller tests are used for adding, editing and removing diaries, including some edge cases.
 
-\subsection{Integration Tests}
 
-Integration tests validate the interaction between multiple components of the application. In Flutter, these tests run the application in a simulated or real environment and verify complete user flows, including navigation, data retrieval, and interaction with services. Integration tests are essential to ensure that controllers, services, and UI components work together correctly.
+
+
+\subsubsection{Service Tests}
+These tests are used to validate the service components of the app, dealing with authentication, memory cache, notifications, internet connection, permissions, geolocation and background tasks.
+For example, the authentication service tests verify the login and registration flows with mocked Firebase objects. The memory service tests check RAM cache, saved locale values and keys. There are also tests for internet status changes, GPS access and permission handling.
+
 
 \subsection{User Testing}
 
