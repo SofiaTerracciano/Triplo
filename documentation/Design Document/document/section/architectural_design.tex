@@ -40,7 +40,7 @@ The View layer deals with user interactions. Controllers manage the app logic an
 Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
 Using Backend-as-a-Service (BaaS) solutions, the system can replace a traditional custom server-side layer with a more lightweight and scalable architecture. Data management, authentication and storage are handled by managed services; see section \ref{Firebase as Backend-as-a-Service}.
 The system connects directly to external services, so the application does not need a custom backend gateway to communicate with backend services and external resources. \\
-
+ 
 
 
 
@@ -142,7 +142,6 @@ The \texttt{BackgroundService} executes tasks even when the application is not a
 Periodically, it checks weather conditions and generates notifications. The  application schedule these tasks through WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed depending on system availability.
 
 \subsubsection{AuthService}
-
 The AuthService handles not only authentication but also the smartwatch pairing process.
 It manages user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
 
@@ -943,6 +942,8 @@ The MemoryService stores the selected language code locally using shared prefere
 \subsubsection{High level description of the pairing mechanism}
 quiquixxxxx  The pairing mechanism associates a Wear OS device with an authenticated mobile user through a backend-mediated approval process. The watch does not authenticate directly with Firebase Auth; instead, device identity and user identity are linked via Firestore. Reasons behind this design decision are detailed in Section \ref{Phone Smartwatch Pairing}
 
+
+
 \subsubsection{Device Identity}
 Each watch either makes or restores from memory a \texttt{watchId}, stored securely on-device.  
 A corresponding document exists in Firestore:
@@ -1013,7 +1014,7 @@ This preserves device identity while removing user association.
     \item QR tokens are random and time-limited.
     \item The smartphone application allows the user to remotely disable or re-enable an existing pairing through a backend flag
 \end{itemize}
-This design cleanly separates device identity from user authentication while minimizing credential exposure on the wearable device.
+This design separates device identity from user authentication while minimizing credential exposure on the wearable device.
 
 
 
@@ -1341,6 +1342,7 @@ The main motivation behind this decision is maintainability. If a library or und
 \newpage
 \subsection{Use of External Service Providers}
 \label{Use od External Service Providers}
+
 
 The application relies on a set of external service providers to implement functionalities related to weather information and map visualization, which are required by several functional requirements of the system. 
 In particular, these providers support the fulfillment of requirements related to the visualization of weather conditions associated with trekking routes, the detection of weather alerts and the display of geographical information on maps.

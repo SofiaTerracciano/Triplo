@@ -23,6 +23,7 @@ import 'package:triplo/service/notification.dart';
 import 'package:triplo/service/permission.dart';
 import 'main_test.mocks.dart';
 
+// Tell Mockito which real classes must be replaced with mocks
 @GenerateMocks([
   MemoryService,
   GeoService,
@@ -38,6 +39,7 @@ import 'main_test.mocks.dart';
   ServiceController,
 ])
 void main() {
+  // Mock variables used by the tests
   late MockMemoryService mockMemory;
   late MockGeoService mockGeo;
   late MockAuthService mockAuth;
@@ -51,6 +53,7 @@ void main() {
   late MockUserController mockUser;
   late MockServiceController mockServiceController;
 
+  //function that creates a simple Trekking object for the tests
   Trekking makeTrekking({
     String id = 'trek1',
     String name = 'Test Trek',
@@ -81,6 +84,7 @@ void main() {
   }
 
   setUp(() {
+    // Create all fake dependencies.
     mockMemory = MockMemoryService();
     mockGeo = MockGeoService();
     mockAuth = MockAuthService();
@@ -94,10 +98,13 @@ void main() {
     mockUser = MockUserController();
     mockServiceController = MockServiceController();
 
+    // Default fake values used in most tests
     when(mockLanguage.locale).thenReturn(const Locale('en'));
     when(mockLanguage.hasListeners).thenReturn(false);
     when(mockInternet.isOnline).thenReturn(true);
     when(mockInternet.hasListeners).thenReturn(false);
+
+    // These mock components also start with no listeners
     for (final n in [mockTrekking, mockDiary, mockChallenges, mockUser]) {
       when(n.hasListeners).thenReturn(false);
     }
@@ -113,19 +120,47 @@ void main() {
     when(mockInternet.isOnline).thenReturn(isOnline);
     when(mockLanguage.locale).thenReturn(locale);
 
+    // Build a minimal app with the same providers used by the real app
     return MultiProvider(
       providers: [
+        // Language is provided as a ChangeNotifier because it can notify the UI
         ChangeNotifierProvider<Language>.value(value: mockLanguage),
+
+        // MemoryService is provided as a simple Provider because it does not notify listeners
         Provider<MemoryService>.value(value: mockMemory),
+
+        // GeoService is a simple service
+        // It does not need to rebuild the UI
         Provider<GeoService>.value(value: mockGeo),
+
+        // AuthService is a ChangeNotifier because authentication state can change,
+        //  and widgets listening to AuthService can rebuild when notifyListeners() is called
         ChangeNotifierProvider<AuthService>.value(value: mockAuth),
+
+        // PermissionService is provided as a simple Provider because it does not notify the UI
         Provider<PermissionService>.value(value: mockPermission),
+
+        // NotificationService is a simple Provider because it does not notify the UI through notifyListeners()
         Provider<NotificationService>.value(value: mockNotification),
+
+
+
+        // ServiceController is a simple Provider
         Provider<ServiceController>.value(value: mockServiceController),
+
+        // InternetService is a ChangeNotifier because if the internet state changes, it can notify the widgets that depend on it
         ChangeNotifierProvider<InternetService>.value(value: mockInternet),
+
+        // UserController is a ChangeNotifier because user-related data can change
+        // and the UI may need to update when those changes happen
         ChangeNotifierProvider<UserController>.value(value: mockUser),
+
         ChangeNotifierProvider<TrekkingController>.value(value: mockTrekking),
+
+        // DiaryController is a ChangeNotifier because diary entries or diary state
+        // can change, and listening widgets may need to rebuild
         ChangeNotifierProvider<DiaryController>.value(value: mockDiary),
+
         ChangeNotifierProvider<ChallengesController>.value(value: mockChallenges),
       ],
       child: Builder(
@@ -161,6 +196,8 @@ void main() {
     );
   }
 
+
+  // Build only what is needed to test BackgroundServiceHost
   Widget buildWithAllProviders({required Widget child}) {
     return MultiProvider(
       providers: [
@@ -176,6 +213,8 @@ void main() {
       child: MaterialApp(home: BackgroundServiceHost(child: child)),
     );
   }
+
+
 
   Future<BuildContext> pumpServiceContext(WidgetTester tester) async {
     late BuildContext ctx;
@@ -193,10 +232,12 @@ void main() {
         }),
       ),
     );
+
     return ctx;
   }
 
   group('MyApp – constructor', () {
+    // Create MyApp with mocks and check that every field stores the same object
     test('stores all required service references', () {
       final app = MyApp(
         memoryService: mockMemory,
@@ -216,35 +257,42 @@ void main() {
   });
 
   group('navKey', () {
+    // The app exposes one navigator key, and it must have the correct type
     test('is a GlobalKey<NavigatorState>', () {
       expect(navKey, isA<GlobalKey<NavigatorState>>());
     });
   });
 
   group('MaterialApp configuration', () {
+    // If the app tree can be pumped, the root widget configuration is valid.
     testWidgets('builds without throwing', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp());
       expect(find.byType(MaterialApp), findsOneWidget);
     });
 
+    // Read the MaterialApp widget and check its title field
     testWidgets('title is "Triplo"', (tester) async {
+      //uses minimal app tree with providers
       await tester.pumpWidget(buildMockedMaterialApp());
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(app.title, 'Triplo');
     });
 
+    // The debug banner should be off
     testWidgets('debug banner is disabled', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp());
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(app.debugShowCheckedModeBanner, isFalse);
     });
 
+    // The locale shown by the app must come from the Language provider
     testWidgets('locale reflects Language.locale', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp(locale: const Locale('en')));
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(app.locale, const Locale('en'));
     });
 
+    // Check that the expected five language codes are registered
     testWidgets('supportedLocales contains en, it, es, de, fr', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp());
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -252,6 +300,7 @@ void main() {
       expect(codes, containsAll(['en', 'it', 'es', 'de', 'fr']));
     });
 
+    // Check that the test app exposes the same main routes expected by the project
     testWidgets('routes map contains all 6 expected keys', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp());
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
@@ -263,18 +312,21 @@ void main() {
   });
 
   group('Online / offline rendering', () {
+    // With internet on, the home widget must show the online placeholder in buildMockedMaterialApp
     testWidgets('shows online content when connected', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp(isOnline: true));
       await tester.pumpAndSettle();
       expect(find.text('online'), findsOneWidget);
     });
 
+    // With internet off, the home widget must show the offline placeholder in the same widget
     testWidgets('shows offline content when not connected', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp(isOnline: false));
       await tester.pumpAndSettle();
       expect(find.text('offline'), findsOneWidget);
     });
 
+    // Pump the widget twice with different states and check that the UI changes
     testWidgets('rebuilds when online status changes', (tester) async {
       await tester.pumpWidget(buildMockedMaterialApp(isOnline: true));
       await tester.pumpAndSettle();
@@ -295,6 +347,8 @@ void main() {
       expect(find.byKey(key), findsOneWidget);
     });
 
+
+    // Replacing the widget tree forces dispose
     testWidgets('disposes without throwing', (tester) async {
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
       await tester.pumpWidget(buildWithAllProviders(child: const SizedBox()));
@@ -302,6 +356,7 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: SizedBox()));
       expect(tester.takeException(), isNull);
     });
+
 
     testWidgets('mounts and starts without crashing', (tester) async {
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -312,6 +367,7 @@ void main() {
   });
 
   group('BackgroundService', () {
+    // Starting the background service must be safe in a normal scenario
     testWidgets('start() runs without throwing', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -320,6 +376,7 @@ void main() {
       service.dispose();
     });
 
+    // Normal lifecycle: start first, then dispose
     testWidgets('dispose() after start() does not throw', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -328,12 +385,14 @@ void main() {
       expect(() => service.dispose(), returnsNormally);
     });
 
+    // Edge case: dispose is called before start, so internal timer is still null
     testWidgets('dispose() before start() does not throw (timer is null)', (tester) async {
       final ctx = await pumpServiceContext(tester);
       final service = BackgroundService(ctx);
       expect(() => service.dispose(), returnsNormally);
     });
 
+    // The service should avoid running the same work twice at the same time
     testWidgets('_run() skips second call while first is running', (tester) async {
       final ctx = await pumpServiceContext(tester);
       final completer = Completer<List<Trekking>>();
@@ -354,6 +413,7 @@ void main() {
       service.dispose();
     });
 
+    // Returning to foreground should force another check.
     testWidgets('didChangeAppLifecycleState resumed triggers _run()', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -369,6 +429,7 @@ void main() {
       service.dispose();
     });
 
+    // Paused should not force a new weather-alert check.
     testWidgets('didChangeAppLifecycleState paused does NOT trigger _run()', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -385,6 +446,7 @@ void main() {
       service.dispose();
     });
 
+    // Inactive should also not force a new check.
     testWidgets('didChangeAppLifecycleState inactive does NOT trigger _run()', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
@@ -401,6 +463,7 @@ void main() {
       service.dispose();
     });
 
+    // If the controller throws, the service should render the error and continue
     testWidgets('_run() catches and swallows exceptions', (tester) async {
       final ctx = await pumpServiceContext(tester);
       when(mockTrekking.getWeatherAlertTrekkings())
@@ -453,6 +516,7 @@ void main() {
 
   group('BackgroundServiceLogic', () {
     setUp(() {
+      // Default fake behavior for the pure logic tests below
       when(mockServiceController.weatherbitAlerts(any, any))
           .thenAnswer((_) async => []);
       when(mockServiceController.mockAlerts())
@@ -468,6 +532,7 @@ void main() {
       )).thenAnswer((_) async => {});
     });
 
+    // If there are no trekking subscriptions, the method should just finish
     test('run() with no trekkings completes without error', () async {
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => []);
       await expectLater(
@@ -481,6 +546,7 @@ void main() {
       );
     });
 
+    // The logic must call the weather API using the trekking start coordinates
     test('run() calls weatherbitAlerts with starting_point coordinates', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -496,6 +562,7 @@ void main() {
       verify(mockServiceController.mockAlerts()).called(1);
     });
 
+    // A new alert should create a notification and then save its unique key
     test('run() shows notification for new alert and saves key', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -518,6 +585,7 @@ void main() {
       verify(mockMemory.addShownWeatherAlertKey(any)).called(1);
     });
 
+    // If memory says the alert was already shown, no new notification is sent
     test('run() skips already-shown alert', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -541,6 +609,7 @@ void main() {
       verifyNever(mockMemory.addShownWeatherAlertKey(any));
     });
 
+
     test('run() uses title field when event is null', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -562,6 +631,7 @@ void main() {
       )).called(1);
     });
 
+    // If both fields are missing, a safe default title is expected
     test('run() uses default title when both event and title are null', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -583,6 +653,7 @@ void main() {
       )).called(1);
     });
 
+    // Real API alerts and local mock alerts are combined into one list.
     test('run() merges real and mock alerts, notifies for each', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -607,6 +678,7 @@ void main() {
       )).called(2);
     });
 
+    // Each trekking should be processed separately, with one notification per alert
     test('run() processes multiple trekkings independently', () async {
       final trek1 = makeTrekking(id: 't1', name: 'Trek 1', startingPoint: const LatLng(45.0, 9.0));
       final trek2 = makeTrekking(id: 't2', name: 'Trek 2', startingPoint: const LatLng(46.0, 10.0));
@@ -630,6 +702,7 @@ void main() {
       )).called(2);
     });
 
+    // The same alert data should generate the same key, so duplicates are ignored.
     test('alert key is stable for same trekking and alert data', () async {
       final trek = makeTrekking(startingPoint: const LatLng(45.0, 9.0));
       when(mockTrekking.getWeatherAlertTrekkings()).thenAnswer((_) async => [trek]);
@@ -660,6 +733,7 @@ void main() {
     });
   });
 
+   // Test the startup helper that builds and initializes app services
    group('appSetup()', () {
     setUp(() {
       when(mockMemory.getSavedLocaleCode())   
@@ -668,11 +742,14 @@ void main() {
       when(mockNotification.init()).thenAnswer((_) async {});
       when(mockPermission.askPermissionsOnce()).thenAnswer((_) async {});
     });
+
+
  
+    // appSetup should return all required service objects
     test('restituisce tutti i servizi richiesti', () async {
       final result = await appSetup(
         memoryOverride: mockMemory,
-        authOverride: mockAuth,           // <-- FIX: evita FirebaseAuth.instance
+        authOverride: mockAuth,           // Use the mock instead of real FirebaseAuth.instance
         notificationOverride: mockNotification,
         permissionOverride: mockPermission,
       );
@@ -685,6 +762,7 @@ void main() {
       expect(result.language, isA<Language>());
     });
  
+
     test('chiama setNavKey con navKey', () async {
       await appSetup(
         memoryOverride: mockMemory,
@@ -695,6 +773,7 @@ void main() {
       verify(mockNotification.setNavKey(navKey)).called(1);
     });
  
+
     test('chiama init() su NotificationService', () async {
       await appSetup(
         memoryOverride: mockMemory,
@@ -705,6 +784,7 @@ void main() {
       verify(mockNotification.init()).called(1);
     });
  
+    // PermissionService should ask permissions once during startup
     test('chiama askPermissionsOnce su PermissionService', () async {
       await appSetup(
         memoryOverride: mockMemory,
@@ -716,12 +796,11 @@ void main() {
     });
   });
  
-  // ----------------------------------------------------------
+
   // handleConnectivityChange() — testa la logica pura senza
   // montare MyApp reale (che dipende da Firebase/dotenv).
   // Usiamo un MaterialApp minimale per ottenere un NavigatorState
   // reale con le rotte /offline e /user registrate.
-  // ----------------------------------------------------------
   group('handleConnectivityChange()', () {
     setUp(() {
       // Resetta lo stato globale prima di ogni test
