@@ -38,7 +38,7 @@ The system separates concerns between presentation, application logic and data m
 In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources.
 The View layer deals with user interactions. Controllers manage the app logic and keep the UI connected to the data models.
 Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
-Using Backend-as-a-Service (BaaS) solutions, the system can replace a traditional custom server-side layer with a more lightweight and scalable architecture. Data management, authentication and storage are handled by managed services; see section \ref{Firebase as Backend-as-a-Service}.
+
 The system connects directly to external services, so the application does not need a custom backend gateway to communicate with backend services and external resources. \\
 
 
