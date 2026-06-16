@@ -84,7 +84,7 @@ class _SearchPageState extends State<SearchPage>
 
       final user = userController.currentUser;
 
-      // Se non sei loggato o non ancora caricato: NON bloccare la UI
+
       if (user == null) {
         if (!mounted) return;
         setState(() {

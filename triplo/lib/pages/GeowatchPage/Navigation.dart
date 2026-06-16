@@ -40,7 +40,6 @@ class _CompassAltitudePageState extends State<CompassAltitudePage> with WidgetsB
     fontWeight: FontWeight.bold,
     fontStyle: FontStyle.italic,
   );
-
   @override
   void initState() {
     super.initState();

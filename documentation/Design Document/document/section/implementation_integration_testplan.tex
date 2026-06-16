@@ -5,18 +5,12 @@
 \chapter{Implementation and Integration} \label{Implementation and Integration}
 
 \section{Implementation Strategy}
-The development of the Triplo application followed an incremental approach, starting from the basic components and then moving to higher level features. This was consistent with the architecture of the system, where the lower level parts support the appl logic and the user interface. \
-
+The development of the Triplo application followed an incremental approach, starting from the basic components and then moving to higher level features. This was consistent with the architecture of the system, where the lower level parts support the application logic and the user interface. \
 The implementation did not follow a completely fixed sequence. Some parts were developed in parallel and refined as new features were added. \
-
 The first components developed were the \textbf{model components}. They define the main domain entities of the application, such as \texttt{challengeModel}, \texttt{trekkingModel}, \texttt{UserModel} and \texttt{DiaryModel}. These classes are  the data used by the application and exchanged with the backend. \
-
 The \textbf{controller components} were introduced early in the process. Controllers such as \texttt{languagecontroller}, \texttt{challengecontroller}, \texttt{trekkingcontroller}, \texttt{UserController} and \texttt{DiaryController} were then updated while the related features were added. They were not completed all at once, but evolved together  with the introduction of application features. \
-
 The \textbf{view components} were developed together with the controllers. Pages such as \texttt{GeowatchPage}, \texttt{HomePage}, \texttt{trekkingPage}, \texttt{SettingsPage}, \texttt{LoginRegistrationPage}, \texttt{SearchPage}, \texttt{UserProfilePage} and \texttt{DiaryPage} grew gradually together with the application features. \
-
 The application uses \textbf{service components} to delegate some tasks to  the controllers, so that controllers can stay focused on coordinating the app logic. Services such as \texttt{Background\_service}, \texttt{InternetService}, \texttt{permissionservice}, \texttt{geoservice}, \texttt{memoryservice}, \texttt{notificationservice} and \texttt{authservice} manage specific responsibilities, including permissions, geolocation, local storage, notifications, connectivity and authentication. \
-
 This also makes the code easier to maintain, because changes to integrations can remain limited to the corresponding service.
 
 
@@ -42,15 +36,10 @@ The incremental construction of the system components is summarized in Figure~\r
 
 
 After the main components were implemented, the application was assembled progressively. We started developing and integrating the components communicating with the backend and then moved to the interface and external services.
-
 \textbf{Firebase} was integrated together with the controller components. Controllers access Firebase services, such as authentication, database and storage through platform specific SDKs, enabling validation features that rely on the backend from the beginning of the integration process.
-
 The \textbf{view components} were then connected to the controllers while their features were being developed. In this way, each feature could be tested and adjusted before adding more functionality.
-
 External services, such as weather and map providers, were connected later, after the related UI components were available. As these dependencies grew, the application introduced a dedicated \textbf{ServiceController} based on the Facade pattern. This component gives the rest of the application one place to access external APIs and OS-level services, keeping these interactions more organized.
-
 The application also connected \textbf{device-level services} through dedicated service components. These services manage interactions with the operating system, such as permissions, geolocation, notifications and local storage.
-
 The integration process was incremental: core backend functionality was integrated first, followed by user interface components and finally external services and OS interactions.
 
 
@@ -102,7 +91,7 @@ The tests of the controllers verify the bahavior of the application logic withou
 \begin{figure}[H]
     \label{test smartwatch}
     \centering
-    \includegraphics[width=0.8\linewidth]{./images/test smartwatch.jpg}
+    \includegraphics[width=\linewidth]{./images/test smartwatch.jpg}
     \caption{test smartwatch application}
 \end{figure}
 
