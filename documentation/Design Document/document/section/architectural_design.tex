@@ -20,7 +20,7 @@ The Triplo system has a modular architecture in which the main application logic
     \label{Overview Diagram 1}
     \centering
     \includegraphics[width=0.8\linewidth]{./images/Overview.png}
-    \caption{Overview Diagram: Blue lines represent the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines show the smartwatch application’s connectivity, OpenTopoMap. The smartphone and smartwatch applications access the network independently, reflecting their ability to operate as standalone clients, while still relying on a shared set of backend services for data and functionality.}
+    \caption{Overview Diagram: Blue lines represent the smartphone application’s connectivity with Firebase and external services, providing full access to all Firebase modules and external APIs. Dashed green lines show the smartwatch application’s connectivity. The smartphone and smartwatch applications access the network independently, reflecting their ability to operate as standalone clients, while still relying on a shared set of backend services for data and functionality.}
 \end{figure}
 \newpage
 
@@ -35,13 +35,12 @@ The Triplo system has a modular architecture in which the main application logic
     \caption{Detailed Overview Diagram}
 \end{figure}
 The system separates concerns between presentation, application logic and data management by adopting a Model–View–Controller (MVC) architectural pattern, as explained in section \ref{Architectural Patterns Model View controller with mediator and observer}. Both the presentation layer and the core application logic are implemented within the Flutter-based applications, while remaining logically decoupled through the use of Controllers that mediate between Views and Models. 
-In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources.
-The View layer deals with user interactions. Controllers manage the app logic and keep the UI connected to the data models.
-Data management and authentication are handled through Firebase services; Firebase Authentication, Cloud Firestore and Firebase Storage. Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources. 
-
-The system connects directly to external services, so the application does not need a custom backend gateway to communicate with backend services and external resources. \\
-
-
+In particular, the mobile application represents the main client, while the smartwatch application provides a lightweight extension offering a subset of functionalities adapted to the constraints and interaction model of wearable devices, relying on the same backend services and data sources. \\
+The View layer deals with user interactions. Controllers manage the app logic and keep the UI connected to the data models. \\
+Data management and authentication are handled through Firebase services, such as Firebase Authentication, Cloud Firestore and Firebase Storage. \\
+Firebase acts as a Backend-as-a-Service (BaaS) platform, providing managed services for authentication, data storage and user management, relying on platform-specific SDKs for access to these resources.  \\
+The application also connects to external services, accessed through RESTful APIs over HTTPS.  \\
+This is a client driven design, in which the application manages the communication with backend services and external services APIs without the need for a custom backend infrastructure.
 
 
 
@@ -78,14 +77,14 @@ The system connects directly to external services, so the application does not n
 \end{landscape}
 \newpage
 The high-level component diagram provides an overview of the main architectural elements of the system and their interactions. The system is composed of two client applications: the smartphone application and the smartwatch application. They both rely on a shared set of backend services and external resources. \\
-The graphical user interfaces (GUIs) represented follow the convention adopted in the \textit{UML Distilled} book quoted in the references. In this context, each GUI represents a group of related pages or a major functional area of the application, rather than a single page. \\
+The representation of the graphical user interfaces (GUIs) follows the convention adopted in the \textit{UML Distilled} book quoted in the references. In this context, each GUI represents a group of related pages or a major functional area of the application, rather than a single page. \\
 The diagram presents two versions of the application. The smartphone application represents the main client and provides the full set of functionalities. It is implemented using Flutter, which enables cross-platform development and allows the application to run on both Android and iOS devices, see section \ref{Flutter as Application Framework}. \\
-The smartwatch application represents a lightweight extension of the system and is deployed on Wear OS, as discussed in section \ref{Network connectivity requirements and smartwatch platform} .
+The smartwatch application, also implemented with Flutter, represents a lightweight extension of the system and is deployed on Wear OS, as discussed in section \ref{Network connectivity requirements and smartwatch platform} .
 It provides a subset of functionalities adapted to the constraints of wearable devices. \\
-Both applications interact with a common set of backend services and selected external resources. Both the smartphone and smartwatch applications access Firestore for data storage and Firebase Storage for media management, as well as shared external services such as OpenTopoMap for map visualization. However, the smartwatch application only applies to a subset of services, reflecting its role as a lightweight client and the constraints of wearable devices. \\
-Access to backend resources such as Firestore, Firebase Storage and selected external services is otherwise shared between the smartphone and smartwatch applications. The diagram indicates which services are accessible from each client. \\
+Both applications interact with a common set of backend services and selected external resources. Both the smartphone and smartwatch applications access Firestore for data storage and Firebase Storage for media management, as well as shared external services such as OpenTopoMap for map visualization. However, the smartwatch application only leverages a subset of services, reflecting its role as a lightweight client adjusted to the constraints of wearable devices. \\
+However, the most important backend resources such as Firestore, Firebase Storage and selected external services are shared between the smartphone and smartwatch applications. The diagram indicates which services are accessible from each client. \\
 The application uses several external services, for example map providers such as OpenTopoMap and Google Satellite View, as well as external authentication providers. Weather alert functionalities rely on both Weatherbit and a Demo Meteo Server. The latter is used exclusively for demonstration purposes, allowing the simulation of weather alerts without depending on real external conditions. \\
-Smartphone OS and Watch OS represent the operating system interfaces. The application accesses platform features through Flutter packages instead of communicating with the operating systems directly. The specific packages used to interact with such services are described in the diagrams of the smartphone application components, section \ref{Mobile Smartphone App component view} and of the smartwatch application components, section \ref{Mobile Smartwatch App component view}. \\
+Smartphone OS and Watch OS represent the operating system interfaces. The application accesses platform features through Flutter libraries, without communicating with the operating systems directly. The specific libraries used to interact with such services are described in the diagrams of the smartphone application components, section \ref{Mobile Smartphone App component view} and of the smartwatch application components, section \ref{Mobile Smartwatch App component view}. \\
 The interfaces associated with Firebase services, Firebase Authentication, Firestore and Firebase Storage are based on the SDKs provided by the Backend-as-a-Service platform. These SDKs hide the details of the underlying communication mechanisms and offer a structured way to access backend functionalities, as documented in the Firebase official documentation. \\
 For the other external interfaces, such as Weather API, Weather Alert API, Satellite API, the application relies on RESTful communication. In these cases, the application uses HTTP-based requests via Flutter libraries, handling data exchange in JSON format and performing client-side decoding. \\
 When authentication is performed through an external provider, Google, the application obtains an authentication token which is then passed to Firebase Authentication. Firebase verifies the token with the external provider as part of the OAuth2-based authentication process. The SDK handles this additional interaction, but it is included in the diagram to provide a more accurate representation of the overall system behavior. \\
@@ -113,14 +112,20 @@ When authentication is performed through an external provider, Google, the appli
 
 \subsubsection{View Components}
 The UI of the application is organized by functionality. Components group together views related to the same feature, rather than representing isolated pages.
-The \texttt{GeoWatch Page component} includes all functionalities related to navigation and environmental awareness during a trekking activity. It displays the useful weather information to the user: weather alerts and a satellite map with meteo. It also provides navigation support through compass heading, altitude and user position.
-The \texttt{Home Page component} represents the main map-based point of the application. It displays trekking routes on an OpenTopoMap layer and allows users to explore available paths.
-The \texttt{Trekking Page component} provides information routes, including a description and photos. Users can also access the component that handles the creation of a diary associated with the route and to save the route to their profile, the \texttt{Diary Page component}.
-The \texttt{Diary Page component} handles the creation and modification of diary entries related to trekking experiences, including notes, images and activity-related data.
-The \texttt{User Profile Page component} is displays user information including saved trekkings, diary related, follower and following users' data.
-The \texttt{Settings Page component} allows users to manage application and account settings, including profile information, security options such as password updates, smartwatch pairing and weather notification preferences.
-The \texttt{LoginRegistration Page component} handles login and registration workflows. It supports authentication via email and password, performs simple format validation operations, supports Google authentication and password recovery.
-Users can use the \texttt{Search Page component} to search for other users and access their public profiles or to search for a trekking by its name.
+\begin{itemize}
+\item The \texttt{Home Page component} represents the main map based view of the application. It displays trekking routes on an OpenTopoMap layer and allows users to explore available paths.
+\item The \texttt{Trekking Page component} provides information routes, including a description and photos. Users can also access the component that handles the creation of a diary associated with the route and to save the route to their profile, the \texttt{Diary Page component}.
+\item The \texttt{Diary Page component} handles the creation and modification of diary entries related to trekking experiences, including notes, images and activity related data.
+\item The \texttt{User Profile Page component} is displays user information including saved trekkings, diary related, follower and following users' data.
+\item The \texttt{Settings Page component} allows users to manage application and account settings, including profile information, security options such as password updates, smartwatch pairing and weather notification preferences.
+\item The \texttt{GeoWatch Page component} includes all functionalities related to navigation and environmental awareness during a trekking activity. It displays the useful weather information to the user: weather alerts and a satellite map with meteo. It also provides navigation support through compass heading, altitude and user position.
+\item The \texttt{LoginRegistration Page component} handles login and registration workflows. It supports authentication via email and password, performs simple format validation operations, supports Google authentication and password recovery.
+\item Users can use the \texttt{Search Page component} to search for other users and access their public profiles or to search for a trekking by its name.
+\end{itemize}
+
+
+
+
 
 \subsubsection{Controller components}
 The controller package manages the application logic and the interactions between UI components and backend services. 
@@ -134,26 +139,28 @@ These include components such as \texttt{GeoService}, \texttt{PermissionService}
 This package isolates dependencies on external libraries and platform APIs. If a library needs to be replaced or updated, the changes are limited to the corresponding service. 
 
 \subsubsection{Internet Service}
-The \texttt{InternetService} monitors network connectivity. It periodically uses the ServiceController to attempt connections to external endpoints (e.g., Google services). Depending on the outcome, the application switches between offline and online modes.
+The \texttt{InternetService} monitors network connectivity. It periodically uses the ServiceController to attempt connections to external endpoints, for example Google services. Depending on the outcome, the application switches between offline and online modes.
 
-\subsubsection{Background Service}
 
-The \texttt{BackgroundService} executes tasks even when the application is not actively open, depending on operating system constraints.
-Periodically, it checks weather conditions and generates notifications. The  application schedule these tasks through WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed depending on system availability.
+
+
 
 \subsubsection{AuthService}
 
-The AuthService handles not only authentication but also the smartwatch pairing process.
-It manages user authentication through Firebase Auth and Google, password reset, session management, coordinates the pairing workflow between the smartphone application and the smartwatch, centralizing all identity-related logic.
+The AuthService handles not only authentication but also the phone side part of the pairing process.
+It manages user authentication through Firebase Auth and Google, password reset, session management, managing authentication and phone side pairing flows.
 
+\subsubsection{Background Service}
+The \texttt{BackgroundService} executes tasks even when the application is not actively open, depending on operating system constraints.
+Periodically, it checks weather conditions and generates notifications. The  application schedule these tasks through WorkManager mechanism, a Flutter wrapper around Android's Workmanager and iOS Background tasks. Background tasks are executed depending on system availability.
 \subsubsection{Backend and External Services}
 
-The application relies on Firebase as a Backend-as-a-Service, including Authentication, Firestore and Storage.
+The application relies on Firebase as a Backend as a Service, including Authentication, Firestore and Storage.
 External services are used for specific functionalities such as OpenTopoMap for map visualization, OpenWeather and Weatherbit for weather data and alerts and Google services for authentication and connectivity verification.
 
 \subsubsection{Architectural Summary}
 
-Each component of the architecture has a specific role. Domain controllers manage application logic and backend interaction, the ServiceController gives unified access point to external and system services and OSService components contain platform dependencies. This structure improves modularity and of the system.
+Each component of the architecture has a specific role. Domain controllers manage application logic and backend interaction, the ServiceController serves as a unified access point to external and system services, handled by the OSservice components, which contain platform dependencies. This structure improves modularity and of the system.
 Domain controllers such as \texttt{UserController}, \texttt{DiaryController}, \texttt{TrekkingController} and \texttt{ChallengeController}  coordinate the application logic related to their respective functional domains. These controllers connect the View layer to the Model layer and manage access to backend resources, such as Firebase services.
 
 
