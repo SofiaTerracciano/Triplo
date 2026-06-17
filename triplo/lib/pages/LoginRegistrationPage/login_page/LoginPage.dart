@@ -137,39 +137,40 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
-
   /** UI of the Login Page */
   @override
   Widget build(BuildContext context) {
     final language = context.watch<Language>();
     final local = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
+      key: const Key('loginPage'),
+
+        appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Text(
-                language.locale.languageCode.toUpperCase(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+          backgroundColor: Colors.transparent,
+          actions: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Text(
+                  language.locale.languageCode.toUpperCase(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => LanguageButton(
-                  onLocaleSelected: context.read<Language>().setLocale,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+            IconButton(
+              icon: const Icon(Icons.language),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => LanguageButton(
+                    onLocaleSelected: context.read<Language>().setLocale,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
 
         body: SafeArea(
           child: Center(
@@ -199,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Email
                 BoxField(
+                  key: const Key('emailField'),
                   label: local.email_label,
                   isEmail: true,
                   controller: emailController,
@@ -207,6 +209,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // password
                 BoxField(
+                  key: const Key('passwordField'),
                   label: local.password_label,
                   isPassword: true,
                   controller: passwordController,
@@ -217,6 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: SizedBox(
                     width: 250,
                     child: ElevatedButton(
+                      key: const Key('loginButton'),
                       onPressed: () => _loginEmailPwd(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -263,6 +267,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 24),
                 TextButton(
+                    key: const Key('goToRegistrationButton'),
                   onPressed: () =>
                       Navigator.pushNamed(context, '/registration'),
                   child: Text(

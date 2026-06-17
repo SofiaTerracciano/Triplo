@@ -127,6 +127,7 @@ class _SearchPageState extends State<SearchPage>
     super.build(context);
 
     return Scaffold(
+        key: const Key('searchPage'),
       appBar: AppBar(title: Text(local.search_page_title), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -137,6 +138,7 @@ class _SearchPageState extends State<SearchPage>
                 // Search box
                 Expanded(
                   child: TextField(
+                    key: const Key('searchTextField'),
                     controller: _searchController,
                     focusNode: _focusNode, // To manage focus state
                     decoration: InputDecoration(
@@ -198,6 +200,7 @@ class _SearchPageState extends State<SearchPage>
               child: Row(
                 children: [
                   Filter(
+                    key: const Key('UserModeFilter'),
                     mode: SearchMode.users,
                     selectedMode: _searchMode,
                     label: local.user_label,
@@ -205,6 +208,7 @@ class _SearchPageState extends State<SearchPage>
                   ),
                   const SizedBox(width: 8),
                   Filter(
+                    key: const Key('trekkingModeFilter'),
                     mode: SearchMode.trekking,
                     selectedMode: _searchMode,
                     label: local.trekking_label,
@@ -532,16 +536,17 @@ class _SearchPageState extends State<SearchPage>
       if (_userResults.isEmpty) {
         return Center(child: Text(local.no_user_found_label));
       }
-
       return ListView.builder(
         itemCount: _userResults.length,
         itemBuilder: (context, index) {
           final u = _userResults[index];
-
           return ListTile(
+              key: Key('userResult_$index'),
             leading: (u.photoProfile == null || u.photoProfile!.isEmpty)
                 ? const CircleAvatar(
-                    backgroundColor: Colors.grey,
+
+
+              backgroundColor: Colors.grey,
                     child: Icon(Icons.person),
                   )
                 : CircleAvatar(backgroundImage: NetworkImage(u.photoProfile!)),
@@ -570,6 +575,7 @@ class _SearchPageState extends State<SearchPage>
         itemBuilder: (context, index) {
           final trekking = _trekkingResults[index];
           return ListTile(
+              key: Key('trekkingResult_$index'),
             leading: Icon(
               Icons.terrain, 
               color: trekking.difficulty_level == "easy"

@@ -57,6 +57,7 @@ class _UserPageState extends State<UserPage> {
 
     if (user == null) {
       return Scaffold(
+        key: const Key('userPageNotLogged'),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -74,6 +75,7 @@ class _UserPageState extends State<UserPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
+                key: const Key('goToLoginButton'),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/login');
                 },
@@ -109,7 +111,10 @@ class _UserPageState extends State<UserPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        key: const Key('userPage'),
         appBar: AppBar(
+
+
           title: Text(local.profile_page_title),
           centerTitle: true,
           actions: [
@@ -124,6 +129,7 @@ class _UserPageState extends State<UserPage> {
             ),
           ],
         ),
+
         body: Column(
           children: [
             Padding(
@@ -440,6 +446,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
+                  key: const Key('openSearchPageButton'),
                 leading: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
                 title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
@@ -450,6 +457,8 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
+
+                  key: const Key('openSettingsButton'),
                 leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
                 title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {

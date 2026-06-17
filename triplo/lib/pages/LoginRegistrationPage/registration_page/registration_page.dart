@@ -93,6 +93,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final local = AppLocalizations.of(context)!;
 
     return Scaffold(
+      key: const Key('registrationPage'),
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -111,6 +112,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 24),
 
                 BoxField(
+                  key: const Key('registrationEmailField'),
                   label: local.email_label,
                   isEmail: true,
                   controller: emailController,
@@ -119,6 +121,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
 
                 BoxField(
+                  key: const Key('registrationPasswordField'),
                   label: local.password_label,
                   isPassword: true,
                   controller: passwordController,
@@ -127,6 +130,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 16),
 
                 BoxField(
+                  key: const Key('registrationConfirmPasswordField'),
                   label: local.confirm_password_label,
                   isPassword: true,
                   controller: confirmPasswordController,
@@ -141,6 +145,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   child: SizedBox(
                     width: 250,
                     child: ElevatedButton(
+                        key: const Key('registrationButton'),
                       onPressed: _isLoading ? null : () => _register(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,

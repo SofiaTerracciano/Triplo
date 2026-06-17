@@ -106,6 +106,7 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     return Scaffold(
+      key: const Key('settingPage'),
       appBar: AppBar(
         title: Text(local.settings_page_title),
         centerTitle: true,
@@ -278,6 +279,7 @@ class _SettingPageState extends State<SettingPage> {
 
             const Divider(height: 1),
             ListTile(
+              key: const Key('languageSettingsButton'),
               title: Text(local.language_field_label, style: titleStyle),
               subtitle: Text(
                 _getLanguageName(languageController.locale.languageCode),
@@ -630,6 +632,7 @@ class _SettingPageState extends State<SettingPage> {
 }
 
 // Popup dialog to select the language
+
 class LanguageDialog extends StatelessWidget {
   final Future<void> Function(Locale) onLocaleSelected;
 
@@ -644,23 +647,55 @@ class LanguageDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _langTile(context, "🇬🇧", "English", const Locale('en')),
-          _langTile(context, "🇮🇹", "Italiano", const Locale('it')),
-          _langTile(context, "🇪🇸", "Español", const Locale('es')),
-          _langTile(context, "🇩🇪", "Deutsch", const Locale('de')),
-          _langTile(context, "🇫🇷", "Français", const Locale('fr')),
+          _langTile(
+            context,
+            "🇬🇧",
+            "English",
+            const Locale('en'),
+            const Key('languageOptionEnglish'),
+          ),
+          _langTile(
+            context,
+            "🇮🇹",
+            "Italiano",
+            const Locale('it'),
+            const Key('languageOptionItalian'),
+          ),
+          _langTile(
+            context,
+            "🇪🇸",
+            "Español",
+            const Locale('es'),
+            const Key('languageOptionSpanish'),
+          ),
+          _langTile(
+            context,
+            "🇩🇪",
+            "Deutsch",
+            const Locale('de'),
+            const Key('languageOptionGerman'),
+          ),
+          _langTile(
+            context,
+            "🇫🇷",
+            "Français",
+            const Locale('fr'),
+            const Key('languageOptionFrench'),
+          ),
         ],
       ),
     );
   }
 
   Widget _langTile(
-    BuildContext context,
-    String flag,
-    String name,
-    Locale locale,
-  ) {
+      BuildContext context,
+      String flag,
+      String name,
+      Locale locale,
+      Key tileKey,
+      ) {
     return ListTile(
+      key: tileKey,
       leading: Text(flag, style: const TextStyle(fontSize: 22)),
       title: Text(name),
       onTap: () async {

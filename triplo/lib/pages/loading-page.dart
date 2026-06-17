@@ -7,6 +7,7 @@ class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: const Key('loadingPage'),
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: Column(

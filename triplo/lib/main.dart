@@ -538,11 +538,11 @@ class MyApp extends StatelessWidget {
               isOnline: internet.isOnline,
             );
           });
-
           return Consumer<Language>(
             builder: (context, lang, child) {
               return BackgroundServiceHost(
                 child: MaterialApp(
+                  key: const Key('appMain'),
                   title: 'Triplo',
                   debugShowCheckedModeBanner: false,
                   navigatorKey: navKey,

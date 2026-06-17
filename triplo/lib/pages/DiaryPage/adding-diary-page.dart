@@ -102,6 +102,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
 
         //final user = snapshot.data!;
         return Scaffold(
+            key: const Key('addDiaryPage'),
           appBar: AppBar(title: Text(trekking.name), centerTitle: true),
           body: ScrollConfiguration(
             behavior: ScrollConfiguration.of(
@@ -266,6 +267,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                     local.notes_trekking_label,
                     Icons.notes,
                     TextField(
+                      key: const Key('diaryNotesField'),
                       controller: _notesController,
                         minLines: 1,
                         maxLines: null,
@@ -685,6 +687,7 @@ class _AddingDiaryPageState extends State<AddingDiaryPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
+                          key: const Key('saveDiaryButton'),
                           child: Text(local.save_botton_label),
                           onPressed: () async {
                             Navigator.push(

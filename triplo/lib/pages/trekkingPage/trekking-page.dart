@@ -64,7 +64,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
   @override
   void initState() {
     super.initState();
-    // Carichiamo il meteo del percorso (non GPS utente)
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //_loadTrailWeather();
       _initSavedState();
@@ -234,7 +234,7 @@ class _TrekkingPageState extends State<TrekkingPage> {
         }
 
         // Se il trekking è stato appena scaricato e il meteo è ancora in caricamento/errore,
-        // facciamo ripartire il caricamento del meteo ora che abbiamo i dati.
+        // facciamo ripartire il caricamento del meteo ora che abbiamo i dati
         if (loadingWeather && weather == null && weatherError == null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _loadTrailWeatherAfterFetch(trekking);
@@ -270,12 +270,14 @@ class _TrekkingPageState extends State<TrekkingPage> {
         final bool isSaved = _isSavedLocal ?? false;
 
         return Scaffold(
+            key: const Key('trekkingDetailsPage'),
           appBar: AppBar(
             title: Text(trekking.name),
             centerTitle: true,
             actions: [
               //add button
               IconButton(
+                key: const Key('openAddDiaryButton'),
                 icon: Icon(Icons.add),
                 onPressed: () {
                   Navigator.push(

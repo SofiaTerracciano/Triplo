@@ -63,6 +63,7 @@ class _UserPagePublicState extends State<UserPagePublic> {
     final u = user!;
 
     return Scaffold(
+        key: const Key('userPublicPage'),
       appBar: AppBar(
         title: Text(u.username),
         centerTitle: true,
