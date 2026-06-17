@@ -1132,7 +1132,6 @@ void main() {
       expect(apps[1].watchId, 'id-2');
       expect(apps[2].watchId, 'id-3');
     });
-
     testWidgets('permissionsFactory null non lancia eccezioni', (tester) async {
       TriploWatchApp? app;
       await initializeApp(

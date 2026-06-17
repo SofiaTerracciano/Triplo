@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
     final servicecontroller = context.watch<ServiceController>();
 
     return Scaffold(
+      key: const Key('watchExplorePage'),
       backgroundColor: Colors.black,
       body: Stack(
         children: [

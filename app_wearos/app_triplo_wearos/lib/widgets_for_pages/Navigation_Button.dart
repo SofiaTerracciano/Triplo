@@ -7,6 +7,7 @@ class NavigationButton extends StatelessWidget {
   final VoidCallback? onTap;
 
   const NavigationButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.color,

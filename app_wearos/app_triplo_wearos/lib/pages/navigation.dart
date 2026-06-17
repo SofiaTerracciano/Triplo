@@ -91,6 +91,7 @@ class _NavigationPageState extends State<NavigationPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     NavigationButton(
+                      key: const Key('openWatchHomeButton'),
                       icon: Icons.home,
                       label: local.home_label,
                       color: const Color(0xFF2F80ED),
@@ -120,6 +121,7 @@ class _NavigationPageState extends State<NavigationPage> {
                 ),
                 const SizedBox(height: 4),
                 GestureDetector(
+                  key: const Key('openWatchLanguageButton'),
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
                     showDialog(
@@ -194,11 +196,41 @@ class LanguageDialog extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _langTile(context, "🇬🇧", "English", const Locale('en')),
-                    _langTile(context, "🇮🇹", "Italiano", const Locale('it')),
-                    _langTile(context, "🇪🇸", "Español", const Locale('es')),
-                    _langTile(context, "🇩🇪", "Deutsch", const Locale('de')),
-                    _langTile(context, "🇫🇷", "Français", const Locale('fr')),
+                    _langTile(
+                      context,
+                      "🇬🇧",
+                      "English",
+                      const Locale('en'),
+                      const Key('watchLanguageOptionEnglish'),
+                    ),
+                    _langTile(
+                      context,
+                      "🇮🇹",
+                      "Italiano",
+                      const Locale('it'),
+                      const Key('watchLanguageOptionItalian'),
+                    ),
+                    _langTile(
+                      context,
+                      "🇪🇸",
+                      "Español",
+                      const Locale('es'),
+                      const Key('watchLanguageOptionSpanish'),
+                    ),
+                    _langTile(
+                      context,
+                      "🇩🇪",
+                      "Deutsch",
+                      const Locale('de'),
+                      const Key('watchLanguageOptionGerman'),
+                    ),
+                    _langTile(
+                      context,
+                      "🇫🇷",
+                      "Français",
+                      const Locale('fr'),
+                      const Key('watchLanguageOptionFrench'),
+                    ),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -209,10 +241,11 @@ class LanguageDialog extends StatelessWidget {
       ),
     );
   }
-
-  Widget _langTile(BuildContext context, String flag, String name, Locale locale) {
+  Widget _langTile(BuildContext context, String flag, String name, Locale locale, Key tileKey) {
     return InkWell(
-      onTap: () async {
+        key: tileKey,
+
+        onTap: () async {
         await onLocaleSelected(locale);
         Navigator.pop(context);
       },
