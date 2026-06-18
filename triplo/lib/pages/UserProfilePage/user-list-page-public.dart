@@ -87,7 +87,9 @@ class _UsersListPublicState extends State<UsersListPublic> {
                         MaterialPageRoute(
                           builder: (_) => UserPagePublic(userId: user.uid),
                         ),
-                      );
+                      ).then((_) {
+                        if (mounted) _loadUsers(); // ricarica la lista al ritorno
+                      });
                     },
                   );
                 },

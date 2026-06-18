@@ -46,11 +46,7 @@ class _UserPageState extends State<UserPage> {
     final userController = context.watch<UserController>();
 
     if (userController.isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final user = userController.currentUser;
@@ -66,7 +62,10 @@ class _UserPageState extends State<UserPage> {
               const SizedBox(height: 16),
               Text(
                 local.not_logged_title,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -144,11 +143,14 @@ class _UserPageState extends State<UserPage> {
                         CircleAvatar(
                           radius: 36,
                           backgroundImage:
-                          user.photoProfile != null && user.photoProfile!.isNotEmpty
+                              user.photoProfile != null &&
+                                  user.photoProfile!.isNotEmpty
                               ? NetworkImage(user.photoProfile!)
                               : null,
                           backgroundColor: Colors.grey[300],
-                          child: user.photoProfile == null || user.photoProfile!.isEmpty
+                          child:
+                              user.photoProfile == null ||
+                                  user.photoProfile!.isEmpty
                               ? const Icon(Icons.person, size: 40)
                               : null,
                         ),
@@ -228,12 +230,17 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: local.follower),
+                                    builder: (_) =>
+                                        UsersList(listName: local.follower),
                                   ),
-                                );
+                                ).then(
+                                  (_) => setState(() {}),
+                                ); 
                               },
                               child: FutureBuilder<List<Users>>(
-                                future: context.read<UserController>().getFollowers(user.uid),
+                                future: context
+                                    .read<UserController>()
+                                    .getFollowers(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
                                     label: local.follower,
@@ -247,12 +254,17 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersList(listName: local.following),
+                                    builder: (_) =>
+                                        UsersList(listName: local.following),
                                   ),
-                                );
+                                ).then(
+                                  (_) => setState(() {}),
+                                ); 
                               },
                               child: FutureBuilder<List<Users>>(
-                                future: context.read<UserController>().getFollowing(user.uid),
+                                future: context
+                                    .read<UserController>()
+                                    .getFollowing(user.uid),
                                 builder: (context, snap) {
                                   return _StatItem(
                                     label: local.following,
@@ -291,13 +303,15 @@ class _UserPageState extends State<UserPage> {
                       icon: const Icon(Icons.share),
                       label: Text(local.share_profile_button_label),
                       onPressed: () {
-                        final renderBox = context.findRenderObject() as RenderBox?;
+                        final renderBox =
+                            context.findRenderObject() as RenderBox?;
                         if (renderBox == null) return;
 
                         Share.share(
                           '${local.watch_profile_dialog_level}\nhttps://triplo.app/user/${user.username}',
                           sharePositionOrigin:
-                          renderBox.localToGlobal(Offset.zero) & renderBox.size,
+                              renderBox.localToGlobal(Offset.zero) &
+                              renderBox.size,
                         );
                       },
                     ),
@@ -315,18 +329,27 @@ class _UserPageState extends State<UserPage> {
             ),
             Expanded(
               child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
+                behavior: ScrollConfiguration.of(
+                  context,
+                ).copyWith(overscroll: false),
                 child: TabBarView(
                   children: [
                     FutureBuilder<List<Diary>>(
-                      future: context.read<DiaryController>().getPublicDiaries(user.uid),
+                      future: context.read<DiaryController>().getPublicDiaries(
+                        user.uid,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final diaries = snapshot.data ?? [];
                         if (diaries.isEmpty) {
-                          return Center(child: Text(local.no_public_diary_label));
+                          return Center(
+                            child: Text(local.no_public_diary_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: diaries.length,
@@ -339,7 +362,8 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                    builder: (_) =>
+                                        DiaryPage(diaryId: diary.diaryId),
                                   ),
                                 );
                               },
@@ -349,14 +373,21 @@ class _UserPageState extends State<UserPage> {
                       },
                     ),
                     FutureBuilder<List<Diary>>(
-                      future: context.read<DiaryController>().getPrivateDiaries(user.uid),
+                      future: context.read<DiaryController>().getPrivateDiaries(
+                        user.uid,
+                      ),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final diaries = snapshot.data ?? [];
                         if (diaries.isEmpty) {
-                          return Center(child: Text(local.no_private_diary_label));
+                          return Center(
+                            child: Text(local.no_private_diary_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: diaries.length,
@@ -369,7 +400,8 @@ class _UserPageState extends State<UserPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => DiaryPage(diaryId: diary.diaryId),
+                                    builder: (_) =>
+                                        DiaryPage(diaryId: diary.diaryId),
                                   ),
                                 );
                               },
@@ -379,14 +411,21 @@ class _UserPageState extends State<UserPage> {
                       },
                     ),
                     FutureBuilder<List<Trekking>>(
-                      future: context.read<TrekkingController>().getSavedTrekkings(user.uid),
+                      future: context
+                          .read<TrekkingController>()
+                          .getSavedTrekkings(user.uid),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         final trekkings = snapshot.data ?? [];
                         if (trekkings.isEmpty) {
-                          return Center(child: Text(local.no_saved_trekking_label));
+                          return Center(
+                            child: Text(local.no_saved_trekking_label),
+                          );
                         }
                         return ListView.builder(
                           itemCount: trekkings.length,
@@ -411,7 +450,7 @@ class _UserPageState extends State<UserPage> {
                           },
                         );
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -429,7 +468,10 @@ class _UserPageState extends State<UserPage> {
                 child: const SizedBox.shrink(),
               ),
               ListTile(
-                leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.home,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.home_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -439,15 +481,20 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.person,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.profile_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                  key: const Key('openSearchPageButton'),
-                leading: Icon(Icons.search, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.search_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -457,9 +504,10 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-
-                  key: const Key('openSettingsButton'),
-                leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.settings,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.settings_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -469,7 +517,10 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.emoji_events, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.emoji_events,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.challeng_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
@@ -479,12 +530,17 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.explore, color: Theme.of(context).colorScheme.primary),
+                leading: Icon(
+                  Icons.explore,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 title: Text(local.navigation_page_title, style: optionStyle),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const CompassAltitudePage()),
+                    MaterialPageRoute(
+                      builder: (_) => const CompassAltitudePage(),
+                    ),
                   );
                 },
               ),

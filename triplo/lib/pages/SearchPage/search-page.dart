@@ -558,7 +558,15 @@ class _SearchPageState extends State<SearchPage>
                 MaterialPageRoute(
                   builder: (_) => UserPagePublic(userId: u.uid),
                 ),
-              );
+              ).then((_) {
+                if (mounted) {
+                  SearchCache.randomDiaries = null; 
+                  setState(() {
+                    loading = true;
+                  });
+                  _loadRandomDiaries(); 
+                }
+              });
             },
           );
         },
