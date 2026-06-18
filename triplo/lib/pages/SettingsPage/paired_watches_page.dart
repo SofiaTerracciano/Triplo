@@ -86,95 +86,113 @@ class _PairedWatchesPageState extends State<PairedWatchesPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: SafeArea(
+        top: false,
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  "${local.error_loading_watches}:\n${snapshot.error}",
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-
-          final watches = snapshot.data ?? [];
-
-          if (watches.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  local.no_watches,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(12),
-            itemCount: watches.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final watch = watches[index];
-              final watchId = watch['watchId']?.toString() ?? '-';
-              final remoteActive = _remoteLogoutActive(watch);
-
-              return Card(
+            if (snapshot.hasError) {
+              return Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${local.watch_id}: $watchId",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-
-                      Text("${local.status}: ${watch['status'] ?? '-'}"),
-                      Text("${local.platform}: ${watch['platform'] ?? '-'}"),
-
-                      Text(
-                        "${local.remote_logout}: "
-                        "${remoteActive ? local.enabled : local.disabled}",
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          ElevatedButton(
-                            onPressed: remoteActive
-                                ? null
-                                : () => _enableRemoteLogout(watchId),
-                            child: Text(local.enable_remote_logout),
-                          ),
-                          ElevatedButton(
-                            onPressed: remoteActive
-                                ? () => _clearRemoteLogout(watchId)
-                                : null,
-                            child: Text(local.disable_remote_logout),
-                          ),
-                        ],
-                      ),
-                    ],
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    16 + MediaQuery.of(context).viewPadding.bottom,
+                  ),
+                  child: Text(
+                    "${local.error_loading_watches}:\n${snapshot.error}",
+                    textAlign: TextAlign.center,
                   ),
                 ),
               );
-            },
-          );
-        },
+            }
+
+            final watches = snapshot.data ?? [];
+
+            if (watches.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    16,
+                    16,
+                    16 + MediaQuery.of(context).viewPadding.bottom,
+                  ),
+                  child: Text(
+                    local.no_watches,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
+
+            return ListView.separated(
+              padding: EdgeInsets.fromLTRB(
+                12,
+                12,
+                12,
+                12 + MediaQuery.of(context).viewPadding.bottom,
+              ),
+              itemCount: watches.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final watch = watches[index];
+                final watchId = watch['watchId']?.toString() ?? '-';
+                final remoteActive = _remoteLogoutActive(watch);
+
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${local.watch_id}: $watchId",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Text("${local.status}: ${watch['status'] ?? '-'}"),
+                        Text("${local.platform}: ${watch['platform'] ?? '-'}"),
+
+                        Text(
+                          "${local.remote_logout}: "
+                              "${remoteActive ? local.enabled : local.disabled}",
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            ElevatedButton(
+                              onPressed: remoteActive
+                                  ? null
+                                  : () => _enableRemoteLogout(watchId),
+                              child: Text(local.enable_remote_logout),
+                            ),
+                            ElevatedButton(
+                              onPressed: remoteActive
+                                  ? () => _clearRemoteLogout(watchId)
+                                  : null,
+                              child: Text(local.disable_remote_logout),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

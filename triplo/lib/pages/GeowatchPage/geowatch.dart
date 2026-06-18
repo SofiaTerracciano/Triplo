@@ -62,7 +62,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   }
 
 
-  LatLng? _userPos; // GPS dell’utente (optional)
+  LatLng? _userPos; // GPS dell’utente
   bool _loading = false;
   String? _error;
   Map<String, dynamic>? _weather;
@@ -188,12 +188,17 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
         ],
       ),
         extendBodyBehindAppBar: false,
-        body: Stack(
-          children: [
-        ListView(
-        padding: const EdgeInsets.all(12),
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(
+            12,
+            12,
+            12,
+            12 + MediaQuery.of(context).viewPadding.bottom,
+          ),
         children: [
-          // ========= HEADER METEO  =========
+          //HEADER METEO
           Card(
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -289,7 +294,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
           const SizedBox(height: 12),
 
-          // ========= MINI MAP (CENTER = PERCORSO) =========
+          //MINI MAP
           Mini_Map(
             center: _useTrailWeather
                 ? widget.trailCenter ?? const LatLng(46.0, 11.0)
@@ -299,7 +304,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
           const SizedBox(height: 10),
 
-          // ========= BUTTON → SATELLITE MAP =========
+          //BUTTON SATELLITE MAP
           ElevatedButton.icon(
             onPressed: () {
 
@@ -333,7 +338,7 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
 
           const SizedBox(height: 14),
 
-          // ========= ALERTS SECTION (placeholder) =========
+          //ALERTS SECTION
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -469,10 +474,11 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               child: SafeArea(
                 child: _buildBackButton(context),
               ),
-            ),*/], ),
+            ),*/
 
 
 
+      )
     );
   }
   Widget _buildLocationToggle() {
@@ -489,14 +495,19 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              alignment: Alignment.center,
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               decoration: BoxDecoration(
                 color: _useTrailWeather ? Colors.green[700] : Colors.grey[200],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
                 child: Text(
                   local.trail_weather_label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
                   style: TextStyle(
                     color: _useTrailWeather ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
@@ -520,14 +531,19 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
               }
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              alignment: Alignment.center,
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               decoration: BoxDecoration(
                 color: !_useTrailWeather ? Colors.green[700] : Colors.grey[200],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
                 child: Text(
                   local.my_gps_label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
                   style: TextStyle(
                     color: !_useTrailWeather ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
@@ -543,8 +559,11 @@ class _GeoWatchPageState extends State<GeoWatchPage> {
   Color _severityColor(String sev) {
     switch (sev.toLowerCase()) {
       case "advisory":
+
+
       case "minor":
         return Colors.yellow.shade700;
+
       case "moderate":
       case "watch" :
         return Colors.orange;
@@ -678,7 +697,6 @@ Widget _buildSkeletonWeather() {
     ),
   );
 }*/
-
 class AlertDetailPage extends StatelessWidget {
   final String event;
   final String severity;
@@ -693,56 +711,62 @@ class AlertDetailPage extends StatelessWidget {
     required this.description,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
     final local = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title:  Text(local.weather_alert_title),
+        title: Text(local.weather_alert_title),
       ),
-
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Text(
-              event,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            Text(
-              severity,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            if (headline.isNotEmpty)
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + MediaQuery.of(context).viewPadding.bottom,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                headline,
-                style: const TextStyle(fontSize: 16),
+                event,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 6),
 
-            if (description.isNotEmpty)
               Text(
-                description,
-                style: const TextStyle(fontSize: 15),
+                severity,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
               ),
-          ],
+
+              const SizedBox(height: 20),
+
+              if (headline.isNotEmpty) ...[
+                Text(
+                  headline,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              if (description.isNotEmpty)
+                Text(
+                  description,
+                  style: const TextStyle(fontSize: 15),
+                ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

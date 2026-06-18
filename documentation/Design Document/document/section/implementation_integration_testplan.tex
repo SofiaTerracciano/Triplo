@@ -72,7 +72,7 @@ The integration process was incremental: core backend functionality was integrat
 \subsection{Objectives}
 The purpose of the tests written for this application is to verify logical correctness of the components and their behavior, both normal behavior and error handling.
 In order to test the behavior of components that use backend funcitonalities or external APIs, those functionalities have been mocked through the \textit{Mockito} library, allowing the tests to run offline without the need of a network connection: furthermore, this choice allows to test the application logic independently from the backend and the APIs. \\
-The UI, the models and the controller and services funcitonalities are tested using a mixed approach, mostly by the use of unit and widget tests. 
+The UI, the models and the controller and services funcitonalities are tested using a mixed approach, mostly by the use of unit and widget tests and some integration tests that cover the most important use cases, according with the policy specified in the \textit{Flutter documentation}. 
 The widget tests are useful in order to verify the correct behavior of the UI, the navigation and response to user input.
 The tests of the model components verify the correct behavior of the serialization and deserialization of the objects.
 The tests of the controllers verify the bahavior of the application logic without the need of the backend or APIs. 
@@ -119,8 +119,8 @@ For example, the trekking controller tests verify trekking loading, search, save
 \subsubsection{Service Tests}
 These tests are used to validate the service components of the app, dealing with authentication, memory cache, notifications, internet connection, permissions, geolocation and background tasks.
 For example, the authentication service tests verify the login and registration flows with mocked Firebase objects. The memory service tests check RAM cache, saved locale values and keys. There are also tests for internet status changes, GPS access and permission handling.
-
-
+\subsection{Integration tests}
+The integration tests cover the main flows of the mobile application. In particular, tests were written for user login, user registration, trekking search, user search, language preference change and the creation of a diary entry from a trekking page. These tests simulate realistic user interactions such as tapping buttons, entering text, opening pages from the drawer, selecting filters, and verifying that the expected destination page is reached.
 \subsection{User Testing}
 User testing represents the final stage of validation, where the application is tested by end users in realistic scenarios. This type of testing focuses on usability, user experience, and overall system behavior in real-world conditions.
 \subsection{Test Environment}
