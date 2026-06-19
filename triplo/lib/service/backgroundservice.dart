@@ -27,7 +27,7 @@ class BackgroundService with WidgetsBindingObserver {
     debugPrint("BackgroundService started"); //coverage:ignore-line
     _run();
     _timer = Timer.periodic(
-      const Duration(minutes: 12),
+      const Duration(minutes: 1),
           (_) => _run(),
     );
   }
