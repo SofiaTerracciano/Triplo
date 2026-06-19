@@ -13,7 +13,7 @@ class PairingService extends ChangeNotifier {
   final String watchId;
   final Uuid _uuid = const Uuid();
 
-  static const Duration _qrTtl = Duration(minutes: 2);
+  static const Duration _qrTtl = Duration(minutes: 12);
   String? _pairId;
   String? get pairId => _pairId;
 
@@ -91,7 +91,7 @@ class PairingService extends ChangeNotifier {
         'status': 'waiting',
         'platform': 'wearos',
         'createdAt': FieldValue.serverTimestamp(),
-        'expiresAt': Timestamp.fromDate(DateTime.now().add(_qrTtl)),
+        'expiresAt': Timestamp.fromDate(DateTime.now().toUtc().add(_qrTtl)),
         'uid': null,
       }, SetOptions(merge: true));
 

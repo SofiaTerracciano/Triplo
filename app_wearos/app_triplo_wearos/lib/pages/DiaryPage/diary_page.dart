@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:app_triplo_wearos/controller/challenge.dart';
 import 'package:app_triplo_wearos/model/diary.dart';
 import 'package:app_triplo_wearos/pages/UserProfilePage/user.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +54,7 @@ class _DiaryPageState extends State<DiaryPage> {
     final local = AppLocalizations.of(context)!;
     final primaryColor = Theme.of(context).colorScheme.primary;
     final diary = widget.diary;
+    final challengesController = context.read<ChallengesController>();
 
     if (_isLoading) {
       return const Scaffold(
@@ -186,13 +190,27 @@ class _DiaryPageState extends State<DiaryPage> {
                     spacing: 8,
                     runSpacing: 8,
                     children: diary.challenges.map((challengePath) {
-                      // Challenge icons
-                      return Image.asset(
-                        challengePath,
-                        width: 24,
-                        height: 24,
-                        errorBuilder: (context, error, stackTrace) => 
-                          Icon(Icons.flag, size: 20, color: primaryColor),
+                      return FutureBuilder<File?>(
+                        future: challengesController.getCachedImage(challengePath),
+                        builder: (_, snap) {
+                          if (snap.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 1.5),
+                            );
+                          }
+                          if (!snap.hasData || snap.data == null) {
+                            return Icon(Icons.flag, size: 20, color: primaryColor);
+                          }
+                          return Image.file(
+                            snap.data!,
+                            width: 24,
+                            height: 24,
+                            errorBuilder: (_, __, ___) =>
+                                Icon(Icons.flag, size: 20, color: primaryColor),
+                          );
+                        },
                       );
                     }).toList(),
                   ),
