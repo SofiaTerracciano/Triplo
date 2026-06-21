@@ -344,6 +344,7 @@ class UserController extends ChangeNotifier {
       "Level": level,
     });
 
+
     _currentUser?.intermediate = intermediate;
     _currentUser?.advanced = advanced;
     _currentUser?.level = level;

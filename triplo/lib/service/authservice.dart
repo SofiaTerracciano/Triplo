@@ -341,10 +341,10 @@ class AuthService extends ChangeNotifier {
 
     final ref = _db.collection('watch_pair').doc(
         watchId);
-
     await _db.runTransaction((tx) async {
       final snap = await tx.get(ref);
       if (!snap.exists) {
+
         throw Exception("watch_pair non trovato (watchId=$watchId)");
       }
 
@@ -441,10 +441,10 @@ class AuthService extends ChangeNotifier {
         .where('uid', isEqualTo: user.uid)
         .where('status', isEqualTo: 'approved')
         .get();
-
-    return snap.docs.map((doc) {
+ return snap.docs.map((doc) {
       final data = doc.data();
       return {
+
         'watchId': doc.id,
         'status': data['status'],
         'uid': data['uid'],

@@ -491,6 +491,7 @@ class _UserPageState extends State<UserPage> {
                 },
               ),
               ListTile(
+                key: const Key('openSearchPageButton'),
                 leading: Icon(
                   Icons.search,
                   color: Theme.of(context).colorScheme.primary,
